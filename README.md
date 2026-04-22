@@ -38,19 +38,35 @@ yongol validate examples/zenflow
 ```
 
 ```
-✓ Config       zenflow, go/gin, typescript/react
-✓ OpenAPI      23 endpoints
-✓ DDL          7 tables, 43 columns
-✓ SSaC         23 service functions
-✓ Model        1 files
-✓ TSX          2 pages, 4 apiClient calls
-✓ States       1 diagrams, 7 transitions
-✓ Policy       1 files, 18 rules
-✓ Scenario     7 scenario hurl files
-✓ Func         7 funcs
-✓ Cross        0 mismatches
+## Validation
 
-All SSOT sources are consistent.
+✓ manifest
+✓ openapi
+✓ ddl
+✓ query
+✓ ssac
+✓ statemachine
+✓ rego
+✓ hurl
+✓ funcspec
+✓ openapi_ddl
+✓ openapi_ssac
+✓ openapi_hurl
+✓ openapi_manifest
+✓ ssac_ddl
+✓ ssac_statemachine
+✓ ssac_func
+✓ ssac_manifest
+✓ ssac_rego
+✓ ssac_authz
+✓ ssac_sqlc
+✓ ddl_statemachine
+✓ ddl_rego
+✓ rego_manifest
+✓ tsx
+✓ tsx_openapi
+
+0 errors, 0 warnings
 ```
 
 ```bash
@@ -126,20 +142,35 @@ The full contract, the PRV-10~17 runtime guards, and CLI usage are documented in
 Individual SSOT validation followed by cross-layer consistency checks.
 
 ```
-✓ Config       my-project, go/gin, typescript/react
-✓ OpenAPI      12 endpoints
-✓ DDL          4 tables, 23 columns
-✓ SSaC         12 service functions
-✓ Model        1 files
-✓ TSX          2 pages, 2 apiClient calls
-✓ States       2 diagrams, 7 transitions
-✓ Policy       1 files, 7 rules, 3 ownership mappings
-✓ Scenario     3 scenario hurl files
-✓ Func         2 funcs
-✓ Cross        0 mismatches
-— Contract     no artifacts
+## Validation
 
-All SSOT sources are consistent.
+✓ manifest
+✓ openapi
+✓ ddl
+✓ query
+✓ ssac
+✓ statemachine
+✓ rego
+✓ hurl
+✓ funcspec
+✓ openapi_ddl
+✓ openapi_ssac
+✓ openapi_hurl
+✓ openapi_manifest
+✓ ssac_ddl
+✓ ssac_statemachine
+✓ ssac_func
+✓ ssac_manifest
+✓ ssac_rego
+✓ ssac_authz
+✓ ssac_sqlc
+✓ ddl_statemachine
+✓ ddl_rego
+✓ rego_manifest
+✓ tsx
+✓ tsx_openapi
+
+0 errors, 0 warnings
 ```
 
 ### `yongol generate <specs-dir> <artifacts-dir>`

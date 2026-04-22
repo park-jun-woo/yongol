@@ -33,6 +33,14 @@ label, and Hurl scenario references the same PascalCase identifier.
     └── components/*.tsx
 ```
 
+`specs/` holds declarations only. Do **not** run `npm install`, `go mod init`,
+`sqlc generate`, `tsc`, `vite build`, or any other build/install tool inside
+`specs/`. yongol parses everything internally; all compilation and code
+generation land in `arts/` via `yongol generate`. The one legitimate install
+(`@swc/core` for TSX parsing) goes at the **project root** — one directory
+above `specs/` — so parent-traversal node resolution picks it up without
+polluting the SSOT tree. See [`docs/tsx.md`](docs/tsx.md).
+
 ## manifest.yaml
 
 Full schema: [`docs/manifest.md`](docs/manifest.md).

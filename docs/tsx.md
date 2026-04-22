@@ -87,14 +87,18 @@ yongol extracts ASTs with `swc` (`@swc/core`):
 | `register('<name>', {...})` | `FormField.Name` |
 | `import ... from '@/components/<Name>'` | `ComponentImport` |
 
-`@swc/core` must be installed for `yongol validate` to parse TSX:
+`@swc/core` must be installed for `yongol validate` to parse TSX. Install it **at the project root** — the directory that contains `specs/` and (later) `arts/` — **never inside `specs/`**:
 
 ```bash
+# From the directory that holds specs/
 npm install --save-dev @swc/core
-# Or: export YONGOL_SWC_PROJECT_DIR=/path/to/frontend
+# Or point validate at an existing install:
+export YONGOL_SWC_PROJECT_DIR=/path/to/any/node_modules/parent
 ```
 
-Without it, validate fails fast with installation instructions.
+yongol resolves `@swc/core` via standard Node parent traversal, so an install at the project root is picked up when validating `specs/frontend/pages/*.tsx`. Running `npm install` inside `specs/frontend/pages/` or `specs/frontend/components/` pollutes the SSOT tree with `node_modules/` and risks the TSX parser mistakenly scanning third-party `.tsx` / `.d.ts` files as user specs.
+
+Without `@swc/core` reachable, validate fails fast with installation instructions.
 
 ## Implementation Notes
 
