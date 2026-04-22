@@ -1,0 +1,36 @@
+//ff:func feature=gen-gogin type=util control=sequence
+//ff:what buildGet — @get 시퀀스 빌더 (sqlc SELECT, @empty/@exists 후속 시 ErrNoRows 관용)
+
+package ssac
+
+import (
+	"fmt"
+	ssacparser "github.com/park-jun-woo/yongol/pkg/parser/ssac"
+)
+
+// buildGet emits the sqlc SELECT call and error handling. When the following
+// sequence is @empty or @exists targeting the same variable, sql.ErrNoRows is
+// treated as "zero value, continue" — @empty checks ID == 0 afterwards to
+// return 404, @exists checks ID != 0 to return 409 (and skips on absence).
+// Without a matching guard sequence, ErrNoRows propagates as 500 (same as before).
+func (g *methodGen) buildGet(seq ssacparser.Sequence, next *ssacparser.Sequence) ([]string, []string) {
+	method := resolveSQLCMethod(seq.Model)
+	varName := "_"
+	if seq.Result != nil {
+		varName = seq.Result.Var
+	}
+	assign := g.assignOp(varName != "_")
+	argStr := g.sqlcArgs(method, seq.Inputs)
+
+	var imports []string
+	errHandler := "if err != nil { return nil, err }"
+	if varName != "_" && next != nil && (next.Type == "empty" || next.Type == "exists") && next.Target == varName {
+		errHandler = "if err != nil && !errors.Is(err, sql.ErrNoRows) { return nil, err }"
+		imports = []string{`"database/sql"`, `"errors"`}
+	}
+
+	return []string{
+		fmt.Sprintf("%s, err %s %s.%s(%s)", varName, assign, g.queryVar(), method, argStr),
+		errHandler,
+	}, imports
+}

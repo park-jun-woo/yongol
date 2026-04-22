@@ -1,0 +1,48 @@
+//ff:func feature=rule type=test control=sequence dimension=1
+//ff:what populateSSaCSymbols — DDL row → Struct.<Model>.<PascalField> 타입 등록
+
+package ground
+
+import (
+	"testing"
+
+	"github.com/park-jun-woo/yongol/pkg/parser/ddl"
+)
+
+// TestPopulateSSaCSymbols_StructTypes verifies DDL table rows are registered
+// as Struct.<Model>.<PascalField> = <GoType>. Model is singular PascalCase of
+// the table name; field is PascalCase of the column.
+func TestPopulateSSaCSymbols_StructTypes(t *testing.T) {
+	tab := ddl.Table{
+		Name: "users",
+		Columns: map[string]string{
+			"id":         "int64",
+			"created_at": "time.Time",
+		},
+	}
+	fs := newMinimalFullstack(withDDLTables(tab))
+	g := newGround()
+
+	populateSSaCSymbols(g, fs)
+
+	// "users" (plural) → singular "User" PascalCase
+	if got := g.Types["Struct.User.ID"]; got != "int64" {
+		t.Errorf("Struct.User.ID = %q, want int64", got)
+	}
+	if got := g.Types["Struct.User.CreatedAt"]; got != "time.Time" {
+		t.Errorf("Struct.User.CreatedAt = %q, want time.Time", got)
+	}
+}
+
+// TestPopulateSSaCSymbols_EmptyTables: no panics / no Struct.* keys when no
+// DDL tables.
+func TestPopulateSSaCSymbols_EmptyTables(t *testing.T) {
+	g := newGround()
+	populateSSaCSymbols(g, newMinimalFullstack())
+
+	for k := range g.Types {
+		if len(k) >= len("Struct.") && k[:len("Struct.")] == "Struct." {
+			t.Errorf("unexpected Struct.* key %q when no DDL tables", k)
+		}
+	}
+}

@@ -1,0 +1,46 @@
+//ff:func feature=validate type=rule control=iteration dimension=3 topic=ssac-sqlc
+//ff:what XQS-18 — SSaC Input의 request.* OpenAPI param 타입 ↔ sqlc/DDL 타입 불일치 ERROR
+
+package ssac_sqlc
+
+import (
+	"github.com/park-jun-woo/yongol/pkg/diagnostic"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
+)
+
+// openAPITypeCompatible reports whether an OpenAPI type is compatible with a Go DDL type.
+var openAPITypeCompatible = map[string]map[string]bool{
+	"integer": {"int32": true, "int64": true, "int": true},
+	"string":  {"string": true},
+	"boolean": {"bool": true},
+	"number":  {"float32": true, "float64": true},
+}
+
+// xqs18ParamTypeMismatch validates XQS-18: when a SSaC Input references
+// request.* and the same key exists in sqlc Params, the OpenAPI param type
+// must be compatible with the DDL column Go type.
+// Skip: seq.Type == "call".
+func xqs18ParamTypeMismatch(fs *yongol.Fullstack) []diagnostic.Diagnostic {
+	if fs == nil || fs.OpenAPIDoc == nil {
+		return nil
+	}
+	opMap := buildXqs18OperationMap(fs.OpenAPIDoc)
+	if len(opMap) == 0 {
+		return nil
+	}
+	ddlColType := buildXqs18DDLColumnTypeMap(fs)
+	paramMap := buildQueryParamMap(fs)
+
+	var diags []diagnostic.Diagnostic
+	for _, fn := range fs.ServiceFuncs {
+		op, ok := opMap[fn.Name]
+		if !ok {
+			continue
+		}
+		oapiParams := buildXqs18OAPIParamTypeMap(op)
+		for _, seq := range fn.Sequences {
+			diags = append(diags, xqs18CheckSeq(fn, seq, oapiParams, paramMap, ddlColType)...)
+		}
+	}
+	return diags
+}

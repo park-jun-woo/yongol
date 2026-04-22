@@ -1,0 +1,45 @@
+# Compiled CLI binaries
+/yongol
+/yongol.exe
+*.exe
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude Code (local dev only)
+.claude/
+CLAUDE.md
+
+# whyso cache (sibling dev tool)
+.whyso/
+
+# Project-local config
+.clari/
+
+# Secrets / env
+.env
+.env.local
+.env.*.local
+
+# Generated artifacts from `yongol generate`
+artifacts/
+
+# Frontend tooling deps (yongol spawns swc, openapi-typescript)
+node_modules/
+
+# Go test / profile output
+*.test
+*.prof
+coverage.out
+coverage.html
+
+# Release tooling output
+dist/

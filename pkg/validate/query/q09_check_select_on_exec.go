@@ -1,0 +1,37 @@
+//ff:func feature=validate type=util control=sequence topic=query-structural
+//ff:what q09CheckSelectOnExec — :exec 쿼리에서 top-level SELECT / RETURNING 감지 + ERROR 진단
+
+package query
+
+import (
+	"strings"
+
+	"github.com/park-jun-woo/yongol/pkg/diagnostic"
+	"github.com/park-jun-woo/yongol/pkg/parser/sqlc"
+)
+
+// q09CheckSelectOnExec inspects a single :exec query and returns (diag, true)
+// when it emits rows via a top-level SELECT or a RETURNING clause.
+func q09CheckSelectOnExec(q sqlc.QuerySpec) (diagnostic.Diagnostic, bool) {
+	if q.Cardinality != "exec" {
+		return diagnostic.Diagnostic{}, false
+	}
+	body, err := readQueryBody(q)
+	if err != nil || body == nil {
+		return diagnostic.Diagnostic{}, false
+	}
+	text := strings.TrimSpace(body.Text)
+	hasTopSelect := topLevelSelectRe.MatchString(text)
+	hasReturning := returningWordRe.MatchString(body.Text)
+	if !hasTopSelect && !hasReturning {
+		return diagnostic.Diagnostic{}, false
+	}
+	return diagnostic.Diagnostic{
+		File:    q.File,
+		Line:    q.Line,
+		Phase:   diagnostic.PhaseValidate,
+		Level:   diagnostic.LevelError,
+		Message: "[Q-09] :exec query " + q.Name + " returns rows (top-level SELECT / RETURNING present)",
+		Advice:  "반환 행이 필요하면 cardinality 를 :one / :many 로 바꾸거나 SELECT/RETURNING 을 제거하세요",
+	}, true
+}

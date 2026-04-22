@@ -1,0 +1,43 @@
+//ff:func feature=gen-gogin type=generator control=sequence
+//ff:what blockCORS — gin-contrib/cors 미들웨어 등록 (manifest + env 기반)
+
+package boot
+
+import (
+	"fmt"
+
+	"github.com/park-jun-woo/yongol/pkg/yongol"
+)
+
+// blockCORS emits a cors.New(cors.Config{...}) middleware registration based
+// on manifest.backend.cors. When CORS is disabled or unconfigured, the block
+// is inert (empty Lines). envStringList / envBool (declared by
+// blockEnvHelpers) provide runtime overrides for origins, methods, and
+// credentials.
+//
+// Positioned after blockRouter and before blockHealth so health/ready
+// probes also benefit from CORS headers (browser status dashboards).
+func blockCORS(fs *yongol.Fullstack) MainBlock {
+	if !corsEnabled(fs) {
+		return MainBlock{Name: "cors"}
+	}
+	c := fs.Manifest.Backend.CORS
+
+	lines := []string{
+		`corsCfg := cors.Config{`,
+		fmt.Sprintf(`	AllowMethods:     envStringList("CORS_ALLOW_METHODS", %s),`, goStringSlice(c.AllowMethods)),
+		fmt.Sprintf(`	AllowHeaders:     %s,`, goStringSlice(c.AllowHeaders)),
+		fmt.Sprintf(`	ExposeHeaders:    %s,`, goStringSlice(c.ExposeHeaders)),
+		fmt.Sprintf(`	AllowCredentials: envBool("CORS_ALLOW_CREDENTIALS", %v),`, c.AllowCredentials),
+		fmt.Sprintf(`	MaxAge:           %s,`, durationLiteral(c.MaxAge)),
+		`}`,
+		fmt.Sprintf(`corsCfg.AllowOrigins = envStringList("CORS_ALLOW_ORIGINS", %s)`, goStringSlice(c.AllowOrigins)),
+		`r.Use(cors.New(corsCfg))`,
+	}
+
+	return MainBlock{
+		Name:    "cors",
+		Imports: []string{`"github.com/gin-contrib/cors"`},
+		Lines:   lines,
+	}
+}

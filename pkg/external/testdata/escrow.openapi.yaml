@@ -1,0 +1,101 @@
+openapi: "3.0.3"
+info:
+  title: Escrow
+  version: "1.0.0"
+servers:
+  - url: https://api.escrow.example.com
+paths:
+  /escrow/hold:
+    post:
+      operationId: hold
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                gigId:
+                  type: integer
+                  format: int64
+                amount:
+                  type: integer
+                  format: int64
+      responses:
+        "200":
+          description: Hold created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transactionId:
+                    type: integer
+                    format: int64
+                  status:
+                    type: string
+  /escrow/release:
+    post:
+      operationId: release
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                gigId:
+                  type: integer
+                  format: int64
+                freelancerId:
+                  type: integer
+                  format: int64
+      responses:
+        "200":
+          description: Funds released
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transactionId:
+                    type: integer
+                    format: int64
+                  amount:
+                    type: integer
+                    format: int64
+  /escrow/{id}:
+    get:
+      operationId: getStatus
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Escrow status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  amount:
+                    type: integer
+                    format: int64
+    delete:
+      operationId: cancel
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: Cancelled

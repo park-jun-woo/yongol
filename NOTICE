@@ -1,0 +1,27 @@
+yongol — Full-stack SSOT Orchestrator
+Copyright (c) 2026 Park Junwoo
+
+This project is licensed under the MIT License.
+See the LICENSE file for details.
+
+This software was built with the assistance of Claude (Anthropic).
+All code is human-reviewed and maintained by the copyright holder.
+
+Third-party dependencies:
+
+  github.com/getkin/kin-openapi
+    Licensed under the MIT License
+    Copyright (c) 2017 Aidan Haran
+    https://github.com/getkin/kin-openapi
+
+  github.com/open-policy-agent/opa
+    Licensed under the Apache License, Version 2.0
+    Copyright The Open Policy Agent Authors
+    https://github.com/open-policy-agent/opa
+    Used by generated OPA Authorizer code (authz package)
+
+  github.com/aws/aws-sdk-go-v2
+    Licensed under the Apache License, Version 2.0
+    Copyright Amazon.com, Inc. or its affiliates.
+    https://github.com/aws/aws-sdk-go-v2
+    Used by S3 file storage backend
