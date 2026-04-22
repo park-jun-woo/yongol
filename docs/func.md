@@ -2,14 +2,11 @@
 
 Optional SSOT for custom Go functions called from SSaC via `@call`. Use for domain-specific logic not covered by the built-ins (`auth`, `session`, `cache`, `file`, `crypto`, `mail`, `text`, `image`, `storage`).
 
-`model/*.go` (DTO declarations) follows the same rules and is covered here.
-
 ## Location
 
 ```
 <project-root>/
-├── func/<pkg>/*.go     # Func Spec (optional)
-└── model/*.go          # DTO + @dto types
+└── func/<pkg>/*.go     # Func Spec (optional)
 ```
 
 ## Fixed Signature
@@ -87,25 +84,6 @@ SSaC imports `internal/<pkg>`. Specs live under `specs/<project>/func/<pkg>/`; `
 2. `ssac/pkg/<pkg>/` — built-in
 3. Neither -> ERROR + skeleton suggestion
 
-## model/*.go
-
-- `model/model.go` must exist (at minimum `package model`) even without any `@dto` types — the generator always imports this package.
-- `// @dto` above a struct skips DDL-table matching (pure request/response types).
-- Structs without `@dto` must correspond to a DDL table (M-2 ERROR otherwise).
-- `CurrentUser` is auto-generated from `manifest.backend.auth.claims` — do not declare it manually.
-
-```go
-// model/token.go
-package model
-
-// @dto
-type Token struct {
-    AccessToken  string `json:"access_token"`
-    RefreshToken string `json:"refresh_token"`
-    ExpiresIn    int    `json:"expires_in"`
-}
-```
-
 ## Cross-SSOT Links
 
 | Link | Validation |
@@ -114,9 +92,7 @@ type Token struct {
 | `Request` fields -> SSaC args | Name + type |
 | `Response` fields -> SSaC result-variable fields | Match |
 | Purity rule | Forbidden DB/network imports |
-| Non-`@dto` struct -> DDL table | M-2 |
 | Struct fields -> OpenAPI response schema | Field-name match |
-| `CurrentUser` -> manifest claims | Auto-generated; manual creation rejected |
 
 ## Prefer Built-ins
 

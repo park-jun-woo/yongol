@@ -7,7 +7,7 @@ and line — use it as the ground truth; examples below omit error output.
 
 ## What yongol does
 
-Orchestrates 10 SSOTs into one contract, cross-validates them, and generates a
+Orchestrates 9 SSOTs into one contract, cross-validates them, and generates a
 Go+Gin backend plus a React frontend. The keystone is **`operationId`**: every
 OpenAPI operation, SSaC `func`, TSX `apiClient.<op>()` call, Mermaid transition
 label, and Hurl scenario references the same PascalCase identifier.
@@ -23,7 +23,6 @@ label, and Hurl scenario references the same PascalCase identifier.
 │   ├── *.sql                     # DDL
 │   └── queries/*.sql             # sqlc queries (-- name: ...)
 ├── service/<domain>/*.ssac       # SSaC (one func per file, Go-comment DSL)
-├── model/*.go                    # Go structs (// @dto for non-DDL types)
 ├── func/<pkg>/*.go               # Custom @call funcs (optional)
 ├── states/*.md                   # Mermaid stateDiagram
 ├── policy/*.rego                 # OPA Rego v1
@@ -319,17 +318,6 @@ Custom `@call` implementations in `func/<pkg>/*.go`. Details:
   `artifacts/<project>/backend/internal/<pkg>/` at generate time.
 - Resolution order: project `func/<pkg>/` → built-in `ssac/pkg/<pkg>/` → ERROR.
 
-## Model
-
-`model/*.go`.
-
-- Directory must exist. If no DTOs are needed, keep `model/model.go` with
-  only `package model` — codegen imports it unconditionally.
-- `// @dto` marks types that are NOT backed by a DDL table (tokens, refunds,
-  etc.); without `@dto`, each type must match a DDL table (M-2).
-- `CurrentUser` is auto-generated from `manifest.backend.auth.claims` — do not
-  author manually.
-
 ## Middleware — bearerAuth
 
 Emitted when `backend.middleware` contains `bearerAuth` and OpenAPI
@@ -425,7 +413,7 @@ hatch: `// nolint:prv-NN` (or `// nolint:panic` for PRV-10). Full spec:
 
 1. **Read this manual.** Do not copy from other projects' specs.
 2. **Author SSOTs** under `specs/<project>/` in this order: manifest →
-   DDL + sqlc.yaml + sqlc queries → OpenAPI → model → states → policy → SSaC
+   DDL + sqlc.yaml + sqlc queries → OpenAPI → states → policy → SSaC
    → TSX → Hurl (Func spec optional). Keep `operationId` consistent across
    all layers.
 3. **Validate:** `yongol validate specs/<project>`. Fix every ERROR and
@@ -449,7 +437,6 @@ hatch: `// nolint:prv-NN` (or `// nolint:panic` for PRV-10). Full spec:
 - Every SSaC `@publish "topic"` has a matching `@subscribe` (and vice versa).
 - Pagination / sort / filter params declared in OpenAPI match sqlc params and
   SSaC Input keys exactly.
-- Types without `@dto` correspond to a DDL table (M-2).
 
 ### Error triage
 

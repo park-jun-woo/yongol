@@ -61,7 +61,7 @@ yongol does not auto-inject `has_next` / `next_cursor`. Declare them explicitly 
 
 ## Response Schema <-> SSaC
 
-Every field in a response `schema.properties` must be mapped by SSaC `@response` to one of: a DDL model field, a Func Response type, or a `@dto` type.
+Every field in a response `schema.properties` must be mapped by SSaC `@response` to one of: a DDL model field or a Func Response type.
 
 ## Request Body Property Case Rule
 

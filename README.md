@@ -4,7 +4,7 @@ The keel of your AI-coded SaaS.
 
 **Add 10 endpoints to a 500-endpoint codebase in 30 minutes. Nothing breaks.**
 
-Vibe coding hits a wall around 200 endpoints: the AI loses the global picture, patterns drift, and the 201st feature costs 10× the 21st. yongol shifts the AI workload from generated code to declarative SSOTs (9 specialized specs, ~10× context compression) and catches cross-layer drift before it compiles.
+Vibe coding hits a wall around 200 endpoints: the AI loses the global picture, patterns drift, and the 201st feature costs 10× the 21st. yongol shifts the AI workload from generated code to declarative SSOTs (8 specialized specs, ~10× context compression) and catches cross-layer drift before it compiles.
 
 ---
 
@@ -24,7 +24,7 @@ Adding features never slowed down. Existing tests never broke.
 
 ---
 
-A full-stack SSOT orchestrator. Validates the consistency of 9 declarative sources and generates code from them.
+A full-stack SSOT orchestrator. Validates the consistency of 8 declarative sources and generates code from them.
 
 ## Quick Start
 
@@ -85,7 +85,7 @@ Read yongol/manual-for-ai.md and build the spec in yongol/examples/zenflow/zenfl
 
 The AI writes specs. `yongol validate` catches cross-layer inconsistencies the moment they appear. AI stays free within the rails; step off the rails and validation fails fast.
 
-## The 9 SSOT Sources
+## The 8 SSOT Sources
 
 ```
 specs/
@@ -93,7 +93,6 @@ specs/
 ├── api/openapi.yaml           → OpenAPI 3.x
 ├── db/*.sql                   → SQL DDL + sqlc queries
 ├── service/**/*.ssac          → SSaC — service sequence DSL
-├── model/*.go                 → Go structs (// @dto types)
 ├── func/<pkg>/*.go            → custom function implementations (optional)
 ├── states/*.md                → Mermaid stateDiagram (state transitions)
 ├── policy/*.rego              → OPA Rego (authorization)
@@ -107,7 +106,7 @@ Every layer uses `operationId` as a keystone — a single PascalCase identifier 
 
 ## Why AI doesn't get lost
 
-Tell an agent "add a feature" and context collapses as the project grows. yongol sets up 9 SSOTs that reference each other, and `validate` surfaces every inconsistency on the spot. The AI writes freely; leaving the rails fails validation. Freedom on rails.
+Tell an agent "add a feature" and context collapses as the project grows. yongol sets up 8 SSOTs that reference each other, and `validate` surfaces every inconsistency on the spot. The AI writes freely; leaving the rails fails validation. Freedom on rails.
 
 ## Can I edit the generated code?
 

@@ -125,11 +125,18 @@ allow {
 1. Read `manual-for-ai.md` at repo root as the sole source of yongol conventions.
 2. Author SSOT files in `examples/zenflow/specs/`.
 3. Generate code with `yongol generate examples/zenflow/specs examples/zenflow/arts`.
-4. Record a start timestamp when you write the first `manifest.yaml` line and measure wall-clock time to the first all-green `yongol validate`.
+4. Record a start timestamp when you write the first `manifest.yaml` line and measure wall-clock time through the full green chain, in this order:
+   1. `yongol validate examples/zenflow/specs` — all SSOTs consistent.
+   2. `yongol generate examples/zenflow/specs examples/zenflow/arts` — no ERROR/WARNING.
+   3. `go build ./...` inside the generated backend — compiles clean.
+   4. Start the backend and run `hurl --test --variable host=http://localhost:8080 examples/zenflow/arts/<project>/tests/smoke.hurl` — every smoke assertion green.
+
+   The benchmark stops at the first run in which all four steps pass end-to-end.
 5. Runtime dependencies for the generated backend:
-   - Postgres: run via Docker (`docker run -e POSTGRES_PASSWORD=...`).
+   - Postgres: run via Docker (`docker run -e POSTGRES_PASSWORD=...`); apply emitted migrations with `golang-migrate` or equivalent before starting the backend.
    - Dummy SMTP (if `@call mail.*` is used): run `python3 scripts/dummy-smtp.py` from the yongol repo root (accepts all, discards).
+   - Hurl CLI (`hurl`) on PATH for the smoke step above.
 6. Build only from `manual-for-ai.md`. Do not consult other full-stack scaffolds, generated code from prior attempts, or unrelated implementations.
-7. If `yongol` itself errors, do **not** monkey-patch. Report at `~/.clari/repos/yongol/bugs/BUG000.md` and stop only if blocked outright.
-8. On completion, record the timing breakdown (initial build, each incremental add) for benchmarking.
+7. If `yongol` itself errors, do **not** monkey-patch. Report at `~/.clari/repos/fullend/bugs/BUG000.md` and stop only if blocked outright.
+8. On completion, record the timing breakdown (initial build, each incremental add) for benchmarking. and report in `examples/zenflow/REPORT.md`
 9. Shell caveat: in a PTY, `!` is history-expanded — avoid it in passwords.

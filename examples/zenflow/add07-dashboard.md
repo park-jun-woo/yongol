@@ -1,25 +1,42 @@
 # ZenFlow Add-on #07 — Dashboard + Relation Enrichment
 
 ## Overview
-An operator dashboard summarizing org state on one screen. Exercises two yongol features together: **`@dto`** (aggregate models with no backing table) and **TSX custom components** (widgets too complex for plain data binding).
+An operator dashboard summarizing org state on one screen. Exercises two yongol features together: **Func Response types** (aggregate response structs declared in `func/<pkg>/*.go` and consumed via `@call`) and **TSX custom components** (widgets too complex for plain data binding).
 
 ## Verification Points
-- **`@dto` models** — `DashboardSummary`, `ExecutionDetail`; no DDL table; assembled via `@call dashboard.Summarize` / `BuildExecutionDetail`.
+- **Func Response types** — `SummarizeResponse`, `BuildExecutionDetailResponse` declared in `func/dashboard/*.go`; assembled via `@call dashboard.Summarize` / `@call dashboard.BuildExecutionDetail` and referenced by the OpenAPI response schema per the `@response` ↔ Func Response rule.
 - **TSX custom components** — widgets (credits gauge, execution chart, status badge) live under `frontend/components/*.tsx` and are invoked by the page component.
 
 ## New Endpoints
 - **GET /dashboard** (`GetDashboard`)
-  - Response: `{ summary: DashboardSummary }`
+  - Response: `{ summary: SummarizeResponse }`
   - Flow: `@get Organization org` + `@call dashboard.Summarize({OrgID, ...})` → aggregated object.
 - **GET /audit-logs/{id}** (`GetAuditLog`) — detail view; caller can enrich client-side by calling `GetUser` and `GetOrganization` separately.
 - **GET /execution-logs/{id}/detail** (`GetExecutionDetail`)
-  - Response type: `ExecutionDetail` (`@dto`, combines log + workflow + org).
+  - Response type: `BuildExecutionDetailResponse` (Func Response, combines log + workflow + org).
 
-## `@dto` Models (`model/`)
+## DDL
+No changes — reuse existing `workflows`, `execution_logs`, `audit_logs`, `organizations`, `users`.
+
+## Custom Functions (`func/dashboard/`)
+
+Each Func declares its `Response` struct in the same file; SSaC pulls the type via `@call`.
 
 ```go
-// @dto
-type DashboardSummary struct {
+// func/dashboard/summarize.go
+package dashboard
+
+// @func summarize
+// @description Assemble org dashboard summary in-memory.
+
+type SummarizeRequest struct {
+    OrgID          int64
+    OrgName        string
+    PlanType       string
+    CreditsBalance int64
+}
+
+type SummarizeResponse struct {
     OrgName           string
     PlanType          string
     CreditsBalance    int64
@@ -29,8 +46,35 @@ type DashboardSummary struct {
     TotalCreditsSpent int64
 }
 
-// @dto
-type ExecutionDetail struct {
+func Summarize(req SummarizeRequest) (SummarizeResponse, error) {
+    return SummarizeResponse{
+        OrgName:        req.OrgName,
+        PlanType:       req.PlanType,
+        CreditsBalance: req.CreditsBalance,
+        // remaining fields simulated (constant or random) to stay purity-safe.
+    }, nil
+}
+```
+
+```go
+// func/dashboard/build_execution_detail.go
+package dashboard
+
+// @func buildExecutionDetail
+// @description Compose ExecutionDetail from log + workflow + org.
+
+type BuildExecutionDetailRequest struct {
+    LogID         int64
+    WorkflowID    int64
+    WorkflowTitle string
+    OrgID         int64
+    OrgName       string
+    Status        string
+    CreditsSpent  int64
+    ExecutedAt    string
+}
+
+type BuildExecutionDetailResponse struct {
     ID            int64
     WorkflowID    int64
     WorkflowTitle string
@@ -40,14 +84,22 @@ type ExecutionDetail struct {
     CreditsSpent  int64
     ExecutedAt    string
 }
+
+func BuildExecutionDetail(req BuildExecutionDetailRequest) (BuildExecutionDetailResponse, error) {
+    return BuildExecutionDetailResponse{
+        ID:            req.LogID,
+        WorkflowID:    req.WorkflowID,
+        WorkflowTitle: req.WorkflowTitle,
+        OrgID:         req.OrgID,
+        OrgName:       req.OrgName,
+        Status:        req.Status,
+        CreditsSpent:  req.CreditsSpent,
+        ExecutedAt:    req.ExecutedAt,
+    }, nil
+}
 ```
 
-## DDL
-No changes — reuse existing `workflows`, `execution_logs`, `audit_logs`, `organizations`, `users`.
-
-## Custom Functions
-- `dashboard.Summarize(OrgID, OrgName, PlanType, CreditsBalance)` — compose the aggregate object in-memory. Stats are simulated (random or constant) to stay purity-safe.
-- `dashboard.BuildExecutionDetail(LogID, WorkflowID, OrgID, Status, CreditsSpent, ExecutedAt, WorkflowTitle, OrgName)` — assemble the `ExecutionDetail` DTO.
+If you prefer a single sqlc JOIN query over an in-memory composer for `GetExecutionDetail`, that is also valid — declare `-- name: ExecutionLogGetDetail :one` with `LEFT JOIN workflows / organizations` and use the synthesized `ExecutionLogGetDetailRow` directly in `@get`. The `@call` path shown above is the one the SSaC below follows.
 
 ## SSaC
 
@@ -139,5 +191,5 @@ SELECT * FROM audit_logs WHERE id = $1;
 
 ## E2E Scenario
 - Create org + a few workflows + executions → `GET /dashboard` returns summary.
-- `GET /execution-logs/{id}/detail` → `ExecutionDetail` composite returned.
+- `GET /execution-logs/{id}/detail` → `BuildExecutionDetailResponse` composite returned.
 - TSX: `XOT-1` / `XOT-2` pass (apiClient call + args align with OpenAPI). Custom component imports resolve against `frontend/components/`.

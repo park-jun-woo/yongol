@@ -1,7 +1,7 @@
 # ZenFlow Add-on #03 — Workflow Template Marketplace
 
 ## Overview
-Publish a workflow as a public template; other orgs search and clone it. Exercises cursor pagination, `@exists` guard, and `@dto` models.
+Publish a workflow as a public template; other orgs search and clone it. Exercises cursor pagination and the `@exists` guard.
 
 ## New Endpoints
 - **POST /templates** (`PublishTemplate`) — publish a workflow as a template.
@@ -12,9 +12,6 @@ Publish a workflow as a public template; other orgs search and clone it. Exercis
 ## DDL
 - `templates` table: `id, source_workflow_id (FK), org_id (FK), title, description, category, clone_count INT DEFAULT 0, created_at`.
 - `CREATE UNIQUE INDEX idx_templates_source ON templates(source_workflow_id)` — prevent double-publish.
-
-## `@dto` Models
-- `TemplateDetail` — template + author org name + action count. Denormalized view, no backing table.
 
 ## Pagination (standard OpenAPI parameters — no `x-*` extensions)
 ```yaml
@@ -43,7 +40,6 @@ Cursor is `id DESC` (fixed). `category` is a standard query parameter.
 ## Verification Points
 - Cursor pagination: `@get []Template items = Template.ListCursor({...})` + explicit `@response { items: items }`.
 - `@exists` guard for duplicate prevention (409 if non-nil).
-- `@dto` model (no DDL-matching).
 - Response shape: `{ items: [...] }` — last-page detection via `len(items) < per_page`.
 
 ## E2E Scenario
