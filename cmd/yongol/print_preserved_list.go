@@ -1,5 +1,5 @@
 //ff:func feature=cli type=reporter control=iteration dimension=1
-//ff:what printPreservedList — preserved 파일 경로·reason 목록 출력
+//ff:what printPreservedList — prints preserved file paths and their reason comments
 
 package main
 

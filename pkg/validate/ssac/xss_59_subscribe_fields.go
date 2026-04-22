@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what XSS-59 — @subscribe message fields → @publish payload 매칭
+//ff:what XSS-59 — verifies that @subscribe message fields match the @publish payload
 
 package ssac
 
@@ -63,7 +63,7 @@ func xss59SubscribeFields(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
 				Message: fmt.Sprintf("[XSS-59] @subscribe message field %q has no matching @publish payload key for topic %q", field.Name, fn.Subscribe.Topic),
-				Advice:  fmt.Sprintf("@publish payload 에 누락 필드 %q 를 추가하세요", field.Name),
+				Advice:  fmt.Sprintf("Add the missing field %q to the @publish payload", field.Name),
 			})
 		}
 	}

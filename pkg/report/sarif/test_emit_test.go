@@ -1,5 +1,5 @@
 //ff:func feature=report type=test control=iteration dimension=1 topic=sarif
-//ff:what test: Emit — SARIF 2.1.0 구조(버전, tool.driver, results, fired rules, level 매핑) 검증
+//ff:what test: Emit — verifies SARIF 2.1.0 structure (version, tool.driver, results, fired rules, level mapping)
 package sarif
 
 import (
@@ -63,7 +63,7 @@ func TestEmitWithRuleID(t *testing.T) {
 					Line:    15,
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
-					Message: "[S-27] 변수 foo 미선언",
+					Message: "[S-27] variable foo is not declared",
 				},
 				{
 					File:    "service/workflow/update.ssac",

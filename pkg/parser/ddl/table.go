@@ -1,12 +1,12 @@
 //ff:type feature=manifest type=model
-//ff:what Table — DDL CREATE TABLE에서 추출한 테이블 메타데이터
+//ff:what Table — table metadata extracted from a DDL CREATE TABLE statement
 package ddl
 
 // Table holds parsed metadata for a single DDL table.
 type Table struct {
 	Name            string
-	File            string              // 원본 .sql 파일 경로
-	Line            int                 // CREATE TABLE 줄 번호 (1-based, 0 = 미상)
+	File            string              // path of the source .sql file
+	Line            int                 // CREATE TABLE line number (1-based, 0 = unknown)
 	Columns         map[string]string   // column_name → Go type
 	ColumnOrder     []string            // DDL definition order
 	ForeignKeys     []ForeignKey

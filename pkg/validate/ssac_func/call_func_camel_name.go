@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=sequence topic=func-check
-//ff:what callFuncCamelName — @call model 을 camelCase func annotation 키로 변환
+//ff:what callFuncCamelName — convert a @call model to the camelCase func annotation key
 
 package ssac_func
 

@@ -1,10 +1,10 @@
 //ff:func feature=ssac-parse type=parser control=sequence topic=response
-//ff:what @response 줄을 파싱하여 Sequence 또는 멀티라인 시작 반환
+//ff:what parseResponseLine — parses an @response line, returning a Sequence or signalling multi-line start
 package ssac
 
 import "strings"
 
-// parseResponseLine은 @response 줄을 파싱한다.
+// parseResponseLine parses an @response line.
 func parseResponseLine(line string) (*Sequence, bool, error) {
 	tag := "@response"
 	suppressWarn := false
@@ -16,7 +16,7 @@ func parseResponseLine(line string) (*Sequence, bool, error) {
 	if trimmed == "{" {
 		return nil, true, nil
 	}
-	// 단일 행 구조체: @response { field: var, ... }
+	// single-line struct: @response { field: var, ... }
 	if strings.HasPrefix(trimmed, "{") && strings.HasSuffix(trimmed, "}") {
 		inner := trimmed[1 : len(trimmed)-1]
 		lines := strings.Split(inner, ",")
@@ -26,7 +26,7 @@ func parseResponseLine(line string) (*Sequence, bool, error) {
 			SuppressWarn: suppressWarn,
 		}, false, nil
 	}
-	// @response 간단쓰기: @response varName
+	// shorthand: @response varName
 	if trimmed != "" {
 		return &Sequence{
 			Type:         SeqResponse,

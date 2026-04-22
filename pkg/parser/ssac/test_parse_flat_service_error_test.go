@@ -1,5 +1,5 @@
 //ff:func feature=ssac-parse type=parser control=sequence
-//ff:what 플랫 service/ 디렉토리에 .ssac 파일 배치 시 에러 검증
+//ff:what validates that placing a .ssac file directly in the flat service/ directory produces an error
 
 package ssac
 
@@ -27,7 +27,7 @@ func Login() {}
 	if len(diags) == 0 {
 		t.Fatal("expected diagnostic for flat service/ file, got none")
 	}
-	if !strings.Contains(diags[0].Message, "feature 서브 폴더를 사용하세요") {
+	if !strings.Contains(diags[0].Message, "Use a feature subfolder") {
 		t.Errorf("unexpected diagnostic message: %s", diags[0].Message)
 	}
 }

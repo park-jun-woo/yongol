@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=iteration dimension=1 topic=ssac-openapi
-//ff:what collectMissingProps — SSaC 필드 중 OpenAPI 속성에 없는 항목을 Diagnostic으로 반환
+//ff:what collectMissingProps — returns Diagnostics for SSaC response fields absent from the OpenAPI schema
 
 package openapi_ssac
 
@@ -19,13 +19,13 @@ func collectMissingProps(fn ssac.ServiceFunc, fields []string, opProps map[strin
 		var advice string
 		switch ruleID {
 		case "XOS-17":
-			advice = "@response 의 전체 필드 " + field + " 를 OpenAPI response schema 에 추가하세요"
+			advice = "Add the full @response field " + field + " to the OpenAPI response schema"
 		case "XOS-19":
-			advice = "shorthand response 변수의 필드 " + field + " 를 OpenAPI response 에 추가하세요"
+			advice = "Add field " + field + " from the shorthand response variable to the OpenAPI response schema"
 		case "XSO-20":
-			advice = "type-based response 에서 " + field + " 를 OpenAPI response 에 추가하거나 @response 에서 제거하세요"
+			advice = "Add field " + field + " to the OpenAPI response or remove it from @response"
 		default:
-			advice = "@response 필드 " + field + " 를 OpenAPI response schema 에 추가하세요"
+			advice = "Add @response field " + field + " to the OpenAPI response schema"
 		}
 		diags = append(diags, diagnostic.Diagnostic{
 			File:    fn.FileName,

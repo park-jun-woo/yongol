@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=sequence topic=ddl-structural
-//ff:what isSkippableDDLLine — 컬럼 정의가 아닌 스킵 대상 DDL 라인 여부 검사
+//ff:what isSkippableDDLLine — report whether a DDL line is not a column definition and should be skipped
 package ddl
 
 import "strings"

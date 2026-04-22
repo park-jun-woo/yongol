@@ -1,5 +1,5 @@
 //ff:func feature=cli type=test control=iteration dimension=1
-//ff:what test: validate 서브커맨드 end-to-end 4 케이스 (happy / missing-dir / missing-args / parse-fail)
+//ff:what test: validate subcommand end-to-end 4 cases (happy / missing-dir / missing-args / parse-fail)
 
 package main
 

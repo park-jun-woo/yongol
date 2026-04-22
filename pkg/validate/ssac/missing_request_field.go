@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=sequence topic=ssac-structural
-//ff:what missingRequestField — S-60 ERROR Diagnostic 생성 헬퍼
+//ff:what missingRequestField — helper that generates an S-60 ERROR Diagnostic
 
 package ssac
 
@@ -19,6 +19,6 @@ func missingRequestField(fn ssac.ServiceFunc, seq ssac.Sequence, field string) d
 		Phase:   diagnostic.PhaseValidate,
 		Level:   diagnostic.LevelError,
 		Message: fmt.Sprintf("[S-60] request.%s not in OpenAPI request schema", field),
-		Advice:  fmt.Sprintf("OpenAPI 스키마에 field %q 를 case-exact 로 추가하거나 SSaC 에서 정확한 snake_case 필드명으로 변경하세요", field),
+		Advice:  fmt.Sprintf("Add field %q to the OpenAPI schema with the exact case, or change the SSaC reference to the exact snake_case field name", field),
 	}
 }

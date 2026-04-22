@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=iteration dimension=1 topic=states
-//ff:what diagram 이벤트 중 SSaC 함수가 없는 것 수집
+//ff:what collectUnmatchedEvents — collects diagram events that have no corresponding SSaC function
 
 package ssac_statemachine
 
@@ -39,7 +39,7 @@ func collectUnmatchedEvents(d *statemachine.StateDiagram, funcNames map[string]b
 			Phase:   diagnostic.PhaseValidate,
 			Level:   diagnostic.LevelError,
 			Message: "[XSM-23] transition event \"" + event + "\" in diagram \"" + d.ID + "\" has no matching SSaC function",
-			Advice:  "stateDiagram event '" + event + "' 를 사용하는 SSaC 함수를 추가하세요",
+			Advice:  "Add an SSaC function that handles stateDiagram event '" + event + "'",
 		})
 	}
 	return diags

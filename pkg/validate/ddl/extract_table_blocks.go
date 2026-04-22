@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=iteration dimension=1 topic=ddl-structural
-//ff:what extractTableBlocks — SQL 파일에서 CREATE TABLE 블록들을 파싱해 반환
+//ff:what extractTableBlocks — parse and return all CREATE TABLE blocks from a SQL file
 package ddl
 
 import (

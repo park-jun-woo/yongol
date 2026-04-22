@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=query-structural
-//ff:what Q-07 — SELECT * + @sensitive 컬럼 있는 테이블 → WARNING
+//ff:what Q-07 — WARNING when SELECT * is used on a table that has @sensitive columns
 
 package query
 
@@ -46,7 +46,7 @@ func q07SelectStarSensitive(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelWarning,
 				Message: fmt.Sprintf("[Q-07] SELECT * in %s exposes @sensitive columns of %s: %s", q.Name, table, strings.Join(cols, ", ")),
-				Advice:  "명시적 컬럼 목록으로 교체하거나 의도적 노출이면 `-- +allow-sensitive` 주석을 붙이세요",
+				Advice:  "Replace with an explicit column list, or add `-- +allow-sensitive` if intentional exposure is accepted",
 			})
 		}
 	}

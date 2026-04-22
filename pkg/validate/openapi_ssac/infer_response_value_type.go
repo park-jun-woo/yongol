@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=sequence topic=openapi-ssac
-//ff:what inferResponseValueType — @response field value 문자열에서 Go 타입 추론
+//ff:what inferResponseValueType — infers a Go type from a @response field value string
 package openapi_ssac
 
 import (
@@ -33,8 +33,8 @@ func inferResponseValueType(g *rule.Ground, funcName, value string) string {
 		if varType == "" {
 			return ""
 		}
-		// dotted field 조회 시 wrapper/slice/pointer/package prefix 모두 제거하여
-		// Struct.<UnqualifiedTypeName>.<field> 로 normalize.
+		// When looking up a dotted field, strip all wrapper/slice/pointer/package
+		// prefixes and normalise to Struct.<UnqualifiedTypeName>.<field>.
 		return g.Types["Struct."+normalizeTypeName(varType)+"."+field]
 	}
 	return g.Types["SSaC.var."+funcName+"."+value]

@@ -1,5 +1,5 @@
 //ff:func feature=manifest type=test control=iteration dimension=1
-//ff:what Table.Line / Table.File 이 정확히 채워지는지 검증
+//ff:what verifies that Table.Line and Table.File are populated correctly
 
 package ddl
 

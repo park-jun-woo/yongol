@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=iteration dimension=1 topic=ssac-openapi
-//ff:what collectUnusedProps — OpenAPI 속성 중 SSaC가 사용하지 않는 항목을 Diagnostic으로 반환
+//ff:what collectUnusedProps — returns Diagnostics for OpenAPI properties not used in SSaC @response
 
 package openapi_ssac
 
@@ -16,9 +16,9 @@ func collectUnusedProps(fn ssac.ServiceFunc, opProps []string, used map[string]b
 		if used[prop] {
 			continue
 		}
-		advice := "미사용 필드 " + prop + " 를 OpenAPI 에서 제거하거나 SSaC @response 에서 사용하세요"
+		advice := "Remove unused field " + prop + " from the OpenAPI schema or reference it in SSaC @response"
 		if ruleID == "XSO-20" {
-			advice = "미사용 필드 " + prop + " 를 제거하거나 SSaC 변수에서 노출하세요"
+			advice = "Remove unused field " + prop + " or expose it from an SSaC variable"
 		}
 		diags = append(diags, diagnostic.Diagnostic{
 			File:    fn.FileName,

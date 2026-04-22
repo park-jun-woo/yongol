@@ -1,5 +1,5 @@
 //ff:func feature=cli type=command control=sequence
-//ff:what import — 외부 OpenAPI 문서에서 Go 클라이언트 모델을 생성한다.
+//ff:what import — generates a Go client package from an external OpenAPI document
 
 package main
 

@@ -10,9 +10,9 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
-// xdp32OwnershipColumn validates XDP-32: Rego @ownership 이 참조하는
-// 컬럼이 대상 테이블의 DDL 컬럼 정의에 존재하는지 확인한다. 테이블이
-// 존재하지 않으면 XDP-31 에서 보고하므로 여기서는 건너뛴다.
+// xdp32OwnershipColumn validates XDP-32: the column referenced by a Rego
+// @ownership annotation must exist in the DDL column definitions of the target
+// table. Missing tables are already reported by XDP-31 and are skipped here.
 func xdp32OwnershipColumn(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	if fs == nil {
 		return nil
@@ -45,9 +45,9 @@ func xdp32OwnershipColumn(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase: diagnostic.PhaseValidate,
 					Level: diagnostic.LevelError,
 					Message: fmt.Sprintf(
-						"[XDP-32] @ownership %s 의 컬럼 %s.%s 가 DDL 에 존재하지 않습니다",
+						"[XDP-32] @ownership %s — column %s.%s not found in DDL",
 						om.Resource, om.Table, om.Column),
-					Advice: fmt.Sprintf("DDL 테이블 %s 에 컬럼 %s 를 추가하세요 (보통 owner_id, user_id 등)", om.Table, om.Column),
+					Advice: fmt.Sprintf("Add column %s to DDL table %s (typically owner_id, user_id, etc.)", om.Column, om.Table),
 				})
 			}
 		}

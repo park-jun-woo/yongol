@@ -1,5 +1,5 @@
 //ff:func feature=cli type=reporter control=sequence
-//ff:what printArtifactsSummary — arts/backend 파일 수·generated·preserved·drift 요약 출력
+//ff:what printArtifactsSummary — prints arts/backend file count, generated, preserved, and drift summary
 
 package main
 

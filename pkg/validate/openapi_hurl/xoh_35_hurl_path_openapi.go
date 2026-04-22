@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=1 topic=scenario-check
-//ff:what XOH-35 — Hurl path가 OpenAPI에 정의된 경로에 매칭되는지 검증
+//ff:what XOH-35 — verifies that a Hurl path matches a path defined in OpenAPI
 
 package openapi_hurl
 
@@ -26,7 +26,7 @@ func xoh35HurlPathOpenAPI(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			Phase:   diagnostic.PhaseValidate,
 			Level:   diagnostic.LevelError,
 			Message: "[XOH-35] hurl path " + e.Path + " not found in OpenAPI",
-			Advice:  "Hurl path 를 OpenAPI 의 path 와 일치시키거나 OpenAPI 에 해당 경로를 추가하세요",
+			Advice:  "Align the Hurl path with an OpenAPI path, or add the path to OpenAPI",
 		})
 	}
 	return diags

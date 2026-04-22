@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=sequence topic=ddl-statemachine
-//ff:what checkDefaultAgainstInitial — 단일 diagram 의 initial 과 DDL DEFAULT 대조
+//ff:what checkDefaultAgainstInitial — compares the initial state of a single diagram against the DDL DEFAULT value
 
 package ddl_statemachine
 
@@ -20,7 +20,7 @@ func checkDefaultAgainstInitial(g *rule.Ground, diagramID, table, column, initia
 			Level:   diagnostic.LevelError,
 			Message: "[XDM-28] DDL " + table + "." + column + " has no DEFAULT but stateDiagram " + diagramID +
 				" initial state is '" + initial + "'",
-			Advice: "DDL " + table + "." + column + " 에 DEFAULT '" + initial + "' 를 추가하세요",
+			Advice: "Add DEFAULT '" + initial + "' to DDL column " + table + "." + column,
 		}
 	}
 	if got != initial {
@@ -29,7 +29,7 @@ func checkDefaultAgainstInitial(g *rule.Ground, diagramID, table, column, initia
 			Level:   diagnostic.LevelError,
 			Message: "[XDM-28] DDL " + table + "." + column + " DEFAULT '" + got + "' ≠ stateDiagram " +
 				diagramID + " initial '" + initial + "'",
-			Advice: "DDL DEFAULT 를 '" + initial + "' 로 변경하거나 stateDiagram [*] --> 를 '" + got + "' 로 변경하여 통일하세요",
+			Advice: "Change the DDL DEFAULT to '" + initial + "' or change the stateDiagram [*] --> transition to '" + got + "' so they agree",
 		}
 	}
 	return nil

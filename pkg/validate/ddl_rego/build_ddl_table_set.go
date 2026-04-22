@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=iteration dimension=1 topic=policy-check
-//ff:what buildDDLTableSet — DDL 테이블 이름 집합 구성 (Ground.Lookup 선호, fs.DDLTables fallback)
+//ff:what buildDDLTableSet — build the set of DDL table names (prefers Ground.Lookup, falls back to fs.DDLTables)
 package ddl_rego
 
 import (

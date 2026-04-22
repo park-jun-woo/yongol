@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=sequence topic=ddl-structural
-//ff:what parseSqlcYaml — db/sqlc.yaml 를 읽어 schema/queries 경로 추출
+//ff:what parseSqlcYaml — read db/sqlc.yaml and extract schema/queries paths
 
 package ddl
 

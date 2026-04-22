@@ -1,5 +1,5 @@
 //ff:func feature=validate type=test control=sequence topic=funcspec-structural
-//ff:what XFF-40 테스트 (TODO: 케이스 추가)
+//ff:what XFF-40 test (TODO: add cases)
 
 package funcspec
 

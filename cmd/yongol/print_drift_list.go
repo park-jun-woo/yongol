@@ -1,5 +1,5 @@
 //ff:func feature=cli type=reporter control=iteration dimension=1
-//ff:what printDriftList — validate/contract.Run 결과 Contract Drift 섹션 출력
+//ff:what printDriftList — prints the Contract Drift section from validate/contract.Run results
 
 package main
 

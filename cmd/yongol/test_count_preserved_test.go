@@ -1,5 +1,5 @@
 //ff:func feature=cli type=test control=sequence
-//ff:what test: TestCountPreserved — reason 보유/미보유 파일 분리 카운트 검증
+//ff:what test: TestCountPreserved — validates split count of files with and without a reason comment
 
 package main
 

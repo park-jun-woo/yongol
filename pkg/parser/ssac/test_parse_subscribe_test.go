@@ -1,5 +1,5 @@
 //ff:func feature=ssac-parse type=parser control=sequence
-//ff:what @subscribe 파싱 검증 — Topic, MessageType, 시퀀스 필터링 확인
+//ff:what validates @subscribe parsing — Topic, MessageType, and sequence filtering
 
 package ssac
 
@@ -23,7 +23,7 @@ func OnOrderCompleted(message OnOrderCompletedMessage) {}
 	}
 	assertEqual(t, "Subscribe.Topic", sf.Subscribe.Topic, "order.completed")
 	assertEqual(t, "Subscribe.MessageType", sf.Subscribe.MessageType, "OnOrderCompletedMessage")
-	// @subscribe는 시퀀스에 포함되지 않아야 함
+	// @subscribe must not appear in the sequence list
 	if len(sf.Sequences) != 1 {
 		t.Fatalf("expected 1 sequence (subscribe filtered), got %d", len(sf.Sequences))
 	}

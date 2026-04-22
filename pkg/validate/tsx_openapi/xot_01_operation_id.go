@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=1 topic=tsx-openapi
-//ff:what XOT-1 — apiClient.<op>() 호출의 <op> 가 OpenAPI operationId 에 존재하는지 검증
+//ff:what XOT-1 — verifies that the <op> in apiClient.<op>() calls exists as an OpenAPI operationId
 package tsx_openapi
 
 import (
@@ -35,7 +35,7 @@ func xot01OperationID(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
 				Message: "[XOT-1] apiClient." + call.OperationID + "() has no matching OpenAPI operationId",
-				Advice:  "openapi.yaml 에 operationId: " + call.OperationID + " 를 추가하거나 호출명 오타를 확인하세요",
+				Advice:  "Add operationId: " + call.OperationID + " to openapi.yaml, or check for a typo in the call name",
 			})
 		}
 	}

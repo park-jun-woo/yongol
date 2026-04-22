@@ -1,5 +1,5 @@
 //ff:func feature=ssac-parse type=parser control=sequence
-//ff:what 콜론 없는 입력 형식 에러 검증 — {query} 형태 거부
+//ff:what validates that input pairs without a colon are rejected — e.g. {query} form
 
 package ssac
 
@@ -25,7 +25,7 @@ func ListGigs(c *gin.Context) {}
 	if len(diags) == 0 {
 		t.Fatal("expected diagnostic for input without colon")
 	}
-	if !strings.Contains(diags[0].Message, "유효하지 않은 입력 형식") {
+	if !strings.Contains(diags[0].Message, "is not a valid input pair") {
 		t.Errorf("unexpected diagnostic message: %s", diags[0].Message)
 	}
 }

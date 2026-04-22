@@ -1,5 +1,5 @@
 //ff:func feature=cli type=util control=iteration dimension=1
-//ff:what printParseErrorsFile — 단일 파일에 속한 Diagnostic 목록을 들여써서 출력
+//ff:what printParseErrorsFile — prints diagnostics belonging to a single file with indentation
 package main
 
 import (

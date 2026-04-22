@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what S-26 — Model.Method 형식 필수
+//ff:what S-26 — Model.Method format is required
 
 package ssac
 
@@ -30,7 +30,7 @@ func s26DotMethod(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
 					Message: fmt.Sprintf("[S-26] Model must be Model.Method format (got %q)", seq.Model),
-					Advice:  "Model.Method 형식으로 작성하세요 (예: User.FindByEmail)",
+					Advice:  "Use the Model.Method format (e.g. User.FindByEmail)",
 				})
 			}
 		}

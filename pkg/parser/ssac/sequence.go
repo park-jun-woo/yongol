@@ -1,53 +1,53 @@
 //ff:type feature=ssac-parse type=model
-//ff:what 하나의 시퀀스 라인 타입
+//ff:what Sequence — type representing a single SSaC sequence line
 package ssac
 
-// Sequence는 하나의 시퀀스 라인이다.
+// Sequence represents a single sequence line.
 type Sequence struct {
 	Type string // "get", "post", "put", "delete", "empty", "exists", "state", "auth", "call", "response"
-	Line int    // 시퀀스가 시작된 주석 줄 번호 (1-based, 0 = 미상)
+	Line int    // comment line number where the sequence begins (1-based; 0 = unknown)
 
-	// get/post/put/delete/call 공통: 함수 호출
-	Package string // "session" (패키지 접두사, 없으면 "")
-	Model   string // "Course.FindByID" 또는 "auth.VerifyPassword"
-	Args    []Arg  // 호출 인자
+	// get/post/put/delete/call common: function call
+	Package string // "session" (package prefix; empty string if absent)
+	Model   string // "Course.FindByID" or "auth.VerifyPassword"
+	Args    []Arg  // call arguments
 
-	// get/post/call: 대입
-	Result *Result // 결과 바인딩 (nil이면 대입 없음)
+	// get/post/call: assignment
+	Result *Result // result binding (nil means no assignment)
 
 	// empty/exists: guard
-	Target string // "course" 또는 "course.InstructorID"
+	Target string // "course" or "course.InstructorID"
 
-	// state: 상태 전이
+	// state: state transition
 	DiagramID  string            // "reservation"
 	Inputs     map[string]string // {status: "reservation.Status"}
 	Transition string            // "cancel"
 
-	// publish: 이벤트 발행
+	// publish: event publishing
 	Topic   string            // "order.completed"
-	Options map[string]string // {delay: "1800"} (선택)
-	// Inputs 재사용: payload
+	Options map[string]string // {delay: "1800"} (optional)
+	// Inputs reused: payload
 
-	// auth: 권한 검사
+	// auth: authorization check
 	Action   string // "delete"
 	Resource string // "project"
-	// Inputs 재사용     // {id: "project.ID", owner: "project.OwnerID"}
+	// Inputs reused     // {id: "project.ID", owner: "project.OwnerID"}
 
-	// response: 필드 매핑
+	// response: field mapping
 	Fields map[string]string // {course: "course", instructor_name: "instructor.Name"}
 
-	// verify-password: 로그인 타이밍 방어 묶음 (Phase010)
+	// verify-password: login timing-safe bundle (Phase010)
 	//   @verify-password <Model>.<EmailCol>=<EmailExpr> <Model>.<HashCol> vs <PasswordExpr>
 	//     -> <Result.Var> <ErrStatus> "<Message>"
-	// Model/EmailCol/HashCol 은 sqlc row 타입과 컬럼명, EmailExpr/PasswordExpr 는
-	// handler 안에서 해석될 Go 식. Result 는 성공 시 바인딩되는 변수명 (기존 필드 재사용).
+	// Model/EmailCol/HashCol are the sqlc row type and column names; EmailExpr/PasswordExpr are
+	// Go expressions resolved inside the handler. Result is the binding variable on success (reuses existing field).
 	EmailCol     string
 	EmailExpr    string
 	HashCol      string
 	PasswordExpr string
 
-	// 공통
-	Message      string // 에러 메시지
-	ErrStatus    int    // 에러 HTTP 상태 코드 (0이면 타입별 기본값: @call→500, @empty→404, @exists→409, @state→409, @auth→403)
-	SuppressWarn bool   // @type! — WARNING 억제
+	// common
+	Message      string // error message
+	ErrStatus    int    // error HTTP status code (0 = type default: @call→500, @empty→404, @exists→409, @state→409, @auth→403)
+	SuppressWarn bool   // @type! — suppress WARNING
 }

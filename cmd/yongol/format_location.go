@@ -1,5 +1,5 @@
 //ff:func feature=cli type=util control=sequence
-//ff:what formatLocation — file:line: prefix 포맷 (file/line 부재 시 생략)
+//ff:what formatLocation — formats the file:line: prefix, omitting absent parts
 package main
 
 import "fmt"

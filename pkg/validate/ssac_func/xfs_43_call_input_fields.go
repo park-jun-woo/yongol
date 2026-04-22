@@ -42,7 +42,7 @@ func xfs43CallInputFields(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 						Phase:   diagnostic.PhaseValidate,
 						Level:   diagnostic.LevelError,
 						Message: "[XFS-43] @call " + seq.Model + " input field " + inputKey + " not in " + funcName + "Request",
-						Advice:  "@call 입력 키 " + inputKey + " 를 func Request struct 에 추가하거나 SSaC 에서 제거하세요",
+						Advice:  "Add input key " + inputKey + " to the func Request struct, or remove it from the SSaC @call",
 					})
 				}
 			}

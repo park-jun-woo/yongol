@@ -1,5 +1,5 @@
 //ff:func feature=validate type=test control=sequence topic=ddl-structural
-//ff:what D-1 테스트 (TODO: 케이스 추가)
+//ff:what D-1 test (TODO: add cases)
 
 package ddl
 

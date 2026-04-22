@@ -1,5 +1,5 @@
 //ff:func feature=validate type=test control=sequence topic=authz-check
-//ff:what XAS-60 positive 테스트 — @auth input 키가 CheckRequest 필드에 없으면 ERROR
+//ff:what XAS-60 positive test — @auth input key absent from CheckRequest fields triggers ERROR
 
 package ssac_authz
 

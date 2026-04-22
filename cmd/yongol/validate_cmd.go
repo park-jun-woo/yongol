@@ -1,5 +1,5 @@
 //ff:func feature=cli type=command control=sequence
-//ff:what validateCmd — yongol validate 서브커맨드 반환 (--format md|sarif 포함)
+//ff:what validateCmd — returns the yongol validate subcommand (including --format md|sarif)
 package main
 
 import (

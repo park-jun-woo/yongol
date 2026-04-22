@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=1 topic=ddl-structural
-//ff:what D-6 — sqlc.yaml 의 queries 경로가 queries/ 를 포함하는지 검증
+//ff:what D-6 — verify sqlc.yaml queries path includes queries/
 
 package ddl
 
@@ -31,6 +31,6 @@ func d06SqlcYamlQueriesPath(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		Phase:   diagnostic.PhaseValidate,
 		Level:   diagnostic.LevelWarning,
 		Message: "[D-6] sqlc.yaml queries path does not include \"queries/\" — db/queries/*.sql files may not be picked up by sqlc",
-		Advice:  "queries 를 \"queries/\" 로 설정하세요",
+		Advice:  "Set queries to \"queries/\"",
 	}}
 }

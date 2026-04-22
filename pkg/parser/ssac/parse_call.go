@@ -1,5 +1,5 @@
 //ff:func feature=ssac-parse type=parser control=sequence
-//ff:what @call 외부 함수 호출 시퀀스 파싱
+//ff:what parseCall — parses an @call external function call sequence
 package ssac
 
 import (
@@ -7,13 +7,13 @@ import (
 	"strings"
 )
 
-// parseCall은 @call을 파싱한다.
-// Type var = pkg.Func({Key: val, ...}) 또는 pkg.Func({Key: val, ...})
+// parseCall parses @call.
+// Forms: Type var = pkg.Func({Key: val, ...}) or pkg.Func({Key: val, ...})
 func parseCall(rest string) (*Sequence, error) {
 	rest = strings.TrimSpace(rest)
 	seq := &Sequence{Type: SeqCall}
 
-	// = 가 있고, 그 전에 ( 가 없으면 result 있는 형태
+	// If = is present and no ( appears before it, the form includes a result binding
 	var remainder string
 	eqIdx := strings.Index(rest, "=")
 	parenIdx := strings.Index(rest, "(")

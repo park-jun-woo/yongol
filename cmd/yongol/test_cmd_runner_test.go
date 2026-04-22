@@ -1,5 +1,5 @@
 //ff:func feature=cli type=test-helper control=sequence
-//ff:what runCmd / zenflowSpecsDir — cobra CLI 통합 테스트 공용 헬퍼
+//ff:what runCmd / zenflowSpecsDir — shared cobra CLI integration test helpers
 
 package main
 

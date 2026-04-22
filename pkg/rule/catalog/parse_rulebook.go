@@ -1,5 +1,5 @@
 //ff:func feature=rule type=parser control=iteration dimension=2 topic=catalog
-//ff:what Parse — rulebook.md 의 H2 section + `| Rule ID | Level | Description | Source |` 테이블을 RuleMeta 슬라이스로 파싱
+//ff:what Parse — parses H2 sections and `| Rule ID | Level | Description | Source |` tables from rulebook.md into a RuleMeta slice
 package catalog
 
 import (
@@ -18,7 +18,7 @@ import (
 //	...
 //	| Rule ID | Level | Description | Source |
 //	|---|---|---|---|
-//	| S-27 | ERROR | 변수 선언 후 사용 | `pkg/validate/ssac/s_27_var_declared.go` |
+//	| S-27 | ERROR | Variable must be declared before use | `pkg/validate/ssac/s_27_var_declared.go` |
 //
 // H2 headings prefixed with `##` open a new section. The first table after
 // a section header whose header row starts with `| Rule ID` is consumed.

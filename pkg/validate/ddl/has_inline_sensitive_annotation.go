@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=sequence topic=ddl-structural
-//ff:what hasInlineSensitiveAnnotation — DDL 라인에 -- @sensitive / -- @nosensitive 어노테이션 여부
+//ff:what hasInlineSensitiveAnnotation — report whether a DDL line carries a -- @sensitive / -- @nosensitive annotation
 package ddl
 
 import "strings"

@@ -1,5 +1,5 @@
 //ff:func feature=ssac-parse type=parser control=sequence
-//ff:what @auth 파싱 검증 — Action, Resource, Message, Inputs 확인
+//ff:what @auth parse test — verifies Action, Resource, Message, and Inputs
 
 package ssac
 
@@ -8,7 +8,7 @@ import "testing"
 func TestParseAuth(t *testing.T) {
 	src := `package service
 
-// @auth "delete" "project" {id: project.ID, owner: project.OwnerID} "권한 없음"
+// @auth "delete" "project" {id: project.ID, owner: project.OwnerID} "access denied"
 func DeleteProject(c *gin.Context) {}
 `
 	sfs := parseTestFile(t, src)
@@ -16,7 +16,7 @@ func DeleteProject(c *gin.Context) {}
 	assertEqual(t, "Type", seq.Type, SeqAuth)
 	assertEqual(t, "Action", seq.Action, "delete")
 	assertEqual(t, "Resource", seq.Resource, "project")
-	assertEqual(t, "Message", seq.Message, "권한 없음")
+	assertEqual(t, "Message", seq.Message, "access denied")
 	assertEqual(t, "Inputs[id]", seq.Inputs["id"], "project.ID")
 	assertEqual(t, "Inputs[owner]", seq.Inputs["owner"], "project.OwnerID")
 }

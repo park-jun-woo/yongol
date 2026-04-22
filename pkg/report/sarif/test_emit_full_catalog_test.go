@@ -1,5 +1,5 @@
 //ff:func feature=report type=test control=iteration dimension=1 topic=sarif
-//ff:what test: Emit(..., catalog) — full catalog rules 수록 + ruleIndex 연결 + rule 메타 필드 검증
+//ff:what test: Emit(..., catalog) — verifies full catalog rules are included, ruleIndex linkage, and rule meta fields
 package sarif
 
 import (
@@ -66,7 +66,7 @@ func TestEmitFullCatalogRuleIndex(t *testing.T) {
 					Line:    15,
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
-					Message: "[S-27] 변수 foo 미선언",
+					Message: "[S-27] variable foo is not declared",
 				},
 			},
 		},

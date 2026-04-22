@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=iteration dimension=1 topic=sqlc
-//ff:what findCaseInsensitiveParam — param 집합에서 대소문자 무시 매칭 반환
+//ff:what findCaseInsensitiveParam — return a case-insensitive match from the param set
 
 package ssac_sqlc
 

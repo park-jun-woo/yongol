@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=sequence topic=query-structural
-//ff:what q05CheckDeleteWhere — 단일 DELETE 쿼리의 WHERE 유무 판정 + ERROR 진단 생성
+//ff:what q05CheckDeleteWhere — checks whether a single DELETE query has a WHERE clause and generates an ERROR diagnostic if not
 
 package query
 
@@ -35,6 +35,6 @@ func q05CheckDeleteWhere(q sqlc.QuerySpec) (diagnostic.Diagnostic, bool) {
 		Phase:   diagnostic.PhaseValidate,
 		Level:   diagnostic.LevelError,
 		Message: "[Q-05] DELETE in " + q.Name + " has no WHERE clause (potential full-table wipe)",
-		Advice:  "WHERE 조건을 추가하거나 의도적 전체 삭제면 `-- +allow-truncate` 주석을 붙이세요",
+		Advice:  "Add a WHERE clause, or add `-- +allow-truncate` if a full-table delete is intentional",
 	}, true
 }

@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=1 topic=ssac-openapi
-//ff:what XOS-19 — shorthand @response 필드가 OpenAPI response 스키마에 포함되는지 검증
+//ff:what XOS-19 — verifies that shorthand @response fields are present in the OpenAPI response schema
 
 package openapi_ssac
 
@@ -29,7 +29,7 @@ func xos19ShorthandResponse(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
 				Message: "[XOS-19] shorthand response variable \"" + varName + "\" not declared in " + fn.Name,
-				Advice:  "shorthand @response 변수 " + varName + " 를 @get/@call 등으로 먼저 선언하세요",
+				Advice:  "Declare the shorthand @response variable " + varName + " with @get/@call or similar first",
 			})
 			continue
 		}

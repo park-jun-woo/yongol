@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=iteration dimension=2 topic=sqlc
-//ff:what checkSeqInputKeyCase — 단일 sequence input key를 sqlc param 집합과 대소문자 비교
+//ff:what checkSeqInputKeyCase — compare a single sequence's input keys against the sqlc param set for casing
 
 package ssac_sqlc
 

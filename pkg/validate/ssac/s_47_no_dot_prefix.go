@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what S-47 — @get/@post/@put/@delete Model에 package prefix 금지
+//ff:what S-47 — package prefix is forbidden in the Model field of @get/@post/@put/@delete
 
 package ssac
 
@@ -29,7 +29,7 @@ func s47NoDotPrefix(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
 				Message: fmt.Sprintf("[S-47] package-prefix @model not allowed (got %q)", seq.Model),
-				Advice:  "@model 값에서 패키지 prefix(pkg.X) 를 제거하세요",
+				Advice:  "Remove the package prefix (pkg.X) from the @model value",
 			})
 		}
 	}

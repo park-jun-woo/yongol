@@ -1,10 +1,10 @@
 //ff:func feature=ssac-parse type=util control=sequence
-//ff:what "target \"message\"" 문자열을 target과 message로 분리
+//ff:what splitTargetMessage — splits a "target \"message\"" string into target and message
 package ssac
 
 import "strings"
 
-// splitTargetMessage는 "target "message""를 분리한다.
+// splitTargetMessage splits a string of the form `target "message"` into its parts.
 func splitTargetMessage(s string) (string, string, string) {
 	quoteIdx := strings.IndexByte(s, '"')
 	if quoteIdx < 0 {

@@ -1,5 +1,5 @@
 //ff:func feature=ssac-parse type=parser control=sequence
-//ff:what 디렉토리 내 모든 .ssac 파일을 재귀 탐색하여 []ServiceFunc 반환
+//ff:what ParseDir — recursively walks a directory for all .ssac files and returns []ServiceFunc
 package ssac
 
 import (
@@ -10,7 +10,7 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
 )
 
-// ParseDir은 디렉토리 내 모든 .ssac 파일을 재귀 탐색하여 []ServiceFunc를 반환한다.
+// ParseDir recursively walks a directory for all .ssac files and returns the extracted []ServiceFunc.
 func ParseDir(dir string) ([]ServiceFunc, []diagnostic.Diagnostic) {
 	var funcs []ServiceFunc
 	var diags []diagnostic.Diagnostic
@@ -21,7 +21,7 @@ func ParseDir(dir string) ([]ServiceFunc, []diagnostic.Diagnostic) {
 				Line:    0,
 				Phase:   diagnostic.PhaseParse,
 				Level:   diagnostic.LevelError,
-				Message: "디렉토리 탐색 실패: " + err.Error(),
+				Message: "directory walk error: " + err.Error(),
 			})
 			return nil
 		}

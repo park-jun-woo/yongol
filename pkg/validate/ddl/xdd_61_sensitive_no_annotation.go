@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=3 topic=ddl-structural
-//ff:what XDD-61 — 민감 패턴 컬럼 @sensitive 없음
+//ff:what XDD-61 — sensitive-pattern column missing @sensitive annotation
 
 package ddl
 
@@ -11,10 +11,10 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
-// xdd61SensitiveNoAnnotation validates XDD-61: db/*.sql의 컬럼 이름이
-// 민감 패턴(password, token, ssn 등)에 매치되지만 같은 라인에
-// `-- @sensitive` (또는 `-- @nosensitive`) 어노테이션이 없으면 WARNING.
-// 어노테이션이 없으면 JSON 응답에 노출될 수 있어 경고한다.
+// xdd61SensitiveNoAnnotation validates XDD-61: a column name in db/*.sql that
+// matches a sensitive pattern (password, token, ssn, etc.) but lacks a
+// `-- @sensitive` (or `-- @nosensitive`) annotation on the same line is a WARNING.
+// Without the annotation the column value may be exposed in JSON responses.
 func xdd61SensitiveNoAnnotation(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	files := readDBSQLFiles(fs.SpecsDir)
 	if len(files) == 0 {
@@ -49,9 +49,9 @@ func xdd61SensitiveNoAnnotation(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase: diagnostic.PhaseValidate,
 					Level: diagnostic.LevelWarning,
 					Message: fmt.Sprintf(
-						"[XDD-61] 테이블 %q 컬럼 %q — 민감 패턴 %q 에 매치되지만 -- @sensitive 어노테이션이 없습니다",
+						"[XDD-61] table %q column %q — matches sensitive pattern %q but has no -- @sensitive annotation",
 						blk.tableName, colName, match),
-					Advice: "민감 컬럼 라인 끝에 -- @sensitive 또는 -- @nosensitive 어노테이션을 추가하세요 (없으면 JSON 응답에 노출될 수 있음)",
+					Advice: "Append -- @sensitive or -- @nosensitive to the column line (without it the value may appear in JSON responses)",
 				})
 			}
 		}

@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what XSS-58 — @subscribe topic → @publish 시퀀스 존재
+//ff:what XSS-58 — verifies that every @subscribe topic has a corresponding @publish sequence
 
 package ssac
 
@@ -35,7 +35,7 @@ func xss58SubscribeToPublish(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			Phase:   diagnostic.PhaseValidate,
 			Level:   diagnostic.LevelError,
 			Message: fmt.Sprintf("[XSS-58] @subscribe topic %q has no matching @publish", fn.Subscribe.Topic),
-			Advice:  fmt.Sprintf("topic %q 에 대한 @publish 시퀀스를 추가하세요", fn.Subscribe.Topic),
+			Advice:  fmt.Sprintf("Add a @publish sequence for topic %q", fn.Subscribe.Topic),
 		})
 	}
 	return diags

@@ -1,5 +1,5 @@
 //ff:func feature=manifest type=parser control=sequence
-//ff:what BuildLineIndex 가 operationId 줄 번호를 올바르게 색인하는지 검증
+//ff:what BuildLineIndex — verifies that operationId line numbers are indexed correctly
 
 package openapi
 

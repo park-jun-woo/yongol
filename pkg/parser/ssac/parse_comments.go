@@ -1,5 +1,5 @@
 //ff:func feature=ssac-parse type=parser control=iteration dimension=1
-//ff:what 주석 리스트에서 v2 시퀀스를 추출
+//ff:what parseComments — extracts v2 sequences from a comment list
 package ssac
 
 import (
@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-// parseComments는 주석 리스트에서 v2 시퀀스를 추출한다.
-// fset이 nil이 아니면 각 시퀀스에 주석 줄 번호(1-based)를 채운다.
+// parseComments extracts v2 sequences from a list of comments.
+// When fset is non-nil, each sequence is annotated with its 1-based comment line number.
 func parseComments(fset *token.FileSet, comments []*ast.Comment) ([]Sequence, error) {
 	cp := &commentParser{}
 	for _, c := range comments {

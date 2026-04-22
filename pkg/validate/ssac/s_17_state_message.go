@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what S-17 — @state Message 필수
+//ff:what S-17 — @state requires a Message field
 
 package ssac
 
@@ -23,7 +23,7 @@ func s17StateMessage(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
 					Message: "[S-17] @state requires Message",
-					Advice:  "@state 시퀀스에 Message 항목을 추가하세요",
+					Advice:  "Add a Message field to the @state sequence",
 				})
 			}
 		}

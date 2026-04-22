@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=sequence topic=openapi-structural
-//ff:what comparePathVars — path 템플릿 변수와 parameters[] 선언 비교, 차이만 진단
+//ff:what comparePathVars — compares path template variables against parameters[] declarations, diagnosing only mismatches
 
 package openapi
 
@@ -30,7 +30,7 @@ func comparePathVars(path, method string, line int, want, got map[string]bool) [
 			Message: fmt.Sprintf(
 				"[O-3] %s %s path template declares {%s} but parameters[] has no matching in:path name=%s",
 				strings.ToUpper(method), path, strings.Join(missing, ","), strings.Join(missing, "|")),
-			Advice: "parameters 에 name 을 path 템플릿과 동일하게 선언하세요",
+			Advice: "Declare the parameter name in parameters[] to match the path template exactly",
 		})
 	}
 	if len(extra) > 0 {
@@ -42,7 +42,7 @@ func comparePathVars(path, method string, line int, want, got map[string]bool) [
 			Message: fmt.Sprintf(
 				"[O-3] %s %s parameters declares in:path name=%s but path template has no {%s}",
 				strings.ToUpper(method), path, strings.Join(extra, ","), strings.Join(extra, "|")),
-			Advice: "path 템플릿에 변수를 추가하거나 parameters 에서 제거하세요",
+			Advice: "Add the variable to the path template or remove it from parameters[]",
 		})
 	}
 	return diags

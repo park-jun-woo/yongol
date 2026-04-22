@@ -1,9 +1,9 @@
 //ff:func feature=ssac-parse type=parser control=sequence topic=response
-//ff:what @response 블록 내부 줄을 처리하여 블록 종료 여부 반환
+//ff:what handleResponseLine — processes a line inside a @response block and reports whether the block has ended
 package ssac
 
-// handleResponseLine은 @response 블록 내부 줄을 처리한다.
-// 블록이 종료되면 (true, 완성된 Sequence)를 반환한다.
+// handleResponseLine processes a line inside a @response block.
+// It returns (true, completed Sequence) when the block ends.
 func handleResponseLine(line string, responseLines []string, suppressWarn bool) (bool, Sequence) {
 	if line != "}" {
 		return false, Sequence{}

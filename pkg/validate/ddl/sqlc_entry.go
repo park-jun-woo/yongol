@@ -1,5 +1,5 @@
 //ff:type feature=validate type=model topic=ddl-structural
-//ff:what sqlcEntry — sqlc v2 sql[] 항목 (schema/queries 경로)
+//ff:what sqlcEntry — sqlc v2 sql[] entry (schema/queries paths)
 
 package ddl
 

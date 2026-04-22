@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=sequence topic=ddl-structural
-//ff:what hasSentinelInsert — INSERT INTO <table> VALUES (0, ...) 센티널 존재 여부
+//ff:what hasSentinelInsert — report whether an INSERT INTO <table> VALUES (0, ...) sentinel exists
 package ddl
 
 import "regexp"

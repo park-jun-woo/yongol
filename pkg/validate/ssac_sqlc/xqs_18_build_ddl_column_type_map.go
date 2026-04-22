@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=iteration dimension=2 topic=ssac-sqlc
-//ff:what buildXqs18DDLColumnTypeMap — DDLTables → tableName → column → Go 타입 맵
+//ff:what buildXqs18DDLColumnTypeMap — build a tableName → column → Go-type map from DDLTables
 
 package ssac_sqlc
 

@@ -1,13 +1,13 @@
 //ff:func feature=policy type=parser control=iteration dimension=1
-//ff:what extractAllowRules — Rego 소스에서 allow 블록들을 분리하고 AllowRule 추출
+//ff:what extractAllowRules — splits allow blocks from Rego source and extracts AllowRule entries
 package rego
 
 import "strings"
 
 func extractAllowRules(content string, p *Policy) {
 	normalized := strings.ReplaceAll(content, "\nallow {", "\nallow if {")
-	// 원본 content 기준 라인 번호 계산을 위해 개행 누적 수를 추적.
-	// "\nallow {" → "\nallow if {" 치환은 동일 줄 내 토큰만 늘리므로 줄 번호는 보존.
+	// Track cumulative newline counts to compute 1-based line numbers relative to the original content.
+	// The "\nallow {" → "\nallow if {" substitution only adds tokens within the same line, so line numbers are preserved.
 	const token = "allow if {"
 	offset := 0
 	for {
@@ -32,8 +32,8 @@ func extractAllowRules(content string, p *Policy) {
 	}
 }
 
-// lineOfOffset — 문자열 s 의 바이트 오프셋 off 가 놓인 1-based 라인 번호.
-// off 가 범위 밖이면 0 을 반환한다.
+// lineOfOffset returns the 1-based line number at byte offset off in string s.
+// Returns 0 when off is out of range.
 func lineOfOffset(s string, off int) int {
 	if off < 0 || off > len(s) {
 		return 0

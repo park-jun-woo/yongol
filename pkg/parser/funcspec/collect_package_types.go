@@ -1,5 +1,5 @@
 //ff:func feature=funcspec type=parser control=iteration dimension=1
-//ff:what 디렉토리 내 모든 .go 파일에서 구조체 타입과 필드를 수집하고, Go parse 실패는 Diagnostic 으로 보고한다
+//ff:what collectPackageTypes — collects struct types and fields from all .go files in a directory; reports Go parse failures as Diagnostics
 package funcspec
 
 import (
@@ -15,11 +15,11 @@ import (
 // collectPackageTypes parses all .go files in dir (non-recursive)
 // and returns a map of struct name to fields.
 //
-// Diagnostic 반환 규약:
-//   - dir 이 존재하지 않으면 SILENT-OK (companion 타입 디렉토리 부재는 정상).
-//   - 그 외 ReadDir 에러는 Diagnostic 1 건 + 빈 result.
-//   - 개별 파일의 parser.ParseFile 실패는 Diagnostic 1 건으로 기록하고
-//     나머지 파일은 계속 수집한다 (partial success).
+// Diagnostic contract:
+//   - If dir does not exist, returns SILENT-OK (absent companion type directory is normal).
+//   - Any other ReadDir error returns one Diagnostic + empty result.
+//   - A parser.ParseFile failure on an individual file is recorded as one Diagnostic
+//     while the remaining files continue to be collected (partial success).
 func collectPackageTypes(dir string) (map[string][]Field, []diagnostic.Diagnostic) {
 	result := make(map[string][]Field)
 	var diags []diagnostic.Diagnostic

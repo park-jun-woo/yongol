@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=manifest-observability
-//ff:what OBS-002 — metrics.path 가 OpenAPI 정의 path 와 충돌하면 안 됨
+//ff:what OBS-002 — metrics.path must not collide with an OpenAPI-defined path
 
 package manifest
 
@@ -36,7 +36,7 @@ func obs02MetricsPathNotOpenAPI(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
 				Message: "[OBS-002] backend.observability.metrics.path " + quoted(path) + " collides with an OpenAPI path of the same name",
-				Advice:  "metrics.path 를 OpenAPI 에 없는 경로 (예: '/internal/metrics') 로 변경하거나 OpenAPI 에서 해당 path 를 제거하세요",
+				Advice:  "Change metrics.path to a path not present in OpenAPI (e.g. '/internal/metrics'), or remove that path from the OpenAPI document",
 			}}
 		}
 	}

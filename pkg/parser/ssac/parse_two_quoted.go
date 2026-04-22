@@ -1,10 +1,10 @@
 //ff:func feature=ssac-parse type=util control=sequence
-//ff:what "first" "second" 형식의 두 개 인용문 파싱
+//ff:what parseTwoQuoted — parses two quoted strings of the form "first" "second"
 package ssac
 
 import "strings"
 
-// parseTwoQuoted는 "first" "second"를 파싱한다.
+// parseTwoQuoted parses a string of the form `"first" "second"` into two quoted parts.
 func parseTwoQuoted(s string) (string, string, string) {
 	s = strings.TrimSpace(s)
 	first, rest := extractQuoted(s)

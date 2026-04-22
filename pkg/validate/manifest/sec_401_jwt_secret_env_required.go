@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=manifest-auth
-//ff:what SEC-401 — backend.auth.secret 리터럴 금지 (secret_env 만 허용)
+//ff:what SEC-401 — backend.auth.secret literal is forbidden; only secret_env is allowed
 
 package manifest
 
@@ -50,8 +50,8 @@ func sec401JWTSecretEnvRequired(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Line:    auth.Content[i].Line,
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
-				Message: "[SEC-401] backend.auth.secret 리터럴은 금지됩니다 — secret_env 에 환경변수 이름만 지정하세요",
-				Advice:  "secret 필드를 제거하고 `secret_env: JWT_SECRET` 형태로 변경하세요",
+				Message: "[SEC-401] backend.auth.secret literal is forbidden — specify only an environment variable name in secret_env",
+				Advice:  "Remove the secret field and use `secret_env: JWT_SECRET` instead",
 			}}
 		}
 	}

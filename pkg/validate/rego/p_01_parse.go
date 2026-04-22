@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=1 topic=rego-structural
-//ff:what P-1 — Rego 파일 파싱 에러 감지 (재파싱)
+//ff:what P-1 — detects Rego file parse errors by re-parsing
 
 package rego
 
@@ -21,7 +21,7 @@ func p01Parse(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	for i := range diags {
 		diags[i].Phase = diagnostic.PhaseValidate
 		diags[i].Message = "[P-1] " + diags[i].Message
-		diags[i].Advice = "Rego 문법을 OPA 공식 문서에 따라 작성하세요"
+		diags[i].Advice = "Write Rego syntax according to the official OPA documentation"
 	}
 	return diags
 }

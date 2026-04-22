@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=3 topic=ssac-structural
-//ff:what S-37 — FK 참조 @get 후 @empty 가드 필요
+//ff:what S-37 — a FK-referenced @get result requires an @empty guard
 
 package ssac
 
@@ -32,7 +32,7 @@ func s37FKReferenceGuard(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 						Phase:   diagnostic.PhaseValidate,
 						Level:   diagnostic.LevelWarning,
 						Message: fmt.Sprintf("[S-37] %s: FK reference @get requires @empty guard", seq.Result.Var),
-						Advice:  "@get 으로 조회한 객체에 @empty 가드를 추가하세요",
+						Advice:  "Add an @empty guard for the object fetched with @get",
 					})
 				}
 			}

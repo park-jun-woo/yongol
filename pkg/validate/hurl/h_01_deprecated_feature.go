@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=1 topic=hurl-structural
-//ff:what H-1 — tests/*.feature 파일 존재 감지 (deprecated)
+//ff:what H-1 — detects deprecated *.feature files under tests/
 
 package hurl
 
@@ -22,7 +22,7 @@ func h01DeprecatedFeature(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
 				Message: "[H-1] .feature files are deprecated",
-				Advice:  ".feature 파일을 tests/scenario-*.hurl 형식으로 재작성하세요",
+				Advice:  "Rewrite .feature files in the tests/scenario-*.hurl format",
 			})
 		}
 	}

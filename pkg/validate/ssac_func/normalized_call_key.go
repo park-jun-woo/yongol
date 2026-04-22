@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=sequence topic=func-check
-//ff:what normalizedCallKey — SSaC @call "pkg.Pascal" → Func 어노테이션 "pkg.camel"
+//ff:what normalizedCallKey — convert SSaC @call "pkg.Pascal" to Func annotation "pkg.camel"
 
 package ssac_func
 

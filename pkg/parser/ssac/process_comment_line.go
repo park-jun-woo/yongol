@@ -1,11 +1,11 @@
 //ff:func feature=ssac-parse type=parser control=sequence
-//ff:what 주석 한 줄을 상태에 따라 처리
+//ff:what processLine — processes a single comment line according to current parser state
 package ssac
 
 import "strings"
 
-// processLine은 주석 한 줄을 상태에 따라 처리한다.
-// commentLine은 주석의 1-based 라인 번호 (0 = 미상).
+// processLine processes a single comment line according to the current parser state.
+// commentLine is the 1-based line number of the comment (0 = unknown).
 func (cp *commentParser) processLine(line string, commentLine int) error {
 	if cp.inResponse {
 		cp.processResponseBody(line)

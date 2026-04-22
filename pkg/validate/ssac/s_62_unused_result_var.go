@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what S-62 — 선언된 result 변수가 후속 시퀀스에서 한 번도 참조되지 않으면 ERROR
+//ff:what S-62 — ERROR when a declared result variable is never referenced by a subsequent sequence
 
 package ssac
 
@@ -31,8 +31,8 @@ func s62UnusedResultVar(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Line:    seq.Line,
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
-					Message: fmt.Sprintf("[S-62] result 변수 %q가 후속 시퀀스에서 사용되지 않습니다", varName),
-					Advice:  "불필요한 변수는 제거하거나, 필요하다면 @response 등에서 참조하세요",
+					Message: fmt.Sprintf("[S-62] result variable %q is never used in a subsequent sequence", varName),
+					Advice:  "Remove the unused variable, or reference it in @response or a later sequence",
 				})
 			}
 		}

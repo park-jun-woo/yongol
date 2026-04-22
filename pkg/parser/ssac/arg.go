@@ -1,11 +1,11 @@
 //ff:type feature=ssac-parse type=model
-//ff:what 함수 호출 인자 타입
+//ff:what Arg — type representing a single function call argument
 package ssac
 
-// Arg는 함수 호출 인자다.
+// Arg represents a single function call argument.
 type Arg struct {
-	Source   string // "request", 변수명, 또는 "" (리터럴)
-	Field    string // "CourseID", "ID" 등
-	Literal  string // 리터럴 원문 (quoted string 의 경우 따옴표 제거됨)
-	IsQuoted bool   // Literal 이 "..." quoted string 이었는지 — type inference 용
+	Source   string // "request", a variable name, or "" (literal)
+	Field    string // "CourseID", "ID", etc.
+	Literal  string // raw literal text (quotes stripped for quoted strings)
+	IsQuoted bool   // whether Literal was a "..." quoted string — used for type inference
 }

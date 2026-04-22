@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=3 topic=ssac-structural
-//ff:what S-29 — Inputs 값 변수 선언
+//ff:what S-29 — variables used as Inputs values must be declared
 
 package ssac
 
@@ -30,7 +30,7 @@ func s29InputDeclared(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
 					Message: fmt.Sprintf("[S-29] Input value variable %q used before declaration", ref),
-					Advice:  fmt.Sprintf("변수 %q 를 @get/@post 시퀀스 결과로 먼저 선언하세요", ref),
+					Advice:  fmt.Sprintf("Declare variable %q as the result of a preceding @get/@post sequence", ref),
 				})
 			}
 		}

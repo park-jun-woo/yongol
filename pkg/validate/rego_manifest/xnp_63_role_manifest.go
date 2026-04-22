@@ -42,7 +42,7 @@ func xnp63RoleManifest(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
 					Message: fmt.Sprintf("[XNP-63] Rego uses role %q but manifest backend.auth.roles is not declared", r.RoleValue),
-					Advice:  fmt.Sprintf("manifest backend.auth.roles 에 [%s, ...] 를 선언하세요", r.RoleValue),
+					Advice:  fmt.Sprintf("Declare [%s, ...] in manifest backend.auth.roles", r.RoleValue),
 				})
 				continue
 			}
@@ -55,7 +55,7 @@ func xnp63RoleManifest(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
 				Message: fmt.Sprintf("[XNP-63] Rego role %q — not declared in manifest backend.auth.roles", r.RoleValue),
-				Advice:  fmt.Sprintf("manifest backend.auth.roles 에 '%s' 를 추가하세요", r.RoleValue),
+				Advice:  fmt.Sprintf("Add '%s' to manifest backend.auth.roles", r.RoleValue),
 			})
 		}
 	}

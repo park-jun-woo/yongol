@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=config-check
-//ff:what XNP-53 — Rego input.claims → claims 값
+//ff:what XNP-53 — every Rego input.claims reference must be declared in manifest claims
 
 package rego_manifest
 
@@ -43,7 +43,7 @@ func xnp53InputClaimsValues(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
 				Message: fmt.Sprintf("[XNP-53] Rego input.claims.%s — not declared in manifest backend.auth.claims", ref),
-				Advice:  fmt.Sprintf("manifest backend.auth.claims 에 '%s' 필드를 추가하거나 Rego 에서 input.claims.%s 참조를 제거하세요", ref, ref),
+				Advice:  fmt.Sprintf("Add field '%s' to manifest backend.auth.claims, or remove the input.claims.%s reference from Rego", ref, ref),
 			})
 		}
 	}

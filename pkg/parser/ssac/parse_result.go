@@ -1,10 +1,10 @@
 //ff:func feature=ssac-parse type=parser control=sequence topic=response
-//ff:what "Type var" 또는 "[]Type var" 결과 바인딩 파싱
+//ff:what parseResult — parses a "Type var" or "[]Type var" result binding
 package ssac
 
 import "strings"
 
-// parseResult는 "Type var" 또는 "[]Type var"를 파싱한다.
+// parseResult parses a result binding of the form "Type var" or "[]Type var".
 func parseResult(lhs string) *Result {
 	lhs = strings.TrimSpace(lhs)
 	parts := strings.Fields(lhs)

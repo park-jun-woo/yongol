@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=hurl-structural
-//ff:what H-2 — tests/ 디렉토리 있는데 .hurl 파일 0 개면 WARNING
+//ff:what H-2 — WARNING when tests/ directory exists but contains no .hurl files
 
 package hurl
 
@@ -21,6 +21,6 @@ func h02EmptyTestsDir(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		Phase:   diagnostic.PhaseValidate,
 		Level:   diagnostic.LevelWarning,
 		Message: "[H-2] tests/ directory exists but contains no .hurl scenario files",
-		Advice:  "scenario/invariant hurl 파일을 추가하거나 tests/ 디렉토리를 제거하세요",
+		Advice:  "Add scenario or invariant Hurl files, or remove the tests/ directory",
 	}}
 }

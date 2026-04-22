@@ -1,5 +1,5 @@
 //ff:func feature=validate type=test control=sequence topic=func-check
-//ff:what XFS-44 테스트 (TODO: 케이스 추가)
+//ff:what XFS-44 test (TODO: add cases)
 
 package ssac_func
 

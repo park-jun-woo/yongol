@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=3 topic=sqlc
-//ff:what XQS-17 — sqlc Params 필드가 SSaC Input에 없으면 ERROR
+//ff:what XQS-17 — ERROR when a sqlc Params field is absent from the SSaC Input
 
 package ssac_sqlc
 
@@ -45,8 +45,8 @@ func xqs17ParamKeyMissing(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Line:    seq.Line,
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
-					Message: fmt.Sprintf("[XQS-17] sqlc 쿼리 %s 의 Params 필드 %q 가 SSaC Input에 없습니다", queryName, param),
-					Advice:  fmt.Sprintf("SSaC @%s Inputs 에 {%s: <value>} 를 추가하세요", seq.Type, param),
+					Message: fmt.Sprintf("[XQS-17] sqlc query %s Params field %q is missing from the SSaC Input", queryName, param),
+					Advice:  fmt.Sprintf("Add {%s: <value>} to the SSaC @%s Inputs", param, seq.Type),
 				})
 			}
 		}

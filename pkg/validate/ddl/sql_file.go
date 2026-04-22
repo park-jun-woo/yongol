@@ -1,5 +1,5 @@
 //ff:type feature=validate type=model topic=ddl-structural
-//ff:what sqlFile — 단일 .sql 파일의 경로/이름/내용 보관 구조체
+//ff:what sqlFile — struct holding a single .sql file's path, name, and content
 package ddl
 
 // sqlFile holds a single .sql file's path and content.

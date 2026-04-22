@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=func-check
-//ff:what XFS-39 — @call → func 구현 존재
+//ff:what XFS-39 — @call references an existing func implementation
 
 package ssac_func
 
@@ -10,7 +10,8 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
-// xfs39CallToFuncSpec validates XFS-39: @call → func 구현 존재
+// xfs39CallToFuncSpec validates XFS-39: every @call must reference an
+// existing func implementation.
 func xfs39CallToFuncSpec(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	g := fs.Ground()
 	if g == nil {
@@ -38,7 +39,7 @@ func xfs39CallToFuncSpec(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
 					Message: "[XFS-39] @call references non-existent func spec " + seq.Model,
-					Advice:  "pkg/ 아래 함수 " + seq.Model + " 를 정의하세요",
+					Advice:  "Define function " + seq.Model + " under pkg/",
 				})
 			}
 		}

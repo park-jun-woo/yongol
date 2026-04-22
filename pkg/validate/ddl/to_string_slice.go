@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=selection topic=ddl-structural
-//ff:what toStringSlice — YAML 값(string 또는 []string)을 []string 으로 정규화
+//ff:what toStringSlice — normalize a YAML value (string or []string) to []string
 
 package ddl
 

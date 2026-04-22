@@ -1,5 +1,5 @@
 //ff:type feature=orchestrator type=model
-//ff:what 진단 단계 열거 타입
+//ff:what Diagnostic phase enum type
 package diagnostic
 
 // Phase identifies which stage produced the diagnostic.

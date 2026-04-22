@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=config-check
-//ff:what XNS-57 — queue.backend=memory + tx-bound @publish 조합 경고
+//ff:what XNS-57 — warns when queue.backend=memory is combined with a tx-bound @publish
 
 package ssac_manifest
 
@@ -41,7 +41,7 @@ func xns57MemoryTxPublish(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				"[XNS-57] queue.backend is \"memory\" but %s mixes @publish with @post/@put/@delete — tx-bound publish has no atomicity guarantee",
 				fn.Name,
 			),
-			Advice: "production 환경에서는 queue.backend 를 \"postgres\" 로 설정하세요 (memory 백엔드는 PublishTx 를 지원하지 않습니다)",
+			Advice: "In production, set queue.backend to \"postgres\" (the memory backend does not support PublishTx)",
 		})
 	}
 	return diags

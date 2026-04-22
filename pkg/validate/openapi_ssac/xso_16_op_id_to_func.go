@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=1 topic=ssac-openapi
-//ff:what XSO-16 — OpenAPI operationId가 SSaC funcName에 구현되어 있는지 검증
+//ff:what XSO-16 — verifies that every OpenAPI operationId is implemented as an SSaC funcName
 
 package openapi_ssac
 
@@ -27,7 +27,7 @@ func xso16OpIDToFunc(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			Phase:   diagnostic.PhaseValidate,
 			Level:   diagnostic.LevelError,
 			Message: "[XSO-16] OpenAPI operationId " + opID + " has no matching SSaC func",
-			Advice:  "operationId " + opID + " 에 대응하는 SSaC 함수를 추가하세요",
+			Advice:  "Add an SSaC function corresponding to operationId " + opID,
 		})
 	}
 	return diags

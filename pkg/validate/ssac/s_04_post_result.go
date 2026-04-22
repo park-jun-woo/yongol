@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what S-4 — @post Result 필수
+//ff:what S-4 — @post requires a Result field
 
 package ssac
 
@@ -23,7 +23,7 @@ func s04PostResult(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
 					Message: "[S-4] @post requires Result",
-					Advice:  "@post 시퀀스에 Result 항목을 추가하세요",
+					Advice:  "Add a Result field to the @post sequence",
 				})
 			}
 		}

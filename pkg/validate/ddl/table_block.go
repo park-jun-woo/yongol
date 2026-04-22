@@ -1,5 +1,5 @@
 //ff:type feature=validate type=model topic=ddl-structural
-//ff:what tableBlock — CREATE TABLE 블록의 테이블명·시작/끝 라인·본문 보관 구조체
+//ff:what tableBlock — struct holding a CREATE TABLE block's table name, start/end lines, and body text
 package ddl
 
 // tableBlock describes one CREATE TABLE block extracted from a SQL file.

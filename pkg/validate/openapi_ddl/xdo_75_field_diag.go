@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=sequence topic=openapi-ddl
-//ff:what xdo75FieldDiag — 단일 field 에 대한 XDO-75 위반 판정 + 진단 생성
+//ff:what xdo75FieldDiag — determines whether a single field violates XDO-75 and generates the diagnostic
 
 package openapi_ddl
 
@@ -45,6 +45,6 @@ func xdo75FieldDiag(fs *yongol.Fullstack, opID, fieldName string, fc oapiparser.
 			"[XDO-75] %s — OpenAPI optional field %q is NOT NULL in DDL table %q with no DEFAULT",
 			opID, fieldName, tbl.Name,
 		),
-		Advice: "DDL에 DEFAULT를 추가하거나 OpenAPI에서 required로 변경하세요",
+		Advice: "Add a DEFAULT to the DDL column, or change the field to required in OpenAPI",
 	}, true
 }

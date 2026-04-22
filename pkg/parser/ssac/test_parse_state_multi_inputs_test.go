@@ -1,5 +1,5 @@
 //ff:func feature=ssac-parse type=parser control=sequence
-//ff:what @state 다중 Inputs 파싱 검증 — status + createdAt 두 개 입력
+//ff:what validates @state parsing with multiple Inputs — status and createdAt
 
 package ssac
 
@@ -8,7 +8,7 @@ import "testing"
 func TestParseStateMultiInputs(t *testing.T) {
 	src := `package service
 
-// @state course {status: course.Status, createdAt: course.CreatedAt} "publish" "발행할 수 없습니다"
+// @state course {status: course.Status, createdAt: course.CreatedAt} "publish" "cannot publish"
 func PublishCourse(c *gin.Context) {}
 `
 	sfs := parseTestFile(t, src)

@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=rego-manifest
-//ff:what Run — Rego↔Manifest 교차 검증 실행 (XNP-*, XPN-*)
+//ff:what Run — execute all Rego↔Manifest cross-validation rules (XNP-*, XPN-*)
 package rego_manifest
 
 import (

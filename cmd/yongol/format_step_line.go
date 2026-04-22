@@ -1,5 +1,5 @@
 //ff:func feature=cli type=reporter control=sequence
-//ff:what formatStepLine — StepResult를 "✓ name  summary  (E errors, W warnings)" 형식으로 포매팅
+//ff:what formatStepLine — formats a StepResult as "✓ name  summary  (E errors, W warnings)"
 package main
 
 import (

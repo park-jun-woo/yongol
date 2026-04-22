@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=sequence topic=ssac-sqlc
-//ff:what xqs18LookupDDLType — tableName + colName → Go 타입 조회
+//ff:what xqs18LookupDDLType — look up the Go type for a given tableName + colName
 
 package ssac_sqlc
 

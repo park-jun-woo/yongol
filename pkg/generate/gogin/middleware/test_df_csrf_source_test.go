@@ -1,5 +1,5 @@
 //ff:func feature=gen-gogin type=test control=sequence topic=csrf
-//ff:what csrf_source 렌더 스냅샷 — double-submit cookie 골격 존재 확인
+//ff:what csrf_source render snapshot — verifies that the double-submit cookie skeleton is present
 
 package middleware
 
@@ -22,7 +22,7 @@ func TestCsrfSourceTemplate_ContainsDoubleSubmitFragments(t *testing.T) {
 		"subtle.ConstantTimeCompare",
 		"http.MethodGet, http.MethodHead, http.MethodOptions",
 		"csrf_token_invalid",
-		"CSRF 토큰이 유효하지 않습니다",
+		"CSRF token is invalid",
 		"HybridBearerSkip",
 		"hasBearerHeader",
 		`"Authorization"`,

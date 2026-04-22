@@ -1,5 +1,5 @@
 //ff:func feature=cli type=command control=sequence
-//ff:what statusCmd — yongol status 서브커맨드 반환 (SSOT Summary + Artifacts + Preserved + Drift)
+//ff:what statusCmd — returns the yongol status subcommand (SSOT Summary + Artifacts + Preserved + Drift)
 
 package main
 

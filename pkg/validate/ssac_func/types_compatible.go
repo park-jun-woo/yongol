@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=sequence topic=func-check
-//ff:what TypesCompatible — 두 Go 타입 이름 문자열이 호환되는지 판정 (공유 헬퍼)
+//ff:what TypesCompatible — report whether two Go type name strings are assignment-compatible (shared helper)
 
 package ssac_func
 

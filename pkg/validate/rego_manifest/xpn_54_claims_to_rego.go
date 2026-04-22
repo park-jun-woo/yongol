@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=config-check
-//ff:what XPN-54 — Manifest claims → Rego 참조
+//ff:what XPN-54 — every manifest claim must be referenced from Rego, middleware, or an OpenAPI response
 
 package rego_manifest
 
@@ -57,7 +57,7 @@ func xpn54ClaimsToRego(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			Phase:   diagnostic.PhaseValidate,
 			Level:   diagnostic.LevelWarning,
 			Message: fmt.Sprintf("[XPN-54] manifest claim %q — not referenced by Rego, middleware, or OpenAPI response", key),
-			Advice:  fmt.Sprintf("manifest claim '%s' 를 Rego/middleware/response 중 하나에서 사용하거나 manifest 에서 제거하세요", key),
+			Advice:  fmt.Sprintf("Use manifest claim '%s' in Rego, middleware, or an OpenAPI response — or remove it from the manifest", key),
 		})
 	}
 	return diags

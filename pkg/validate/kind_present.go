@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=selection
-//ff:what kindPresent — 주어진 SSOT kind의 파싱 결과가 Fullstack에 존재하는지 검사
+//ff:what kindPresent — checks whether the parse result for a given SSOT kind is present in Fullstack
 package validate
 
 import "github.com/park-jun-woo/yongol/pkg/yongol"
@@ -19,7 +19,7 @@ func kindPresent(fs *yongol.Fullstack, k yongol.SSOTKind) bool {
 	case yongol.KindPolicy:
 		return fs.ParsedPolicies != nil
 	case yongol.KindScenario:
-		// Declared 상태 (디렉토리 있음 + 파일 0) 도 validator 가 돌아야 H-2 발행 가능
+		// A Declared state (directory present + 0 files) must still run the validator so H-2 can fire
 		return fs.HurlEntries != nil || fs.HurlFiles != nil || fs.PresenceOf(yongol.KindScenario) != yongol.SSOTAbsent
 	case yongol.KindFunc:
 		return fs.ProjectFuncSpecs != nil

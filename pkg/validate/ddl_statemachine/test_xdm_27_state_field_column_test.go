@@ -1,5 +1,5 @@
 //ff:func feature=validate type=test control=sequence topic=states
-//ff:what XDM-27 테스트 (TODO: 케이스 추가)
+//ff:what XDM-27 test (TODO: add cases)
 
 package ddl_statemachine
 

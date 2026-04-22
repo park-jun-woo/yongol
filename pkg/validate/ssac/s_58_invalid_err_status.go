@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what S-58 — IANA 미등록 HTTP status
+//ff:what S-58 — HTTP status code is not registered with IANA
 
 package ssac
 
@@ -27,7 +27,7 @@ func s58InvalidErrStatus(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
 				Message: fmt.Sprintf("[S-58] ErrStatus %d is not a valid HTTP status code (100-599)", seq.ErrStatus),
-				Advice:  "IANA 등록된 HTTP status code 를 사용하세요 (4xx/5xx)",
+				Advice:  "Use an IANA-registered HTTP status code (4xx/5xx)",
 			})
 		}
 	}

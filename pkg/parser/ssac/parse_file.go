@@ -1,5 +1,5 @@
 //ff:func feature=ssac-parse type=parser control=iteration dimension=1
-//ff:what 단일 .ssac 파일을 파싱하여 []ServiceFunc 반환
+//ff:what ParseFile — parses a single .ssac file and returns []ServiceFunc
 package ssac
 
 import (
@@ -10,7 +10,7 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
 )
 
-// ParseFile은 단일 .ssac 파일을 파싱하여 []ServiceFunc를 반환한다.
+// ParseFile parses a single .ssac file and returns the extracted []ServiceFunc.
 func ParseFile(path string) ([]ServiceFunc, []diagnostic.Diagnostic) {
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, path, nil, parser.ParseComments)
@@ -20,7 +20,7 @@ func ParseFile(path string) ([]ServiceFunc, []diagnostic.Diagnostic) {
 			Line:    0,
 			Phase:   diagnostic.PhaseParse,
 			Level:   diagnostic.LevelError,
-			Message: "Go 파싱 실패: " + err.Error(),
+			Message: "Go parse error: " + err.Error(),
 		}}
 	}
 

@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=iteration dimension=1 topic=sqlc
-//ff:what buildQueryParamMap — sqlc QuerySpec에서 쿼리명 → Params set 맵 구축
+//ff:what buildQueryParamMap — build a query-name → Params-set map from sqlc QuerySpecs
 
 package ssac_sqlc
 

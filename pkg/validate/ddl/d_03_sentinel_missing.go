@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=3 topic=ddl-structural
-//ff:what D-3 — FK DEFAULT 0 센티널 레코드 누락
+//ff:what D-3 — FK DEFAULT 0 sentinel record missing
 
 package ddl
 
@@ -11,9 +11,9 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
-// d03SentinelMissing validates D-3: 컬럼이 FK + DEFAULT 0이라면, 참조
-// 대상 테이블에 id=0 센티널 레코드(INSERT INTO ... VALUES (0, ...))가
-// 존재해야 한다. 없으면 ERROR.
+// d03SentinelMissing validates D-3: when a column is FK + DEFAULT 0, the
+// referenced table must have an id=0 sentinel record
+// (INSERT INTO ... VALUES (0, ...)). Missing sentinel is an ERROR.
 func d03SentinelMissing(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	files := readDBSQLFiles(fs.SpecsDir)
 	if len(files) == 0 {
@@ -59,9 +59,9 @@ func d03SentinelMissing(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase: diagnostic.PhaseValidate,
 					Level: diagnostic.LevelError,
 					Message: fmt.Sprintf(
-						"[D-3] 테이블 %q 컬럼 %q — FK + DEFAULT 0 이지만 참조 대상 %q 에 id=0 센티널 레코드가 없습니다",
+						"[D-3] table %q column %q — FK + DEFAULT 0 but referenced table %q has no id=0 sentinel record",
 						blk.tableName, colName, refTable),
-					Advice: fmt.Sprintf("INSERT INTO %s (id, ...) VALUES (0, ...) ON CONFLICT DO NOTHING; 을 추가하세요", refTable),
+					Advice: fmt.Sprintf("Add: INSERT INTO %s (id, ...) VALUES (0, ...) ON CONFLICT DO NOTHING;", refTable),
 				})
 			}
 		}

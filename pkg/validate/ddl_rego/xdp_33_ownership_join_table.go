@@ -10,8 +10,8 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
-// xdp33OwnershipJoinTable validates XDP-33: Rego @ownership via 로 지정한
-// 조인 테이블이 DDL 에 존재하는지 확인한다.
+// xdp33OwnershipJoinTable validates XDP-33: the join table specified in a
+// Rego @ownership via clause must exist in the DDL.
 func xdp33OwnershipJoinTable(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	if fs == nil {
 		return nil
@@ -38,9 +38,9 @@ func xdp33OwnershipJoinTable(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase: diagnostic.PhaseValidate,
 					Level: diagnostic.LevelError,
 					Message: fmt.Sprintf(
-						"[XDP-33] @ownership %s via 의 join table %q 가 DDL 에 존재하지 않습니다",
+						"[XDP-33] @ownership %s via — join table %q not found in DDL",
 						om.Resource, om.JoinTable),
-					Advice: fmt.Sprintf("DDL 에 join 테이블 %s 를 정의하세요", om.JoinTable),
+					Advice: fmt.Sprintf("Define join table %s in the DDL", om.JoinTable),
 				})
 			}
 		}

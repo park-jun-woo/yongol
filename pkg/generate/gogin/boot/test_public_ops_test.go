@@ -1,5 +1,5 @@
 //ff:func feature=gen-gogin type=test control=sequence
-//ff:what collectPublicOps 단위 테스트 — 루트 security, opt-out, public 케이스
+//ff:what collectPublicOps unit test — root security, opt-out, and public cases
 package boot
 
 import (
@@ -9,7 +9,7 @@ import (
 )
 
 func TestCollectPublicOps(t *testing.T) {
-	// 루트 security 있음, Login 만 opt-out
+	// root security present, only Login opts out
 	doc := buildDoc(
 		[]opSpec{
 			{path: "/login", method: "POST", opID: "Login", sec: &openapi3.SecurityRequirements{}},
@@ -22,7 +22,7 @@ func TestCollectPublicOps(t *testing.T) {
 		t.Errorf("case1: got %v want [Login]", got)
 	}
 
-	// 루트 security 없음 → 모든 op 가 public
+	// no root security → all ops are public
 	doc2 := buildDoc(
 		[]opSpec{
 			{path: "/a", method: "GET", opID: "A", sec: nil},
@@ -34,7 +34,7 @@ func TestCollectPublicOps(t *testing.T) {
 		t.Errorf("case2: got %v want [A B]", got)
 	}
 
-	// 전부 보호
+	// all ops protected
 	doc3 := buildDoc(
 		[]opSpec{
 			{path: "/x", method: "POST", opID: "X", sec: nil},

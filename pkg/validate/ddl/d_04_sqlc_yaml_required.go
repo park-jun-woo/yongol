@@ -28,6 +28,6 @@ func d04SqlcYamlRequired(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		Phase:   diagnostic.PhaseValidate,
 		Level:   diagnostic.LevelError,
 		Message: "[D-4] db/sqlc.yaml not found — yongol generate requires sqlc config",
-		Advice:  "db/sqlc.yaml 을 작성하세요 (sqlc v2 format)",
+		Advice:  "Create db/sqlc.yaml (sqlc v2 format)",
 	}}
 }

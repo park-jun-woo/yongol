@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=iteration dimension=1 topic=ssac-openapi
-//ff:what checkFuncErrStatus — 단일 SSaC 함수의 ErrStatus 코드가 OpenAPI에 정의되어 있는지 검증
+//ff:what checkFuncErrStatus — verifies that ErrStatus codes in a single SSaC function are defined in OpenAPI
 
 package openapi_ssac
 
@@ -32,7 +32,7 @@ func checkFuncErrStatus(file, funcName string, seqs []ssac.Sequence, op *openapi
 			Phase:   diagnostic.PhaseValidate,
 			Level:   diagnostic.LevelError,
 			Message: "[XOS-21] SSaC @" + seq.Type + " in " + funcName + " uses HTTP " + strconv.Itoa(status) + " but OpenAPI has no " + strconv.Itoa(status) + " response",
-			Advice:  "OpenAPI " + funcName + " responses 에 " + strconv.Itoa(status) + " 응답을 추가하세요",
+			Advice:  "Add a " + strconv.Itoa(status) + " response to the OpenAPI " + funcName + " responses",
 		})
 	}
 	return diags

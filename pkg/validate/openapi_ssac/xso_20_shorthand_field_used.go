@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=1 topic=ssac-openapi
-//ff:what XSO-20 — OpenAPI response 필드가 shorthand @response 변수 타입에서 사용되는지 검증
+//ff:what XSO-20 — validates that every OpenAPI response field is used in the shorthand @response variable type
 
 package openapi_ssac
 
@@ -22,8 +22,8 @@ func xso20ShorthandFieldUsed(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		if varName == "" {
 			continue
 		}
-		// Page[T]/Cursor[T] wrapper 면제 제거 — B안에서 shorthand @response도
-		// OpenAPI response fields와 매칭 검증을 받아야 함.
+		// Page[T]/Cursor[T] wrapper exemption removed — shorthand @response must also
+		// be validated against OpenAPI response fields under option B.
 		fields := g.Schemas["SSaC.response."+fn.Name]
 		if len(fields) == 0 {
 			continue

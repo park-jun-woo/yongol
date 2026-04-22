@@ -1,5 +1,5 @@
 //ff:func feature=ssac-parse type=parser control=iteration dimension=1
-//ff:what {key: value, ...} 형식 입력을 파싱하여 맵 반환
+//ff:what parseInputs — parses {key: value, ...} form input and returns a map
 package ssac
 
 import (
@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// parseInputs는 {key: value, ...} 형식을 파싱한다.
+// parseInputs parses the {key: value, ...} form.
 func parseInputs(s string) (map[string]string, error) {
 	s = strings.TrimSpace(s)
 	s = strings.TrimPrefix(s, "{")
@@ -24,7 +24,7 @@ func parseInputs(s string) (map[string]string, error) {
 		}
 		colonIdx := strings.IndexByte(pair, ':')
 		if colonIdx < 0 {
-			return nil, fmt.Errorf("%q는 유효하지 않은 입력 형식입니다. \"{Key: value}\" 형식을 사용하세요", pair)
+			return nil, fmt.Errorf("%q is not a valid input pair; use \"{Key: value}\" format", pair)
 		}
 		key := strings.TrimSpace(pair[:colonIdx])
 		val := strings.TrimSpace(pair[colonIdx+1:])

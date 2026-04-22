@@ -1,5 +1,5 @@
 //ff:func feature=gen-gogin type=generator control=sequence
-//ff:what generateReexport — internal/auth/reexport.go 생성 (ssac/pkg/auth 전량 재export)
+//ff:what generateReexport — writes internal/auth/reexport.go (full re-export of ssac/pkg/auth)
 
 package auth
 
@@ -19,14 +19,14 @@ import (
 //   - JWT issue/verify — Configure / IssueToken / RefreshToken / VerifyToken
 //   - Refresh rotation — RefreshStore / RefreshHandler / RefreshTokensDDL /
 //     ClaimMatcher / ErrRefreshTokenNotFound / ErrRefreshTokenReused
-//   - Auth endpoints (Phase009) — RefreshRotate / Logout (SSaC 정규 경로)
+//   - Auth endpoints (Phase009) — RefreshRotate / Logout (standard SSaC path)
 //
 // Type aliases use `=` so `auth.IssueTokenRequest` in callers is the exact
 // same type as `ssac/pkg/auth.IssueTokenRequest`.
 func generateReexport(authDir string) error {
 	header := ffannot.EmitAnnotationBlock(ffannot.Block{
 		Type: ffannot.TypeAnnot{Feature: "auth", Type: "accessor"},
-		What: "reexport — ssac/pkg/auth 전량 재export (password + JWT + refresh rotation)",
+		What: "reexport — full re-export of ssac/pkg/auth (password + JWT + refresh rotation)",
 	})
 	src := header + `package auth
 
@@ -37,7 +37,7 @@ var HashPassword = pkgauth.HashPassword
 var VerifyPassword = pkgauth.VerifyPassword
 var GenerateResetToken = pkgauth.GenerateResetToken
 
-// DummyHash — bcrypt 타이밍 방어용 상수 재export.
+// DummyHash — bcrypt timing-safe constant re-export.
 const DummyHash = pkgauth.DummyHash
 
 type HashPasswordRequest = pkgauth.HashPasswordRequest
@@ -70,7 +70,7 @@ var ErrRefreshTokenReused = pkgauth.ErrRefreshTokenReused
 type RefreshStore = pkgauth.RefreshStore
 type ClaimMatcher = pkgauth.ClaimMatcher
 
-// Auth endpoints (Phase009 — SSaC 정규 경로).
+// Auth endpoints (Phase009 — standard SSaC path).
 var RefreshRotate = pkgauth.RefreshRotate
 var Logout = pkgauth.Logout
 

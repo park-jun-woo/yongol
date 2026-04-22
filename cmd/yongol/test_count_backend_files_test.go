@@ -1,5 +1,5 @@
 //ff:func feature=cli type=test control=sequence
-//ff:what test: TestCountBackendFiles — arts/backend .go 파일 집계, vendor/hidden 제외
+//ff:what test: TestCountBackendFiles — counts arts/backend .go files, excluding vendor and hidden directories
 
 package main
 

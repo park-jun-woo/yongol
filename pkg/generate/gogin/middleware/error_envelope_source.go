@@ -1,5 +1,5 @@
 //ff:type feature=gen-gogin type=generator
-//ff:what errorEnvelopeSource — GenerateErrorEnvelope 가 기록하는 error_envelope.go 템플릿
+//ff:what errorEnvelopeSource — error_envelope.go template written by GenerateErrorEnvelope
 
 package middleware
 
@@ -23,7 +23,7 @@ package middleware
 // reuse it without changing shape for generic errors. field_errors is a map
 // because the v1 scope supports a single message per field.
 const errorEnvelopeSource = `//` + `ff:func feature=runtime-middleware type=util control=sequence topic=error-envelope
-//` + `ff:what ErrorEnvelope / ErrorEnvelopeMiddleware — 모든 에러 응답을 단일 JSON envelope 으로 정렬
+//` + `ff:what ErrorEnvelope / ErrorEnvelopeMiddleware — normalises all error responses into a single JSON envelope
 
 package middleware
 
@@ -86,32 +86,32 @@ func DefaultCodeFor(status int) string {
 	return "error"
 }
 
-// DefaultMessageFor returns the human-readable one-liner (ko locale) for a
-// status code. Unmapped statuses yield a generic message.
+// DefaultMessageFor returns the human-readable one-liner for a status code.
+// Unmapped statuses yield a generic message.
 func DefaultMessageFor(status int) string {
 	switch status {
 	case http.StatusBadRequest:
-		return "잘못된 요청입니다"
+		return "Bad request"
 	case http.StatusUnauthorized:
-		return "인증이 필요합니다"
+		return "Authentication required"
 	case http.StatusForbidden:
-		return "권한이 없습니다"
+		return "Access denied"
 	case http.StatusNotFound:
-		return "리소스를 찾을 수 없습니다"
+		return "Resource not found"
 	case http.StatusConflict:
-		return "리소스 충돌이 발생했습니다"
+		return "Resource conflict"
 	case http.StatusRequestEntityTooLarge:
-		return "요청 본문이 너무 큽니다"
+		return "Request body too large"
 	case http.StatusUnprocessableEntity:
-		return "입력값을 확인해주세요"
+		return "Invalid input"
 	case http.StatusTooManyRequests:
-		return "요청이 너무 많습니다"
+		return "Too many requests"
 	case http.StatusInternalServerError:
-		return "서버 오류가 발생했습니다"
+		return "Internal server error"
 	case http.StatusServiceUnavailable:
-		return "일시적으로 서비스를 제공할 수 없습니다"
+		return "Service temporarily unavailable"
 	}
-	return "요청을 처리할 수 없습니다"
+	return "Unable to process request"
 }
 
 // WriteEnvelope writes a canonical envelope and aborts the gin context.

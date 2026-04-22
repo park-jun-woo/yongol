@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=manifest-observability
-//ff:what OBS-003 — backend.observability.tracing.exporter 는 otlp/stdout/noop 중 하나여야 함
+//ff:what OBS-003 — backend.observability.tracing.exporter must be one of otlp/stdout/noop
 
 package manifest
 
@@ -41,6 +41,6 @@ func obs03TracingExporter(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		Phase:   diagnostic.PhaseValidate,
 		Level:   diagnostic.LevelError,
 		Message: "[OBS-003] backend.observability.tracing.exporter must be one of otlp/stdout/noop (got " + quoted(obs.Tracing.Exporter) + ")",
-		Advice:  "exporter 를 otlp(기본 프로덕션), stdout(개발 로컬 확인), noop(비활성) 중 하나로 설정하세요",
+		Advice:  "Set exporter to one of: otlp (default for production), stdout (local dev inspection), noop (disabled)",
 	}}
 }

@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what S-35 — Go 예약어 result type 금지
+//ff:what S-35 — Go reserved words are forbidden as result type names
 
 package ssac
 
@@ -28,7 +28,7 @@ func s35GoReservedWordModel(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
 				Message: fmt.Sprintf("[S-35] result type %q is a Go reserved word", t),
-				Advice:  fmt.Sprintf("Go 예약어 %q 는 타입명으로 사용할 수 없습니다", t),
+				Advice:  fmt.Sprintf("Go reserved word %q cannot be used as a type name", t),
 			})
 		}
 	}

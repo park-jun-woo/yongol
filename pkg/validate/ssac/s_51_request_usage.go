@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=3 topic=ssac-structural
-//ff:what S-51 — OpenAPI request field가 SSaC에서 사용
+//ff:what S-51 — verifies that OpenAPI request fields are actually used in SSaC
 
 package ssac
 
@@ -70,7 +70,7 @@ func s51RequestUsage(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelWarning,
 				Message: fmt.Sprintf("[S-51] OpenAPI request field %q declared but unused in SSaC", field),
-				Advice:  "OpenAPI 에 선언했지만 미사용. 제거하거나 SSaC 에서 사용하세요",
+				Advice:  "Declared in OpenAPI but not used; remove it or reference it in SSaC",
 			})
 		}
 	}

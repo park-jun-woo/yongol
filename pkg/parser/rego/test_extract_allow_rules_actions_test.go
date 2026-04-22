@@ -1,5 +1,5 @@
 //ff:func feature=policy type=test control=sequence
-//ff:what extractAllowRules — 액션 집합 / role / owner 참조 검출 + AllowRule.SourceLine 회귀
+//ff:what extractAllowRules — action set / role / owner reference detection + AllowRule.SourceLine regression
 
 package rego
 
@@ -13,7 +13,7 @@ func TestParsePolicyFile_ActionSetAndRole(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "authz.rego")
 
-	// "allow if {" legacy form — extractAllowRules 가 "allow {" 도 커버한다.
+	// "allow if {" legacy form — extractAllowRules also covers "allow {".
 	content := `package authz
 
 default allow := false
@@ -64,7 +64,7 @@ allow if {
 		t.Errorf("Rules[1].UsesOwner = false, want true")
 	}
 
-	// claims.sub 참조 수집
+	// collect claims.sub references
 	if len(p.ClaimsRefs) == 0 {
 		t.Errorf("ClaimsRefs empty, want at least [sub]")
 	}

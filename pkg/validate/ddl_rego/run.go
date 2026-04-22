@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=ddl-rego
-//ff:what Run — DDL↔Rego 교차 검증 실행 (XDP-*)
+//ff:what Run — execute all DDL↔Rego cross-validation rules (XDP-*)
 package ddl_rego
 
 import (

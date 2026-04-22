@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=config-check
-//ff:what XNS-56 — @publish/@subscribe → queue 필수
+//ff:what XNS-56 — @publish/@subscribe requires queue configuration in the manifest
 
 package ssac_manifest
 
@@ -26,7 +26,7 @@ func xns56QueueRequired(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		Phase:   diagnostic.PhaseValidate,
 		Level:   diagnostic.LevelError,
 		Message: "[XNS-56] @publish/@subscribe is used but manifest.yaml queue.backend is not configured",
-		Advice:  "manifest queue.backend 를 설정하세요 (memory|kafka|redis 등)",
+		Advice:  "Set manifest queue.backend (e.g. memory, kafka, or redis)",
 	}}
 }
 

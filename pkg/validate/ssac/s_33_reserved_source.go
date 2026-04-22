@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what S-33 — ssac 예약 소스를 result 변수로 사용 금지
+//ff:what S-33 — forbids using an SSaC reserved source name as a result variable
 
 package ssac
 
@@ -28,7 +28,7 @@ func s33ReservedSource(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
 				Message: fmt.Sprintf("[S-33] reserved source %q used as result variable", seq.Result.Var),
-				Advice:  fmt.Sprintf("변수명 %q 는 예약어이므로 다른 이름을 사용하세요", seq.Result.Var),
+				Advice:  fmt.Sprintf("%q is a reserved name; choose a different variable name", seq.Result.Var),
 			})
 		}
 	}

@@ -1,5 +1,5 @@
 //ff:func feature=validate type=test control=sequence topic=ssac-ddl
-//ff:what XDS-12 sqlc row type 매칭 회귀 — RowType 등록 시 WARNING 없음, 미등록 시 WARNING
+//ff:what XDS-12 sqlc row type matching regression — no WARNING when RowType is registered, WARNING when it is not
 
 package ssac_ddl
 
@@ -11,8 +11,8 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/parser/ssac"
 )
 
-// TestCheckSeqResultType_SqlcRowTypePasses — JOIN 쿼리의 sqlc 합성 row type 을
-// `@get` result 로 사용하면 (DTO 선언 없이, DDL 테이블 매칭 없이) 통과해야 한다.
+// TestCheckSeqResultType_SqlcRowTypePasses — using a sqlc composite row type from a JOIN query
+// as a `@get` result (with no DTO declaration and no DDL table match) must pass with zero diagnostics.
 func TestCheckSeqResultType_SqlcRowTypePasses(t *testing.T) {
 	fs := &yongol.Fullstack{
 		SQLcQueries: []sqlcparser.QuerySpec{
@@ -36,8 +36,8 @@ func TestCheckSeqResultType_SqlcRowTypePasses(t *testing.T) {
 	}
 }
 
-// TestCheckSeqResultType_UnknownTypeStillWarns — 회귀 가드: RowType 에 등록되지
-// 않은 합성 타입은 기존대로 WARNING 을 내야 한다 (modelToTable 분기 유지 확인).
+// TestCheckSeqResultType_UnknownTypeStillWarns — regression guard: a composite type not
+// registered in RowType must still emit a WARNING (verifies the modelToTable branch is preserved).
 func TestCheckSeqResultType_UnknownTypeStillWarns(t *testing.T) {
 	fs := &yongol.Fullstack{
 		SQLcQueries: []sqlcparser.QuerySpec{

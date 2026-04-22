@@ -1,5 +1,5 @@
 //ff:func feature=cli type=reporter control=sequence topic=sarif
-//ff:what printReportSARIF — validate.Report 를 SARIF 2.1.0 JSON 으로 stdout 출력
+//ff:what printReportSARIF — prints validate.Report as SARIF 2.1.0 JSON to stdout
 package main
 
 import (

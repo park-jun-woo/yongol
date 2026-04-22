@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=1 topic=tsx
-//ff:what T-1 — 로컬 컴포넌트 import 경로의 실제 파일 존재 여부 확인
+//ff:what T-1 — verifies that local component import paths resolve to an existing file
 package tsx
 
 import (
@@ -37,7 +37,7 @@ func t01ComponentFile(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelWarning,
 					Message: "[T-1] imported component file not found: " + imp.Path,
-					Advice:  "해당 경로에 컴포넌트 파일(.tsx/.ts/index.tsx 중 하나)을 생성하거나 import 경로를 수정하세요",
+					Advice:  "Create a component file (.tsx, .ts, or index.tsx) at that path, or correct the import path",
 				})
 			}
 		}

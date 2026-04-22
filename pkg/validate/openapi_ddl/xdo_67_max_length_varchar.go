@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=openapi-ddl
-//ff:what XDO-67 — DDL VARCHAR(n) 컬럼인데 OpenAPI 요청 필드가 maxLength를 지정하지 않으면 ERROR
+//ff:what XDO-67 — ERROR when a DDL VARCHAR(n) column's OpenAPI request field does not specify maxLength
 
 package openapi_ddl
 
@@ -35,7 +35,7 @@ func xdo67MaxLengthVarchar(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
 				Message: fmt.Sprintf("[XDO-67] %s.%s — DDL column %s is VARCHAR(%d) but OpenAPI has no maxLength", opID, fieldName, col, varcharLen),
-				Advice:  fmt.Sprintf("OpenAPI 필드 %q 에 maxLength: %d 추가하세요 (DDL VARCHAR 길이와 일치)", fieldName, varcharLen),
+				Advice:  fmt.Sprintf("Add maxLength: %d to OpenAPI field %q to match the DDL VARCHAR length", varcharLen, fieldName),
 			})
 		}
 	}

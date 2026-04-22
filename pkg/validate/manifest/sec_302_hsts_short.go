@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=manifest-security-headers
-//ff:what SEC-302 — HSTS max_age 가 180일(15552000초) 미만이면 WARNING
+//ff:what SEC-302 — WARNING when HSTS max_age is below 180 days (15552000 seconds)
 
 package manifest
 
@@ -39,7 +39,7 @@ func sec302HSTSShort(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		File:    "manifest.yaml",
 		Phase:   diagnostic.PhaseValidate,
 		Level:   diagnostic.LevelWarning,
-		Message: "[SEC-302] backend.security_headers.hsts.max_age=" + strconv.Itoa(sh.HSTS.MaxAge) + " 는 HSTS preload 최소치(" + strconv.Itoa(hstsPreloadMinSeconds) + "초, 180일) 미만입니다",
-		Advice:  "운영 환경에서는 max_age 를 최소 15552000 (180일) 이상, 권장 31536000 (1년) 으로 설정하세요",
+		Message: "[SEC-302] backend.security_headers.hsts.max_age=" + strconv.Itoa(sh.HSTS.MaxAge) + " is below the HSTS preload minimum (" + strconv.Itoa(hstsPreloadMinSeconds) + " seconds / 180 days)",
+		Advice:  "Set max_age to at least 15552000 (180 days) in production; 31536000 (1 year) is recommended",
 	}}
 }

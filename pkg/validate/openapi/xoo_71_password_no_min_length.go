@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=openapi-structural
-//ff:what XOO-71 — password 계열 필드에 minLength 제약 누락
+//ff:what XOO-71 — password-type fields are missing a minLength constraint
 
 package openapi
 
@@ -48,7 +48,7 @@ func xoo71PasswordNoMinLength(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelWarning,
 				Message: fmt.Sprintf("[XOO-71] password field %q in %s has no minLength constraint", name, opID),
-				Advice:  "password 필드에 minLength: 8 (또는 정책 최솟값) 을 추가하세요",
+				Advice:  "Add minLength: 8 (or your policy minimum) to the password field",
 			})
 		}
 	}

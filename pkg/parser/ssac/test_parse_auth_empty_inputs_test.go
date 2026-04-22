@@ -1,5 +1,5 @@
 //ff:func feature=ssac-parse type=parser control=sequence
-//ff:what @auth 빈 Inputs 파싱 검증 — {} 입력 시 Inputs 길이 0
+//ff:what validates @auth parsing with empty Inputs — {} yields Inputs of length 0
 
 package ssac
 
@@ -8,7 +8,7 @@ import "testing"
 func TestParseAuthEmptyInputs(t *testing.T) {
 	src := `package service
 
-// @auth "view" "dashboard" {} "권한 없음"
+// @auth "view" "dashboard" {} "unauthorized"
 func ViewDashboard(c *gin.Context) {}
 `
 	sfs := parseTestFile(t, src)

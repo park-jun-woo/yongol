@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=ddl-structural
-//ff:what Run — DDL 검증 전체 실행 (D-*, XDD-*)
+//ff:what Run — execute all DDL validation rules (D-*, XDD-*)
 package ddl
 
 import (

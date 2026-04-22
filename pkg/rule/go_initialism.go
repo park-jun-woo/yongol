@@ -1,12 +1,12 @@
 //ff:func feature=rule type=util control=iteration dimension=1
-//ff:what Go initialism 사전 + ViolatesInitialism — PascalCase 식별자가 Go convention 위반하는지 검사
+//ff:what Go initialism dictionary + ViolatesInitialism — checks whether a PascalCase identifier violates Go naming convention
 package rule
 
 import "strings"
 
-// goInitialisms 는 golint 규약의 common initialism 집합에 yongol 스택 약자를
-// 추가한 확장 집합. Go naming convention: 약자는 모두 대문자 유지
-// (Id → ID, Url → URL, Jwt → JWT, ...). 알파벳 순으로 정렬한다.
+// goInitialisms is an extended set that adds yongol stack acronyms to the
+// common initialisms from the golint convention. Go naming convention: all
+// acronyms must be uppercase (Id → ID, Url → URL, Jwt → JWT, …). Sorted alphabetically.
 var goInitialisms = map[string]bool{
 	"ACL":    true,
 	"API":    true,

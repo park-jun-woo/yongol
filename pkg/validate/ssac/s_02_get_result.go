@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what S-2 — @get Result 필수
+//ff:what S-2 — @get requires a Result field
 
 package ssac
 
@@ -23,7 +23,7 @@ func s02GetResult(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
 					Message: "[S-2] @get requires Result",
-					Advice:  "@get 시퀀스에 Result 항목을 추가하세요",
+					Advice:  "Add a Result field to the @get sequence",
 				})
 			}
 		}

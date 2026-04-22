@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ddl-structural
-//ff:what D-7 — sqlc 쿼리에 위치 파라미터($1, $2 등) 전면 금지
+//ff:what D-7 — positional parameters ($1, $2, …) forbidden in sqlc queries
 
 package ddl
 
@@ -24,9 +24,9 @@ func d07SqlcPositionalParam(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Line:  h.line,
 				Phase: diagnostic.PhaseValidate,
 				Level: diagnostic.LevelError,
-				Message: fmt.Sprintf("[D-7] query %s — 위치 파라미터 %s 사용 금지",
+				Message: fmt.Sprintf("[D-7] query %s — positional parameter %s is forbidden",
 					q.Name, h.param),
-				Advice: "WHERE/SET/VALUES 는 @name, LIMIT/OFFSET 은 sqlc.arg(name) 을 사용하세요",
+				Advice: "Use @name for WHERE/SET/VALUES and sqlc.arg(name) for LIMIT/OFFSET",
 			})
 		}
 	}

@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=1 topic=statemachine-structural
-//ff:what ST-1 — Mermaid stateDiagram 파싱 에러 감지 (재파싱하여 진단 수집)
+//ff:what ST-1 — detects Mermaid stateDiagram parse errors by re-parsing and collecting diagnostics
 
 package statemachine
 
@@ -22,7 +22,7 @@ func st01Parse(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	for i := range diags {
 		diags[i].Phase = diagnostic.PhaseValidate
 		diags[i].Message = "[ST-1] " + diags[i].Message
-		diags[i].Advice = "Mermaid stateDiagram-v2 문법을 점검하세요"
+		diags[i].Advice = "Check the Mermaid stateDiagram-v2 syntax"
 	}
 	return diags
 }

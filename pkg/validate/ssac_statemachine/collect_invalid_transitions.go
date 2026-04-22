@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=iteration dimension=1 topic=states
-//ff:what SSaC 함수의 @state transition이 diagram 이벤트와 매칭되는지 수집
+//ff:what collectInvalidTransitions — collects @state transitions in SSaC functions that do not match any diagram event
 
 package ssac_statemachine
 
@@ -34,7 +34,7 @@ func collectInvalidTransitions(fn ssac.ServiceFunc, diagramByID map[string]*stat
 			Phase:   diagnostic.PhaseValidate,
 			Level:   diagnostic.LevelError,
 			Message: "[XMS-25] transition \"" + seq.Transition + "\" is not a valid event in diagram \"" + seq.DiagramID + "\"",
-			Advice:  "stateDiagram 에 transition '" + seq.Transition + "' 를 정의하세요",
+			Advice:  "Define transition '" + seq.Transition + "' in the stateDiagram",
 		})
 	}
 	return diags

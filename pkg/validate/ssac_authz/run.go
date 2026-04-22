@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=ssac-authz
-//ff:what Run — SSaC↔Authz 교차 검증 실행 (XAS-*)
+//ff:what Run — execute all SSaC↔Authz cross-validation rules (XAS-*)
 package ssac_authz
 
 import (

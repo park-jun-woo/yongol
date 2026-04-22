@@ -1,5 +1,5 @@
 //ff:func feature=ssac-parse type=parser control=sequence
-//ff:what 전체 시퀀스 통합 파싱 검증 — auth/get/empty/state/call/put/get/response 8단계
+//ff:what full sequence integration parse test — auth/get/empty/state/call/put/get/response 8 steps
 
 package ssac
 
@@ -10,10 +10,10 @@ func TestParseFullExample(t *testing.T) {
 
 import "myapp/auth"
 
-// @auth "cancel" "reservation" {id: request.ReservationID} "권한 없음"
+// @auth "cancel" "reservation" {id: request.ReservationID} "access denied"
 // @get Reservation reservation = Reservation.FindByID({ReservationID: request.ReservationID})
-// @empty reservation "예약을 찾을 수 없습니다"
-// @state reservation {status: reservation.Status} "cancel" "취소할 수 없습니다"
+// @empty reservation "reservation not found"
+// @state reservation {status: reservation.Status} "cancel" "cannot cancel"
 // @call Refund refund = billing.CalculateRefund({ID: reservation.ID, StartAt: reservation.StartAt, EndAt: reservation.EndAt})
 // @put Reservation.UpdateStatus({ReservationID: request.ReservationID, Status: "cancelled"})
 // @get Reservation reservation = Reservation.FindByID({ReservationID: request.ReservationID})

@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=1 topic=config-check
-//ff:what XNO-50 — OpenAPI securityScheme → Manifest middleware 매칭 검사
+//ff:what XNO-50 — verifies that every OpenAPI securityScheme is matched by a Manifest middleware
 
 package openapi_manifest
 
@@ -23,7 +23,7 @@ func xno50SecuritySchemeMiddleware(fs *yongol.Fullstack) []diagnostic.Diagnostic
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
 				Message: "[XNO-50] OpenAPI securityScheme \"" + name + "\" has no matching middleware in manifest.yaml",
-				Advice:  "manifest backend.middleware 에 \"" + name + "\" 를 추가하세요",
+				Advice:  "Add \"" + name + "\" to manifest backend.middleware",
 			})
 		}
 	}

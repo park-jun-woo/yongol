@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=1 topic=rego-structural
-//ff:what XPP-30 — Rego 정책에서 resource_owner 참조 시 @ownership 어노테이션 필수
+//ff:what XPP-30 — @ownership annotation is required when a Rego policy references resource_owner
 
 package rego
 
@@ -22,7 +22,7 @@ func xpp30OwnershipNoAnnotation(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
 				Message: "[XPP-30] policy references resource_owner but declares no @ownership",
-				Advice:  "정책 패키지 상단에 # @ownership table.column [join_table.fk] 를 추가하세요",
+				Advice:  "Add # @ownership table.column [join_table.fk] at the top of the policy package",
 			})
 		}
 	}

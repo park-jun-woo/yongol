@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=1 topic=scenario-check
-//ff:what XOH-36 — Hurl entry의 HTTP method가 매칭된 OpenAPI path에 정의되어 있는지 검증
+//ff:what XOH-36 — verifies that a Hurl entry's HTTP method is defined in the matched OpenAPI path
 
 package openapi_hurl
 
@@ -28,7 +28,7 @@ func xoh36HurlMethodOpenAPI(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			Phase:   diagnostic.PhaseValidate,
 			Level:   diagnostic.LevelError,
 			Message: "[XOH-36] method " + e.Method + " " + e.Path + " — path exists but method not defined in OpenAPI",
-			Advice:  "Hurl method 를 OpenAPI op 의 메서드와 일치시키거나 OpenAPI 에 해당 메서드를 추가하세요",
+			Advice:  "Align the Hurl method with the OpenAPI operation's method, or add the method to OpenAPI",
 		})
 	}
 	return diags

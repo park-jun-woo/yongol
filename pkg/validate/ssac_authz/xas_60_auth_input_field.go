@@ -41,7 +41,7 @@ func xas60AuthInputField(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
 					Message: "[XAS-60] @auth input field " + strconv.Quote(key) + " missing in authz.CheckRequest",
-					Advice:  "authz.CheckRequest 정의 필드만 사용하거나 custom authz 패키지를 manifest 에 등록하세요",
+					Advice:  "Use only fields defined in authz.CheckRequest, or register a custom authz package in the manifest",
 				})
 			}
 		}

@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=openapi-ddl
-//ff:what XOD-10 — DDL 컬럼이 대응 OpenAPI components.schemas property 로 노출되지 않으면 WARNING
+//ff:what XOD-10 — WARNING when a DDL column is not exposed as a property in the corresponding OpenAPI components.schemas
 
 package openapi_ddl
 
@@ -48,7 +48,7 @@ func xod10DDLToResponse(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelWarning,
 				Message: fmt.Sprintf("[XOD-10] DDL column %s.%s missing from OpenAPI schema %s", t.Name, col, schemaName),
-				Advice:  fmt.Sprintf("DDL 컬럼 %q 를 OpenAPI response schema %s 에 추가하거나 DDL 컬럼에 -- @sensitive 어노테이션을 다세요", col, schemaName),
+				Advice:  fmt.Sprintf("Add DDL column %q to OpenAPI response schema %s, or annotate the DDL column with -- @sensitive", col, schemaName),
 			})
 		}
 	}

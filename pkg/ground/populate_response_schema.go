@@ -1,5 +1,5 @@
 //ff:func feature=rule type=loader control=iteration dimension=1
-//ff:what populateResponseSchema — operationId별 OpenAPI response 필드를 Ground.Schemas에 등록
+//ff:what populateResponseSchema — registers OpenAPI response fields per operationId into Ground.Schemas
 package ground
 
 import (
@@ -34,16 +34,16 @@ func populateResponseSchema(g *rule.Ground, opID string, op *openapi3.Operation)
 			fields = append(fields, name)
 		}
 
-		// 상태 코드별 키: OpenAPI.response.<code>.<opID>
+		// per-status-code key: OpenAPI.response.<code>.<opID>
 		g.Schemas["OpenAPI.response."+code+"."+opID] = fields
 
-		// $ref 解決 (상태 코드별)
+		// $ref resolution (per status code)
 		resolved := resolveRefProperties(ct.Schema.Value)
 		if len(resolved) > 0 {
 			g.Schemas["OpenAPI.response.resolved."+code+"."+opID] = resolved
 		}
 
-		// 첫 2xx 는 기존 키(OpenAPI.response.<opID>)로도 유지 — 하위 호환
+		// also keep the first 2xx under the legacy key (OpenAPI.response.<opID>) for back-compat
 		if !primary2xxDone && code[0] == '2' {
 			g.Schemas["OpenAPI.response."+opID] = fields
 			if len(resolved) > 0 {

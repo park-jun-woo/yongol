@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=3 topic=openapi-ssac
-//ff:what XOS-67 — @response field 값 type 이 OpenAPI response schema 기대 type 과 호환
+//ff:what XOS-67 — the value type of each @response field must be compatible with the expected type in the OpenAPI response schema
 
 package openapi_ssac
 
@@ -53,7 +53,7 @@ func xos67ResponseFieldType(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Level: diagnostic.LevelError,
 					Message: fmt.Sprintf("[XOS-67] %s seq[%d] — @response field %q = %q: type %s ≠ OpenAPI response %q expected type %s",
 						fn.Name, seqIdx, key, value, actual, key, expected),
-					Advice: "값의 타입이 OpenAPI 스키마와 호환되도록 수정하세요",
+					Advice: "Correct the value type so that it is compatible with the OpenAPI schema",
 				})
 			}
 		}

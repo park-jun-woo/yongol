@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=iteration dimension=1 topic=states
-//ff:what SSaC 함수의 @state sequence 중 존재하지 않는 diagram 수집
+//ff:what collectMissingDiagrams — collects @state sequences in SSaC functions that reference a non-existent diagram
 
 package ssac_statemachine
 
@@ -30,7 +30,7 @@ func collectMissingDiagrams(fn ssac.ServiceFunc, diagramByID map[string]*statema
 			Phase:   diagnostic.PhaseValidate,
 			Level:   diagnostic.LevelError,
 			Message: "[XMS-24] @state references diagram \"" + seq.DiagramID + "\" which does not exist",
-			Advice:  "specs/states/" + seq.DiagramID + ".mmd 파일을 추가하세요",
+			Advice:  "Add the file specs/states/" + seq.DiagramID + ".mmd",
 		})
 	}
 	return diags

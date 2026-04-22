@@ -1,5 +1,5 @@
 //ff:func feature=validate type=test control=sequence topic=rego-structural
-//ff:what XPP-30 테스트 (TODO: 케이스 추가)
+//ff:what XPP-30 test (TODO: add cases)
 
 package rego
 

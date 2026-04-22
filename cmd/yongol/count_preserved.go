@@ -1,5 +1,5 @@
 //ff:func feature=cli type=util control=iteration dimension=1
-//ff:what countPreserved — preserved 경로 슬라이스에서 reason 주석 보유/미보유 분리 카운트
+//ff:what countPreserved — splits preserved path slice into files with and without a reason comment
 
 package main
 

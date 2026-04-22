@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=manifest-auth
-//ff:what SEC-403 — backend.auth.mode 값은 cookie|bearer|hybrid 중 하나여야 함 (Phase020)
+//ff:what SEC-403 — backend.auth.mode must be one of cookie|bearer|hybrid (Phase020)
 
 package manifest
 
@@ -36,7 +36,7 @@ func sec403AuthModeEnum(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		File:    "manifest.yaml",
 		Phase:   diagnostic.PhaseValidate,
 		Level:   diagnostic.LevelError,
-		Message: "[SEC-403] backend.auth.mode=\"" + mode + "\" 는 알 수 없는 값입니다",
-		Advice:  "auth.mode 를 cookie / bearer / hybrid 중 하나로 지정하세요 (미지정 시 cookie)",
+		Message: "[SEC-403] backend.auth.mode=\"" + mode + "\" is an unknown value",
+		Advice:  "Set auth.mode to one of cookie / bearer / hybrid (defaults to cookie when omitted)",
 	}}
 }

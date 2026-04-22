@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=iteration dimension=1 topic=openapi-structural
-//ff:what o02CaseConflictDiag — 단일 path parameter 의 case variants 를 진단으로 변환
+//ff:what o02CaseConflictDiag — converts case variants of a single path parameter into a diagnostic
 
 package openapi
 
@@ -29,6 +29,6 @@ func o02CaseConflictDiag(lower string, cases map[string]map[string]bool) (diagno
 		Level: diagnostic.LevelError,
 		Message: fmt.Sprintf("[O-2] path parameter %q appears with multiple case variants across paths: %v",
 			lower, variants),
-		Advice: "하나의 case 로 통일하세요 (case 구별은 router 에서 서로 다른 param 으로 처리됨)",
+		Advice: "Unify to a single casing (the router treats differently-cased names as distinct parameters)",
 	}, true
 }

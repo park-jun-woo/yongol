@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what S-46 — Result 타입 대문자 시작
+//ff:what S-46 — Result type name must start with an uppercase letter
 
 package ssac
 
@@ -35,7 +35,7 @@ func s46UppercaseStart(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
 				Message: fmt.Sprintf("[S-46] result type %q must start with uppercase", t),
-				Advice:  "Result 타입은 대문자로 시작해야 합니다 (PascalCase)",
+				Advice:  "Result type names must start with an uppercase letter (PascalCase)",
 			})
 		}
 	}

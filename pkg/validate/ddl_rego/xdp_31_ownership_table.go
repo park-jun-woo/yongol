@@ -10,8 +10,8 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
-// xdp31OwnershipTable validates XDP-31: Rego @ownership 어노테이션이 참조하는
-// 테이블이 DDL 에 존재하는지 확인한다.
+// xdp31OwnershipTable validates XDP-31: every table referenced by a Rego
+// @ownership annotation must exist in the DDL.
 func xdp31OwnershipTable(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	if fs == nil {
 		return nil
@@ -22,7 +22,7 @@ func xdp31OwnershipTable(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	}
 	tables := g.Lookup["DDL.table"]
 	if tables == nil {
-		// Ground 미생성은 상위 파이프라인 버그. XDP-31 은 Ground 단일 소스만 사용한다.
+		// Missing Ground is a pipeline bug upstream; XDP-31 relies solely on Ground.
 		return nil
 	}
 
@@ -45,9 +45,9 @@ func xdp31OwnershipTable(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase: diagnostic.PhaseValidate,
 					Level: diagnostic.LevelError,
 					Message: fmt.Sprintf(
-						"[XDP-31] @ownership %s 의 table %q 가 DDL 에 존재하지 않습니다",
+						"[XDP-31] @ownership %s — table %q not found in DDL",
 						om.Resource, om.Table),
-					Advice: fmt.Sprintf("DDL 에 테이블 %s 를 정의하거나 Rego @ownership 에서 제거하세요", om.Table),
+					Advice: fmt.Sprintf("Define table %s in the DDL, or remove it from the Rego @ownership annotation", om.Table),
 				})
 			}
 		}

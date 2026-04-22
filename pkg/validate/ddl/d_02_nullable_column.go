@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=3 topic=ddl-structural
-//ff:what D-2 — NOT NULL 누락
+//ff:what D-2 — NOT NULL missing
 
 package ddl
 
@@ -11,8 +11,9 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
-// d02NullableColumn validates D-2: db/*.sql의 컬럼 정의에 NOT NULL이
-// 없으면 ERROR. PRIMARY KEY 컬럼은 암묵적으로 NOT NULL이므로 제외.
+// d02NullableColumn validates D-2: a column definition in db/*.sql that lacks
+// NOT NULL is an ERROR. PRIMARY KEY columns are implicitly NOT NULL and are
+// excluded.
 func d02NullableColumn(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	files := readDBSQLFiles(fs.SpecsDir)
 	if len(files) == 0 {
@@ -44,9 +45,9 @@ func d02NullableColumn(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase: diagnostic.PhaseValidate,
 					Level: diagnostic.LevelError,
 					Message: fmt.Sprintf(
-						"[D-2] 테이블 %q 컬럼 %q — NOT NULL 이 없습니다",
+						"[D-2] table %q column %q — NOT NULL is missing",
 						blk.tableName, colName),
-					Advice: fmt.Sprintf("%s.%s 에 NOT NULL 제약을 추가하거나 명시적 nullable 의도를 -- @nullable 코멘트로 적으세요", blk.tableName, colName),
+					Advice: fmt.Sprintf("Add a NOT NULL constraint to %s.%s, or if intentional add a -- @nullable comment", blk.tableName, colName),
 				})
 			}
 		}

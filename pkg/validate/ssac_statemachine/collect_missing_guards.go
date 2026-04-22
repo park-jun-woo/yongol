@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=iteration dimension=1 topic=states
-//ff:what diagram 이벤트 중 @state 가드가 없는 함수 수집
+//ff:what collectMissingGuards — collects diagram events whose SSaC function has no @state guard
 
 package ssac_statemachine
 
@@ -28,7 +28,7 @@ func collectMissingGuards(diagramID string, events []string, funcByName map[stri
 			Phase:   diagnostic.PhaseValidate,
 			Level:   diagnostic.LevelWarning,
 			Message: "[XSM-26] function \"" + event + "\" participates in diagram \"" + diagramID + "\" but has no @state sequence",
-			Advice:  "state 변경 전 @empty 가드를 추가하세요",
+			Advice:  "Add an @empty guard before the state change",
 		})
 	}
 	return diags

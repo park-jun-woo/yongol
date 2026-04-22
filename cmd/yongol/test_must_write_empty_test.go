@@ -1,5 +1,5 @@
 //ff:func feature=cli type=test-helper control=sequence
-//ff:what test: mustWriteEmpty — 테스트용 빈 파일 생성 헬퍼
+//ff:what test: mustWriteEmpty — helper that creates an empty file for testing
 
 package main
 

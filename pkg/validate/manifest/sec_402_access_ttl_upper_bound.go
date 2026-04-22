@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=manifest-auth
-//ff:what SEC-402 — backend.auth.access_token_ttl 은 30분 이하여야 함 (OWASP 권고)
+//ff:what SEC-402 — backend.auth.access_token_ttl must be 30 minutes or less (OWASP recommendation)
 
 package manifest
 
@@ -40,7 +40,7 @@ func sec402AccessTTLUpperBound(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		File:    "manifest.yaml",
 		Phase:   diagnostic.PhaseValidate,
 		Level:   diagnostic.LevelWarning,
-		Message: "[SEC-402] backend.auth.access_token_ttl=" + raw + " 은 권장 상한(30m)을 초과합니다",
-		Advice:  "access_token_ttl 을 30m 이하로 낮추고 refresh-token rotation 주기를 짧게 유지하세요",
+		Message: "[SEC-402] backend.auth.access_token_ttl=" + raw + " exceeds the recommended upper bound (30m)",
+		Advice:  "Lower access_token_ttl to 30m or less and keep the refresh-token rotation interval short",
 	}}
 }

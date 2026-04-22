@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=func-check
-//ff:what XSF-46 — @result 없지만 func Response 있음
+//ff:what XSF-46 — no @result but func has a Response
 
 package ssac_func
 
@@ -10,8 +10,8 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
-// xsf46CallResultIgnored validates XSF-46: @result 없지만 func Response 있음.
-// WARNING level — caller silently drops a return value the callee provides.
+// xsf46CallResultIgnored validates XSF-46: no @result but func has Response
+// fields. WARNING — caller silently drops a return value the callee provides.
 func xsf46CallResultIgnored(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	var diags []diagnostic.Diagnostic
 	for _, fn := range fs.ServiceFuncs {
@@ -33,7 +33,7 @@ func xsf46CallResultIgnored(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelWarning,
 					Message: "[XSF-46] @call " + seq.Model + " ignores Response fields",
-					Advice:  "func " + seq.Model + " 의 반환값이 무시됩니다 — @get 결과 변수에 바인드하세요",
+					Advice:  "The return value of func " + seq.Model + " is being ignored — bind it to a @get result variable",
 				})
 			}
 		}

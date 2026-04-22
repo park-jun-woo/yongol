@@ -1,5 +1,5 @@
 //ff:func feature=ssac-parse type=parser control=sequence
-//ff:what AST 함수 선언에서 ServiceFunc를 추출
+//ff:what parseFuncDecl — extracts a ServiceFunc from an AST function declaration
 package ssac
 
 import (
@@ -10,7 +10,7 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
 )
 
-// parseFuncDecl은 AST 함수 선언에서 ServiceFunc를 추출한다.
+// parseFuncDecl extracts a ServiceFunc from an AST function declaration.
 func parseFuncDecl(fset *token.FileSet, fn *ast.FuncDecl, f *ast.File, path string, imports []string, structs []StructInfo) (*ServiceFunc, []diagnostic.Diagnostic) {
 	comments := collectFuncComments(f, fn.Pos())
 
@@ -41,7 +41,7 @@ func parseFuncDecl(fset *token.FileSet, fn *ast.FuncDecl, f *ast.File, path stri
 		NoPagination: noPagination,
 	}
 
-	// @subscribe 추출: 시퀀스가 아닌 함수 메타데이터
+	// @subscribe extraction: function metadata, not a sequence
 	sf.Sequences = filterSubscribe(&sf, sequences)
 
 	return &sf, nil

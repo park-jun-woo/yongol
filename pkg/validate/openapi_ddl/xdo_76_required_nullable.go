@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=openapi-ddl
-//ff:what XDO-76 — OpenAPI required + DDL nullable → WARNING. `-- @nullable` 어노테이션 면제.
+//ff:what XDO-76 — WARNING when OpenAPI marks a field required but the DDL column is nullable; exempted by `-- @nullable` annotation
 
 package openapi_ddl
 
@@ -53,7 +53,7 @@ func xdo76RequiredNullable(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					"[XDO-76] %s — OpenAPI required field %q is nullable in DDL table %q",
 					opID, fieldName, tbl.Name,
 				),
-				Advice: "DDL에 NOT NULL을 추가하거나 의도적이면 -- @nullable 어노테이션을 추가하세요",
+				Advice: "Add NOT NULL to the DDL column, or add -- @nullable if the nullable column is intentional",
 			})
 		}
 	}

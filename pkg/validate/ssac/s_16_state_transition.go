@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what S-16 — @state Transition 필수
+//ff:what S-16 — @state requires a Transition field
 
 package ssac
 
@@ -23,7 +23,7 @@ func s16StateTransition(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
 					Message: "[S-16] @state requires Transition",
-					Advice:  "@state 시퀀스에 Transition 항목을 추가하세요 (예: Draft-->Published)",
+					Advice:  "Add a Transition field to the @state sequence (e.g. Draft-->Published)",
 				})
 			}
 		}

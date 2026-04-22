@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what S-39 — @subscribe message 타입에 대응하는 struct 정의 필수
+//ff:what S-39 — a struct matching the @subscribe message type must be defined
 
 package ssac
 
@@ -34,7 +34,7 @@ func s39SubscribeMessageRequired(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			Phase:   diagnostic.PhaseValidate,
 			Level:   diagnostic.LevelError,
 			Message: fmt.Sprintf("[S-39] @subscribe message type %s has no struct definition", fn.Param.TypeName),
-			Advice:  fmt.Sprintf("@subscribe message 타입 %s 에 대응하는 struct 를 정의하세요", fn.Param.TypeName),
+			Advice:  fmt.Sprintf("Define a struct corresponding to the @subscribe message type %s", fn.Param.TypeName),
 		})
 	}
 	return diags

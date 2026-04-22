@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=sequence topic=func-check
-//ff:what callFuncName — @call "pkg.Func" 에서 PascalCase 함수명 부분 추출
+//ff:what callFuncName — extract the PascalCase function name from a @call "pkg.Func" model
 
 package ssac_func
 

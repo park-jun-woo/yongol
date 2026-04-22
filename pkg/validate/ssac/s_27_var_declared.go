@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=3 topic=ssac-structural
-//ff:what S-27 — 변수 선언 후 사용 (Args)
+//ff:what S-27 — variables must be declared before use in Args
 
 package ssac
 
@@ -28,7 +28,7 @@ func s27VarDeclared(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
 					Message: fmt.Sprintf("[S-27] variable %q used before declaration", name),
-					Advice:  fmt.Sprintf("변수 %q 를 @get/@post 시퀀스 결과로 먼저 선언하세요", name),
+					Advice:  fmt.Sprintf("Declare variable %q as the result of a preceding @get/@post sequence", name),
 				})
 			}
 		}

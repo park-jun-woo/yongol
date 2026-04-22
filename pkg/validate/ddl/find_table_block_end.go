@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=iteration dimension=1 topic=ddl-structural
-//ff:what findTableBlockEnd — CREATE TABLE 블록의 종료 line 인덱스 탐색
+//ff:what findTableBlockEnd — locate the closing line index of a CREATE TABLE block
 
 package ddl
 

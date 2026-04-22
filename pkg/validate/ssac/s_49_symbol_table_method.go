@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what S-49 — Model.Method 중 Method가 심볼 테이블에 존재
+//ff:what S-49 — the Method part of Model.Method must exist in the symbol table
 
 package ssac
 
@@ -41,7 +41,7 @@ func s49SymbolTableMethod(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
 				Message: fmt.Sprintf("[S-49] method %s not found on model %s", method, model),
-				Advice:  fmt.Sprintf("model %s 에 method %s 를 정의하세요 (예: @method %s Model.%s(...))", model, method, method, method),
+				Advice:  fmt.Sprintf("Define method %s on model %s (e.g. @method %s Model.%s(...))", method, model, method, method),
 			})
 		}
 	}

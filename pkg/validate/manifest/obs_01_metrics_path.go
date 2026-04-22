@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=manifest-observability
-//ff:what OBS-001 — backend.observability.metrics.path 가 "/" 로 시작해야 함
+//ff:what OBS-001 — backend.observability.metrics.path must start with "/"
 
 package manifest
 
@@ -35,6 +35,6 @@ func obs01MetricsPath(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		Phase:   diagnostic.PhaseValidate,
 		Level:   diagnostic.LevelError,
 		Message: "[OBS-001] backend.observability.metrics.path must start with '/' (got " + quoted(obs.Metrics.Path) + ")",
-		Advice:  "path 를 '/metrics' 또는 '/internal/metrics' 처럼 '/' 로 시작하는 절대 경로로 지정하세요",
+		Advice:  "Set path to an absolute path starting with '/' (e.g. '/metrics' or '/internal/metrics')",
 	}}
 }

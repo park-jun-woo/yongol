@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what XSS-38 — @call 함수명 소문자 시작 금지
+//ff:what XSS-38 — @call function name must not start with a lowercase letter
 
 package ssac
 
@@ -33,7 +33,7 @@ func xss38CallFuncLowercase(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
 				Message: fmt.Sprintf("[XSS-38] @call function %q must start with uppercase", method),
-				Advice:  "@call 함수명은 대문자로 시작해야 합니다 (Go exported)",
+				Advice:  "@call function names must start with an uppercase letter (Go exported)",
 			})
 		}
 	}

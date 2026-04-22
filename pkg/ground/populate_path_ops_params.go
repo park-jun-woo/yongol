@@ -1,5 +1,5 @@
 //ff:func feature=rule type=loader control=iteration dimension=1
-//ff:what populatePathOpsParams — path의 각 operation에서 param/sort/filter 등록
+//ff:what populatePathOpsParams — registers param/sort/filter from each operation in a path
 package ground
 
 import (
@@ -10,11 +10,12 @@ import (
 
 func populatePathOpsParams(g *rule.Ground, ops map[string]*openapi3.Operation) {
 	for _, op := range ops {
-		// operationId 부재 operation 은 Lookup 키를 만들 수 없어 skip.
-		// operationId 는 OpenAPI 사양상 선택이지만 yongol 는 전 SSOT 연결
-		// 키로 사용하므로 선행 validate (`pkg/validate/openapi` 의 O-4 규칙)
-		// 에서 ERROR 로 차단된다. Ground 계층은 loader 이므로 diagnostic 을
-		// 발행하지 않고 skip 만 한다 (O-4 통과 후에는 실제로 도달하지 않음).
+		// Operations without an operationId cannot produce a Lookup key — skip them.
+		// operationId is optional per the OpenAPI spec, but yongol uses it as the
+		// cross-SSOT join key, so the preceding validate step (O-4 rule in
+		// pkg/validate/openapi) blocks these with an ERROR. The Ground layer is a
+		// loader and never emits diagnostics; in practice this path is unreachable
+		// after O-4 passes.
 		if op.OperationID != "" {
 			populateOpParams(g, op)
 		}

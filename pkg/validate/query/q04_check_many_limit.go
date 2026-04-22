@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=sequence topic=query-structural
-//ff:what q04CheckManyLimit — 단일 :many 쿼리의 LIMIT 유무 판정 + WARNING 진단 생성
+//ff:what q04CheckManyLimit — checks whether a single :many query has a LIMIT clause and generates a WARNING diagnostic if not
 
 package query
 
@@ -33,6 +33,6 @@ func q04CheckManyLimit(q sqlc.QuerySpec) (diagnostic.Diagnostic, bool) {
 		Phase:   diagnostic.PhaseValidate,
 		Level:   diagnostic.LevelWarning,
 		Message: "[Q-04] :many query " + q.Name + " has no LIMIT clause (unbounded result)",
-		Advice:  "LIMIT 을 추가하거나 의도적 전체 반환이면 `-- +no-pagination` 주석을 붙이세요",
+		Advice:  "Add a LIMIT clause, or add `-- +no-pagination` if returning all rows is intentional",
 	}, true
 }

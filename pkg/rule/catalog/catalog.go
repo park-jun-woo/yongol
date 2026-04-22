@@ -1,13 +1,13 @@
 //ff:type feature=rule type=model topic=catalog
-//ff:what Catalog — rulebook.md 파싱 결과를 Rule ID 로 조회 가능한 Lookup 테이블로 보관
+//ff:what Catalog — stores the parsed rulebook.md result as a Rule ID keyed lookup table
 package catalog
 
 import "strings"
 
 // RuleMeta describes a single rule as declared in rulebook.md.
 //
-// SectionTitle is the H2 heading (예: "A. SSaC Internal") that the row belongs to.
-// SectionAnchor is the GFM-style lowercase anchor of the section (예: "a-ssac-internal"),
+// SectionTitle is the H2 heading (e.g. "A. SSaC Internal") that the row belongs to.
+// SectionAnchor is the GFM-style lowercase anchor of the section (e.g. "a-ssac-internal"),
 // used by the SARIF emitter to build a stable helpUri.
 type RuleMeta struct {
 	ID            string

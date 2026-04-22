@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=3 topic=ssac-structural
-//ff:what XSS-47 — @call arg source 미정의 (WARNING)
+//ff:what XSS-47 — @call argument source variable is undefined (WARNING)
 
 package ssac
 
@@ -31,7 +31,7 @@ func xss47CallSourceVarUndefined(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelWarning,
 					Message: fmt.Sprintf("[XSS-47] @call arg source %q is undefined", name),
-					Advice:  fmt.Sprintf("@call 인자 source 변수 %q 를 미리 선언하세요", name),
+					Advice:  fmt.Sprintf("Declare the @call argument source variable %q before using it", name),
 				})
 			}
 		}

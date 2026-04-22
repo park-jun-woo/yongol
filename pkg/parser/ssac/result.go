@@ -1,10 +1,10 @@
 //ff:type feature=ssac-parse type=model
-//ff:what 결과 바인딩 타입
+//ff:what Result — type representing a result binding
 package ssac
 
-// Result는 결과 바인딩이다.
+// Result represents a result binding.
 type Result struct {
-	Type    string // "Course", "Reservation" (내부 타입)
+	Type    string // "Course", "Reservation" (concrete type)
 	Var     string // "course", "reservations"
-	Wrapper string // "Page", "Cursor", "" (제네릭 래퍼)
+	Wrapper string // "Page", "Cursor", "" (generic wrapper)
 }

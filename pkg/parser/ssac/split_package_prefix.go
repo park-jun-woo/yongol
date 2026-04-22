@@ -1,14 +1,14 @@
 //ff:func feature=ssac-parse type=util control=sequence
-//ff:what "session.Session.Get" → ("session", "Session.Get") 패키지 접두사 분리
+//ff:what splitPackagePrefix — splits "session.Session.Get" into ("session", "Session.Get") package prefix
 package ssac
 
 import "strings"
 
-// splitPackagePrefix는 "session.Session.Get" → ("session", "Session.Get")로 분리한다.
-// "Course.FindByID" → ("", "Course.FindByID") — 2-part는 패키지 없음.
-// @call은 이미 pkg.Func 형식이므로 이 함수를 사용하지 않는다.
+// splitPackagePrefix splits "session.Session.Get" into ("session", "Session.Get").
+// "Course.FindByID" → ("", "Course.FindByID") — 2-part form has no package prefix.
+// @call already uses the pkg.Func form so this function is not used for it.
 func splitPackagePrefix(model string) (pkg, rest string) {
-	// dot 개수: 1개 → 기존 Model.Method, 2개 이상 → pkg.Model.Method
+	// dot count: 1 → legacy Model.Method, 2+ → pkg.Model.Method
 	firstDot := strings.IndexByte(model, '.')
 	if firstDot < 0 {
 		return "", model

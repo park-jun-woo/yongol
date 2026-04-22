@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=config-check
-//ff:what XNS-48 — currentUser 사용 → claims 필수
+//ff:what XNS-48 — using currentUser requires claims to be enabled in the manifest
 
 package ssac_manifest
 
@@ -27,7 +27,7 @@ func xns48CurrentUserClaims(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		Phase:   diagnostic.PhaseValidate,
 		Level:   diagnostic.LevelError,
 		Message: "[XNS-48] currentUser is used but manifest.yaml backend.auth.claims is not defined",
-		Advice:  "manifest backend.auth.claims 를 활성화하거나 currentUser 사용을 제거하세요",
+		Advice:  "Enable manifest backend.auth.claims, or remove the use of currentUser",
 	}}
 }
 

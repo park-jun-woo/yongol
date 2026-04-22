@@ -1,5 +1,5 @@
 //ff:func feature=cli type=command control=sequence
-//ff:what generateCmd — yongol generate 서브커맨드 반환
+//ff:what generateCmd — returns the yongol generate subcommand
 
 package main
 

@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=ssac-sqlc
-//ff:what Run — SSaC↔sqlc 교차 검증 실행 (XQS-*)
+//ff:what Run — execute all SSaC↔sqlc cross-validation rules (XQS-*)
 package ssac_sqlc
 
 import (

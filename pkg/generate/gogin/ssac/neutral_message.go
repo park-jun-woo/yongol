@@ -1,11 +1,11 @@
 //ff:func feature=gen-gogin type=util control=sequence
-//ff:what neutralMessage — HTTP status code 별 중립 에러 메시지
+//ff:what neutralMessage — client-safe default error message per HTTP status code
 
 package ssac
 
 // neutralMessages maps HTTP status code → client-safe default message.
-// SSaC 에 명시 메시지가 없는 경우에만 fallback 으로 사용. 내부 에러 원문
-// (err.Error()) 을 외부에 노출하지 않기 위한 기반.
+// Used only as a fallback when no explicit message is given in SSaC, so that
+// raw internal error text (err.Error()) is never exposed to clients.
 var neutralMessages = map[int]string{
 	400: "Bad request",
 	401: "Unauthorized",

@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ddl-structural
-//ff:what D-1 — sqlc query name 중복
+//ff:what D-1 — sqlc query name duplicate
 
 package ddl
 
@@ -10,9 +10,9 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
-// d01SqlcQueryDuplicate validates D-1: db/queries/*.sql 사이에서 동일한
-// `-- name: <Name>` 쿼리 이름이 두 번 이상 등장하면 ERROR. sqlc는 전역
-// 네임스페이스이므로 ModelPrefix를 권장한다.
+// d01SqlcQueryDuplicate validates D-1: a `-- name: <Name>` query that appears
+// more than once across db/queries/*.sql is an ERROR. Because sqlc uses a global
+// namespace, a ModelPrefix is recommended.
 func d01SqlcQueryDuplicate(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	if len(fs.SQLcQueries) == 0 {
 		return nil
@@ -44,9 +44,9 @@ func d01SqlcQueryDuplicate(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase: diagnostic.PhaseValidate,
 				Level: diagnostic.LevelError,
 				Message: fmt.Sprintf(
-					"[D-1] sqlc query name %q is duplicated — sqlc 는 전역 네임스페이스",
+					"[D-1] sqlc query name %q is duplicated — sqlc uses a global namespace",
 					name),
-				Advice: fmt.Sprintf("-- name: %s 의 이름이 중복되지 않도록 ModelPrefix 를 추가하세요 (예: User%s, Gig%s)", name, name, name),
+				Advice: fmt.Sprintf("Add a ModelPrefix to make -- name: %s unique (e.g. User%s, Gig%s)", name, name, name),
 			})
 		}
 	}

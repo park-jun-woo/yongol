@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=3 topic=ssac-structural
-//ff:what S-32 — @publish에서 query 금지
+//ff:what S-32 — query references are forbidden in @publish arguments
 
 package ssac
 
@@ -24,7 +24,7 @@ func s32PublishForbidden(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 						Phase:   diagnostic.PhaseValidate,
 						Level:   diagnostic.LevelError,
 						Message: "[S-32] @publish cannot use query",
-						Advice:  "@publish 인자에서 query.* 참조를 제거하세요",
+						Advice:  "Remove query.* references from the @publish arguments",
 					})
 				}
 			}

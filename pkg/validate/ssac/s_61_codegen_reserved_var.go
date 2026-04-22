@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what S-61 — 코드젠 예약 변수명 충돌 방지
+//ff:what S-61 — prevents result variable names from colliding with codegen-reserved identifiers
 
 package ssac
 
@@ -29,8 +29,8 @@ func s61CodegenReservedVar(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Line:    seq.Line,
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
-				Message: fmt.Sprintf("[S-61] 변수명 %q 는 코드젠 예약어입니다 (Server receiver, context, error 등에서 사용)", v),
-				Advice:  "의미를 드러내는 이름으로 바꾸세요 (예: s → summary, ctx → callCtx)",
+				Message: fmt.Sprintf("[S-61] variable name %q is a codegen-reserved identifier (used for Server receiver, context, error, etc.)", v),
+				Advice:  "Rename it to something descriptive (e.g. s → summary, ctx → callCtx)",
 			})
 		}
 	}

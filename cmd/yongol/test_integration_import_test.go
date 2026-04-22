@@ -1,5 +1,5 @@
 //ff:func feature=cli type=test control=iteration dimension=1
-//ff:what test: import 서브커맨드 end-to-end 3 케이스 (file-source-happy / missing-args / bad-source)
+//ff:what test: import subcommand end-to-end 3 cases (file-source-happy / missing-args / bad-source)
 
 package main
 

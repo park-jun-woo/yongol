@@ -1,5 +1,5 @@
 //ff:func feature=cli type=reporter control=iteration dimension=1 topic=md
-//ff:what printReportMD — validate.Report 를 GFM-lite(H2/H3 + bullet + inline code)로 출력
+//ff:what printReportMD — prints validate.Report as GFM-lite (H2/H3 + bullet + inline code)
 package main
 
 import (

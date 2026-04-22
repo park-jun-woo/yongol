@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=sequence topic=func-check
-//ff:what resolveInputType — @call 입력 값 표현의 Go 타입 해석 (literal → SSaC.var lookup)
+//ff:what resolveInputType — resolve the Go type of a @call input value expression (literal or SSaC.var lookup)
 
 package ssac_func
 

@@ -1,11 +1,11 @@
 //ff:func feature=ssac-parse type=parser control=sequence
-//ff:what "pkg.Func({Key: val, ...}) remainder" 형식 파싱
+//ff:what parseCallExprInputs — parses the "pkg.Func({Key: val, ...}) remainder" form
 package ssac
 
 import "strings"
 
-// parseCallExprInputs는 "pkg.Func({Key: val, ...}) remainder"를 파싱한다.
-// 닫는 괄호 뒤의 remainder도 반환한다.
+// parseCallExprInputs parses "pkg.Func({Key: val, ...}) remainder".
+// Also returns the remainder after the closing parenthesis.
 func parseCallExprInputs(expr string) (string, map[string]string, string, error) {
 	expr = strings.TrimSpace(expr)
 	parenIdx := strings.Index(expr, "(")
@@ -14,7 +14,7 @@ func parseCallExprInputs(expr string) (string, map[string]string, string, error)
 	}
 	model := expr[:parenIdx]
 	afterParen := expr[parenIdx+1:]
-	// 마지막 ) 찾기
+	// find the last )
 	closeIdx := strings.LastIndex(afterParen, ")")
 	if closeIdx < 0 {
 		return model, nil, "", nil

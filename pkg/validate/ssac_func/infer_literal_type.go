@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=sequence topic=func-check
-//ff:what inferLiteralType — seq.Inputs value 문자열에서 literal Go 타입을 추론
+//ff:what inferLiteralType — infer the literal Go type from a seq.Inputs value string
 
 package ssac_func
 

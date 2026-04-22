@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=query-structural
-//ff:what Q-08 — 선언된 파라미터가 본문에 안 쓰이면 ERROR
+//ff:what Q-08 — ERROR when a declared parameter is not referenced in the query body
 
 package query
 
@@ -49,7 +49,7 @@ func q08UnusedParam(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
 				Message: "[Q-08] query " + q.Name + " declares unused parameter " + declared,
-				Advice:  "선언된 파라미터 " + declared + " 를 WHERE/SET/VALUES 에 참조하거나 제거하세요",
+				Advice:  "Reference the declared parameter " + declared + " in WHERE/SET/VALUES, or remove it",
 			})
 		}
 	}

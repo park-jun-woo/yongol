@@ -1,5 +1,5 @@
 //ff:type feature=orchestrator type=test
-//ff:what Phase 상수 값 lock-in 테스트
+//ff:what Phase constant value lock-in test
 package diagnostic_test
 
 import (
@@ -8,8 +8,8 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
 )
 
-// TestPhaseConstants 는 Phase 상수 문자열 값이 의도된 값임을 고정한다.
-// 값 변경 시 의도적으로 실패하므로, 변경이 필요하면 이 테스트도 함께 수정.
+// TestPhaseConstants locks in the string values of Phase constants.
+// It will fail intentionally on any value change — update the test alongside the constant.
 func TestPhaseConstants(t *testing.T) {
 	cases := []struct {
 		name string
@@ -27,7 +27,7 @@ func TestPhaseConstants(t *testing.T) {
 	}
 }
 
-// TestPhase_TypeIsStringAlias 는 Phase 가 string 기반 타입으로 변환 가능한지 확인한다.
+// TestPhase_TypeIsStringAlias verifies that Phase is convertible to and from string.
 func TestPhase_TypeIsStringAlias(t *testing.T) {
 	p := diagnostic.PhaseValidate
 	s := string(p)
@@ -35,7 +35,7 @@ func TestPhase_TypeIsStringAlias(t *testing.T) {
 		t.Errorf("string(PhaseValidate): want %q, got %q", "validate", s)
 	}
 
-	// 반대 방향: string → Phase 로 캐스팅 가능해야 함.
+	// Reverse direction: string → Phase cast must also round-trip.
 	custom := diagnostic.Phase("custom")
 	if string(custom) != "custom" {
 		t.Errorf("Phase(\"custom\"): round-trip failed, got %q", string(custom))

@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what S-7 — @put Result 부재
+//ff:what S-7 — @put must not have a Result field
 
 package ssac
 
@@ -23,7 +23,7 @@ func s07PutResult(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
 					Message: "[S-7] @put must not have Result",
-					Advice:  "@put 시퀀스에서 Result 항목을 제거하세요 (필요 시 @get 으로 다시 조회)",
+					Advice:  "Remove the Result field from the @put sequence (re-fetch with @get if the value is needed)",
 				})
 			}
 		}

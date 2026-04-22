@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=sequence topic=sqlc
-//ff:what checkSingleInputKeyCase — 단일 input key 의 sqlc param 대소문자 불일치 판정
+//ff:what checkSingleInputKeyCase — detect a casing mismatch between a single input key and its sqlc param
 
 package ssac_sqlc
 
@@ -33,7 +33,7 @@ func checkSingleInputKeyCase(fn ssac.ServiceFunc, seq ssac.Sequence, key string,
 		Line:    seq.Line,
 		Phase:   diagnostic.PhaseValidate,
 		Level:   diagnostic.LevelWarning,
-		Message: fmt.Sprintf("[XQS-14] input key %q와 sqlc 파라미터 %q 대소문자 불일치", key, matched),
-		Advice:  fmt.Sprintf("input key를 %q로 변경하세요", matched),
+		Message: fmt.Sprintf("[XQS-14] input key %q casing does not match sqlc parameter %q", key, matched),
+		Advice:  fmt.Sprintf("Rename the input key to %q", matched),
 	}, true
 }

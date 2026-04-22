@@ -1,5 +1,5 @@
 //ff:type feature=orchestrator type=test
-//ff:what Diagnostic 구조체 zero 값 회귀 테스트
+//ff:what Regression test that locks in the zero value of the Diagnostic struct
 package diagnostic_test
 
 import (
@@ -9,7 +9,7 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
 )
 
-// TestDiagnostic_ZeroValue 는 Diagnostic 의 zero 값이 기대한 형태임을 lock-in 한다.
+// TestDiagnostic_ZeroValue locks in the expected zero value of Diagnostic.
 func TestDiagnostic_ZeroValue(t *testing.T) {
 	var d diagnostic.Diagnostic
 
@@ -33,7 +33,7 @@ func TestDiagnostic_ZeroValue(t *testing.T) {
 	}
 }
 
-// TestDiagnostic_FieldAssignment 은 각 필드에 값을 대입/비교 가능한지 확인한다.
+// TestDiagnostic_FieldAssignment verifies that each field can be assigned and compared.
 func TestDiagnostic_FieldAssignment(t *testing.T) {
 	d := diagnostic.Diagnostic{
 		File:    "spec.yaml",
@@ -64,7 +64,7 @@ func TestDiagnostic_FieldAssignment(t *testing.T) {
 	}
 }
 
-// TestDiagnostic_DeepEqual 은 같은 값의 Diagnostic 두 개가 reflect.DeepEqual 로 동등함을 확인한다.
+// TestDiagnostic_DeepEqual verifies that two Diagnostics with the same values compare equal via reflect.DeepEqual.
 func TestDiagnostic_DeepEqual(t *testing.T) {
 	a := diagnostic.Diagnostic{
 		File:    "a.yaml",

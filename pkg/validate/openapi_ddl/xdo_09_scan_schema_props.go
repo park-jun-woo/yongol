@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=iteration dimension=1 topic=openapi-ddl
-//ff:what xdo09ScanSchemaProps — 단일 schema 의 property 를 DDL 컬럼과 대조하여 ghost property 진단 생성
+//ff:what xdo09ScanSchemaProps — compares properties of a single schema against DDL columns and generates ghost property diagnostics
 
 package openapi_ddl
 
@@ -38,7 +38,7 @@ func xdo09ScanSchemaProps(fs *yongol.Fullstack, schemaName string, schemaRef *op
 			Phase:   diagnostic.PhaseValidate,
 			Level:   diagnostic.LevelError,
 			Message: fmt.Sprintf("[XDO-9] schema %s property %q has no DDL column %s.%s", schemaName, propName, tableName, propName),
-			Advice:  fmt.Sprintf("OpenAPI schema 에서 컬럼 %q 를 제거하거나 DDL %s 테이블에 추가하세요", propName, tableName),
+			Advice:  fmt.Sprintf("Remove column %q from the OpenAPI schema, or add it to the DDL %s table", propName, tableName),
 		})
 	}
 	return diags

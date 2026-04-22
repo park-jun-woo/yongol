@@ -1,5 +1,5 @@
 //ff:type feature=validate type=model topic=ddl-structural
-//ff:what positionalHit — $N 위치 파라미터 스캔 결과 (line + param 텍스트)
+//ff:what positionalHit — $N positional parameter scan result (line number + matched token)
 
 package ddl
 

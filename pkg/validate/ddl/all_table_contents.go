@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=iteration dimension=2 topic=ddl-structural
-//ff:what allTableContents — CREATE TABLE 블록을 테이블명 → 파일 전체 내용 맵으로 수집
+//ff:what allTableContents — collect CREATE TABLE blocks into a table-name → file-content map
 package ddl
 
 // allTableContents merges every CREATE TABLE block keyed by table name across

@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=openapi-ddl
-//ff:what XDO-70 — OpenAPI maxLength 가 DDL VARCHAR(n) 보다 크면 WARNING
+//ff:what XDO-70 — WARNING when OpenAPI maxLength exceeds the DDL VARCHAR(n) length
 
 package openapi_ddl
 
@@ -38,7 +38,7 @@ func xdo70MaxLengthExceedsVarchar(fs *yongol.Fullstack) []diagnostic.Diagnostic 
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelWarning,
 				Message: fmt.Sprintf("[XDO-70] %s.%s — OpenAPI maxLength %d > DDL VARCHAR(%d) for %s", opID, fieldName, *fc.MaxLength, varcharLen, col),
-				Advice:  fmt.Sprintf("OpenAPI maxLength 를 %d 이하로 줄이거나 DDL VARCHAR 길이를 늘리세요", varcharLen),
+				Advice:  fmt.Sprintf("Reduce OpenAPI maxLength to %d or less, or increase the DDL VARCHAR length", varcharLen),
 			})
 		}
 	}

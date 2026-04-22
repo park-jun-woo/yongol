@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=1 topic=query-structural
-//ff:what Q-03 — 쿼리명 PascalCase 강제
+//ff:what Q-03 — query names must be in PascalCase
 
 package query
 
@@ -30,7 +30,7 @@ func q03NamePascalCase(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			Phase:   diagnostic.PhaseValidate,
 			Level:   diagnostic.LevelError,
 			Message: "[Q-03] query name " + q.Name + " is not PascalCase",
-			Advice:  "Go 메서드 네이밍 규약을 따르도록 대문자로 시작하고 underscore 없이 작성하세요 (예: GetUser, WorkflowListByOrgID)",
+			Advice:  "Follow Go method naming conventions: start with an uppercase letter and omit underscores (e.g. GetUser, WorkflowListByOrgID)",
 		})
 	}
 	return diags

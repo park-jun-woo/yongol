@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=sequence topic=policy-check
-//ff:what xps28MissingRegoDiag — SSaC pair 가 Rego 에 없을 때 XPS-28 진단 생성
+//ff:what xps28MissingRegoDiag — generates an XPS-28 diagnostic when an SSaC pair is absent from the Rego policy
 
 package ssac_rego
 
@@ -24,6 +24,6 @@ func xps28MissingRegoDiag(pair [2]string, regoPairs map[[2]string]bool, pairLoc 
 		Message: fmt.Sprintf(
 			"[XPS-28] SSaC authorize (%s, %s) has no matching Rego allow rule",
 			pair[0], pair[1]),
-		Advice: fmt.Sprintf("Rego policy 에 (action: %s, resource: %s) 의 allow 규칙을 추가하세요", pair[0], pair[1]),
+		Advice: fmt.Sprintf("Add an allow rule for (action: %s, resource: %s) to the Rego policy", pair[0], pair[1]),
 	}, true
 }

@@ -1,5 +1,5 @@
 //ff:func feature=funcspec type=parser control=iteration dimension=1
-//ff:what collectPackageTypes / fillMissingFields 의 Diagnostic 전파 동작을 검증한다
+//ff:what validates Diagnostic propagation behaviour of collectPackageTypes / fillMissingFields
 
 package funcspec
 
@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-// TestCollectPackageTypesNormal — 정상 Go 파일은 struct 를 수집하고 diag 이 없어야 한다.
+// TestCollectPackageTypesNormal — a valid Go file must collect structs with zero diagnostics.
 func TestCollectPackageTypesNormal(t *testing.T) {
 	dir := t.TempDir()
 	src := `package sample
@@ -38,7 +38,7 @@ type FooResponse struct {
 	}
 }
 
-// TestCollectPackageTypesMissingDir — 존재하지 않는 경로는 SILENT-OK (diag 0).
+// TestCollectPackageTypesMissingDir — a non-existent path must be SILENT-OK (zero diagnostics).
 func TestCollectPackageTypesMissingDir(t *testing.T) {
 	dir := filepath.Join(t.TempDir(), "does-not-exist")
 	result, diags := collectPackageTypes(dir)
@@ -50,8 +50,8 @@ func TestCollectPackageTypesMissingDir(t *testing.T) {
 	}
 }
 
-// TestCollectPackageTypesReadDirError — 파일을 디렉토리 경로로 넘기면 ReadDir 에러
-// 가 Diagnostic 1 건으로 보고되어야 한다.
+// TestCollectPackageTypesReadDirError — passing a file path where a directory is expected
+// must report the ReadDir error as exactly one Diagnostic.
 func TestCollectPackageTypesReadDirError(t *testing.T) {
 	base := t.TempDir()
 	filePath := filepath.Join(base, "not_a_dir.txt")
@@ -81,8 +81,8 @@ func TestCollectPackageTypesReadDirError(t *testing.T) {
 	}
 }
 
-// TestCollectPackageTypesSyntaxErrorPartial — 문법 오류 파일은 diag 1 건으로 보고되고
-// 같은 디렉토리의 다른 정상 파일은 여전히 수집되어야 한다 (partial success).
+// TestCollectPackageTypesSyntaxErrorPartial — a file with a syntax error must be reported as
+// exactly one Diagnostic while other valid files in the same directory are still collected (partial success).
 func TestCollectPackageTypesSyntaxErrorPartial(t *testing.T) {
 	dir := t.TempDir()
 
@@ -124,17 +124,17 @@ this is not valid go at all !!!
 	if !strings.Contains(d.Message, "Go parse failed") {
 		t.Errorf("diag.Message = %q, want 'Go parse failed' prefix", d.Message)
 	}
-	// partial success: ok.go 의 OkRequest 는 여전히 수집되어야 한다.
+	// partial success: OkRequest from ok.go must still be collected.
 	if _, found := result["OkRequest"]; !found {
 		t.Errorf("OkRequest should still be collected despite sibling syntax error; keys=%v", keysOf(result))
 	}
 }
 
-// TestFillMissingFieldsCacheDedup — 같은 디렉토리를 여러 spec 이 공유하면
-// Diagnostic 은 1 회만 append 되어야 한다 (seenDir dedup).
+// TestFillMissingFieldsCacheDedup — when multiple specs share the same directory,
+// a Diagnostic must be appended only once (seenDir deduplication).
 func TestFillMissingFieldsCacheDedup(t *testing.T) {
 	dir := t.TempDir()
-	// 문법 오류 파일 하나만 두면 collectPackageTypes 가 매번 diag 1 건을 낸다.
+	// A single file with a syntax error causes collectPackageTypes to emit one diag each call.
 	bad := `package sample
 
 !!!invalid!!!
@@ -143,7 +143,7 @@ func TestFillMissingFieldsCacheDedup(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// 같은 dir 을 참조하는 spec 을 2 개 만든다.
+	// Create two specs that reference the same dir.
 	specs := []FuncSpec{
 		{Name: "funcA", Package: "sample"},
 		{Name: "funcB", Package: "sample"},

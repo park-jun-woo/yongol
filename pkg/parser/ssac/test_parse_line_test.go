@@ -1,5 +1,5 @@
 //ff:func feature=ssac-parse type=parser control=iteration dimension=1
-//ff:what ServiceFunc.Line 과 Sequence.Line 이 정확히 채워지는지 검증
+//ff:what validates that ServiceFunc.Line and Sequence.Line are populated correctly
 
 package ssac
 
@@ -17,10 +17,10 @@ func GetCourse() {}
 	sfs := parseTestFile(t, src)
 	sf := sfs[0]
 
-	// 1행: package
-	// 2행: blank
-	// 3-6행: 시퀀스 주석
-	// 7행: func 정의
+	// line 1: package
+	// line 2: blank
+	// lines 3-6: sequence comments
+	// line 7: func definition
 	if sf.Line != 7 {
 		t.Errorf("ServiceFunc.Line = %d, want 7", sf.Line)
 	}

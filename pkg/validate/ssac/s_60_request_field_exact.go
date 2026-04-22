@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=3 topic=ssac-structural
-//ff:what S-60 — SSaC 에서 사용한 request.<field> 가 OpenAPI schema 에 case-exact 로 존재
+//ff:what S-60 — request.<field> references in SSaC must exist case-exactly in the OpenAPI schema
 
 package ssac
 
@@ -27,7 +27,7 @@ func s60RequestFieldExact(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		if fn.Subscribe != nil {
 			continue
 		}
-		// request.* 은 requestBody 필드뿐 아니라 path/query parameter 도 포함
+		// request.* covers not only requestBody fields but also path/query parameters
 		expected := map[string]bool{}
 		if body := g.Lookup["OpenAPI.request."+fn.Name]; body != nil {
 			for k := range body {

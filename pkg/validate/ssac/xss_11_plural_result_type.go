@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what XSS-11 — @result 타입 복수형 (WARNING)
+//ff:what XSS-11 — @result type is in plural form (WARNING)
 
 package ssac
 
@@ -49,7 +49,7 @@ func xss11PluralResultType(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelWarning,
 				Message: fmt.Sprintf("[XSS-11] result element type %q is plural; element types should be singular (use Page[T]/Cursor[T]/[]T to convey plurality)", t),
-				Advice:  "단수형 타입명으로 변경하세요 (예: Gig)",
+				Advice:  "Change to the singular type name (e.g. Gig)",
 			})
 		}
 	}

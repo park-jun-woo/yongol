@@ -1,5 +1,5 @@
 //ff:func feature=rule type=loader control=iteration dimension=2
-//ff:what populateSSaCSymbols — SSaC 변수 → 타입 이름 등록 + DDL row 타입의 Struct.*.* 필드 맵 등록
+//ff:what populateSSaCSymbols — registers SSaC variable→type-name mappings and Struct.*.* field maps for DDL row types
 package ground
 
 import (
@@ -17,15 +17,15 @@ import (
 //  1. Variable → type name
 //     Types["SSaC.var.<funcName>.<varName>"] = <TypeName>
 //
-//  2. DDL row struct type → field → Go type (type-name-keyed, 통합 키 공간)
+//  2. DDL row struct type → field → Go type (type-name-keyed, unified key space)
 //     Types["Struct.<Model>.<PascalField>"] = <GoType>
 //
-// Back-compat: Schemas["SSaC.var.<funcName>.<varName>"] = field list 도 유지
-// (S-59 dotted field existence check). 향후 S-59 가 Types["Struct.*"] 로
-// 통합되면 Schemas 측 유지 불필요.
+// Back-compat: Schemas["SSaC.var.<funcName>.<varName>"] = field list is also maintained
+// (S-59 dotted field existence check). Once S-59 is unified under Types["Struct.*"],
+// the Schemas side can be dropped.
 func populateSSaCSymbols(g *rule.Ground, fs *yongol.Fullstack) {
-	// Layer 2: DDL row struct 타입의 field → Go type 등록.
-	// Field 이름은 Go PascalCase 로 변환 (codegen 이 생성하는 struct field 이름).
+	// Layer 2: register DDL row struct field → Go type.
+	// Field names are converted to Go PascalCase (matching the struct field names emitted by codegen).
 	ddlFields := make(map[string][]string)
 	for _, t := range fs.DDLTables {
 		modelName := strcase.ToGoPascal(inflection.Singular(t.Name))
@@ -36,14 +36,14 @@ func populateSSaCSymbols(g *rule.Ground, fs *yongol.Fullstack) {
 		}
 	}
 
-	// Layer 1: 각 ServiceFunc 의 @get/@post/@call Result.Var → Type 매핑.
+	// Layer 1: map each ServiceFunc @get/@post/@call Result.Var → Type.
 	for _, fn := range fs.ServiceFuncs {
 		for _, seq := range fn.Sequences {
 			if seq.Result == nil || seq.Result.Var == "" || seq.Result.Type == "" {
 				continue
 			}
-			// populateVarTypesSeqs 가 SSaC.var.* 의 원본 type spec (슬라이스/package
-			// prefix 포함) 등록. 여기서는 Schemas 만 추가 (back-compat, S-59 용).
+			// populateVarTypesSeqs registers the raw type spec for SSaC.var.* (including
+			// slice and package prefixes). Here we only append to Schemas (back-compat for S-59).
 			typeName := stripTypePrefix(seq.Result.Type)
 			if dot := strings.LastIndex(typeName, "."); dot >= 0 {
 				typeName = typeName[dot+1:]

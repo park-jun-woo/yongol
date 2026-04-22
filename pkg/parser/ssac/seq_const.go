@@ -1,8 +1,8 @@
 //ff:type feature=ssac-parse type=model
-//ff:what 시퀀스 타입 상수 및 유효성 맵
+//ff:what sequence type constants and validity map
 package ssac
 
-// sequence 타입 상수
+// sequence type constants
 const (
 	SeqGet      = "get"
 	SeqPost     = "post"

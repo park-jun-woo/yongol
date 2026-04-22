@@ -10,10 +10,11 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
-// xdp65RoleDDLCheck validates XDP-65: Rego 정책이 비교하는 role 값들이
-// DDL 의 role 컬럼 CHECK(role IN (...)) 제약에 모두 정의되어 있는지
-// 확인한다. DDL 에 role CHECK 가 전혀 없으면 사용자 role 모델이 없는
-// 것으로 간주하고 통과시킨다 (bak/check_rego_role_ddl.go 와 동일 정책).
+// xdp65RoleDDLCheck validates XDP-65: every role value compared in Rego
+// policies must be declared in the DDL role column CHECK(role IN (...))
+// constraint. When the DDL has no role CHECK at all, the rule assumes no
+// role model is defined and passes (same policy as the legacy
+// bak/check_rego_role_ddl.go).
 func xdp65RoleDDLCheck(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	if fs == nil {
 		return nil
@@ -61,9 +62,9 @@ func xdp65RoleDDLCheck(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			Phase: diagnostic.PhaseValidate,
 			Level: diagnostic.LevelError,
 			Message: fmt.Sprintf(
-				"[XDP-65] Rego role %q 가 DDL CHECK 제약에 정의되어 있지 않습니다",
+				"[XDP-65] Rego role %q is not defined in any DDL CHECK constraint",
 				rv),
-			Advice: fmt.Sprintf("DDL 사용자 테이블의 role 컬럼 CHECK IN 에 '%s' 를 추가하세요", rv),
+			Advice: fmt.Sprintf("Add '%s' to the role column CHECK IN constraint in the DDL user table", rv),
 		})
 	}
 	return diags

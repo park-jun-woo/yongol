@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=iteration dimension=1 topic=func-check
-//ff:what findFuncSpec — callKey(pkg.camel) 로 ProjectFuncSpecs → YongolPkgSpecs 순으로 조회
+//ff:what findFuncSpec — look up a FuncSpec by callKey (pkg.camel), searching ProjectFuncSpecs then YongolPkgSpecs
 
 package ssac_func
 

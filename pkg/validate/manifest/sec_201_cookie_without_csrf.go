@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=manifest-auth
-//ff:what SEC-201 — auth.mode=cookie|hybrid + csrf.enabled=false 조합 금지
+//ff:what SEC-201 — auth.mode=cookie|hybrid combined with csrf.enabled=false is forbidden
 
 package manifest
 
@@ -40,7 +40,7 @@ func sec201CookieWithoutCsrf(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		File:    "manifest.yaml",
 		Phase:   diagnostic.PhaseValidate,
 		Level:   diagnostic.LevelError,
-		Message: "[SEC-201] auth.mode=\"" + mode + "\" 에서는 csrf.enabled 를 false 로 둘 수 없습니다",
-		Advice:  "backend.auth.csrf.enabled 를 true 로 설정하거나 auth.mode 를 \"bearer\" 로 되돌리세요",
+		Message: "[SEC-201] auth.mode=\"" + mode + "\" requires csrf.enabled to be true",
+		Advice:  "Set backend.auth.csrf.enabled to true, or change auth.mode to \"bearer\"",
 	}}
 }

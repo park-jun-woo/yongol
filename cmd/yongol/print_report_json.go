@@ -1,5 +1,5 @@
 //ff:func feature=cli type=reporter control=sequence topic=json
-//ff:what printReportJSON — validate.Report 를 yongol bespoke flat JSON 으로 stdout 출력
+//ff:what printReportJSON — prints validate.Report as yongol bespoke flat JSON to stdout
 package main
 
 import (

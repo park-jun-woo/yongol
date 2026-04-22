@@ -38,7 +38,7 @@ func xfs42CallInputsCount(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Level: diagnostic.LevelError,
 					Message: "[XFS-42] @call " + seq.Model + " inputs " + itoa(len(seq.Inputs)) +
 						" ≠ request fields " + itoa(len(reqFields)),
-					Advice: "@call 입력 개수를 func Request 필드 개수에 맞추세요",
+					Advice: "Match the @call input count to the number of fields in the func Request struct",
 				})
 			}
 		}

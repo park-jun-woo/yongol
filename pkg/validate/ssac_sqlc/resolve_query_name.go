@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=sequence topic=sqlc
-//ff:what resolveQueryName — SSaC seq.Model → sqlc query name 변환
+//ff:what resolveQueryName — convert SSaC seq.Model to a sqlc query name
 
 package ssac_sqlc
 

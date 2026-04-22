@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what S-23 — @publish Topic 필수
+//ff:what S-23 — @publish requires a Topic field
 
 package ssac
 
@@ -23,7 +23,7 @@ func s23PublishTopic(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
 					Message: "[S-23] @publish requires Topic",
-					Advice:  "@publish 시퀀스에 Topic 항목을 추가하세요",
+					Advice:  "Add a Topic field to the @publish sequence",
 				})
 			}
 		}

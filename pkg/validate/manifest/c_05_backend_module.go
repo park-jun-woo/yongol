@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=manifest-structural
-//ff:what C-5 — manifest backend.module 필수 값 검증
+//ff:what C-5 — validates that manifest backend.module is non-empty
 
 package manifest
 
@@ -23,6 +23,6 @@ func c05BackendModule(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		Phase:   diagnostic.PhaseValidate,
 		Level:   diagnostic.LevelError,
 		Message: "[C-5] backend.module is empty",
-		Advice:  "backend.module 에 Go 모듈 경로를 지정하세요 (예: github.com/org/project)",
+		Advice:  "Set backend.module to the Go module path (e.g. github.com/org/project)",
 	}}
 }

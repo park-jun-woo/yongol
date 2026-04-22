@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=config-check
-//ff:what XNO-52 — OpenAPI endpoint security 참조가 Manifest middleware에 존재하는지 검사
+//ff:what XNO-52 — verifies that OpenAPI endpoint security references exist as Manifest middleware
 
 package openapi_manifest
 
@@ -31,7 +31,7 @@ func xno52SecurityMiddleware(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
 					Message: "[XNO-52] " + strings.ToUpper(method) + " " + pathStr + " references security \"" + name + "\" not in manifest.yaml middleware",
-					Advice:  "manifest backend.middleware 에 security \"" + name + "\" 의 핸들러를 추가하세요",
+					Advice:  "Add a handler for security \"" + name + "\" to manifest backend.middleware",
 				})
 			}
 		}

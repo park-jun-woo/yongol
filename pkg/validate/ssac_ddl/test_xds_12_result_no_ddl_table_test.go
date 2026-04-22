@@ -1,5 +1,5 @@
 //ff:func feature=validate type=test control=sequence topic=ssac-ddl
-//ff:what XDS-12 테스트 (TODO: 케이스 추가)
+//ff:what XDS-12 test (TODO: add cases)
 
 package ssac_ddl
 

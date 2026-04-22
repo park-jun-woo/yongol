@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what S-24 — @publish Payload 필수
+//ff:what S-24 — @publish requires a Payload field
 
 package ssac
 
@@ -23,7 +23,7 @@ func s24PublishPayload(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
 					Message: "[S-24] @publish requires Payload",
-					Advice:  "@publish 시퀀스에 Payload 항목을 추가하세요",
+					Advice:  "Add a Payload field to the @publish sequence",
 				})
 			}
 		}

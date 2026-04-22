@@ -1,5 +1,5 @@
 //ff:type feature=orchestrator type=model
-//ff:what 진단 심각도 열거 타입
+//ff:what Diagnostic severity enum type
 package diagnostic
 
 // Level indicates the severity of a diagnostic.

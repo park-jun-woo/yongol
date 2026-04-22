@@ -1,5 +1,5 @@
 //ff:func feature=cli type=test control=iteration dimension=1
-//ff:what test: status 서브커맨드 end-to-end 2 케이스 (happy / missing-dir)
+//ff:what test: status subcommand end-to-end 2 cases (happy / missing-dir)
 
 package main
 

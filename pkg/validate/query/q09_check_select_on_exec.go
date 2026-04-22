@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=sequence topic=query-structural
-//ff:what q09CheckSelectOnExec — :exec 쿼리에서 top-level SELECT / RETURNING 감지 + ERROR 진단
+//ff:what q09CheckSelectOnExec — detects top-level SELECT / RETURNING in an :exec query and generates an ERROR diagnostic
 
 package query
 
@@ -32,6 +32,6 @@ func q09CheckSelectOnExec(q sqlc.QuerySpec) (diagnostic.Diagnostic, bool) {
 		Phase:   diagnostic.PhaseValidate,
 		Level:   diagnostic.LevelError,
 		Message: "[Q-09] :exec query " + q.Name + " returns rows (top-level SELECT / RETURNING present)",
-		Advice:  "반환 행이 필요하면 cardinality 를 :one / :many 로 바꾸거나 SELECT/RETURNING 을 제거하세요",
+		Advice:  "If rows are needed, change the cardinality to :one / :many; otherwise remove SELECT/RETURNING",
 	}, true
 }

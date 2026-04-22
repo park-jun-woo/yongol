@@ -1,5 +1,5 @@
 //ff:func feature=funcspec type=parser control=sequence
-//ff:what ParseFile 기본 동작 테스트 — @func 어노테이션, Request/Response 필드, HasBody 검증
+//ff:what ParseFile basic behavior test — verifies @func annotation, Request/Response fields, and HasBody
 
 package funcspec
 

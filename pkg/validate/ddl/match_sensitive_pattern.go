@@ -1,21 +1,21 @@
 //ff:func feature=validate type=util control=iteration dimension=1 topic=ddl-structural
-//ff:what matchSensitivePattern — 컬럼 이름에서 민감 데이터 패턴 매칭 (password/token/ssn 등)
+//ff:what matchSensitivePattern — match a column name against sensitive-data patterns (password/token/ssn, etc.)
 package ddl
 
 import "strings"
 
 // sensitivePatterns are column-name substrings that suggest sensitive data.
 var sensitivePatterns = []string{
-	// 인증 정보
+	// authentication credentials
 	"password", "passwd", "passphrase",
 	"secret", "token", "hash", "salt",
 	"credential", "otp", "pin",
-	// 암호화
+	// cryptographic material
 	"private_key", "cipher", "encrypted",
-	// 금융
+	// financial
 	"credit_card", "card_number", "cvv",
 	"bank_account", "routing_number",
-	// 개인식별
+	// personal identifiers
 	"ssn", "passport", "license_number",
 	"biometric",
 }

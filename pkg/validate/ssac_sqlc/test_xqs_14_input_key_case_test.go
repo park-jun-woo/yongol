@@ -1,5 +1,5 @@
 //ff:func feature=validate type=test control=sequence topic=sqlc
-//ff:what XQS-14 테스트 (TODO: 케이스 추가)
+//ff:what XQS-14 test (TODO: add cases)
 
 package ssac_sqlc
 

@@ -1,5 +1,5 @@
 //ff:func feature=ssac-parse type=parser control=sequence
-//ff:what @response 블록이 여러 줄에 걸쳐도 첫 줄 번호로 Line 이 채워지는지 검증
+//ff:what validates that Line is set to the first line number of a multi-line @response block
 
 package ssac
 
@@ -18,7 +18,7 @@ func GetCourse() {}
 	sfs := parseTestFile(t, src)
 	sf := sfs[0]
 
-	// @response 는 4행에서 시작
+	// @response starts at line 4
 	respSeq := sf.Sequences[len(sf.Sequences)-1]
 	if respSeq.Type != SeqResponse {
 		t.Fatalf("last seq Type = %s, want %s", respSeq.Type, SeqResponse)

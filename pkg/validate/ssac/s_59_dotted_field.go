@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=3 topic=ssac-structural
-//ff:what S-59 — 변수.필드 접근에서 필드가 변수 타입의 실제 필드인지 검증
+//ff:what S-59 — validates that the field in a variable.field access is an actual field of the variable's type
 
 package ssac
 
@@ -45,7 +45,7 @@ func s59DottedField(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 						Phase:   diagnostic.PhaseValidate,
 						Level:   diagnostic.LevelError,
 						Message: fmt.Sprintf("[S-59] %s.%s: field %q does not exist on variable type", arg.Source, arg.Field, arg.Field),
-						Advice:  fmt.Sprintf("변수 %s 의 타입 필드 중 정확한 이름으로 수정하세요", arg.Source),
+						Advice:  fmt.Sprintf("Correct the field name to match an actual field of variable %s", arg.Source),
 					})
 				}
 			}
@@ -66,7 +66,7 @@ func s59DottedField(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 						Phase:   diagnostic.PhaseValidate,
 						Level:   diagnostic.LevelError,
 						Message: fmt.Sprintf("[S-59] %s.%s: field %q does not exist on variable type", src, fld, fld),
-						Advice:  fmt.Sprintf("변수 %s 의 타입 필드 중 정확한 이름으로 수정하세요", src),
+						Advice:  fmt.Sprintf("Correct the field name to match an actual field of variable %s", src),
 					})
 				}
 			}

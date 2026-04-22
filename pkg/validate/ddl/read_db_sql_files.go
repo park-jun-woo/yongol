@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=sequence topic=ddl-structural
-//ff:what readDBSQLFiles — <specsDir>/db/*.sql 파일 목록을 non-recursive 읽기
+//ff:what readDBSQLFiles — read <specsDir>/db/*.sql files non-recursively
 package ddl
 
 import "path/filepath"

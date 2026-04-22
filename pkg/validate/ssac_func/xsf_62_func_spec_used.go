@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=1 topic=func-check
-//ff:what XSF-62 — func spec → @call 사용
+//ff:what XSF-62 — func spec is referenced by at least one @call
 
 package ssac_func
 
@@ -8,9 +8,9 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
-// xsf62FuncSpecUsed validates XSF-62: project func spec → @call 사용 여부.
-// WARNING level — project-defined func spec that is never referenced by any
-// SSaC @call is dead code. YongolPkgSpecs are excluded from coverage.
+// xsf62FuncSpecUsed validates XSF-62: a project func spec that is never
+// referenced by any SSaC @call is dead code. WARNING — YongolPkgSpecs are
+// excluded from coverage.
 func xsf62FuncSpecUsed(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	if len(fs.ProjectFuncSpecs) == 0 {
 		return nil
@@ -35,7 +35,7 @@ func xsf62FuncSpecUsed(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			Phase:   diagnostic.PhaseValidate,
 			Level:   diagnostic.LevelWarning,
 			Message: "[XSF-62] func spec " + sp.Package + "." + sp.Name + " is not referenced by any SSaC @call",
-			Advice:  "사용되지 않는 func " + sp.Package + "." + sp.Name + " 를 제거하거나 SSaC @call 에서 호출하세요",
+			Advice:  "Remove unused func " + sp.Package + "." + sp.Name + ", or call it from a SSaC @call",
 		})
 	}
 	return diags

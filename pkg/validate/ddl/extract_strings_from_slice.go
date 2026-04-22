@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=iteration dimension=1 topic=ddl-structural
-//ff:what extractStringsFromSlice — []interface{} 에서 string 원소만 추출
+//ff:what extractStringsFromSlice — extract only string elements from []interface{}
 
 package ddl
 

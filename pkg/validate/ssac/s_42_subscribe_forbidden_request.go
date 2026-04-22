@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=3 topic=ssac-structural
-//ff:what S-42 — @subscribe에서 request 금지
+//ff:what S-42 — request inputs are forbidden inside @subscribe functions
 
 package ssac
 
@@ -24,7 +24,7 @@ func s42SubscribeForbiddenRequest(fs *yongol.Fullstack) []diagnostic.Diagnostic 
 						Phase:   diagnostic.PhaseValidate,
 						Level:   diagnostic.LevelError,
 						Message: "[S-42] @subscribe cannot use request",
-						Advice:  "@subscribe 함수는 HTTP 입력(request/query/currentUser)을 사용할 수 없습니다",
+						Advice:  "@subscribe functions cannot use HTTP inputs (request, query, or currentUser)",
 					})
 				}
 			}

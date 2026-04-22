@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what S-10 — @delete Result 부재
+//ff:what S-10 — @delete must not have a Result field
 
 package ssac
 
@@ -23,7 +23,7 @@ func s10DeleteResult(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
 					Message: "[S-10] @delete must not have Result",
-					Advice:  "@delete 시퀀스에서 Result 항목을 제거하세요",
+					Advice:  "Remove the Result field from the @delete sequence",
 				})
 			}
 		}

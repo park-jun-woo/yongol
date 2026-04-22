@@ -1,5 +1,5 @@
 //ff:func feature=validate type=test control=sequence topic=ssac-structural
-//ff:what S-7 테스트 (TODO: 케이스 추가)
+//ff:what S-7 test (TODO: add cases)
 
 package ssac
 

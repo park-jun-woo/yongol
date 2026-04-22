@@ -1,5 +1,5 @@
 //ff:func feature=cli type=test control=iteration dimension=1
-//ff:what printLevelDiags 출력 형식 테스트 — file/line prefix 4 케이스
+//ff:what printLevelDiags output format test — 4 file/line prefix cases
 package main
 
 import (
@@ -42,9 +42,9 @@ func TestPrintLevelDiagsFileLine(t *testing.T) {
 			name: "with advice",
 			diag: diagnostic.Diagnostic{
 				File: "db/users.sql", Line: 5,
-				Level: diagnostic.LevelError, Message: "D-2: missing NOT NULL → 권고: 컬럼에 NOT NULL 추가",
+				Level: diagnostic.LevelError, Message: "D-2: missing NOT NULL → Advice: Add NOT NULL constraint to the column",
 			},
-			want: "  - db/users.sql:5: D-2: missing NOT NULL\n      ↳ 권고: 컬럼에 NOT NULL 추가\n",
+			want: "  - db/users.sql:5: D-2: missing NOT NULL\n      ↳ Advice: Add NOT NULL constraint to the column\n",
 		},
 	}
 	for _, tc := range cases {

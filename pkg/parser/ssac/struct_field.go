@@ -1,8 +1,8 @@
 //ff:type feature=ssac-parse type=model
-//ff:what struct 필드 정보 타입
+//ff:what StructField — type representing a struct field
 package ssac
 
-// StructField는 struct 필드 정보다.
+// StructField holds metadata for a single struct field.
 type StructField struct {
 	Name string // "OrderID"
 	Type string // "int64"

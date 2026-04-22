@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=1 topic=funcspec-structural
-//ff:what XFF-40 — func 본체가 미구현(HasBody=false)인지 감지
+//ff:what XFF-40 — detects funcs whose body is not yet implemented (HasBody=false)
 
 package funcspec
 
@@ -22,7 +22,7 @@ func xff40FuncBodyTodo(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			Phase:   diagnostic.PhaseValidate,
 			Level:   diagnostic.LevelError,
 			Message: "[XFF-40] func " + sp.Package + "." + sp.Name + " is a stub (unimplemented)",
-			Advice:  "TODO 코멘트를 제거하고 본문을 구현하세요",
+			Advice:  "Remove the TODO comment and implement the function body",
 		})
 	}
 	return diags

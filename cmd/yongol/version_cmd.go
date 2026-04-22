@@ -1,5 +1,5 @@
 //ff:func feature=cli type=command control=sequence
-//ff:what versionCmd — yongol version 서브커맨드 반환
+//ff:what versionCmd — returns the yongol version subcommand
 package main
 
 import (

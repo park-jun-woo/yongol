@@ -1,5 +1,5 @@
 //ff:func feature=validate type=test control=sequence topic=config-check
-//ff:what XNP-53 테스트 (TODO: 케이스 추가)
+//ff:what XNP-53 test (TODO: add cases)
 
 package rego_manifest
 

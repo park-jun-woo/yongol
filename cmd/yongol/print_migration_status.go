@@ -1,5 +1,5 @@
 //ff:func feature=cli type=util control=sequence
-//ff:what printMigrationStatus — yongol status 대시보드의 Migration 섹션
+//ff:what printMigrationStatus — prints the Migration section of the yongol status dashboard
 package main
 
 import (

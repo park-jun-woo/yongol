@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=sequence topic=ddl-statemachine
-//ff:what checkStateFieldColumn — 단일 stateDiagram 에 대해 DDL 컬럼 존재 검사
+//ff:what checkStateFieldColumn — verifies that the DDL column referenced by a single stateDiagram exists
 
 package ddl_statemachine
 
@@ -32,6 +32,6 @@ func checkStateFieldColumn(diagramID string, g *rule.Ground) *diagnostic.Diagnos
 		Phase:   diagnostic.PhaseValidate,
 		Level:   diagnostic.LevelError,
 		Message: "[XDM-27] state diagram " + diagramID + " expects DDL column " + table + "." + column + " which does not exist",
-		Advice:  "DDL 테이블 " + table + " 에 컬럼 " + column + " 를 추가하거나 stateDiagram 이름을 변경하세요",
+		Advice:  "Add column " + column + " to DDL table " + table + ", or rename the stateDiagram",
 	}
 }

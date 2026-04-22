@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=iteration dimension=2 topic=policy-check
-//ff:what buildDDLColumnIndex — table → column-set 로컬 맵 구성 (룰 inner loop 최적화)
+//ff:what buildDDLColumnIndex — build a local table → column-set map (inner-loop optimisation for rules)
 package ddl_rego
 
 import "github.com/park-jun-woo/yongol/pkg/yongol"

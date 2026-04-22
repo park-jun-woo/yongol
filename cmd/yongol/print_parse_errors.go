@@ -1,5 +1,5 @@
 //ff:func feature=cli type=util control=iteration dimension=1
-//ff:what printParseErrors — parser 단계 수집된 Diagnostic 을 정렬·출력
+//ff:what printParseErrors — sorts and prints diagnostics collected during the parse phase
 package main
 
 import (

@@ -1,5 +1,5 @@
 //ff:func feature=cli type=command control=sequence
-//ff:what main — yongol CLI 엔트리포인트 (cobra 기반)
+//ff:what main — yongol CLI entry point (cobra-based)
 package main
 
 import (

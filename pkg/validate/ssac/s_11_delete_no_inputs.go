@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what S-11 — @delete Inputs 없음 WARNING
+//ff:what S-11 — WARNING when @delete has no Inputs
 
 package ssac
 
@@ -28,7 +28,7 @@ func s11DeleteNoInputs(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelWarning,
 				Message: "[S-11] @delete has no inputs (all rows may be affected)",
-				Advice:  "@delete 시퀀스에 식별 조건을 Inputs 로 추가하거나 의도된 경우 // ff:allow-empty-delete 주석으로 명시하세요",
+				Advice:  "Add identifying conditions to the @delete sequence Inputs, or annotate with // ff:allow-empty-delete if intentional",
 			})
 		}
 	}

@@ -1,5 +1,5 @@
 //ff:type feature=manifest type=model
-//ff:what FieldConstraint — OpenAPI 스키마 property의 제약조건
+//ff:what FieldConstraint — constraints for a single OpenAPI schema property
 package openapi
 
 // FieldConstraint holds constraints for a single OpenAPI schema property.

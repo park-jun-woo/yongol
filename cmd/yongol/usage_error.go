@@ -1,5 +1,5 @@
 //ff:func feature=cli type=model
-//ff:what usageError — cobra usage 실패 wrapper. main 이 exit code 2 로 매핑
+//ff:what usageError — cobra usage failure wrapper; main maps it to exit code 2
 
 package main
 

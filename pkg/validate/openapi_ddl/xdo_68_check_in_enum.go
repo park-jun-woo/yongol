@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=openapi-ddl
-//ff:what XDO-68 — DDL CHECK IN(...) 컬럼인데 OpenAPI 요청 필드에 enum이 없으면 ERROR
+//ff:what XDO-68 — ERROR when a DDL CHECK IN(...) column has no enum in the corresponding OpenAPI request field
 
 package openapi_ddl
 
@@ -36,7 +36,7 @@ func xdo68CheckInEnum(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
 				Message: fmt.Sprintf("[XDO-68] %s.%s — DDL column %s has CHECK IN (%s) but OpenAPI has no enum", opID, fieldName, col, strings.Join(checkEnums, ", ")),
-				Advice:  fmt.Sprintf("OpenAPI 에 enum: [%s] 를 추가해 DDL CHECK IN 값과 일치시키세요", strings.Join(checkEnums, ", ")),
+				Advice:  fmt.Sprintf("Add enum: [%s] to OpenAPI to match the DDL CHECK IN values", strings.Join(checkEnums, ", ")),
 			})
 		}
 	}

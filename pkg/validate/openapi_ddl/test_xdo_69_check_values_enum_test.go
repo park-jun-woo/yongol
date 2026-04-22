@@ -1,5 +1,5 @@
 //ff:func feature=validate type=test control=sequence topic=openapi-ddl
-//ff:what XDO-69 테스트 (TODO: 케이스 추가)
+//ff:what XDO-69 test (TODO: add cases)
 
 package openapi_ddl
 

@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=3 topic=ssac-sqlc
-//ff:what XQS-18 — SSaC Input의 request.* OpenAPI param 타입 ↔ sqlc/DDL 타입 불일치 ERROR
+//ff:what XQS-18 — ERROR when a SSaC Input request.* OpenAPI param type does not match the sqlc/DDL type
 
 package ssac_sqlc
 

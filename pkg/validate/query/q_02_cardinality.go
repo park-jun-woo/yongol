@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=1 topic=query-structural
-//ff:what Q-02 — cardinality (:one / :many / :exec / :execrows) 필수
+//ff:what Q-02 — cardinality (:one / :many / :exec / :execrows) is required
 
 package query
 
@@ -31,7 +31,7 @@ func q02Cardinality(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			Phase:   diagnostic.PhaseValidate,
 			Level:   diagnostic.LevelError,
 			Message: "[Q-02] query " + q.Name + " has missing or invalid cardinality (" + q.Cardinality + ")",
-			Advice:  "`-- name: " + q.Name + " :one` 등으로 :one / :many / :exec / :execrows 중 하나를 명시하세요",
+			Advice:  "Specify one of :one / :many / :exec / :execrows, e.g. `-- name: " + q.Name + " :one`",
 		})
 	}
 	return diags

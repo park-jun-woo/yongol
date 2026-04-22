@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what S-5 — @post Inputs 필수
+//ff:what S-5 — @post requires an Inputs field
 
 package ssac
 
@@ -23,7 +23,7 @@ func s05PostInputs(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
 					Message: "[S-5] @post requires Inputs",
-					Advice:  "@post 시퀀스에 Inputs 항목을 추가하세요",
+					Advice:  "Add an Inputs field to the @post sequence",
 				})
 			}
 		}

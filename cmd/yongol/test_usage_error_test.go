@@ -1,5 +1,5 @@
 //ff:func feature=cli type=test control=sequence
-//ff:what test: TestUsageArgsAndErrorsAs — usageArgs wraps/passes + errors.As 매칭 검증
+//ff:what test: TestUsageArgsAndErrorsAs — usageArgs wraps/passes + errors.As matching verification
 
 package main
 

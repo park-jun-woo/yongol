@@ -1,5 +1,5 @@
 //ff:func feature=cli type=reporter control=iteration dimension=1
-//ff:what printSSOTSummary — Fullstack 에서 SSOT 요소 개수를 집계해 Summary 섹션 출력
+//ff:what printSSOTSummary — tallies SSOT element counts from Fullstack and prints the Summary section
 
 package main
 

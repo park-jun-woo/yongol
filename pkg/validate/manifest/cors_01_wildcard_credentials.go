@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=manifest-cors
-//ff:what CORS-01 — allow_origins=["*"] + allow_credentials=true 동시 허용 금지
+//ff:what CORS-01 — allow_origins=["*"] and allow_credentials=true must not be used together
 
 package manifest
 
@@ -30,7 +30,7 @@ func cors01WildcardCredentials(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		File:    "manifest.yaml",
 		Phase:   diagnostic.PhaseValidate,
 		Level:   diagnostic.LevelError,
-		Message: "[CORS-01] allow_origins=\"*\" 와 allow_credentials=true 는 동시에 사용할 수 없습니다",
-		Advice:  "allow_origins 를 명시적 origin 목록으로 바꾸거나 allow_credentials 를 false 로 설정하세요",
+		Message: "[CORS-01] allow_origins=\"*\" and allow_credentials=true cannot be used together",
+		Advice:  "Replace allow_origins with an explicit origin list or set allow_credentials to false",
 	}}
 }

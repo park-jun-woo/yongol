@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=sequence topic=openapi-ddl
-//ff:what xdo77PropDiag — 단일 property 의 OpenAPI↔DDL 타입 비교 + 진단 생성
+//ff:what xdo77PropDiag — compares the OpenAPI↔DDL type of a single property and emits a diagnostic on mismatch
 
 package openapi_ddl
 
@@ -58,12 +58,12 @@ func xdo77PropDiag(fs *yongol.Fullstack, schemaName, tableName, propName string,
 		Phase: diagnostic.PhaseValidate,
 		Level: diagnostic.LevelError,
 		Message: fmt.Sprintf(
-			"[XDO-77] schema %s field %s — OpenAPI type %q ↔ DDL column %s.%s type %q 불일치",
+			"[XDO-77] schema %s field %s — OpenAPI type %q ↔ DDL column %s.%s type %q mismatch",
 			schemaName, propName,
 			oaDisplay,
 			tableName, colName,
 			ddlDisplay,
 		),
-		Advice: "OpenAPI 타입을 DDL에 맞추세요",
+		Advice: "Align the OpenAPI type to match the DDL column type",
 	}, true
 }

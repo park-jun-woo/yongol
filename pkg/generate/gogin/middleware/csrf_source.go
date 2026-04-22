@@ -1,5 +1,5 @@
 //ff:type feature=gen-gogin type=generator topic=csrf
-//ff:what csrfSourceTemplate — GenerateCsrf 가 기록하는 csrf.go 템플릿 (double-submit cookie)
+//ff:what csrfSourceTemplate — the csrf.go template written by GenerateCsrf (double-submit cookie)
 
 package middleware
 
@@ -19,7 +19,7 @@ package middleware
 // Error envelope keeps the Phase004 shape (error / message / request_id)
 // so downstream JSON clients parse it uniformly.
 const csrfSourceTemplate = `//` + `ff:func feature=runtime-middleware type=util control=sequence topic=csrf
-//` + `ff:what Csrf — double-submit cookie CSRF 방어 (쿠키 세션 인증 조건부)
+//` + `ff:what Csrf — double-submit cookie CSRF defense (conditional on cookie-session auth)
 
 package middleware
 
@@ -89,7 +89,7 @@ func Csrf(cfg CsrfConfig) gin.HandlerFunc {
 		if cookieTok == "" || headerTok == "" || !constantTimeEqual(cookieTok, headerTok) {
 			c.AbortWithStatusJSON(http.StatusForbidden, CsrfEnvelope{
 				Error:     "csrf_token_invalid",
-				Message:   "CSRF 토큰이 유효하지 않습니다",
+				Message:   "CSRF token is invalid",
 				RequestID: c.GetString("request_id"),
 			})
 			return

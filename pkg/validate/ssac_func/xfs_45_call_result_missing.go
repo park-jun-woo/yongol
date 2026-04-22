@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=func-check
-//ff:what XFS-45 — @result 있지만 func Response 없음
+//ff:what XFS-45 — @result present but func has no Response
 
 package ssac_func
 
@@ -10,8 +10,8 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
-// xfs45CallResultMissing validates XFS-45: @result 있지만 func Response 없음.
-// ERROR level — caller tries to bind a variable that the callee never returns.
+// xfs45CallResultMissing validates XFS-45: @result present but func has no
+// Response fields. ERROR — caller binds a variable the callee never returns.
 func xfs45CallResultMissing(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	var diags []diagnostic.Diagnostic
 	for _, fn := range fs.ServiceFuncs {
@@ -33,7 +33,7 @@ func xfs45CallResultMissing(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
 					Message: "[XFS-45] @call " + seq.Model + " binds @result but func has no Response fields",
-					Advice:  "@call 결과를 받지 않거나 func 에 ResponseFields 를 정의하세요",
+					Advice:  "Either remove the @result binding or add ResponseFields to the func spec",
 				})
 			}
 		}

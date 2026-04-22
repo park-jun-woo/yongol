@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=3 topic=ssac-structural
-//ff:what S-38 — @subscribe Inputs에서 HTTP 전용 소스 금지
+//ff:what S-38 — HTTP-only sources are forbidden in @subscribe Inputs
 
 package ssac
 
@@ -30,7 +30,7 @@ func s38SubscribeNoHTTPInputs(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 						Phase:   diagnostic.PhaseValidate,
 						Level:   diagnostic.LevelError,
 						Message: fmt.Sprintf("[S-38] @subscribe cannot use HTTP input %q", ref),
-						Advice:  "@subscribe 함수는 HTTP 입력(request/query/currentUser)을 사용할 수 없습니다",
+						Advice:  "@subscribe functions cannot use HTTP inputs (request, query, or currentUser)",
 					})
 				}
 			}

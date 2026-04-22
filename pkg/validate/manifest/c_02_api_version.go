@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=manifest-structural
-//ff:what C-2 — manifest apiVersion 값 검증
+//ff:what C-2 — validates that manifest apiVersion is "yongol/v1"
 
 package manifest
 
@@ -21,7 +21,7 @@ func c02APIVersion(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		Phase:   diagnostic.PhaseValidate,
 		Level:   diagnostic.LevelError,
 		Message: "[C-2] apiVersion " + quoted(fs.Manifest.APIVersion) + " is not \"yongol/v1\"",
-		Advice:  "apiVersion 을 yongol/v1 로 설정하세요",
+		Advice:  "Set apiVersion to yongol/v1",
 	}}
 }
 

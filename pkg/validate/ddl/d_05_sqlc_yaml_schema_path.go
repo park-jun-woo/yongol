@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=1 topic=ddl-structural
-//ff:what D-5 — sqlc.yaml 의 schema 경로가 DDL 디렉토리를 포함하는지 검증
+//ff:what D-5 — verify sqlc.yaml schema path covers the DDL directory
 
 package ddl
 
@@ -34,6 +34,6 @@ func d05SqlcYamlSchemaPath(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		Phase:   diagnostic.PhaseValidate,
 		Level:   diagnostic.LevelWarning,
 		Message: "[D-5] sqlc.yaml schema path does not include current directory (\".\") — db/*.sql DDL files may not be picked up by sqlc",
-		Advice:  "schema 를 \".\" 으로 설정하세요",
+		Advice:  "Set schema to \".\"",
 	}}
 }

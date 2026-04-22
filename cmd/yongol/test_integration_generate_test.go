@@ -1,5 +1,5 @@
 //ff:func feature=cli type=test control=iteration dimension=1
-//ff:what test: generate 서브커맨드 end-to-end 2 케이스 (args-count / validation-block)
+//ff:what test: generate subcommand end-to-end 2 cases (args-count / validation-block)
 
 package main
 

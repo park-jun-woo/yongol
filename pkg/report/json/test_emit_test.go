@@ -1,5 +1,5 @@
 //ff:func feature=report type=test control=iteration dimension=1 topic=json
-//ff:what test: Emit — flat JSON snake_case 구조 + summary 카운팅 + rule_id 추출 검증
+//ff:what test: Emit — verifies flat JSON snake_case structure, summary counting, and rule_id extraction
 package json
 
 import (
@@ -62,7 +62,7 @@ func TestEmitWithDiagnostics(t *testing.T) {
 					Line:    15,
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
-					Message: "[S-27] 변수 foo 미선언",
+					Message: "[S-27] variable foo is not declared",
 				},
 				{
 					File:    "service/workflow/update.ssac",

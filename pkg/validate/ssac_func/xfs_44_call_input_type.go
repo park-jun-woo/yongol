@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=3 topic=func-check
-//ff:what XFS-44 — @call Input type ↔ Request field type (literal + variable 추론)
+//ff:what XFS-44 — @call Input type ↔ Request field type (literal and variable inference)
 
 package ssac_func
 
@@ -49,7 +49,7 @@ func xfs44CallInputType(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 						Level: diagnostic.LevelError,
 						Message: "[XFS-44] @call " + seq.Model + " input " + inputKey +
 							" type " + sourceType + " ≠ " + funcName + "Request." + inputKey + " type " + reqType,
-						Advice: "@call 입력 " + inputKey + " 의 타입을 func Request 의 " + inputKey + " 타입과 일치시키세요",
+						Advice: "Make the @call input " + inputKey + " type match the " + inputKey + " field type in the func Request",
 					})
 				}
 			}

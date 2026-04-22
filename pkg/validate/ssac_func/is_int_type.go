@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=selection topic=func-check
-//ff:what isIntType — Go int 계열 타입명(t)인지 판정
+//ff:what isIntType — report whether t is one of Go's integer family type names
 
 package ssac_func
 

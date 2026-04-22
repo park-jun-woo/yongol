@@ -1,5 +1,5 @@
 //ff:func feature=cli type=util control=iteration dimension=1
-//ff:what countLevels — diagnostic 슬라이스에서 ERROR/WARN 개수 집계
+//ff:what countLevels — tallies ERROR and WARNING counts from a diagnostic slice
 package main
 
 import "github.com/park-jun-woo/yongol/pkg/diagnostic"

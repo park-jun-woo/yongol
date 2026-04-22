@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=1 topic=query-structural
-//ff:what Q-01 — `-- name:` 어노테이션 필수
+//ff:what Q-01 — the `-- name:` annotation is required
 
 package query
 
@@ -34,7 +34,7 @@ func q01NameRequired(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			Phase:   diagnostic.PhaseValidate,
 			Level:   diagnostic.LevelError,
 			Message: "[Q-01] SQL statement in " + filepath.Base(file) + " has no `-- name:` annotation",
-			Advice:  "각 쿼리에 `-- name: <PascalName> :one|:many|:exec` 주석을 추가하세요",
+			Advice:  "Add a `-- name: <PascalName> :one|:many|:exec` comment to each query",
 		})
 	}
 	return diags

@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=sequence topic=query-structural
-//ff:what q06CheckUpdateWhere — 단일 UPDATE 쿼리의 WHERE 유무 판정 + ERROR 진단 생성
+//ff:what q06CheckUpdateWhere — checks whether a single UPDATE query has a WHERE clause and generates an ERROR diagnostic if not
 
 package query
 
@@ -35,6 +35,6 @@ func q06CheckUpdateWhere(q sqlc.QuerySpec) (diagnostic.Diagnostic, bool) {
 		Phase:   diagnostic.PhaseValidate,
 		Level:   diagnostic.LevelError,
 		Message: "[Q-06] UPDATE in " + q.Name + " has no WHERE clause (potential full-table update)",
-		Advice:  "WHERE 조건을 추가하거나 의도적 전체 업데이트면 `-- +allow-truncate` 주석을 붙이세요",
+		Advice:  "Add a WHERE clause, or add `-- +allow-truncate` if a full-table update is intentional",
 	}, true
 }

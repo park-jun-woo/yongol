@@ -1,5 +1,5 @@
 //ff:func feature=rule type=loader control=iteration dimension=1
-//ff:what populateSSaC — SSaC에서 funcName, auth 쌍, call 참조, pub/sub 토픽 추출
+//ff:what populateSSaC — extracts funcName, auth pairs, call references, and pub/sub topics from SSaC
 package ground
 
 import (
@@ -21,8 +21,8 @@ func populateSSaC(g *rule.Ground, fs *yongol.Fullstack) {
 		} else {
 			funcNames[fn.Name] = true
 		}
-		// @subscribe handler 의 sequences 도 처리 — @call / @publish / @model
-		// 참조가 Ground 에 등록되도록 (BUG004 fix).
+		// Also process sequences of @subscribe handlers so that @call / @publish /
+		// @model references are registered in Ground (BUG004 fix).
 		for _, seq := range fn.Sequences {
 			populateSSaCSeq(g, fn.Name, seq, authPairs, callRefs, modelRefs, pubTopics)
 		}

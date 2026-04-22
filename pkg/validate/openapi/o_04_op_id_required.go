@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=openapi-structural
-//ff:what O-4 — OpenAPI operation 에 operationId 필수
+//ff:what O-4 — every OpenAPI operation requires an operationId
 
 package openapi
 
@@ -34,7 +34,7 @@ func o04OpIdRequired(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
 				Message: "[O-4] missing operationId at " + method + " " + path,
-				Advice:  "operationId: camelCase 형태로 모든 operation 에 명시하세요 (예: GetWorkflow, ExecuteWorkflow)",
+				Advice:  "Declare an operationId in camelCase on every operation (e.g. GetWorkflow, ExecuteWorkflow)",
 			})
 		}
 	}

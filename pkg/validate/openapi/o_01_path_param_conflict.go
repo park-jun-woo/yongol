@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=1 topic=openapi-structural
-//ff:what O-1 — OpenAPI path에 같은 이름의 {param}이 중복 등장하는지 감지
+//ff:what O-1 — detects duplicate {param} names in an OpenAPI path
 
 package openapi
 
@@ -23,7 +23,7 @@ func o01PathParamConflict(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
 				Message: "[O-1] path parameter conflict at " + path,
-				Advice:  "동일 path 의 파라미터 이름을 일치시키세요",
+				Advice:  "Use distinct parameter names within the same path",
 			})
 		}
 	}

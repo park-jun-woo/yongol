@@ -1,5 +1,5 @@
 //ff:func feature=cli type=test control=iteration dimension=1
-//ff:what test: chain 서브커맨드 end-to-end 2 케이스 (happy / unknown-op)
+//ff:what test: chain subcommand end-to-end 2 cases (happy / unknown-op)
 
 package main
 

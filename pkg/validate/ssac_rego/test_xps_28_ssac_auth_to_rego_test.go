@@ -1,5 +1,5 @@
 //ff:func feature=validate type=test control=sequence topic=policy-check
-//ff:what XPS-28 테스트 (TODO: 케이스 추가)
+//ff:what XPS-28 test (TODO: add cases)
 
 package ssac_rego
 

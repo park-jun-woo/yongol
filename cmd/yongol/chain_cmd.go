@@ -1,5 +1,5 @@
 //ff:func feature=cli type=command control=sequence
-//ff:what chainCmd — yongol chain 서브커맨드 반환
+//ff:what chainCmd — returns the yongol chain subcommand
 package main
 
 import (

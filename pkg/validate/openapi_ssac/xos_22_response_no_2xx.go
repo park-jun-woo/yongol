@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=1 topic=ssac-openapi
-//ff:what XOS-22 — @response 있는 함수에 OpenAPI 2xx 응답 코드 존재 여부 검증
+//ff:what XOS-22 — verifies that functions with @response have a 2xx response code in OpenAPI
 
 package openapi_ssac
 
@@ -33,7 +33,7 @@ func xos22ResponseNo2xx(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			Phase:   diagnostic.PhaseValidate,
 			Level:   diagnostic.LevelError,
 			Message: "[XOS-22] SSaC " + fn.Name + " has @response but OpenAPI defines no explicit 2xx response",
-			Advice:  "OpenAPI " + fn.Name + " responses 에 2xx 응답(200/201/204 등)을 명시하세요",
+			Advice:  "Declare a 2xx response (200, 201, 204, etc.) in the OpenAPI " + fn.Name + " responses",
 		})
 	}
 	return diags

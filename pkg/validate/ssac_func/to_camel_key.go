@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=sequence topic=func-check
-//ff:what toCamelKey — PascalCase → camelCase 변환 (Func 어노테이션 키 정규화)
+//ff:what toCamelKey — convert PascalCase to camelCase (normalize Func annotation keys)
 
 package ssac_func
 

@@ -1,5 +1,5 @@
 //ff:func feature=cli type=util control=selection
-//ff:what statusMark — validate.Status를 ✓/✗/-/? 기호로 변환
+//ff:what statusMark — maps validate.Status to a ✓/✗/-/? symbol
 package main
 
 import "github.com/park-jun-woo/yongol/pkg/validate"

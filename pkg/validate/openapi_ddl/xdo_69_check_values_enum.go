@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=openapi-ddl
-//ff:what XDO-69 — DDL CHECK IN 값 집합과 OpenAPI enum 값 집합이 서로 다르면 ERROR
+//ff:what XDO-69 — ERROR when the DDL CHECK IN value set differs from the OpenAPI enum value set
 
 package openapi_ddl
 
@@ -36,7 +36,7 @@ func xdo69CheckValuesEnum(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
 				Message: fmt.Sprintf("[XDO-69] %s.%s — DDL CHECK IN (%s) ≠ OpenAPI enum [%s]", opID, fieldName, strings.Join(checkEnums, ", "), strings.Join(fc.Enum, ", ")),
-				Advice:  "OpenAPI enum 값을 DDL CHECK IN 값과 동일하게 맞추세요",
+				Advice:  "Align the OpenAPI enum values with the DDL CHECK IN values",
 			})
 		}
 	}

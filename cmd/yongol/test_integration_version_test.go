@@ -1,5 +1,5 @@
 //ff:func feature=cli type=test control=sequence
-//ff:what test: version 서브커맨드 end-to-end 1 케이스 (basic)
+//ff:what test: version subcommand end-to-end 1 case (basic)
 
 package main
 

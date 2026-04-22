@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=3 topic=ssac-structural
-//ff:what S-44 — HTTP 함수에서 message 사용 금지
+//ff:what S-44 — the message variable is forbidden in HTTP handler functions
 
 package ssac
 
@@ -24,7 +24,7 @@ func s44HTTPForbiddenMessage(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 						Phase:   diagnostic.PhaseValidate,
 						Level:   diagnostic.LevelError,
 						Message: "[S-44] HTTP function cannot use message",
-						Advice:  "HTTP 함수는 message 변수를 사용할 수 없습니다 (message 는 @subscribe 전용)",
+						Advice:  "HTTP functions cannot use the message variable (message is exclusive to @subscribe)",
 					})
 				}
 			}

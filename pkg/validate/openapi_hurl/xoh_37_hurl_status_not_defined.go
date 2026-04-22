@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=1 topic=scenario-check
-//ff:what XOH-37 — Hurl entry의 기대 상태코드가 OpenAPI responses에 정의되어 있는지 검증
+//ff:what XOH-37 — verifies that a Hurl entry's expected status code is defined in the OpenAPI responses
 
 package openapi_hurl
 
@@ -35,7 +35,7 @@ func xoh37HurlStatusNotDefined(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			Phase:   diagnostic.PhaseValidate,
 			Level:   diagnostic.LevelWarning,
 			Message: "[XOH-37] status " + e.StatusCode + " for " + e.Method + " " + e.Path + " not defined in OpenAPI responses",
-			Advice:  "OpenAPI op responses 에 " + e.StatusCode + " 를 추가하거나 Hurl 에서 기대 상태코드를 변경하세요",
+			Advice:  "Add " + e.StatusCode + " to the OpenAPI op responses, or change the expected status code in Hurl",
 		})
 	}
 	return diags

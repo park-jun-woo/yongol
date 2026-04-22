@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=3 topic=ssac-structural
-//ff:what S-31 — config.* 입력 금지
+//ff:what S-31 — config.* inputs are forbidden
 
 package ssac
 
@@ -25,7 +25,7 @@ func s31ConfigPrefixForbidden(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
 					Message: "[S-31] config.* input forbidden — use os.Getenv() inside func",
-					Advice:  "config.* 참조 대신 직접 입력값으로 받으세요",
+					Advice:  "Receive the value as an explicit input instead of referencing config.*",
 				})
 			}
 		}

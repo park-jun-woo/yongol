@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what S-63 — @get []T list 엔드포인트인데 pagination params 없고 @no-pagination 없음 (WARNING)
+//ff:what S-63 — @get []T list endpoint missing pagination params and @no-pagination (WARNING)
 
 package ssac
 
@@ -10,7 +10,7 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
-// paginationKeys는 pagination을 나타내는 Inputs 키 목록이다.
+// paginationKeys is the set of Inputs keys that indicate pagination.
 var paginationKeys = map[string]bool{
 	"Page":    true,
 	"PerPage": true,
@@ -46,9 +46,9 @@ func s63ListNoPagination(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelWarning,
 				Message: "[S-63] @get []T list endpoint has no pagination (missing @no-pagination)",
-				Advice:  "pagination params (page/per_page/cursor) 를 추가하거나, 의도적으로 전체 목록을 반환한다면 // @no-pagination 을 붙이세요",
+				Advice:  "Add pagination params (page/per_page/cursor), or add // @no-pagination if returning the full list is intentional",
 			})
-			break // 함수당 한 번만 경고
+			break // warn at most once per function
 		}
 	}
 	return diags

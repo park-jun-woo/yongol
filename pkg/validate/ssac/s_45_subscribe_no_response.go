@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what S-45 — @subscribe에서 @response 금지
+//ff:what S-45 — @response is forbidden inside @subscribe functions
 
 package ssac
 
@@ -25,7 +25,7 @@ func s45SubscribeNoResponse(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
 				Message: "[S-45] @subscribe cannot use @response",
-				Advice:  "@subscribe 함수에서 @response 시퀀스를 제거하세요 (응답은 HTTP 전용)",
+				Advice:  "Remove the @response sequence from the @subscribe function (responses are HTTP-only)",
 			})
 		}
 	}

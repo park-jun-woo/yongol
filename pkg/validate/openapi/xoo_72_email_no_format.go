@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=openapi-structural
-//ff:what XOO-72 — email 계열 필드에 format: email 누락
+//ff:what XOO-72 — email-type fields are missing format: email
 
 package openapi
 
@@ -48,7 +48,7 @@ func xoo72EmailNoFormat(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelWarning,
 				Message: fmt.Sprintf("[XOO-72] email field %q in %s has no format: email constraint", name, opID),
-				Advice:  "email 필드에 format: email 을 추가하세요",
+				Advice:  "Add format: email to the email field",
 			})
 		}
 	}

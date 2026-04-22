@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what S-1 — @get Model 필수
+//ff:what S-1 — @get requires a Model field
 
 package ssac
 
@@ -23,7 +23,7 @@ func s01GetModel(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
 					Message: "[S-1] @get requires Model",
-					Advice:  "@get 시퀀스에 Model 항목을 추가하세요",
+					Advice:  "Add a Model field to the @get sequence",
 				})
 			}
 		}

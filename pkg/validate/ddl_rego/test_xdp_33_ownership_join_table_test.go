@@ -1,5 +1,5 @@
 //ff:func feature=validate type=test control=sequence topic=policy-check
-//ff:what XDP-33 테스트 (TODO: 케이스 추가)
+//ff:what XDP-33 test (TODO: add cases)
 
 package ddl_rego
 

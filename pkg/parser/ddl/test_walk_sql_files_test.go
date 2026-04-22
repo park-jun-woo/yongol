@@ -1,5 +1,5 @@
 //ff:func feature=ddl type=test control=sequence
-//ff:what walkSQLFiles — happy / missing-dir / mixed-filter 3 케이스 회귀
+//ff:what walkSQLFiles — happy / missing-dir / mixed-filter 3 case regression
 
 package ddl
 
@@ -61,15 +61,15 @@ func TestWalkSQLFiles_MissingDir(t *testing.T) {
 
 func TestWalkSQLFiles_MixedFilter(t *testing.T) {
 	dir := t.TempDir()
-	// .sql → 대상
+	// .sql → included
 	if err := os.WriteFile(filepath.Join(dir, "users.sql"), []byte("-- sql"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	// .txt → 제외
+	// .txt → excluded
 	if err := os.WriteFile(filepath.Join(dir, "notes.txt"), []byte("text"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	// 하위 디렉토리 → 제외 (recursive X)
+	// subdirectory → excluded (non-recursive)
 	sub := filepath.Join(dir, "sub")
 	if err := os.Mkdir(sub, 0o755); err != nil {
 		t.Fatal(err)

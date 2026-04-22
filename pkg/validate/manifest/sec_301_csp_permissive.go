@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=manifest-security-headers
-//ff:what SEC-301 — CSP default-src 가 '*' 또는 'unsafe-eval' 을 허용하면 WARNING
+//ff:what SEC-301 — WARNING when CSP default-src permits '*' or 'unsafe-eval'
 
 package manifest
 
@@ -39,7 +39,7 @@ func sec301CspPermissive(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		File:    "manifest.yaml",
 		Phase:   diagnostic.PhaseValidate,
 		Level:   diagnostic.LevelWarning,
-		Message: "[SEC-301] backend.security_headers.csp.default-src 에 " + quoted(offenders[0]) + " 가 포함되어 CSP 보호 효과가 약화됩니다",
-		Advice:  "default-src 에서 '*' / 'unsafe-eval' 을 제거하고 필요한 origin 만 허용하세요 (예: default-src 'self')",
+		Message: "[SEC-301] backend.security_headers.csp.default-src contains " + quoted(offenders[0]) + ", weakening CSP protection",
+		Advice:  "Remove '*' / 'unsafe-eval' from default-src and allow only the required origins (e.g. default-src 'self')",
 	}}
 }

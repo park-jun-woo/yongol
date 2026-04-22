@@ -1,5 +1,5 @@
 //ff:func feature=gen-filefunc type=util control=sequence
-//ff:what buildTopicEntries — 고정 topic 맵 반환 (Phase001 단계에서는 동적 확장 없음)
+//ff:what buildTopicEntries — returns the fixed topic map (no dynamic expansion in Phase001)
 package filefunc
 
 import "github.com/park-jun-woo/yongol/pkg/yongol"
@@ -11,16 +11,16 @@ import "github.com/park-jun-woo/yongol/pkg/yongol"
 func buildTopicEntries(fs *yongol.Fullstack) map[string]string {
 	_ = fs
 	return map[string]string{
-		"request-binding":      "요청 파라미터 수집, body 바인딩",
-		"response-serialize":   "응답 필드 구성",
+		"request-binding":      "collect request parameters and bind body",
+		"response-serialize":   "compose response fields",
 		"transaction-boundary": "BeginTx / Commit / Rollback",
-		"state-transition":     "@state 전이 실행",
-		"auth-check":           "@auth 게이트",
-		"pagination":           "페이지네이션 적용",
-		"error-mapping":        "validation / domain / infra error 분류",
+		"state-transition":     "execute @state transition",
+		"auth-check":           "@auth gate",
+		"pagination":           "apply pagination",
+		"error-mapping":        "classify validation / domain / infra errors",
 		"observability":        "slog / metric / trace",
-		"publish":              "큐 발행",
-		"subscribe":            "큐 구독",
-		"pointer-helper":       "ptr/deref 제네릭 헬퍼",
+		"publish":              "queue publish",
+		"subscribe":            "queue subscribe",
+		"pointer-helper":       "ptr/deref generic helpers",
 	}
 }

@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=tsx-openapi
-//ff:what XOT-2 — apiClient 호출의 path/query 파라미터 객체 키가 OpenAPI parameters 에 존재하는지 검증
+//ff:what XOT-2 — verifies that path/query parameter object keys in apiClient calls exist in the OpenAPI parameters
 package tsx_openapi
 
 import (
@@ -47,7 +47,7 @@ func xot02ParameterMatch(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
 					Message: "[XOT-2] apiClient." + call.OperationID + "({" + arg.Key + ": ...}) — '" + arg.Key + "' is not declared as an OpenAPI parameter",
-					Advice:  "openapi.yaml 에서 해당 operation 의 parameters 에 " + arg.Key + " 를 추가하거나 호출 인자명을 수정하세요",
+					Advice:  "Add " + arg.Key + " to the parameters of the operation in openapi.yaml, or correct the argument name in the call",
 				})
 			}
 		}

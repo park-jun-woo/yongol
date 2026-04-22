@@ -1,5 +1,5 @@
 //ff:func feature=ssac-parse type=parser control=sequence topic=states
-//ff:what @state 상태 전이 시퀀스 파싱
+//ff:what parseState — parses an @state transition sequence
 package ssac
 
 import (
@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// parseState는 @state를 파싱한다.
+// parseState parses an @state annotation.
 // diagramID {inputs} "transition" "message"
 func parseState(rest string) (*Sequence, error) {
 	rest = strings.TrimSpace(rest)

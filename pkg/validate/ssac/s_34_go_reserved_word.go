@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what S-34 — Go 예약어 식별자 금지 (result 변수)
+//ff:what S-34 — Go reserved words are forbidden as result variable names
 
 package ssac
 
@@ -27,7 +27,7 @@ func s34GoReservedWord(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
 				Message: fmt.Sprintf("[S-34] Go reserved word %q used as variable name", seq.Result.Var),
-				Advice:  fmt.Sprintf("Go 예약어 %q 는 변수명으로 사용할 수 없습니다", seq.Result.Var),
+				Advice:  fmt.Sprintf("Go reserved word %q cannot be used as a variable name", seq.Result.Var),
 			})
 		}
 	}

@@ -1,5 +1,5 @@
 //ff:func feature=validate type=test control=sequence topic=scenario-check
-//ff:what XOH-37 테스트 (TODO: 케이스 추가)
+//ff:what XOH-37 test (TODO: add cases)
 
 package openapi_hurl
 

@@ -1,5 +1,5 @@
 //ff:func feature=cli type=test control=iteration dimension=1
-//ff:what test: TestPrintReportReturnValues — printReport 4 케이스 errors/warnings/err 반환 검증
+//ff:what test: TestPrintReportReturnValues — printReport 4 cases validating errors/warnings/err return values
 
 package main
 

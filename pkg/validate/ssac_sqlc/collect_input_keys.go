@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=iteration dimension=1 topic=sqlc
-//ff:what collectInputKeys — sequence의 Args.Field 와 Inputs key를 모아 반환
+//ff:what collectInputKeys — collect the Args.Field names and Inputs keys from a sequence
 
 package ssac_sqlc
 

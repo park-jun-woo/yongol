@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=ssac-func
-//ff:what Run — SSaC↔FuncSpec 교차 검증 실행 (XFS-*, XSF-*)
+//ff:what Run — execute all SSaC↔FuncSpec cross-validation rules (XFS-*, XSF-*)
 package ssac_func
 
 import (

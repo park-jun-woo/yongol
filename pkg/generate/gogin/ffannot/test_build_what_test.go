@@ -1,5 +1,5 @@
 //ff:func feature=gen-gogin type=test control=iteration dimension=1
-//ff:what test: TestBuildWhat — //ff:what 한 줄 조립 검증 (table-driven)
+//ff:what test: TestBuildWhat — table-driven test verifying that a single //ff:what line is assembled correctly
 
 package ffannot
 

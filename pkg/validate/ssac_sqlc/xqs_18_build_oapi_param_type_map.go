@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=iteration dimension=1 topic=ssac-sqlc
-//ff:what buildXqs18OAPIParamTypeMap — OpenAPI Operation 의 parameter 이름 → 타입 맵
+//ff:what buildXqs18OAPIParamTypeMap — build a parameter-name → type map from an OpenAPI Operation
 
 package ssac_sqlc
 

@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=3 topic=ssac-structural
-//ff:what S-57 — @call input type ↔ FuncRequest field type 매칭
+//ff:what S-57 — @call input types must match the FuncRequest field types
 
 package ssac
 
@@ -49,7 +49,7 @@ func s57FuncRequestType(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
 					Message: fmt.Sprintf("[S-57] @call %s input %s type mismatch: %s vs %s", method, arg.Field, sourceType, expected),
-					Advice:  "func spec 의 Request 타입과 SSaC 입력 타입을 일치시키세요",
+					Advice:  "Align the Request type in the func spec with the SSaC input type",
 				})
 			}
 		}

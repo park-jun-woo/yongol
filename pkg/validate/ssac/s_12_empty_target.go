@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what S-12 — @empty Target 필수
+//ff:what S-12 — @empty requires a Target field
 
 package ssac
 
@@ -23,7 +23,7 @@ func s12EmptyTarget(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
 					Message: "[S-12] @empty requires Target",
-					Advice:  "@empty 시퀀스에 Target 항목을 추가하세요",
+					Advice:  "Add a Target field to the @empty sequence",
 				})
 			}
 		}

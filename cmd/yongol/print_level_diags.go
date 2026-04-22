@@ -1,5 +1,5 @@
 //ff:func feature=cli type=reporter control=iteration dimension=1
-//ff:what printLevelDiags — 특정 레벨 diagnostic 을 "[step]" 헤더와 함께 출력
+//ff:what printLevelDiags — prints diagnostics of a given level under a "[step]" header
 package main
 
 import (
@@ -11,7 +11,7 @@ import (
 )
 
 // printLevelDiags writes diagnostics of the given level under a "[step]" header.
-// Multi-line messages and " → 권고: ..." suggestions are indented for readability.
+// Multi-line messages and " → Advice: ..." suggestions are indented for readability.
 func printLevelDiags(w io.Writer, s validate.StepResult, level diagnostic.Level) {
 	first := true
 	for _, d := range s.Diagnostics {
@@ -22,7 +22,7 @@ func printLevelDiags(w io.Writer, s validate.StepResult, level diagnostic.Level)
 			fmt.Fprintf(w, "[%s]\n", s.Name)
 			first = false
 		}
-		// Advice 필드를 우선 사용. 비어있으면 Message 안 인라인된 → 권고: 분리 (Phase003 마이그레이션 중인 함수 호환).
+		// Prefer the Advice field; fall back to splitting inline advice from Message for legacy compatibility.
 		main := d.Message
 		advice := d.Advice
 		if advice == "" {
@@ -30,7 +30,7 @@ func printLevelDiags(w io.Writer, s validate.StepResult, level diagnostic.Level)
 		}
 		fmt.Fprintf(w, "  - %s%s\n", formatLocation(d.File, d.Line), main)
 		if advice != "" {
-			fmt.Fprintf(w, "      ↳ 권고: %s\n", advice)
+			fmt.Fprintf(w, "      ↳ Advice: %s\n", advice)
 		}
 	}
 }

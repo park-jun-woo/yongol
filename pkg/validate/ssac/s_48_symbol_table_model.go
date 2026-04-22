@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what S-48 — @get/@post/@put/@delete Model이 심볼 테이블에 존재
+//ff:what S-48 — the Model in @get/@post/@put/@delete must exist in the symbol table
 
 package ssac
 
@@ -40,7 +40,7 @@ func s48SymbolTableModel(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
 				Message: fmt.Sprintf("[S-48] model %q not found in symbol table", model),
-				Advice:  fmt.Sprintf("model %q 가 정의된 .ssac 파일을 추가하거나 import 하세요", model),
+				Advice:  fmt.Sprintf("Add or import the .ssac file that defines model %q", model),
 			})
 		}
 	}

@@ -1,5 +1,5 @@
 //ff:func feature=cli type=test control=iteration dimension=1 topic=format
-//ff:what test: printReport dispatcher — md/sarif 포맷 분기 + 잘못된 값 에러
+//ff:what test: printReport dispatcher — md/sarif format dispatch + invalid value error
 package main
 
 import (
@@ -63,7 +63,7 @@ func TestPrintReportFormatSARIF(t *testing.T) {
 					Line:    15,
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
-					Message: "[S-27] 변수 foo 미선언",
+					Message: "[S-27] variable foo is undeclared",
 				},
 			},
 		},

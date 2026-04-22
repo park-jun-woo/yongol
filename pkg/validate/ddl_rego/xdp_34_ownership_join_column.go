@@ -10,9 +10,9 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
-// xdp34OwnershipJoinColumn validates XDP-34: Rego @ownership via 의
-// 조인 FK 컬럼이 조인 테이블의 DDL 컬럼 정의에 존재하는지 확인한다.
-// join table 이 DDL 에 없으면 XDP-33 에서 보고되므로 여기서는 건너뛴다.
+// xdp34OwnershipJoinColumn validates XDP-34: the join FK column in a Rego
+// @ownership via clause must exist in the DDL column definitions of the join
+// table. Missing join tables are already reported by XDP-33 and are skipped here.
 func xdp34OwnershipJoinColumn(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	if fs == nil {
 		return nil
@@ -44,9 +44,9 @@ func xdp34OwnershipJoinColumn(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase: diagnostic.PhaseValidate,
 					Level: diagnostic.LevelError,
 					Message: fmt.Sprintf(
-						"[XDP-34] @ownership %s via 의 join 컬럼 %s.%s 가 DDL 에 존재하지 않습니다",
+						"[XDP-34] @ownership %s via — join column %s.%s not found in DDL",
 						om.Resource, om.JoinTable, om.JoinFK),
-					Advice: fmt.Sprintf("DDL join 테이블 %s 에 컬럼 %s 를 추가하세요", om.JoinTable, om.JoinFK),
+					Advice: fmt.Sprintf("Add column %s to DDL join table %s", om.JoinFK, om.JoinTable),
 				})
 			}
 		}

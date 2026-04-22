@@ -1,8 +1,8 @@
 //ff:func feature=ssac-parse type=parser control=sequence topic=response
-//ff:what @response 블록 본문 줄을 처리
+//ff:what processResponseBody — processes a body line of the @response block
 package ssac
 
-// processResponseBody는 @response 블록 본문 줄을 처리한다.
+// processResponseBody processes a single body line of the @response block.
 func (cp *commentParser) processResponseBody(line string) {
 	done, seq := handleResponseLine(line, cp.responseLines, cp.responseSuppressWarn)
 	if done {

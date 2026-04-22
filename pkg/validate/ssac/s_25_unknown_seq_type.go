@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what S-25 — 알 수 없는 시퀀스 타입
+//ff:what S-25 — unknown sequence type
 
 package ssac
 
@@ -24,7 +24,7 @@ func s25UnknownSeqType(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
 				Message: fmt.Sprintf("[S-25] unknown sequence type: @%s", seq.Type),
-				Advice:  "@get/@post/@put/@delete/@call/@empty/@exists/@state/@auth/@publish/@verify-password 중 하나를 사용하세요",
+				Advice:  "Use one of: @get/@post/@put/@delete/@call/@empty/@exists/@state/@auth/@publish/@verify-password",
 			})
 		}
 	}

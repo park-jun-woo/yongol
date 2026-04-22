@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=manifest-observability
-//ff:what OBS-004 — backend.observability.tracing.sample_rate 는 0.0~1.0 범위여야 함
+//ff:what OBS-004 — backend.observability.tracing.sample_rate must be in the range 0.0–1.0
 
 package manifest
 
@@ -41,6 +41,6 @@ func obs04TracingSampleRate(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		Phase:   diagnostic.PhaseValidate,
 		Level:   diagnostic.LevelError,
 		Message: fmt.Sprintf("[OBS-004] backend.observability.tracing.sample_rate must be in [0.0, 1.0] (got %v)", r),
-		Advice:  "dev: 1.0 (모든 trace 수집), prod: 0.05~0.1 (head-based 5~10%) 권장",
+		Advice:  "dev: 1.0 (collect all traces), prod: 0.05–0.1 (head-based 5–10%) recommended",
 	}}
 }

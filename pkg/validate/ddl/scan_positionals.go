@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=iteration dimension=1 topic=ddl-structural
-//ff:what scanPositionals — 쿼리 파일에서 $N 위치 파라미터 라인/토큰 수집
+//ff:what scanPositionals — collect $N positional parameter occurrences (line/token) from a query file
 
 package ddl
 

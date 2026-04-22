@@ -1,5 +1,5 @@
 //ff:func feature=cli type=util control=sequence
-//ff:what countBackendFiles — arts/backend 하위 .go 파일 개수 집계 (vendor/hidden 제외)
+//ff:what countBackendFiles — counts .go files under arts/backend (excluding vendor and hidden directories)
 
 package main
 

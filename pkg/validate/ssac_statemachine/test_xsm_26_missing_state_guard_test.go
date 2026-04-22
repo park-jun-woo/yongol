@@ -1,5 +1,5 @@
 //ff:func feature=validate type=test control=sequence topic=states
-//ff:what XSM-26 테스트 (TODO: 케이스 추가)
+//ff:what XSM-26 test (TODO: add cases)
 
 package ssac_statemachine
 

@@ -1,5 +1,5 @@
 //ff:func feature=validate type=test control=sequence topic=ssac-openapi
-//ff:what XOS-22 테스트 (TODO: 케이스 추가)
+//ff:what XOS-22 test (TODO: add cases)
 
 package openapi_ssac
 

@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=iteration dimension=1 topic=ddl-structural
-//ff:what readSQLDir — 디렉토리 내 .sql 파일들을 sqlFile 슬라이스로 읽어 반환
+//ff:what readSQLDir — read all .sql files in a directory and return them as a []sqlFile slice
 package ddl
 
 import (

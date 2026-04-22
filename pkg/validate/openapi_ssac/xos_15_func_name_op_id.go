@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=1 topic=ssac-openapi
-//ff:what XOS-15 — SSaC funcName이 OpenAPI operationId에 정의되어 있는지 검증
+//ff:what XOS-15 — verifies that every SSaC funcName is defined as an OpenAPI operationId
 
 package openapi_ssac
 
@@ -30,7 +30,7 @@ func xos15FuncNameOpID(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			Phase:   diagnostic.PhaseValidate,
 			Level:   diagnostic.LevelError,
 			Message: "[XOS-15] SSaC func " + fn.Name + " has no matching OpenAPI operationId",
-			Advice:  "SSaC 함수명을 OpenAPI operationId 와 일치시키세요 (operationId: " + fn.Name + ")",
+			Advice:  "Align the SSaC function name with the OpenAPI operationId (operationId: " + fn.Name + ")",
 		})
 	}
 	return diags

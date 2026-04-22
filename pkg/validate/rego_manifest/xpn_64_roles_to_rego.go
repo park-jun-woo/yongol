@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=config-check
-//ff:what XPN-64 — Manifest roles → Rego 사용
+//ff:what XPN-64 — every manifest role must be referenced by at least one Rego allow rule
 
 package rego_manifest
 
@@ -43,7 +43,7 @@ func xpn64RolesToRego(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			Phase:   diagnostic.PhaseValidate,
 			Level:   diagnostic.LevelWarning,
 			Message: fmt.Sprintf("[XPN-64] manifest role %q — not referenced by any Rego allow rule", role),
-			Advice:  fmt.Sprintf("Rego 에 role '%s' 를 사용하는 allow 규칙을 추가하거나 manifest 에서 제거하세요", role),
+			Advice:  fmt.Sprintf("Add a Rego allow rule that uses role '%s', or remove it from the manifest", role),
 		})
 	}
 	return diags

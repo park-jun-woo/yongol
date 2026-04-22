@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=3 topic=sqlc
-//ff:what XQS-15 — SSaC input key 가 Go initialism 컨벤션을 위반하는지 검사
+//ff:what XQS-15 — check whether a SSaC input key violates Go initialism conventions
 
 package ssac_sqlc
 
@@ -46,7 +46,7 @@ func xqs15InputKeyInitialism(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelWarning,
 					Message: fmt.Sprintf("[XQS-15] input key %q violates Go initialism (should be %q)", key, correct),
-					Advice:  "Go struct field 로 코드젠되므로 약자는 모두 대문자로 표기하세요",
+					Advice:  "This key is codegen'd as a Go struct field — use the all-caps initialism form",
 				})
 			}
 		}

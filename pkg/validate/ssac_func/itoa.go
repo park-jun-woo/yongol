@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=sequence topic=func-check
-//ff:what itoa — strconv.Itoa 의 얇은 래퍼 (fmt import 절감)
+//ff:what itoa — thin wrapper around strconv.Itoa to avoid importing fmt
 
 package ssac_func
 

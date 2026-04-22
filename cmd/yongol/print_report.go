@@ -1,5 +1,5 @@
 //ff:func feature=cli type=reporter control=selection dimension=1
-//ff:what printReport — format(md|json|sarif) 값에 따라 해당 렌더러로 분기하는 dispatcher
+//ff:what printReport — dispatcher that routes to the appropriate renderer based on the format (md|json|sarif) value
 package main
 
 import (

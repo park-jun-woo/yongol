@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=ssac-structural
-//ff:what S-40 — @subscribe 파라미터 변수명은 'message' 단일
+//ff:what S-40 — the @subscribe parameter must be named 'message' and be the sole parameter
 
 package ssac
 
@@ -23,7 +23,7 @@ func s40SubscribeSingleParam(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:   diagnostic.PhaseValidate,
 				Level:   diagnostic.LevelError,
 				Message: "[S-40] @subscribe parameter variable must be named 'message'",
-				Advice:  "@subscribe 함수 파라미터를 단일 'message' 변수로 선언하세요",
+				Advice:  "Declare the @subscribe function parameter as a single variable named 'message'",
 			})
 		}
 	}

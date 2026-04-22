@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=3 topic=sqlc
-//ff:what XQS-16 — SSaC Input key가 sqlc Params에 없으면 ERROR
+//ff:what XQS-16 — ERROR when a SSaC Input key is absent from sqlc Params
 
 package ssac_sqlc
 
@@ -41,8 +41,8 @@ func xqs16InputKeyMissing(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Line:    seq.Line,
 					Phase:   diagnostic.PhaseValidate,
 					Level:   diagnostic.LevelError,
-					Message: fmt.Sprintf("[XQS-16] SSaC Input key %q 가 sqlc 쿼리 %s 의 Params에 없습니다", key, queryName),
-					Advice:  fmt.Sprintf("SQL 쿼리에 @%s named parameter를 추가하거나 SSaC Input에서 제거하세요", toSnake(key)),
+					Message: fmt.Sprintf("[XQS-16] SSaC Input key %q is not in Params of sqlc query %s", key, queryName),
+					Advice:  fmt.Sprintf("Add a @%s named parameter to the SQL query, or remove it from the SSaC Input", toSnake(key)),
 				})
 			}
 		}

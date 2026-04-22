@@ -1,5 +1,5 @@
 //ff:func feature=cli type=test-helper control=sequence
-//ff:what printLevelDiags 단일 케이스 실행 헬퍼 — buf/step/assert 묶음
+//ff:what printLevelDiags single-case runner helper — buf/step/assert bundle
 package main
 
 import (

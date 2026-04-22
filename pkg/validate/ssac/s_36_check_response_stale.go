@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=iteration dimension=1 topic=ssac-structural
-//ff:what s36CheckResponseStale — @response 필드에서 stale 변수 참조 검출 → WARNING
+//ff:what s36CheckResponseStale — detects stale variable references in @response fields (WARNING)
 
 package ssac
 
@@ -28,7 +28,7 @@ func s36CheckResponseStale(fn parsessac.ServiceFunc, _ int, seq parsessac.Sequen
 			Phase:   diagnostic.PhaseValidate,
 			Level:   diagnostic.LevelWarning,
 			Message: fmt.Sprintf("[S-36] @response uses %s which was mutated but not re-queried", ref),
-			Advice:  "@put/@delete 후 변경된 객체를 @get 으로 다시 조회하세요",
+			Advice:  "Re-fetch the modified object with @get after a @put/@delete",
 		})
 	}
 	return diags

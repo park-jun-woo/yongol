@@ -1,5 +1,5 @@
 //ff:func feature=validate type=util control=iteration dimension=1 topic=ssac-sqlc
-//ff:what xqs18CheckSeq — 단일 sequence 의 CRUD Args + Inputs 타입 호환성 검사
+//ff:what xqs18CheckSeq — check type compatibility of a single sequence's CRUD Args and Inputs
 
 package ssac_sqlc
 
