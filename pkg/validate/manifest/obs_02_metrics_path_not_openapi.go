@@ -1,11 +1,9 @@
-//ff:func feature=validate type=rule control=sequence topic=manifest-observability
+//ff:func feature=validate type=rule control=iteration dimension=1 topic=manifest-observability
 //ff:what OBS-002 — metrics.path must not collide with an OpenAPI-defined path
 
 package manifest
 
 import (
-	"strings"
-
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
@@ -41,22 +39,4 @@ func obs02MetricsPathNotOpenAPI(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		}
 	}
 	return nil
-}
-
-// resolveMetricsPath returns the effective scrape path: manifest value when
-// explicitly set with a leading "/", else "/metrics". Values failing OBS-001
-// (no leading slash) are skipped — OBS-001 already reports them.
-func resolveMetricsPath(fs *yongol.Fullstack) string {
-	obs := fs.Manifest.Backend.Observability
-	if obs == nil || obs.Metrics == nil {
-		return "/metrics"
-	}
-	p := strings.TrimSpace(obs.Metrics.Path)
-	if p == "" {
-		return "/metrics"
-	}
-	if !strings.HasPrefix(p, "/") {
-		return ""
-	}
-	return p
 }
