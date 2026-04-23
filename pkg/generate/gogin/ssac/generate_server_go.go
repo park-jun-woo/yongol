@@ -32,7 +32,9 @@ func generateServerGo(fs *yongol.Fullstack, artifactsDir, modulePath string) err
 	sb.WriteString("\t\"" + modulePath + "/internal/db\"\n")
 	authActive := fs.Manifest != nil && fs.Manifest.Backend.Auth != nil && len(fs.Manifest.Backend.Auth.Claims) > 0
 	if authActive {
-		sb.WriteString("\t\"" + modulePath + "/internal/auth\"\n")
+		// Phase001 UserClaimUnification — RefreshStore lives in ssac/pkg/auth;
+		// the project-local internal/auth package is no longer generated.
+		sb.WriteString("\t\"github.com/park-jun-woo/ssac/pkg/auth\"\n")
 	}
 	sb.WriteString(")\n\n")
 	sb.WriteString("// Server implements api.StrictServerInterface.\n")

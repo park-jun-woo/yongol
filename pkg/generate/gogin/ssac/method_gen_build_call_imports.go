@@ -12,6 +12,14 @@ func (g *methodGen) buildCallImports(pkgName, callFunc, varName string) []string
 	} else {
 		imps = append(imps, fmt.Sprintf(`"%s/internal/%s"`, g.ModulePath, pkgName))
 	}
+	// Phase001 UserClaimUnification — auth.IssueToken / RefreshToken emit a
+	// `Claims: model.UserClaim{...}` literal, so the enclosing handler needs
+	// the project-local model package on its import list. RefreshToken also
+	// feeds claimLit into server.RefreshStore.Create via
+	// buildCallRefreshCreateLines, same dependency.
+	if pkgName == "auth" && (callFunc == "IssueToken" || callFunc == "RefreshToken") {
+		imps = append(imps, fmt.Sprintf(`"%s/internal/model"`, g.ModulePath))
+	}
 	if g.IsSubscribe {
 		imps = append(imps, `"fmt"`)
 	} else {

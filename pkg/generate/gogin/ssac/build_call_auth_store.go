@@ -97,8 +97,9 @@ func (g *methodGen) buildAuthRefreshStoreCall(seq ssacparser.Sequence, callFunc 
 	}
 
 	var imps []string
-	// auth package is project-local (internal/auth reexport).
-	imps = append(imps, fmt.Sprintf(`"%s/internal/%s"`, g.ModulePath, pkgName))
+	// Phase001 UserClaimUnification — `auth` is back on ssac/pkg/auth for
+	// all emission paths; RefreshRotate/Logout live in ssac/pkg/auth.
+	imps = append(imps, fmt.Sprintf(`"github.com/park-jun-woo/ssac/pkg/%s"`, pkgName))
 	if g.IsSubscribe {
 		imps = append(imps, `"fmt"`)
 	} else {

@@ -14,7 +14,7 @@ func TestPRV11CurrentUserCommaOK(t *testing.T) {
 	writePreserved(t, p,
 		"package service\n\nimport \"context\"\n\n"+
 			"func h(ctx context.Context) {\n"+
-			"\tcu, ok := ctx.Value(\"currentUser\").(*model.CurrentUser)\n"+
+			"\tcu, ok := ctx.Value(\"currentUser\").(*model.UserClaim)\n"+
 			"\t_ = cu; _ = ok\n}\n")
 	diags := prv11PreservedCurrentUserAssertion([]string{p})
 	if len(diags) != 0 {

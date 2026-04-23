@@ -30,7 +30,7 @@ func generateHTTPMethod(sf ssacparser.ServiceFunc, fs *yongol.Fullstack, service
 		// Defensive type assertion — a missing currentUser means the auth
 		// middleware did not run (server configuration bug). Returning an
 		// error propagates as 500 via strict-server instead of panicking.
-		body = append(body, `currentUser, ok := ctx.Value("currentUser").(*model.CurrentUser)`)
+		body = append(body, `currentUser, ok := ctx.Value("currentUser").(*model.UserClaim)`)
 		body = append(body, `if !ok || currentUser == nil {`)
 		body = append(body, fmt.Sprintf(`	slog.Error("missing currentUser in authenticated handler", "op", %q)`, sf.Name))
 		body = append(body, fmt.Sprintf(`	return nil, fmt.Errorf("missing currentUser in authenticated handler: op=%s")`, sf.Name))

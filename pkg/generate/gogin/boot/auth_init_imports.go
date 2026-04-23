@@ -6,9 +6,15 @@ package boot
 // authInitImports returns the imports blockAuthInit requires. Isolated so
 // blockAuthInit stays a short orchestration that does no string literal
 // composition of its own.
+//
+// Phase001 UserClaimUnification — auth import now targets ssac/pkg/auth
+// directly; the project-local internal/auth package is no longer generated.
+// The modulePath argument is retained so the signature is stable for the
+// boot orchestration layer but is intentionally unused here.
 func authInitImports(modulePath string) []string {
+	_ = modulePath
 	return []string{
-		`"` + modulePath + `/internal/auth"`,
+		`"github.com/park-jun-woo/ssac/pkg/auth"`,
 		`"net/http"`,
 		`"time"`,
 	}

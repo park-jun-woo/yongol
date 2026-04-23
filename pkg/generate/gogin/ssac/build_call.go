@@ -12,15 +12,14 @@ import (
 
 // ssacBuiltinPkgs are packages provided by github.com/park-jun-woo/ssac/pkg/.
 //
-// `auth` became fully ssac-origin in Phase003 — JWT Issue/Refresh/Verify and
-// the refresh rotation runtime all live in ssac/pkg/auth. SSaC @call targets
-// still resolve through the project-local `internal/auth` alias surface
-// because build_call emits `auth.Foo(...)` with no package-qualified import;
-// the project's reexport.go re-alias maps those symbols back to ssac/pkg/auth.
-// That is why `auth` is NOT listed here: callers should import
-// `modulePath/internal/auth`, which is the else-branch in buildCall.
+// `auth` is in this set as of Phase001 UserClaimUnification — the project no
+// longer emits `internal/auth/` (the reexport alias surface was deleted),
+// so `@call auth.*` imports ssac/pkg/auth directly like every other builtin.
+// The JWT claim payload type is the project-local `model.UserClaim`, generated
+// from `manifest.backend.auth.claims` by gen-gogin-auth; buildCall emits
+// `Claims: model.UserClaim{...}` for IssueToken / RefreshToken.
 var ssacBuiltinPkgs = map[string]bool{
-	"authz": true, "cache": true, "config": true,
+	"auth": true, "authz": true, "cache": true, "config": true,
 	"crypto": true, "file": true, "image": true, "mail": true,
 	"pagination": true, "queue": true, "session": true, "storage": true, "text": true,
 }
@@ -30,10 +29,9 @@ var ssacBuiltinPkgs = map[string]bool{
 // injects `ctx, ` before the Request literal when the target package is in
 // this set. Packages not listed here retain the legacy `func X(req)` shape.
 //
-// `auth` is intentionally absent — it is dual-origin (ssac + project-local)
-// and bcrypt/JWT operations are CPU-bound, so ctx adds no cancellation
-// value; migration there requires coordinated changes to
-// `internal/auth/reexport.go` and project-local IssueToken/VerifyToken.
+// `auth` is intentionally absent — bcrypt/JWT operations are CPU-bound, so
+// ctx adds no cancellation value; keeping auth on the legacy `func X(req)`
+// shape matches the actual ssac/pkg/auth surface.
 var ssacCtxFirstPkgs = map[string]bool{
 	"mail":    true,
 	"storage": true,

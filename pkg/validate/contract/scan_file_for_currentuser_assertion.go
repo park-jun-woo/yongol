@@ -43,7 +43,7 @@ func scanFileForCurrentUserAssertion(path string) []diagnostic.Diagnostic {
 			Level:   diagnostic.LevelError,
 			Message: fmt.Sprintf("[PRV-11] preserved file uses unsafe single-value currentUser type assertion (line %d)", line),
 			Advice: "Use the comma-ok form to avoid nil deref panic:\n" +
-				"  cu, ok := ctx.Value(\"currentUser\").(*model.CurrentUser)\n" +
+				"  cu, ok := ctx.Value(\"currentUser\").(*model.UserClaim)\n" +
 				"  if !ok || cu == nil { return api.Error401, nil }",
 		})
 		return true

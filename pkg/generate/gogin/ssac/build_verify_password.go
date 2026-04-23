@@ -94,7 +94,9 @@ func (g *methodGen) buildVerifyPassword(seq ssacparser.Sequence) ([]string, []st
 		`"database/sql"`,
 		`"errors"`,
 		`"log/slog"`,
-		fmt.Sprintf(`"%s/internal/auth"`, g.ModulePath),
+		// Phase001 UserClaimUnification — auth is back on ssac/pkg/auth
+		// for all emission paths (the project-local reexport is gone).
+		`"github.com/park-jun-woo/ssac/pkg/auth"`,
 	}
 	return lines, imports
 }

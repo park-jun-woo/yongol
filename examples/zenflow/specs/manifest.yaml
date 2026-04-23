@@ -15,14 +15,6 @@ backend:
       Email: email
       Role: role
       OrgID: org_id:int64
-session:
-  backend: memory
-cache:
-  backend: memory
-file:
-  backend: local
-queue:
-  backend: memory
 frontend:
   lang: typescript
   framework: react

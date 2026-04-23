@@ -10,7 +10,7 @@ import (
 )
 
 func (g *methodGen) buildCallRefreshCreateLines(seq ssacparser.Sequence, varName string) []string {
-	claimLit := "auth.Claim{" + g.mapFields(seq.Inputs) + "}"
+	claimLit := "model.UserClaim{" + g.mapFields(seq.Inputs) + "}"
 	return []string{
 		fmt.Sprintf("if err := server.RefreshStore.Create(ctx, %s.RefreshToken, %s, %s.ExpiresAt); err != nil {", varName, claimLit, varName),
 		fmt.Sprintf("\tslog.Error(\"handler: 5xx\", \"op\", %q, \"status\", 500, \"err\", err)", g.FuncName),
