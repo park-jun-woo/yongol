@@ -189,10 +189,13 @@ func (g *methodGen) buildCall(seq ssacparser.Sequence) ([]string, []string) {
 			`"go.opentelemetry.io/otel"`,
 		)
 	}
-	// Phase020 — gin.Context import needed for the SetAuthCookies emission
-	// (only on auth.RefreshToken follow-up). Safe to always add on auth.*;
-	// deduplicate_imports will drop unused entries in other call paths.
-	if pkgName == "auth" && (callFunc == "RefreshToken" || callFunc == "IssueToken") {
+	// Phase020 — gin.Context import needed for the SetAuthCookies emission.
+	// Only the RefreshToken branch that pairs with a prior IssueToken
+	// actually references *gin.Context; emitting the import for plain
+	// IssueToken calls produced an `imported and not used` build error
+	// in handlers like Login. Scope the import to the RefreshToken +
+	// AccessTokenVar pair (same condition the emission uses above).
+	if pkgName == "auth" && callFunc == "RefreshToken" && varName != "_" && !g.IsSubscribe && g.AccessTokenVar != "" {
 		imps = append(imps, `"github.com/gin-gonic/gin"`)
 	}
 	return lines, imps
