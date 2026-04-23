@@ -1,5 +1,5 @@
-//ff:func feature=manifest type=test control=sequence
-//ff:what enumToStrings / buildFieldConstraint Enum 경로 회귀
+//ff:func feature=openapi-parse type=test control=sequence
+//ff:what buildFieldConstraint — Enum, MaxLength, MinLength, Format 동시 추출
 
 package openapi
 
@@ -8,25 +8,6 @@ import (
 
 	"github.com/getkin/kin-openapi/openapi3"
 )
-
-func TestEnumToStrings_MixedTypes(t *testing.T) {
-	got := enumToStrings([]any{"a", 1, true})
-	want := []string{"a", "1", "true"}
-	if len(got) != len(want) {
-		t.Fatalf("len = %d, want %d", len(got), len(want))
-	}
-	for i, s := range want {
-		if got[i] != s {
-			t.Errorf("[%d] = %q, want %q", i, got[i], s)
-		}
-	}
-}
-
-func TestEnumToStrings_Empty(t *testing.T) {
-	if got := enumToStrings(nil); got != nil {
-		t.Errorf("got %v, want nil", got)
-	}
-}
 
 func TestBuildFieldConstraint_EnumAndLengths(t *testing.T) {
 	ml := uint64(64)

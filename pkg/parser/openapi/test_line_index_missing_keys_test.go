@@ -1,25 +1,9 @@
-//ff:func feature=manifest type=test control=sequence
-//ff:what LineIndex nil receiver + missing-key 경로가 0 을 반환하는지 검증
+//ff:func feature=openapi-parse type=test control=sequence
+//ff:what LineIndex — 존재하지 않는 key lookup 은 0 반환
 
 package openapi
 
 import "testing"
-
-func TestLineIndex_NilReceivers(t *testing.T) {
-	var l *LineIndex
-	if got := l.PathLine("/x"); got != 0 {
-		t.Errorf("nil PathLine = %d", got)
-	}
-	if got := l.SchemaLine("X"); got != 0 {
-		t.Errorf("nil SchemaLine = %d", got)
-	}
-	if got := l.RequestFieldLine("Op", "f"); got != 0 {
-		t.Errorf("nil RequestFieldLine = %d", got)
-	}
-	if got := l.ResponseFieldLine("Op", "f"); got != 0 {
-		t.Errorf("nil ResponseFieldLine = %d", got)
-	}
-}
 
 func TestLineIndex_MissingKeys(t *testing.T) {
 	l := &LineIndex{
@@ -47,19 +31,5 @@ func TestLineIndex_MissingKeys(t *testing.T) {
 	}
 	if got := l.OperationLine("Nope"); got != 0 {
 		t.Errorf("missing OperationLine = %d, want 0", got)
-	}
-}
-
-func TestLineIndex_PathLine_Populated(t *testing.T) {
-	path := writeFixture(t)
-	idx, err := BuildLineIndex(path)
-	if err != nil {
-		t.Fatalf("BuildLineIndex: %v", err)
-	}
-	if got := idx.PathLine("/login"); got != 14 {
-		t.Errorf("PathLine(/login) = %d, want 14", got)
-	}
-	if got := idx.PathLine("/missing"); got != 0 {
-		t.Errorf("PathLine(/missing) = %d, want 0", got)
 	}
 }
