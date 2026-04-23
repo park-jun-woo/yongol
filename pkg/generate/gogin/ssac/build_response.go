@@ -14,10 +14,15 @@ func (g *methodGen) buildResponse(seq ssacparser.Sequence) []string {
 	if len(seq.Fields) > 0 {
 		return g.buildFieldResponse(seq.Fields)
 	}
-	// @response target — direct variable (e.g. list result)
+	// @response target — direct variable (e.g. list result). g.SuccessStatus
+	// was derived from the operation's HTTP method + declared 2xx responses
+	// at extract time so POST handlers emit 201, DELETE handlers emit 204,
+	// etc. instead of the previous hardcoded 200 (BUG-004).
 	if seq.Target != "" {
-		return []string{fmt.Sprintf("return api.%s200JSONResponse(%s), nil", g.FuncName, seq.Target)}
+		return []string{fmt.Sprintf("return api.%s%dJSONResponse(%s), nil",
+			g.FuncName, g.SuccessStatus, seq.Target)}
 	}
-	// @response with no args — empty 200
-	return []string{fmt.Sprintf("return api.%s200JSONResponse{}, nil", g.FuncName)}
+	// @response with no args — empty 2xx
+	return []string{fmt.Sprintf("return api.%s%dJSONResponse{}, nil",
+		g.FuncName, g.SuccessStatus)}
 }

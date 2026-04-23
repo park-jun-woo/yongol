@@ -39,4 +39,17 @@ type methodGen struct {
 	// so build_state can reference statemachine.<Symbol>CanTransition
 	// even when the source .md file uses a lowercase name (BUG-002).
 	DiagramSymbol map[string]string
+	// SuccessStatus is the 2xx status code used for the generated success
+	// response. Derived from the OpenAPI operation's HTTP method + declared
+	// responses via openapi.DeriveSuccessStatus (BUG-004). Defaults to 200
+	// so callers that never invoked extractFromOpenAPI keep emitting the
+	// historical status, but real operations populate this during
+	// newMethodGen → extractFromOpenAPI so build_response and
+	// build_field_response produce `api.<Op><Code>JSONResponse` with the
+	// correct code.
+	SuccessStatus int
+	// Method is the HTTP verb (GET/POST/PUT/PATCH/DELETE) of the operation,
+	// populated alongside SuccessStatus. Used by diagnostics that reference
+	// the source-of-truth HTTP method.
+	Method string
 }

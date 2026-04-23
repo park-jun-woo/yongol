@@ -30,6 +30,7 @@ func newMethodGen(doc *openapi3.T, sf ssacparser.ServiceFunc, modulePath string,
 		symbols[d.ID] = d.Symbol
 	}
 	g := &methodGen{
+		SuccessStatus: 200, // overwritten by extractFromOpenAPI for real ops
 		FuncName:      sf.Name,
 		FileName:      sf.FileName,
 		ModulePath:    modulePath,

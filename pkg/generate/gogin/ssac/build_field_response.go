@@ -13,7 +13,10 @@ import (
 // OpenAPI RespFields tells us the api type for each field.
 func (g *methodGen) buildFieldResponse(fields map[string]string) []string {
 	var lines []string
-	lines = append(lines, fmt.Sprintf("return api.%s200JSONResponse{", g.FuncName))
+	// g.SuccessStatus is HTTP-method-derived at extract time (BUG-004) —
+	// POST → 201, DELETE → 204, etc. instead of the prior hardcoded 200.
+	lines = append(lines, fmt.Sprintf("return api.%s%dJSONResponse{",
+		g.FuncName, g.SuccessStatus))
 
 	keys := make([]string, 0, len(fields))
 	for k := range fields {
