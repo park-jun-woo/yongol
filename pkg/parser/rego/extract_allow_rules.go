@@ -31,12 +31,3 @@ func extractAllowRules(content string, p *Policy) {
 		offset = endIdx + 1
 	}
 }
-
-// lineOfOffset returns the 1-based line number at byte offset off in string s.
-// Returns 0 when off is out of range.
-func lineOfOffset(s string, off int) int {
-	if off < 0 || off > len(s) {
-		return 0
-	}
-	return 1 + strings.Count(s[:off], "\n")
-}
