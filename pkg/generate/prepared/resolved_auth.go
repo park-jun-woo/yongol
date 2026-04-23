@@ -13,9 +13,18 @@ import "github.com/park-jun-woo/yongol/pkg/parser/manifest"
 //
 // Present when manifest.backend.auth is declared; Present==false means
 // the generator should emit no auth-dependent wiring.
+//
+// CsrfRequired is the derived "must the generator emit CSRF wiring?"
+// flag (Phase001 debug01 / BUG-013). It is true only when the
+// resolved Mode is "cookie" or "hybrid"; bearer-only (including
+// JWT-typed-but-mode-unspecified) projects are CSRF-immune because
+// the Authorization header is not auto-sent cross-origin. Emitters
+// MUST gate CSRF block/middleware emission on this field, not on the
+// raw manifest.
 type Auth struct {
-	Present bool
-	Mode    string
+	Present      bool
+	Mode         string
+	CsrfRequired bool
 	// Raw keeps the underlying manifest.Auth pointer for fields that
 	// have not yet been migrated into Auth (claims, TTLs, cookie
 	// config, csrf, ...). Callers SHOULD prefer explicit fields once

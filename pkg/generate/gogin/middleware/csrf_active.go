@@ -9,12 +9,15 @@ import "github.com/park-jun-woo/yongol/pkg/generate/prepared"
 // emitted on the same trigger. Takes a resolved prepared.Auth so the
 // "raw vs resolved Mode" split that caused BUG-009 is structurally
 // impossible: Mode here is always the defaulted value.
+//
+// Phase001 debug01 (BUG-013) — the "must emit CSRF?" decision is
+// now carried by prepared.Auth.CsrfRequired. csrfActive short-circuits
+// on that flag so JWT-only projects never produce csrf.go.
 func csrfActive(a prepared.Auth) bool {
-	if !a.Present || a.Raw == nil {
+	if !a.CsrfRequired {
 		return false
 	}
-	mode := a.Mode
-	if mode != "cookie" && mode != "hybrid" {
+	if !a.Present || a.Raw == nil {
 		return false
 	}
 	if a.Raw.Csrf == nil {

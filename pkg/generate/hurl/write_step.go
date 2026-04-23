@@ -32,6 +32,14 @@ func writeStep(s step) string {
 	}
 	if s.HasBody {
 		b.WriteString("Content-Type: application/json\n")
+	}
+	if len(s.Options) > 0 {
+		b.WriteString("[Options]\n")
+		for _, opt := range s.Options {
+			b.WriteString("variable: " + opt + "\n")
+		}
+	}
+	if s.HasBody {
 		b.WriteString(s.BodyJSON + "\n")
 	}
 	b.WriteString(fmt.Sprintf("HTTP %d\n", s.StatusCode))

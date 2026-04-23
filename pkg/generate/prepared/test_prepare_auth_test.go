@@ -1,5 +1,5 @@
 //ff:func feature=generate type=test control=iteration dimension=1
-//ff:what TestPrepareAuth — Mode 기본값 해석 케이스 (empty→cookie, jwt/hybrid 그대로)
+//ff:what TestPrepareAuth — Mode 기본값 해석 케이스 (empty→cookie, jwt/bearer/cookie/hybrid)
 
 package prepared
 
@@ -19,8 +19,11 @@ func TestPrepareAuth(t *testing.T) {
 	}{
 		{name: "absent", auth: nil, wantOK: false},
 		{name: "mode_empty_defaults_cookie", auth: &pmanifest.Auth{}, wantMode: "cookie", wantOK: true},
+		{name: "type_jwt_defaults_bearer", auth: &pmanifest.Auth{Type: "jwt"}, wantMode: "bearer", wantOK: true},
 		{name: "mode_bearer", auth: &pmanifest.Auth{Mode: "bearer"}, wantMode: "bearer", wantOK: true},
+		{name: "mode_cookie", auth: &pmanifest.Auth{Mode: "cookie"}, wantMode: "cookie", wantOK: true},
 		{name: "mode_hybrid", auth: &pmanifest.Auth{Mode: "hybrid"}, wantMode: "hybrid", wantOK: true},
+		{name: "type_jwt_mode_cookie_explicit_wins", auth: &pmanifest.Auth{Type: "jwt", Mode: "cookie"}, wantMode: "cookie", wantOK: true},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {

@@ -1,59 +1,41 @@
 //ff:func feature=gen-hurl type=util control=iteration dimension=2
-//ff:what buildStateTransitions — stateDiagram BFS + branch-skip 순서로 전이 step 생성
+//ff:what buildStateTransitions — Phase004: 모든 state transition emit + bridge 재활성 삽입
+
 package hurl
 
-import (
-	"sort"
-)
-
-// buildStateTransitions creates steps for state transitions in BFS order,
-// skipping branch transitions (keeps only the first per from-state).
+// buildStateTransitions creates steps for every state transition in
+// order, inserting bridging events when a terminal transition requires
+// a prerequisite state the linear walk has already left.
+//
+// BUG-016 / Phase004 — the previous implementation kept only the first
+// transition per from-state via buildBranchSkipSet, dropping events
+// like ExecuteWorkflow and ArchiveWorkflow from smoke. The new walker
+// emits all transitions. When the simulated current state does not
+// match the event's from-state (e.g. after PauseWorkflow the state is
+// `paused`, but ArchiveWorkflow needs `active`), a bridging transition
+// is inserted first (paused → active via ActivateWorkflow) so the
+// smoke sequence stays executable end-to-end.
 func buildStateTransitions(ctx *scenarioCtx) []step {
 	fs := ctx.fs
 	if len(fs.StateDiagrams) == 0 || fs.OpenAPIDoc == nil {
 		return nil
 	}
 	order := buildTransitionOrder(fs.StateDiagrams)
-	skip := buildBranchSkipSet(fs.StateDiagrams, order)
 	opLookup := buildOpLookup(fs)
+	events := orderedStateEvents(fs.StateDiagrams, order)
 
-	type eventStep struct {
-		event string
-		ord   int
-	}
-	var events []eventStep
-	for _, d := range fs.StateDiagrams {
-		if d == nil {
-			continue
-		}
-		for _, tr := range d.Transitions {
-			if skip[tr.Event] {
-				continue
-			}
-			if ord, ok := order[tr.Event]; ok {
-				events = append(events, eventStep{event: tr.Event, ord: ord})
-			}
-		}
-	}
-	sort.SliceStable(events, func(i, j int) bool {
-		if events[i].ord != events[j].ord {
-			return events[i].ord < events[j].ord
-		}
-		return events[i].event < events[j].event
-	})
-
-	seen := map[string]bool{}
 	var steps []step
-	for _, es := range events {
-		if seen[es.event] {
-			continue
-		}
-		seen[es.event] = true
-		s, ok := buildTransitionStep(ctx, opLookup, es.event)
+	state := initialState(fs.StateDiagrams)
+	for _, ev := range events {
+		bridges, nextState := bridgeSteps(ctx, fs.StateDiagrams, opLookup, state, ev.event)
+		state = nextState
+		steps = append(steps, bridges...)
+		s, ok := buildTransitionStep(ctx, opLookup, ev.event)
 		if !ok {
 			continue
 		}
 		steps = append(steps, s)
+		state = eventTargetState(fs.StateDiagrams, state, ev.event)
 	}
 	return steps
 }

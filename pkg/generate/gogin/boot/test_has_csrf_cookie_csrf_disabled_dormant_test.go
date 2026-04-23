@@ -15,7 +15,7 @@ func TestHasCsrf_CookieCsrfDisabled_Dormant(t *testing.T) {
 		Mode: "cookie",
 		Csrf: &pmanifest.CsrfConfig{Enabled: false},
 	}
-	a := prepared.Auth{Present: true, Mode: "cookie", Raw: raw}
+	a := prepared.Auth{Present: true, Mode: "cookie", CsrfRequired: true, Raw: raw}
 	if hasCsrf(a) {
 		t.Fatalf("csrf.enabled=false must report hasCsrf=false (rejected earlier by SEC-201 at validate)")
 	}

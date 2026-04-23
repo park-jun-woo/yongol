@@ -16,4 +16,10 @@ type step struct {
 	StatusCode  int
 	Captures    []capture
 	Assertions  []string
+	// Options emits `[Options] variable: name=value` lines just before
+	// the response section. Used by the Register auth step to seed a
+	// hurl variable (smoke_email) that later requests reuse. Each entry
+	// is pre-formatted as "name=value" so the emitter can render them
+	// verbatim.
+	Options []string
 }

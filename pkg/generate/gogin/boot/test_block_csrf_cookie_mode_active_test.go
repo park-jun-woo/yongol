@@ -21,7 +21,7 @@ func TestBlockCsrf_CookieMode_Active(t *testing.T) {
 			ExemptPaths: []string{"/auth/login", "/auth/refresh"},
 		},
 	}
-	a := prepared.Auth{Present: true, Mode: "cookie", Raw: raw}
+	a := prepared.Auth{Present: true, Mode: "cookie", CsrfRequired: true, Raw: raw}
 	block := blockCsrf(a, "example.com/zenflow")
 	if block.Active != nil {
 		t.Fatalf("cookie mode with csrf enabled should leave Active nil (always active)")

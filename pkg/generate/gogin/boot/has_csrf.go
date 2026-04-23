@@ -14,11 +14,16 @@ import "github.com/park-jun-woo/yongol/pkg/generate/prepared"
 // Takes a resolved prepared.Auth so Mode is already defaulted; the raw
 // vs resolved inconsistency that caused BUG-009 is structurally
 // impossible here.
+//
+// Phase001 debug01 (BUG-013) — the "must emit CSRF?" decision has been
+// lifted into prepared.Auth.CsrfRequired. hasCsrf reads that flag first
+// and returns false immediately for bearer-only projects so no CSRF
+// block is appended to main.go.
 func hasCsrf(a prepared.Auth) bool {
-	if !a.Present || a.Raw == nil {
+	if !a.CsrfRequired {
 		return false
 	}
-	if a.Mode != "cookie" && a.Mode != "hybrid" {
+	if !a.Present || a.Raw == nil {
 		return false
 	}
 	if a.Raw.Csrf == nil {
