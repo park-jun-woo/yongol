@@ -1,0 +1,12 @@
+package service
+
+import "github.com/park-jun-woo/ssac/pkg/auth"
+
+// @get User existing = User.FindByEmail({Email: request.email})
+// @exists existing "Email already registered" 409
+// @call auth.HashPasswordResponse hp = auth.HashPassword({Password: request.password})
+// @post Organization org = Organization.Create({Name: request.org_name, PlanType: "free", CreditsBalance: 100})
+// @post User user = User.Create({OrgID: org.ID, Email: request.email, PasswordHash: hp.HashedPassword, Role: "admin"})
+// @call auth.IssueTokenResponse token = auth.IssueToken({ID: user.ID, Email: user.Email, Role: user.Role, OrgID: user.OrgID})
+// @response { user: user, organization: org, access_token: token.AccessToken }
+func Register() {}
