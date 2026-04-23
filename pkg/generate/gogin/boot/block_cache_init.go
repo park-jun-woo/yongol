@@ -3,12 +3,14 @@
 
 package boot
 
-import "github.com/park-jun-woo/yongol/pkg/yongol"
+import "github.com/park-jun-woo/yongol/pkg/generate/prepared"
 
-// blockCacheInit produces cache initialization. Active when
-// manifest.cache.backend is set.
-func blockCacheInit(fs *yongol.Fullstack) MainBlock {
-	backend := fs.Manifest.Cache.Backend
+// blockCacheInit produces cache initialization from a resolved Cache.
+// Callers guard with state.ActiveBackends.Cache != nil so this function
+// never sees an inactive subsystem — no raw manifest deref possible by
+// signature.
+func blockCacheInit(c prepared.Cache) MainBlock {
+	backend := c.Backend
 	var lines []string
 	if backend == "postgres" {
 		lines = []string{
@@ -27,8 +29,9 @@ func blockCacheInit(fs *yongol.Fullstack) MainBlock {
 		}
 	}
 	return MainBlock{
-		Name:    "cache-init",
-		Active:  hasCache,
+		Name: "cache-init",
+		// Active left nil: collectActiveBlocks appends this block only
+		// when prepared.State.ActiveBackends.Cache != nil.
 		Imports: []string{`"github.com/park-jun-woo/ssac/pkg/cache"`},
 		Lines:   lines,
 	}

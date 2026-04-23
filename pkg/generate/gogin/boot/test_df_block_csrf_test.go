@@ -6,24 +6,19 @@ package boot
 import (
 	"testing"
 
-	"github.com/park-jun-woo/yongol/pkg/yongol"
+	"github.com/park-jun-woo/yongol/pkg/generate/prepared"
 	pmanifest "github.com/park-jun-woo/yongol/pkg/parser/manifest"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 func TestBlockCsrf_BearerMode_Dormant(t *testing.T) {
-	fs := &yongol.Fullstack{
-		Manifest: &pmanifest.ProjectConfig{
-			Backend: pmanifest.Backend{
-				Module: "example.com/zenflow",
-				Auth:   &pmanifest.Auth{Mode: "bearer"},
-			},
-		},
-	}
-	block := blockCsrf(fs, "example.com/zenflow")
+	raw := &pmanifest.Auth{Mode: "bearer"}
+	a := prepared.Auth{Present: true, Mode: "bearer", Raw: raw}
+	block := blockCsrf(a, "example.com/zenflow")
 	if len(block.Lines) != 0 {
 		t.Fatalf("bearer mode should yield inert block, got lines: %+v", block.Lines)
 	}
-	if block.Active == nil || block.Active(fs) {
+	if block.Active == nil || block.Active(&yongol.Fullstack{}) {
 		t.Fatalf("bearer mode should report Active()=false")
 	}
 }

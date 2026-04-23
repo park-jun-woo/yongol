@@ -1,15 +1,15 @@
 //ff:func feature=gen-gogin type=util control=sequence
-//ff:what resolveAuthInitConfig — manifest.backend.auth 에서 blockAuthInit 가 필요한 모든 값 해석
+//ff:what resolveAuthInitConfig — prepared.Auth 에서 blockAuthInit 가 필요한 모든 값 해석
 
 package boot
 
-import "github.com/park-jun-woo/yongol/pkg/yongol"
+import "github.com/park-jun-woo/yongol/pkg/generate/prepared"
 
-// resolveAuthInitConfig walks manifest.backend.auth (and its Cookie sub-
-// block) returning a fully populated authInitConfig with defaults applied.
-// Flat, selection-free code keeps the helper inside Q1 sequence limits;
-// the deep Cookie sub-block is resolved by resolveAuthCookieConfig.
-func resolveAuthInitConfig(fs *yongol.Fullstack) authInitConfig {
+// resolveAuthInitConfig walks prepared.Auth (and its underlying Cookie
+// sub-block) returning a fully populated authInitConfig with defaults
+// applied. Mode is read from prepared.Auth.Mode which is always the
+// defaulted value — no raw ResolvedMode() call remains.
+func resolveAuthInitConfig(a prepared.Auth) authInitConfig {
 	cfg := authInitConfig{
 		SecretEnv:   "JWT_SECRET",
 		AccessTTL:   "15m",
@@ -19,21 +19,21 @@ func resolveAuthInitConfig(fs *yongol.Fullstack) authInitConfig {
 		AccessName:  "__Host-access_token",
 		RefreshName: "__Host-refresh_token",
 	}
-	if fs.Manifest == nil || fs.Manifest.Backend.Auth == nil {
+	if !a.Present || a.Raw == nil {
 		return cfg
 	}
-	a := fs.Manifest.Backend.Auth
-	if a.SecretEnv != "" {
-		cfg.SecretEnv = a.SecretEnv
+	raw := a.Raw
+	if raw.SecretEnv != "" {
+		cfg.SecretEnv = raw.SecretEnv
 	}
-	if a.AccessTokenTTL != "" {
-		cfg.AccessTTL = a.AccessTokenTTL
+	if raw.AccessTokenTTL != "" {
+		cfg.AccessTTL = raw.AccessTokenTTL
 	}
-	if a.RefreshTokenTTL != "" {
-		cfg.RefreshTTL = a.RefreshTokenTTL
+	if raw.RefreshTokenTTL != "" {
+		cfg.RefreshTTL = raw.RefreshTokenTTL
 	}
-	cfg.Mode = a.ResolvedMode()
-	cfg.DetectReuse = a.DetectReuseLogoutAll
-	resolveAuthCookieConfig(a.Cookie, &cfg)
+	cfg.Mode = a.Mode
+	cfg.DetectReuse = raw.DetectReuseLogoutAll
+	resolveAuthCookieConfig(raw.Cookie, &cfg)
 	return cfg
 }

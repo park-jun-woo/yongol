@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/park-jun-woo/yongol/pkg/generate/prepared"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
@@ -16,7 +17,7 @@ import (
 // The generated middleware runs kin-openapi ValidateRequest on every request
 // (except /health /ready /metrics prefixes) and rejects payloads that violate
 // OpenAPI schema constraints (minLength, maximum, pattern, required, enum…).
-func Generate(fs *yongol.Fullstack, artifactsDir string) error {
+func Generate(fs *yongol.Fullstack, p prepared.State, artifactsDir string) error {
 	if fs == nil {
 		return nil
 	}
@@ -49,7 +50,7 @@ func Generate(fs *yongol.Fullstack, artifactsDir string) error {
 		return fmt.Errorf("write prometheus: %w", err)
 	}
 	// Write csrf.go (Phase005 — dormant unless auth.mode=cookie|hybrid).
-	if err := GenerateCsrf(fs, artifactsDir); err != nil {
+	if err := GenerateCsrf(p.Auth, artifactsDir); err != nil {
 		return fmt.Errorf("write csrf: %w", err)
 	}
 	// Write security_headers.go (Phase007 browser security headers).

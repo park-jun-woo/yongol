@@ -3,7 +3,7 @@
 
 package boot
 
-import "github.com/park-jun-woo/yongol/pkg/yongol"
+import "github.com/park-jun-woo/yongol/pkg/generate/prepared"
 
 // blockAuthInit emits the main.go block that wires ssac/pkg/auth into the
 // running server. It replaces the deprecated blockAuthRefresh (Phase009):
@@ -27,14 +27,18 @@ import "github.com/park-jun-woo/yongol/pkg/yongol"
 //     chain (Phase009 Open Question #1 — for now the guard heuristic in
 //     blockRegisterHandlers covers auth endpoints, see collect_active_blocks).
 //
-// Active iff manifest.backend.auth is configured. verifier-only services
-// with backend.auth but no refresh/logout endpoints still get the DDL +
+// Active iff prepared.Auth.Present. verifier-only services with
+// backend.auth but no refresh/logout endpoints still get the DDL +
 // RefreshStore wiring so BearerAuth's VerifyToken keeps working.
-func blockAuthInit(fs *yongol.Fullstack, modulePath string) MainBlock {
-	cfg := resolveAuthInitConfig(fs)
+func blockAuthInit(a prepared.Auth, modulePath string) MainBlock {
+	if !a.Present {
+		return MainBlock{Name: "auth-init", Active: authAlwaysInactive}
+	}
+	cfg := resolveAuthInitConfig(a)
 	return MainBlock{
-		Name:    "auth-init",
-		Active:  hasAuth,
+		Name: "auth-init",
+		// Active left nil: baseCandidateBlocks gates on a.Present before
+		// calling blockAuthInit.
 		Imports: authInitImports(modulePath),
 		Lines:   authInitLines(cfg),
 	}

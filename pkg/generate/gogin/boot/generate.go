@@ -3,19 +3,22 @@
 
 package boot
 
-import "github.com/park-jun-woo/yongol/pkg/yongol"
+import (
+	"github.com/park-jun-woo/yongol/pkg/generate/prepared"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
+)
 
 // Generate produces artifacts/<project>/backend/cmd/main.go by collecting
 // active blocks based on Fullstack state, deduplicating imports, and
 // assembling body lines. Top-level helpers (envInt, envDuration, …) are
 // emitted as sibling 1-file-1-func files in cmd/ via writeEnvHelperFiles
 // so filefunc F1 passes on the boot surface.
-func Generate(fs *yongol.Fullstack, artifactsDir string) error {
+func Generate(fs *yongol.Fullstack, p prepared.State, artifactsDir string) error {
 	modulePath := ""
 	if fs.Manifest != nil {
 		modulePath = fs.Manifest.Backend.Module
 	}
-	blocks := collectActiveBlocks(fs, modulePath)
+	blocks := collectActiveBlocks(fs, p, modulePath)
 	imports := deduplicateImports(blocks)
 	body := assembleBody(blocks)
 	funcs := collectFuncs(blocks)

@@ -7,30 +7,27 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/park-jun-woo/yongol/pkg/yongol"
+	"github.com/park-jun-woo/yongol/pkg/generate/prepared"
 	pmanifest "github.com/park-jun-woo/yongol/pkg/parser/manifest"
 )
 
 func TestBlockCsrf_CookieMode_Active(t *testing.T) {
-	fs := &yongol.Fullstack{
-		Manifest: &pmanifest.ProjectConfig{
-			Backend: pmanifest.Backend{
-				Module: "example.com/zenflow",
-				Auth: &pmanifest.Auth{
-					Mode: "cookie",
-					Csrf: &pmanifest.CsrfConfig{
-						Enabled:     true,
-						CookieName:  "XSRF-TOKEN",
-						HeaderName:  "X-XSRF-TOKEN",
-						ExemptPaths: []string{"/auth/login", "/auth/refresh"},
-					},
-				},
-			},
+	raw := &pmanifest.Auth{
+		Mode: "cookie",
+		Csrf: &pmanifest.CsrfConfig{
+			Enabled:     true,
+			CookieName:  "XSRF-TOKEN",
+			HeaderName:  "X-XSRF-TOKEN",
+			ExemptPaths: []string{"/auth/login", "/auth/refresh"},
 		},
 	}
-	block := blockCsrf(fs, "example.com/zenflow")
-	if block.Active == nil || !block.Active(fs) {
-		t.Fatalf("cookie mode should report Active()=true")
+	a := prepared.Auth{Present: true, Mode: "cookie", Raw: raw}
+	block := blockCsrf(a, "example.com/zenflow")
+	if block.Active != nil {
+		t.Fatalf("cookie mode with csrf enabled should leave Active nil (always active)")
+	}
+	if len(block.Lines) == 0 {
+		t.Fatalf("cookie mode with csrf enabled should emit lines")
 	}
 	body := strings.Join(block.Lines, "\n")
 	for _, must := range []string{

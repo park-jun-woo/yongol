@@ -3,12 +3,14 @@
 
 package boot
 
-import "github.com/park-jun-woo/yongol/pkg/yongol"
+import "github.com/park-jun-woo/yongol/pkg/generate/prepared"
 
-// blockSessionInit produces session initialization. Active when
-// manifest.session.backend is set.
-func blockSessionInit(fs *yongol.Fullstack) MainBlock {
-	backend := fs.Manifest.Session.Backend
+// blockSessionInit produces session initialization from a resolved
+// Session. Callers guard with state.ActiveBackends.Session != nil so
+// this function never sees an inactive subsystem — no raw manifest
+// deref possible by signature.
+func blockSessionInit(s prepared.Session) MainBlock {
+	backend := s.Backend
 	var lines []string
 	if backend == "postgres" {
 		lines = []string{
@@ -27,8 +29,10 @@ func blockSessionInit(fs *yongol.Fullstack) MainBlock {
 		}
 	}
 	return MainBlock{
-		Name:    "session-init",
-		Active:  hasSession,
+		Name: "session-init",
+		// Active left nil: collectActiveBlocks appends this block only
+		// when prepared.State.ActiveBackends.Session != nil, so the
+		// gate moved out of Active into the caller.
 		Imports: []string{`"github.com/park-jun-woo/ssac/pkg/session"`},
 		Lines:   lines,
 	}

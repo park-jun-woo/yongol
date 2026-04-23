@@ -3,12 +3,14 @@
 
 package boot
 
-import "github.com/park-jun-woo/yongol/pkg/yongol"
+import "github.com/park-jun-woo/yongol/pkg/generate/prepared"
 
-// blockFileInit produces file storage initialization. Active when
-// manifest.file.backend is set.
-func blockFileInit(fs *yongol.Fullstack) MainBlock {
-	backend := fs.Manifest.File.Backend
+// blockFileInit produces file storage initialization from a resolved
+// File. Callers guard with state.ActiveBackends.File != nil so this
+// function never sees an inactive subsystem — no raw manifest deref
+// possible by signature.
+func blockFileInit(f prepared.File) MainBlock {
+	backend := f.Backend
 	var lines []string
 	if backend == "s3" {
 		lines = []string{
@@ -19,8 +21,9 @@ func blockFileInit(fs *yongol.Fullstack) MainBlock {
 		lines = []string{`file.Init(file.NewLocalFile(os.Getenv("FILE_ROOT")))`}
 	}
 	return MainBlock{
-		Name:    "file-init",
-		Active:  hasFile,
+		Name: "file-init",
+		// Active left nil: collectActiveBlocks appends this block only
+		// when prepared.State.ActiveBackends.File != nil.
 		Imports: []string{`"github.com/park-jun-woo/ssac/pkg/file"`},
 		Lines:   lines,
 	}

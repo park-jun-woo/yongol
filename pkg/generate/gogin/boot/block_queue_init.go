@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=iteration dimension=1
+//ff:func feature=gen-gogin type=generator control=sequence
 //ff:what blockQueueInit — queue.Init + Subscribe + Start + defer Close 블록
 
 package boot
@@ -6,31 +6,26 @@ package boot
 import (
 	"fmt"
 
-	"github.com/park-jun-woo/yongol/pkg/yongol"
+	"github.com/park-jun-woo/yongol/pkg/generate/prepared"
+	"github.com/park-jun-woo/yongol/pkg/parser/ssac"
 )
 
-// blockQueueInit produces queue initialization, subscriber registration, and
-// Start/Close lifecycle. Active when manifest.queue.backend is set.
-func blockQueueInit(fs *yongol.Fullstack) MainBlock {
-	backend := "postgres"
-	if fs.Manifest != nil && fs.Manifest.Queue != nil {
-		backend = fs.Manifest.Queue.Backend
-	}
+// blockQueueInit produces queue initialization, subscriber registration,
+// and Start/Close lifecycle. Caller guards with
+// state.ActiveBackends.Queue != nil; q.Backend is the resolved default
+// (matches pre-Phase001 behavior: "postgres" when manifest silent).
+// serviceFuncs carries the Subscribe metadata so this function stays
+// free of raw fs access.
+func blockQueueInit(q prepared.Queue, serviceFuncs []ssac.ServiceFunc) MainBlock {
 	lines := []string{
 		`slog.Info("initializing queue")`,
-		fmt.Sprintf(`if err := queue.Init(ctx, %q, conn); err != nil {`, backend),
+		fmt.Sprintf(`if err := queue.Init(ctx, %q, conn); err != nil {`, q.Backend),
 		`	slog.Error("queue init", "err", err)`,
 		`	os.Exit(1)`,
 		`}`,
 		`defer queue.Close()`,
 	}
-	for _, fn := range fs.ServiceFuncs {
-		if fn.Subscribe != nil {
-			lines = append(lines,
-				fmt.Sprintf(`queue.Subscribe(%q, srv.%s)`, fn.Subscribe.Topic, fn.Name),
-			)
-		}
-	}
+	lines = appendQueueSubscribeLines(lines, serviceFuncs)
 	lines = append(lines,
 		`go func() {`,
 		`	if err := queue.Start(ctx); err != nil {`,
@@ -39,8 +34,9 @@ func blockQueueInit(fs *yongol.Fullstack) MainBlock {
 		`}()`,
 	)
 	return MainBlock{
-		Name:    "queue-init",
-		Active:  hasQueue,
+		Name: "queue-init",
+		// Active left nil: collectActiveBlocks appends this block only
+		// when prepared.State.ActiveBackends.Queue != nil.
 		Imports: []string{`"github.com/park-jun-woo/ssac/pkg/queue"`},
 		Lines:   lines,
 	}

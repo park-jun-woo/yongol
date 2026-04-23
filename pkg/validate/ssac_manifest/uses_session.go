@@ -11,7 +11,7 @@ import (
 
 // usesSession reports whether any SSaC service func issues an @call whose
 // model starts with "session." (e.g. session.GetUser, session.Put). This
-// mirrors pkg/generate/gogin/boot.hasSession's detection logic so that
+// mirrors pkg/generate/prepared.sessionBackendFor detection so that
 // validate and codegen agree on when the session subsystem is "in use".
 func usesSession(fs *yongol.Fullstack) bool {
 	for _, fn := range fs.ServiceFuncs {

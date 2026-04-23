@@ -11,7 +11,7 @@ import (
 
 // usesCache reports whether any SSaC service func issues an @call whose
 // model starts with "cache." (e.g. cache.Get, cache.Set). Mirrors
-// pkg/generate/gogin/boot.hasCache detection so validate and codegen
+// pkg/generate/prepared.cacheBackendFor detection so validate and codegen
 // agree on when the cache subsystem is "in use".
 func usesCache(fs *yongol.Fullstack) bool {
 	for _, fn := range fs.ServiceFuncs {

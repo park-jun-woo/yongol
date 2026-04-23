@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/park-jun-woo/yongol/pkg/generate/prepared"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
@@ -19,11 +20,11 @@ import (
 // rotation (RefreshStore / RefreshHandler / RefreshTokensDDL) live in
 // ssac/pkg/auth as of Phase003. yongol only generates the project-local
 // `Claim` struct whose JSON tags align with manifest claim keys.
-func Generate(fs *yongol.Fullstack, artifactsDir string) error {
-	if fs.Manifest == nil || fs.Manifest.Backend.Auth == nil || len(fs.Manifest.Backend.Auth.Claims) == 0 {
+func Generate(fs *yongol.Fullstack, p prepared.State, artifactsDir string) error {
+	if !p.Auth.Present || p.Auth.Raw == nil || len(p.Auth.Raw.Claims) == 0 {
 		return nil
 	}
-	fields := parseClaims(fs.Manifest.Backend.Auth.Claims)
+	fields := parseClaims(p.Auth.Raw.Claims)
 	modulePath := fs.Manifest.Backend.Module
 
 	authDir := filepath.Join(artifactsDir, "backend", "internal", "auth")
@@ -40,8 +41,7 @@ func Generate(fs *yongol.Fullstack, artifactsDir string) error {
 	if err := generateReexport(authDir); err != nil {
 		return fmt.Errorf("reexport: %w", err)
 	}
-	defaultMode := fs.Manifest.Backend.Auth.ResolvedMode()
-	if err := generateBearerAuth(artifactsDir, modulePath, fields, defaultMode); err != nil {
+	if err := generateBearerAuth(artifactsDir, modulePath, fields, p.Auth.Mode); err != nil {
 		return fmt.Errorf("bearer_auth: %w", err)
 	}
 	// Phase003 — previous yongol versions emitted issue_token.go /

@@ -8,20 +8,20 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/park-jun-woo/yongol/pkg/yongol"
+	"github.com/park-jun-woo/yongol/pkg/generate/prepared"
 )
 
-// GenerateCsrf emits internal/middleware/csrf.go when manifest declares
-// backend.auth.mode="cookie" or "hybrid" AND csrf.enabled=true. On
-// bearer-only projects (default) the file is skipped entirely — no dead
-// code in the artifacts tree.
+// GenerateCsrf emits internal/middleware/csrf.go when the resolved auth
+// mode is "cookie" or "hybrid" AND csrf.enabled=true. On bearer-only
+// projects (default) the file is skipped entirely — no dead code in the
+// artifacts tree.
 //
 // Phase005 remains dormant: with the default bearer mode active, this
 // function early-returns without writing the file. Once Phase020 lands
 // the cookie-session infrastructure, flipping auth.mode will auto-emit
 // the middleware source.
-func GenerateCsrf(fs *yongol.Fullstack, artifactsDir string) error {
-	if !csrfActive(fs) {
+func GenerateCsrf(a prepared.Auth, artifactsDir string) error {
+	if !csrfActive(a) {
 		return nil
 	}
 	mwDir := filepath.Join(artifactsDir, "backend", "internal", "middleware")

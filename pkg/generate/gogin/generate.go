@@ -14,6 +14,7 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/generate/gogin/sqlcpost"
 	ssacgen "github.com/park-jun-woo/yongol/pkg/generate/gogin/ssac"
 	"github.com/park-jun-woo/yongol/pkg/generate/gogin/state"
+	"github.com/park-jun-woo/yongol/pkg/generate/prepared"
 	"github.com/park-jun-woo/yongol/pkg/generate/splitter"
 )
 
@@ -22,6 +23,7 @@ import (
 // boot → ssac → funcCopy → gomod.
 // SQL queries (including pagination) are user-authored — yongol validate checks correctness.
 func Generate(fs *yongol.Fullstack, artifactsDir string) error {
+	p := prepared.New(fs)
 	if err := generateOpenAPIGoGin(fs.SpecsDir, artifactsDir); err != nil {
 		return fmt.Errorf("oapi-codegen strict-server: %w", err)
 	}
@@ -42,16 +44,16 @@ func Generate(fs *yongol.Fullstack, artifactsDir string) error {
 	if err := sqlcpost.Generate(fs, artifactsDir); err != nil {
 		return fmt.Errorf("sqlc post (log masking): %w", err)
 	}
-	if err := auth.Generate(fs, artifactsDir); err != nil {
+	if err := auth.Generate(fs, p, artifactsDir); err != nil {
 		return fmt.Errorf("auth: %w", err)
 	}
 	if err := state.Generate(fs, artifactsDir); err != nil {
 		return fmt.Errorf("statemachine: %w", err)
 	}
-	if err := middleware.Generate(fs, artifactsDir); err != nil {
+	if err := middleware.Generate(fs, p, artifactsDir); err != nil {
 		return fmt.Errorf("middleware: %w", err)
 	}
-	if err := boot.Generate(fs, artifactsDir); err != nil {
+	if err := boot.Generate(fs, p, artifactsDir); err != nil {
 		return fmt.Errorf("main.go: %w", err)
 	}
 	if err := ssacgen.Generate(fs, artifactsDir); err != nil {
