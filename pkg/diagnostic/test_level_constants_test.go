@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=test control=sequence
+//ff:func feature=orchestrator type=test control=iteration dimension=1
 //ff:what Lock-in test for Level constant values
 package diagnostic_test
 
@@ -24,25 +24,5 @@ func TestLevelConstants(t *testing.T) {
 		if string(c.got) != c.want {
 			t.Errorf("%s value changed: want %q, got %q", c.name, c.want, string(c.got))
 		}
-	}
-}
-
-// TestLevel_DistinctValues verifies that LevelError and LevelWarning have distinct values.
-func TestLevel_DistinctValues(t *testing.T) {
-	if diagnostic.LevelError == diagnostic.LevelWarning {
-		t.Errorf("LevelError and LevelWarning must differ, both=%q", diagnostic.LevelError)
-	}
-}
-
-// TestLevel_TypeIsStringAlias verifies that Level is convertible to and from string.
-func TestLevel_TypeIsStringAlias(t *testing.T) {
-	l := diagnostic.LevelError
-	if string(l) != "ERROR" {
-		t.Errorf("string(LevelError): want %q, got %q", "ERROR", string(l))
-	}
-
-	custom := diagnostic.Level("INFO")
-	if string(custom) != "INFO" {
-		t.Errorf("Level(\"INFO\"): round-trip failed, got %q", string(custom))
 	}
 }

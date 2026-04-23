@@ -1,5 +1,5 @@
 //ff:func feature=rule type=parser control=iteration dimension=2 topic=catalog
-//ff:what Parse — parses H2 sections and `| Rule ID | Level | Description | Source |` tables from rulebook.md into a RuleMeta slice
+//ff:what Parse — rulebook.md 의 H2 섹션 + `| Rule ID | Level | Description | Source |` 테이블을 RuleMeta 슬라이스로
 package catalog
 
 import (
@@ -33,11 +33,11 @@ func Parse(r io.Reader) ([]RuleMeta, error) {
 	scanner.Buffer(make([]byte, 0, 64*1024), 1024*1024)
 
 	var (
-		rules         []RuleMeta
-		sectionTitle  string
-		sectionSkip   bool // true while inside ## Deprecated
-		inTable       bool // past header + separator rows
-		sawHeader     bool // saw "| Rule ID | Level | ..." row
+		rules        []RuleMeta
+		sectionTitle string
+		sectionSkip  bool // true while inside ## Deprecated
+		inTable      bool // past header + separator rows
+		sawHeader    bool // saw "| Rule ID | Level | ..." row
 	)
 
 	for scanner.Scan() {
@@ -124,48 +124,4 @@ func Parse(r io.Reader) ([]RuleMeta, error) {
 		return nil, fmt.Errorf("rulebook scan: %w", err)
 	}
 	return rules, nil
-}
-
-// isRuleTableHeader checks whether the trimmed row is the canonical
-// rule table header: "| Rule ID | Level | Description | Source |".
-func isRuleTableHeader(row string) bool {
-	cells := splitRow(row)
-	if len(cells) < 4 {
-		return false
-	}
-	return strings.EqualFold(strings.TrimSpace(cells[0]), "Rule ID") &&
-		strings.EqualFold(strings.TrimSpace(cells[1]), "Level") &&
-		strings.EqualFold(strings.TrimSpace(cells[2]), "Description") &&
-		strings.EqualFold(strings.TrimSpace(cells[3]), "Source")
-}
-
-// isTableSeparator recognises the `|---|---|...|` row immediately below a
-// markdown table header.
-func isTableSeparator(row string) bool {
-	cells := splitRow(row)
-	if len(cells) == 0 {
-		return false
-	}
-	for _, c := range cells {
-		c = strings.TrimSpace(c)
-		if c == "" {
-			return false
-		}
-		for _, r := range c {
-			if r != '-' && r != ':' {
-				return false
-			}
-		}
-	}
-	return true
-}
-
-// splitRow splits a markdown table row on pipe characters, stripping the
-// leading and trailing pipes. Rulebook.md doesn't use escaped pipes inside
-// cells so a naive split is sufficient.
-func splitRow(row string) []string {
-	row = strings.TrimSpace(row)
-	row = strings.TrimPrefix(row, "|")
-	row = strings.TrimSuffix(row, "|")
-	return strings.Split(row, "|")
 }

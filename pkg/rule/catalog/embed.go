@@ -1,12 +1,11 @@
 //ff:func feature=rule type=loader control=sequence topic=catalog
-//ff:what Load — //go:embed 로 내장된 rulebook.md 를 파싱해 Catalog 반환 (failure → panic, 빌드 시점 감지)
+//ff:what Load — //go:embed 로 내장된 rulebook.md 를 파싱해 Catalog 반환 (sync.Once 캐시)
 package catalog
 
 import (
 	"bytes"
 	_ "embed"
 	"fmt"
-	"log"
 	"sync"
 )
 
@@ -39,20 +38,4 @@ func Load() (*Catalog, error) {
 		cached = NewCatalog(rules)
 	})
 	return cached, cacheErr
-}
-
-// MustLoad returns the embedded catalog or calls log.Fatal on parse error.
-// Intended for CLI entry points where recovery is not meaningful.
-func MustLoad() *Catalog {
-	c, err := Load()
-	if err != nil {
-		log.Fatalf("yongol: %v", err)
-	}
-	return c
-}
-
-// Source exposes the raw embedded rulebook bytes. Tests use this to
-// re-parse the canonical source directly.
-func Source() []byte {
-	return rulebookSource
 }
