@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=util control=iteration
+//ff:func feature=orchestrator type=util control=iteration dimension=1
 //ff:what stripModelPrefix 테이블 테스트 — prefix 일치/불일치/빈 model
 package sqlc
 

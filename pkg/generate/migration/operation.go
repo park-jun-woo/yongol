@@ -1,4 +1,4 @@
-//ff:type feature=migration type=model
+//ff:func feature=migration type=model control=sequence
 //ff:what Operation 인터페이스 + 14개 구체 타입 (CREATE/DROP/ALTER + RENAME)
 package migration
 

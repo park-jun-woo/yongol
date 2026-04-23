@@ -1,4 +1,4 @@
-//ff:type feature=gen-gogin type=generator
+//ff:func feature=gen-gogin type=generator control=sequence
 //ff:what rateLimitSourceTemplate — FixedRateLimit 헬퍼만 방출 (비즈니스 결합 가드 전용)
 
 package middleware

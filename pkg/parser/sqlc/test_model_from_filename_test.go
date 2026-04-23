@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=parser control=iteration
+//ff:func feature=orchestrator type=parser control=iteration dimension=1
 //ff:what modelFromFilename 테이블 테스트 — 복수형·snake_case → PascalCase 단수형
 package sqlc
 

@@ -1,4 +1,4 @@
-//ff:type feature=migration type=model
+//ff:func feature=migration type=model control=sequence
 //ff:what Schema AST — diff 비교용 정규화된 PostgreSQL 스키마 표현
 package migration
 

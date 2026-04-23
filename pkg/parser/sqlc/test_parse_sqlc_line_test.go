@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=parser control=iteration
+//ff:func feature=orchestrator type=parser control=iteration dimension=1
 //ff:what parseSQLCLine 테이블 테스트 — :one/:many/:exec/:execresult 및 비매크로 라인
 package sqlc
 

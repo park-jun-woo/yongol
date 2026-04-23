@@ -19,8 +19,7 @@ func readSource(source string) ([]byte, error) {
 	return os.ReadFile(source)
 }
 
-//ff:func feature=external type=loader control=sequence
-//ff:what readHTTPSource — GETs an HTTP(S) source, returns body bytes, and includes a body snippet in the error when status >= 400
+// readHTTPSource — GETs an HTTP(S) source, returns body bytes, and includes a body snippet in the error when status >= 400
 func readHTTPSource(source string) ([]byte, error) {
 	resp, err := http.Get(source)
 	if err != nil {
@@ -43,8 +42,7 @@ func readHTTPSource(source string) ([]byte, error) {
 	return data, nil
 }
 
-//ff:func feature=external type=helper control=sequence
-//ff:what readBodySnippet — reads up to limit bytes from a response body and returns a single-line string (best-effort, errors ignored)
+// readBodySnippet — reads up to limit bytes from a response body and returns a single-line string (best-effort, errors ignored)
 func readBodySnippet(r io.Reader, limit int) string {
 	buf := make([]byte, limit+1)
 	n, _ := io.ReadFull(r, buf)

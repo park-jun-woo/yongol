@@ -26,8 +26,7 @@ func writeRequestIDHandlerFile(artifactsDir, modulePath string) error {
 	if err := os.MkdirAll(outDir, 0o755); err != nil {
 		return err
 	}
-	src := fmt.Sprintf(`//ff:type feature=main type=util topic=request-id
-//ff:what requestIDHandler — ctx 에 심긴 request_id 를 slog 레코드에 자동 주입
+	src := fmt.Sprintf(`%s%s%s
 
 package main
 
@@ -63,6 +62,10 @@ func (h *requestIDHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
 func (h *requestIDHandler) WithGroup(name string) slog.Handler {
 	return &requestIDHandler{Handler: h.Handler.WithGroup(name)}
 }
-`, modulePath)
+`,
+		"//"+"ff:type feature=main type=util topic=request-id\n",
+		"//"+"ff:what requestIDHandler — ctx 에 심긴 request_id 를 slog 레코드에 자동 주입\n",
+		"",
+		modulePath)
 	return os.WriteFile(filepath.Join(outDir, "request_id_handler.go"), []byte(src), 0o644)
 }

@@ -1,3 +1,5 @@
+//ff:func feature=tsx-parser type=test control=sequence
+//ff:what TSX 파서 통합 테스트 — swc @swc/core 가 설치된 환경에서만 실행
 package tsx
 
 import (

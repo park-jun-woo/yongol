@@ -1,4 +1,4 @@
-//ff:type feature=orchestrator type=test
+//ff:func feature=orchestrator type=test control=sequence
 //ff:what Phase constant value lock-in test
 package diagnostic_test
 

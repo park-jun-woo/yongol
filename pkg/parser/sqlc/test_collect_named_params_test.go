@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=parser control=iteration
+//ff:func feature=orchestrator type=parser control=iteration dimension=1
 //ff:what collectNamedParams 테이블 테스트 — @name / sqlc.arg(name) / 혼합
 package sqlc
 

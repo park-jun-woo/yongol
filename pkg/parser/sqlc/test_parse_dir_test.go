@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=parser control=iteration
+//ff:func feature=orchestrator type=parser control=iteration dimension=1
 //ff:what ParseDir 통합 테스트 — 복수 파일 합산 / 없는 디렉토리 / 파일 존재 확인
 package sqlc
 

@@ -1,4 +1,4 @@
-//ff:func feature=cli type=model
+//ff:func feature=cli type=model control=sequence
 //ff:what usageError — cobra usage failure wrapper; main maps it to exit code 2
 
 package main

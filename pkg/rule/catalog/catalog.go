@@ -1,4 +1,4 @@
-//ff:type feature=rule type=model topic=catalog
+//ff:func feature=rule type=model control=sequence topic=catalog
 //ff:what Catalog — stores the parsed rulebook.md result as a Rule ID keyed lookup table
 package catalog
 

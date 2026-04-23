@@ -1,4 +1,4 @@
-//ff:type feature=gen-gogin type=generator
+//ff:func feature=gen-gogin type=generator control=sequence topic=observability
 //ff:what prometheusSourceTemplate — GeneratePrometheus 가 기록하는 prometheus.go 템플릿
 
 package middleware

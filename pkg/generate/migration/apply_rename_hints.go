@@ -1,4 +1,4 @@
-//ff:type feature=migration type=model
+//ff:func feature=migration type=model control=sequence topic=migration-hints
 //ff:what Hints 구조체 + applyRenameHints — 실제 rename 규칙 적용은 Diff 호출부
 package migration
 

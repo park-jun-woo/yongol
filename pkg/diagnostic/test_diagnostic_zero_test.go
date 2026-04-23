@@ -1,4 +1,4 @@
-//ff:type feature=orchestrator type=test
+//ff:func feature=orchestrator type=test control=sequence
 //ff:what Regression test that locks in the zero value of the Diagnostic struct
 package diagnostic_test
 

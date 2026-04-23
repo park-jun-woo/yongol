@@ -1,4 +1,4 @@
-//ff:type feature=orchestrator type=test
+//ff:func feature=orchestrator type=test control=sequence
 //ff:what Lock-in test for Level constant values
 package diagnostic_test
 

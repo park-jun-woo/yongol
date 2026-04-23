@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=parser control=iteration
+//ff:func feature=orchestrator type=parser control=iteration dimension=1
 //ff:what ParseFile — QuerySpec.RowType 이 :one/:many 에 채워지고 :exec/:execresult 는 빈 값인지 회귀
 
 package sqlc

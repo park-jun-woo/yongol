@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=parser control=iteration
+//ff:func feature=orchestrator type=parser control=iteration dimension=1
 //ff:what ParseFile 통합 테스트 — valid / empty / no-macro / multi / read-error
 package sqlc
 
