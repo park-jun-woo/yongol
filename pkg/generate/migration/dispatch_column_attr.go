@@ -19,7 +19,16 @@ func dispatchColumnAttr(t *Table, col *Column, rest []string, i int) int {
 	case tok == "DEFAULT":
 		def, consumed := collectDefaultExpr(rest[i+1:])
 		col.Default = NormalizeDefault(def)
+		if col.Identity != nil {
+			t.errs = append(t.errs,
+				"column "+col.Name+": DEFAULT conflicts with GENERATED AS IDENTITY")
+		}
 		return 1 + consumed
+	case tok == "GENERATED":
+		if consumed := applyIdentityAttr(t, col, rest, i); consumed > 0 {
+			return consumed
+		}
+		return 1
 	case tok == "PRIMARY" && i+1 < len(rest) && strings.ToUpper(rest[i+1]) == "KEY":
 		t.PrimaryKey = []string{col.Name}
 		col.Nullable = false

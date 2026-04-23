@@ -8,5 +8,6 @@ func defaultExprStopKeywords() map[string]bool {
 	return map[string]bool{
 		"NOT": true, "NULL": true, "UNIQUE": true, "PRIMARY": true,
 		"REFERENCES": true, "CHECK": true, "DEFAULT": true, "CONSTRAINT": true,
+		"GENERATED": true,
 	}
 }

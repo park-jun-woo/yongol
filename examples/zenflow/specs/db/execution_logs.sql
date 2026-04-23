@@ -1,5 +1,5 @@
 CREATE TABLE execution_logs (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     workflow_id BIGINT NOT NULL REFERENCES workflows(id),
     org_id BIGINT NOT NULL REFERENCES organizations(id),
     status TEXT NOT NULL,

@@ -11,4 +11,5 @@ type Table struct {
 	ForeignKeys []*ForeignKey      // inline REFERENCES + ALTER TABLE ADD FK unified
 	Checks      []*CheckConstraint // CHECK (...) constraints
 	Comment     string             // optional COMMENT ON TABLE (v1 WARN only)
+	errs        []string           // column-level parse errors (IDENTITY+DEFAULT conflict etc.)
 }

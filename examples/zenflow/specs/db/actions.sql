@@ -1,5 +1,5 @@
 CREATE TABLE actions (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     workflow_id BIGINT NOT NULL REFERENCES workflows(id) ON DELETE CASCADE,
     action_type TEXT NOT NULL,
     payload_template JSONB NOT NULL DEFAULT '{}'::jsonb,

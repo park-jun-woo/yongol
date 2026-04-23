@@ -116,6 +116,9 @@ Standard SQL DDL and sqlc. Details: [`docs/ddl.md`](docs/ddl.md).
   to `tx_type`, `date_range`, etc.
 - `NOT NULL DEFAULT 0` FK sentinel pattern avoids nullable FKs; the referenced
   table must contain an `id=0` sentinel row.
+- Auto-increment primary keys must use `GENERATED ALWAYS AS IDENTITY`.
+  `SERIAL` / `BIGSERIAL` / `SMALLSERIAL` are banned (D-8). Write
+  `id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY`.
 
 ### DDL annotations
 

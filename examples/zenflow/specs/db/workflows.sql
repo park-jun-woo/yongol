@@ -1,5 +1,5 @@
 CREATE TABLE workflows (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     org_id BIGINT NOT NULL REFERENCES organizations(id),
     title TEXT NOT NULL,
     trigger_event TEXT NOT NULL,

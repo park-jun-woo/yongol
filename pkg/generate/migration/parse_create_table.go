@@ -20,5 +20,8 @@ func parseCreateTable(s *Schema, stmt string) error {
 	body := m[2]
 	t := ensureTable(s, name)
 	parseTableItems(t, body)
+	if len(t.errs) > 0 {
+		return fmt.Errorf("table %s: %s", t.Name, t.errs[0])
+	}
 	return nil
 }

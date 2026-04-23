@@ -12,7 +12,7 @@ func parseColumn(t *Table, def string) {
 	typeTok, rest := collectTypeTokens(tokens[1:])
 	ct, isSerial := NormalizeType(typeTok)
 
-	col := &Column{Name: name, Type: ct, Nullable: true}
+	col := &Column{Name: name, Type: ct, RawType: typeTok, Nullable: true}
 	applyColumnAttrs(t, col, rest)
 	applySerialDefault(t, col, isSerial)
 

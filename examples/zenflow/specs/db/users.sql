@@ -1,5 +1,5 @@
 CREATE TABLE users (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     org_id BIGINT NOT NULL REFERENCES organizations(id),
     email TEXT NOT NULL UNIQUE,
     password_hash TEXT NOT NULL, -- @sensitive

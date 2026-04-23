@@ -185,6 +185,7 @@ DDL self-consistency (PostgreSQL + sqlc query definitions).
 | D-5 | WARNING | `sqlc.yaml` `schema` path does not include the DDL directory | `pkg/validate/ddl/d_05_sqlc_yaml_schema_path.go` |
 | D-6 | WARNING | `sqlc.yaml` `queries` path does not include `queries/` | `pkg/validate/ddl/d_06_sqlc_yaml_queries_path.go` |
 | D-7 | ERROR | Positional parameters (`$1`, `$2`) are forbidden in sqlc queries | `pkg/validate/ddl/d_07_sqlc_positional_param.go` |
+| D-8 | ERROR | `SERIAL` / `BIGSERIAL` / `SMALLSERIAL` column types are banned. Use `GENERATED ALWAYS AS IDENTITY`. | `pkg/validate/ddl/d_08_serial_type_banned.go` |
 | XDD-61 | WARNING | Columns matching sensitive patterns (`password` / `secret` / `hash` / `token`) are missing the `@sensitive` annotation | `pkg/validate/ddl/xdd_61_sensitive_no_annotation.go` |
 
 ## F. DDL ↔ OpenAPI
