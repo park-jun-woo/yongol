@@ -33,4 +33,10 @@ type methodGen struct {
 	// <refresh>.RefreshToken). Empty string means "no IssueToken seen";
 	// the SetAuthCookies emission is skipped.
 	AccessTokenVar string
+	// DiagramSymbol maps each state diagram ID (lowercase filename stem
+	// matched by SSaC `@state <id>`) to its exported PascalCase Go
+	// symbol. Populated at methodGen construction from fs.StateDiagrams
+	// so build_state can reference statemachine.<Symbol>CanTransition
+	// even when the source .md file uses a lowercase name (BUG-002).
+	DiagramSymbol map[string]string
 }

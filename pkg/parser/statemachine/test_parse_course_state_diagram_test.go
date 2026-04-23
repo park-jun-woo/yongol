@@ -27,6 +27,12 @@ stateDiagram-v2
 	if d.ID != "course" {
 		t.Errorf("ID = %q, want %q", d.ID, "course")
 	}
+	// BUG-002 — parser must derive an exported PascalCase Symbol so
+	// downstream emitters produce cross-package-visible identifiers
+	// regardless of the source file's filename casing.
+	if d.Symbol != "Course" {
+		t.Errorf("Symbol = %q, want %q", d.Symbol, "Course")
+	}
 
 	if d.InitialState != "unpublished" {
 		t.Errorf("InitialState = %q, want %q", d.InitialState, "unpublished")

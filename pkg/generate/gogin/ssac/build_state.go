@@ -19,8 +19,19 @@ func (g *methodGen) buildState(seq ssacparser.Sequence) ([]string, []string) {
 		inputField = g.mapValue(v)
 		break
 	}
+	// Look up the exported PascalCase Go symbol for this diagram. The
+	// DiagramID stays as the lowercase SSaC reference (matching the
+	// filename stem), but the generated code must use the Symbol so
+	// cross-package callers can reach the function — see BUG-002.
+	// Fall back to DiagramID if the lookup is empty (parser always
+	// populates it; this keeps codegen resilient to future parser
+	// refactors).
+	sym := g.DiagramSymbol[seq.DiagramID]
+	if sym == "" {
+		sym = seq.DiagramID
+	}
 	lines := []string{
-		fmt.Sprintf("if !statemachine.%sCanTransition(%s, %q) {", seq.DiagramID, inputField, seq.Transition),
+		fmt.Sprintf("if !statemachine.%sCanTransition(%s, %q) {", sym, inputField, seq.Transition),
 		fmt.Sprintf("\t%s(\"handler: %s\", \"op\", %q, \"status\", %d)", logLevelFuncForStatus(status), logTagForStatus(status), g.FuncName, status),
 		fmt.Sprintf("\treturn api.%s%dJSONResponse{Error: %q, Code: strPtr(%q)}, nil", g.FuncName, status, msg, neutralCode(status)),
 		"}",

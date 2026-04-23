@@ -24,7 +24,7 @@ func Generate(fs *yongol.Fullstack, artifactsDir string) error {
 	}
 	for _, d := range fs.StateDiagrams {
 		transMap := buildTransitionMap(d)
-		if err := writeStateFile(dir, d.ID, transMap); err != nil {
+		if err := writeStateFile(dir, d.ID, d.Symbol, transMap); err != nil {
 			return fmt.Errorf("statemachine %s: %w", d.ID, err)
 		}
 	}

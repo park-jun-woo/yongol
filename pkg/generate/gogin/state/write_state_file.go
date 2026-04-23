@@ -12,20 +12,23 @@ import (
 
 // writeStateFile writes three sibling files for one statemachine:
 //
-//	<snakeID>.go                — <ID>Transitions var declaration
-//	<snakeID>_can_transition.go — <ID>CanTransition guard function
-//	<snakeID>_next_state.go     — <ID>NextState accessor function
+//	<snakeID>.go                — <Symbol>Transitions var declaration
+//	<snakeID>_can_transition.go — <Symbol>CanTransition guard function
+//	<snakeID>_next_state.go     — <Symbol>NextState accessor function
 //
 // Splitting the prior single-file emit satisfies filefunc F1 on the
-// statemachine package. The base name mirrors the diagram ID so
-// regeneration overwrites prior outputs in place.
-func writeStateFile(dir, id string, transMap map[string]map[string]string) error {
+// statemachine package. id selects the filename stem so regeneration
+// overwrites prior outputs in place. symbol (PascalCase of id, computed
+// by the parser) is the only identifier used inside generated Go
+// source; splicing id directly would emit unexported identifiers when
+// the filename is lowercase — see BUG-002.
+func writeStateFile(dir, id, symbol string, transMap map[string]map[string]string) error {
 	base := strcase.ToSnake(id)
 
 	files := map[string]string{
-		base + ".go":                    renderStateFile(id, transMap),
-		base + "_can_transition.go":     renderCanTransitionFile(id),
-		base + "_next_state.go":         renderNextStateFile(id),
+		base + ".go":                    renderStateFile(id, symbol, transMap),
+		base + "_can_transition.go":     renderCanTransitionFile(id, symbol),
+		base + "_next_state.go":         renderNextStateFile(id, symbol),
 	}
 	for name, src := range files {
 		path := filepath.Join(dir, name)

@@ -8,6 +8,7 @@ import (
 
 	"github.com/park-jun-woo/yongol/pkg/parser/funcspec"
 	ssacparser "github.com/park-jun-woo/yongol/pkg/parser/ssac"
+	"github.com/park-jun-woo/yongol/pkg/parser/statemachine"
 )
 
 // newMethodGen extracts all needed info from OpenAPI for one operation.
@@ -15,20 +16,33 @@ import (
 // resolved manifest.backend.observability.tracing.wrap_calls flag so the
 // generator can emit otel.Tracer().Start wrappers only when explicitly
 // opted-in.
-func newMethodGen(doc *openapi3.T, sf ssacparser.ServiceFunc, modulePath string, useTx bool, projectFuncs, builtinFuncs []funcspec.FuncSpec, wrapCalls bool) *methodGen {
+//
+// diagrams supplies the parsed Mermaid stateDiagrams; newMethodGen
+// flattens them into a `DiagramID → Symbol` lookup so build_state can
+// emit `statemachine.<Symbol>CanTransition(...)` even when the source
+// .md file was authored in lowercase (BUG-002).
+func newMethodGen(doc *openapi3.T, sf ssacparser.ServiceFunc, modulePath string, useTx bool, projectFuncs, builtinFuncs []funcspec.FuncSpec, wrapCalls bool, diagrams []*statemachine.StateDiagram) *methodGen {
+	symbols := make(map[string]string, len(diagrams))
+	for _, d := range diagrams {
+		if d == nil {
+			continue
+		}
+		symbols[d.ID] = d.Symbol
+	}
 	g := &methodGen{
-		FuncName:     sf.Name,
-		FileName:     sf.FileName,
-		ModulePath:   modulePath,
-		PathParams:   make(map[string]bool),
-		QueryParams:  make(map[string]queryParam),
-		BodyFormats:  make(map[string]string),
-		RespFields:   make(map[string]responseField),
-		UseTx:        useTx,
-		FirstErr:     !useTx, // tx가 있으면 이미 err 선언됨
-		ProjectFuncs: projectFuncs,
-		BuiltinFuncs: builtinFuncs,
-		WrapCalls:    wrapCalls,
+		FuncName:      sf.Name,
+		FileName:      sf.FileName,
+		ModulePath:    modulePath,
+		PathParams:    make(map[string]bool),
+		QueryParams:   make(map[string]queryParam),
+		BodyFormats:   make(map[string]string),
+		RespFields:    make(map[string]responseField),
+		UseTx:         useTx,
+		FirstErr:      !useTx, // tx가 있으면 이미 err 선언됨
+		ProjectFuncs:  projectFuncs,
+		BuiltinFuncs:  builtinFuncs,
+		WrapCalls:     wrapCalls,
+		DiagramSymbol: symbols,
 	}
 	if doc != nil {
 		g.extractFromOpenAPI(doc, sf.Name)

@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/ettle/strcase"
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
 )
 
@@ -33,7 +34,14 @@ func Parse(id, content, file string) (*StateDiagram, []diagnostic.Diagnostic) {
 		}}
 	}
 
-	d := &StateDiagram{ID: id, File: file}
+	// Symbol is PascalCase of ID. Computed once at parse time so all
+	// downstream emitters (render_state_file, render_can_transition_file,
+	// render_next_state_file, ssac/build_state) use a single source of
+	// truth for the exported Go identifier. Writing Symbol here instead
+	// of at each emit site removes the foot-gun where a new emitter
+	// forgets the case conversion and silently produces an unexported
+	// identifier that fails at go build.
+	d := &StateDiagram{ID: id, Symbol: strcase.ToPascal(id), File: file}
 	var diags []diagnostic.Diagnostic
 
 	// Parse line by line to track line numbers.
