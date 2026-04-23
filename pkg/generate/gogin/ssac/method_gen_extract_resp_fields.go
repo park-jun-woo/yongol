@@ -5,11 +5,14 @@ package ssac
 
 import "github.com/getkin/kin-openapi/openapi3"
 
-// extractRespFields populates RespFields from the 200 response schema,
-// marking fields listed in `required` so buildResponse can skip pointer
-// wrapping (oapi-codegen emits those as non-pointer Go fields).
+// extractRespFields populates RespFields from the operation's success
+// response schema, marking fields listed in `required` so buildResponse
+// can skip pointer wrapping (oapi-codegen emits those as non-pointer
+// Go fields). The status is picked from g.SuccessStatus, which was
+// derived from the HTTP method + declared 2xx set (BUG-004), so POST
+// handlers read the 201 schema rather than the non-existent 200.
 func (g *methodGen) extractRespFields(op *openapi3.Operation) {
-	resp := op.Responses.Status(200)
+	resp := op.Responses.Status(g.SuccessStatus)
 	if resp == nil || resp.Value == nil || resp.Value.Content == nil {
 		return
 	}

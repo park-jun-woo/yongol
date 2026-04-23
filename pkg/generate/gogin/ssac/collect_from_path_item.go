@@ -6,13 +6,22 @@ package ssac
 import "github.com/getkin/kin-openapi/openapi3"
 
 // collectFromPathItem scans every verb on one PathItem and records the
-// $ref schema names referenced by properties of its 200 response body.
-// Extracted from collectResponseSchemas to keep that loop at depth 1.
+// $ref schema names referenced by the success 2xx response body (both
+// direct body refs and property-level refs). Each verb is paired with
+// its HTTP method so collectFrom200Response can pick the correct 2xx
+// status via DeriveSuccessStatus — POST→201, DELETE→204, etc.
 func collectFromPathItem(pathItem *openapi3.PathItem, out map[string]bool) {
-	ops := []*openapi3.Operation{
-		pathItem.Get, pathItem.Post, pathItem.Put, pathItem.Delete, pathItem.Patch,
+	verbs := []struct {
+		method string
+		op     *openapi3.Operation
+	}{
+		{"GET", pathItem.Get},
+		{"POST", pathItem.Post},
+		{"PUT", pathItem.Put},
+		{"DELETE", pathItem.Delete},
+		{"PATCH", pathItem.Patch},
 	}
-	for _, op := range ops {
-		collectFrom200Response(op, out)
+	for _, v := range verbs {
+		collectFrom200Response(v.op, v.method, out)
 	}
 }

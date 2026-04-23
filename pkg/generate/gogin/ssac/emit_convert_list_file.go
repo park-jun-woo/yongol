@@ -34,12 +34,20 @@ func emitConvertListFile(
 	sb.WriteString("\t\"" + modulePath + "/internal/api\"\n")
 	sb.WriteString("\t\"" + modulePath + "/internal/db\"\n")
 	sb.WriteString(")\n\n")
-	sb.WriteString("func convert" + name + "List(rows []db." + name + ") []api." + name + " {\n")
+	// convert<Model> now returns (*api.X, error) because JSONB unmarshal
+	// can fail (BUG-005). The list variant must propagate that error
+	// instead of swallowing it — unmarshal errors are 500-class bugs
+	// and tx rollback only works when the handler sees them.
+	sb.WriteString("func convert" + name + "List(rows []db." + name + ") ([]api." + name + ", error) {\n")
 	sb.WriteString("\tresult := make([]api." + name + ", len(rows))\n")
 	sb.WriteString("\tfor i, row := range rows {\n")
-	sb.WriteString("\t\tresult[i] = *convert" + name + "(row)\n")
+	sb.WriteString("\t\titem, err := convert" + name + "(row)\n")
+	sb.WriteString("\t\tif err != nil {\n")
+	sb.WriteString("\t\t\treturn nil, err\n")
+	sb.WriteString("\t\t}\n")
+	sb.WriteString("\t\tresult[i] = *item\n")
 	sb.WriteString("\t}\n")
-	sb.WriteString("\treturn result\n")
+	sb.WriteString("\treturn result, nil\n")
 	sb.WriteString("}\n")
 
 	fileName := fffile.EnsureUnique(fffile.FileNameForFunc("convert"+name+"List"), used)

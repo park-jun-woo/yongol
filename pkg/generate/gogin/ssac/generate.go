@@ -43,9 +43,23 @@ func Generate(fs *yongol.Fullstack, artifactsDir string) error {
 	// All converters (db row → api DTO) are emitted as individual
 	// 1-file-1-func files. The legacy bundled converters.go is no longer
 	// written; a stale converters.go from a previous run is swept below.
+	//
+	// `needed` is the set of OpenAPI schemas referenced from success
+	// responses. We intersect it with `sqlcModelNames` (DDL tables mapped
+	// to sqlc struct names) so we only emit convert<X> for schemas that
+	// actually have a sqlc row type — otherwise an api-only wrapper like
+	// ExecuteWorkflowResponse becomes a phantom convertExecuteWorkflowResponse
+	// that references the non-existent db.ExecuteWorkflowResponse.
 	usedNames := make(map[string]bool)
 	needed := collectResponseSchemas(fs.OpenAPIDoc)
-	if err := emitAllConverterFiles(fs.OpenAPIDoc, serviceDir, modulePath, needed, usedNames); err != nil {
+	sqlcModelNames := sqlcModelNameSet(fs)
+	filtered := make(map[string]bool, len(needed))
+	for name := range needed {
+		if sqlcModelNames[name] {
+			filtered[name] = true
+		}
+	}
+	if err := emitAllConverterFiles(fs.OpenAPIDoc, serviceDir, modulePath, filtered, usedNames); err != nil {
 		return fmt.Errorf("converters: %w", err)
 	}
 

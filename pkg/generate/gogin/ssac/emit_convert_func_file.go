@@ -36,9 +36,30 @@ func emitConvertFuncFile(
 		},
 		What: "convert" + name + " — db." + name + " row → *api." + name + " 변환",
 	}))
+	// encoding/json is imported unconditionally — even for schemas that
+	// have no JSONB fields the convert function signature now returns an
+	// error so callers use one pattern. The Go compiler forbids unused
+	// imports, but encoding/json is always used when at least one JSONB
+	// field exists; for JSONB-less schemas the import is still referenced
+	// by the closing comment block? No — it would be unused. We only add
+	// the import when at least one JSONB field is present (BUG-005
+	// response direction).
+	needsJSON := hasJSONBProperty(schema)
+	needsTypes := hasOpenAPITypesCast(schema)
 	sb.WriteString("package service\n\nimport (\n")
+	if needsJSON {
+		sb.WriteString("\t\"encoding/json\"\n\n")
+	}
 	sb.WriteString("\t\"" + modulePath + "/internal/api\"\n")
 	sb.WriteString("\t\"" + modulePath + "/internal/db\"\n")
+	if needsTypes {
+		// openapi_types is the import alias oapi-codegen uses in its own
+		// generated code for github.com/oapi-codegen/runtime/types
+		// (Email, UUID, …). Keep the alias identical so the cast
+		// expressions compile against the same named types the api
+		// struct fields declare.
+		sb.WriteString("\n\topenapi_types \"github.com/oapi-codegen/runtime/types\"\n")
+	}
 	sb.WriteString(")\n\n")
 	writeConvertFunc(&sb, name, schema)
 
