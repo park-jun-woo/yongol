@@ -20,17 +20,19 @@ func (g *methodGen) buildGet(seq ssacparser.Sequence, next *ssacparser.Sequence)
 		varName = seq.Result.Var
 	}
 	assign := g.assignOp(varName != "_")
-	argStr := g.sqlcArgs(method, seq.Inputs)
+	preamble, argStr, argImports := g.sqlcArgs(method, seq.Inputs)
 
-	var imports []string
+	imports := append([]string(nil), argImports...)
 	errHandler := "if err != nil { return nil, err }"
 	if varName != "_" && next != nil && (next.Type == "empty" || next.Type == "exists") && next.Target == varName {
 		errHandler = "if err != nil && !errors.Is(err, sql.ErrNoRows) { return nil, err }"
-		imports = []string{`"database/sql"`, `"errors"`}
+		imports = append(imports, `"database/sql"`, `"errors"`)
 	}
 
-	return []string{
+	lines := append([]string(nil), preamble...)
+	lines = append(lines,
 		fmt.Sprintf("%s, err %s %s.%s(%s)", varName, assign, g.queryVar(), method, argStr),
 		errHandler,
-	}, imports
+	)
+	return lines, imports
 }

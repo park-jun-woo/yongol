@@ -23,5 +23,10 @@ func (g *methodGen) extractBodyFormats(op *openapi3.Operation) {
 		if propRef.Value.Format != "" {
 			g.BodyFormats[propName] = propRef.Value.Format
 		}
+		// Record JSONB-shaped properties so sqlcArgs can hoist a
+		// json.Marshal call for them (BUG-005 request direction).
+		if isJSONBProperty(propRef) {
+			g.BodyJSONBFields[propName] = true
+		}
 	}
 }

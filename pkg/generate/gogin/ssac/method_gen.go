@@ -60,4 +60,12 @@ type methodGen struct {
 	// DTO — the two types diverge on acronym casing and JSONB encoding,
 	// so the conversion helper is mandatory (BUG-003 / BUG-005).
 	VarTypes map[string]string
+	// BodyJSONBFields lists request body property names whose OpenAPI
+	// schema is the JSONB shape (`type: object, additionalProperties:
+	// true`). oapi-codegen emits these as map[string]interface{} while
+	// sqlc generates json.RawMessage for the matching JSONB column.
+	// Populated from the request body schema at extract time so
+	// sqlcArgs can wrap the source with json.Marshal(...) before
+	// assigning into the params struct (BUG-005 request direction).
+	BodyJSONBFields map[string]bool
 }

@@ -41,8 +41,9 @@ func newMethodGen(doc *openapi3.T, sf ssacparser.ServiceFunc, modulePath string,
 	}
 	g := &methodGen{
 		SuccessStatus: 200, // overwritten by extractFromOpenAPI for real ops
-		VarTypes:      varTypes,
-		FuncName:      sf.Name,
+		VarTypes:        varTypes,
+		BodyJSONBFields: make(map[string]bool),
+		FuncName:        sf.Name,
 		FileName:      sf.FileName,
 		ModulePath:    modulePath,
 		PathParams:    make(map[string]bool),
