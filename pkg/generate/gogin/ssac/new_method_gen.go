@@ -29,8 +29,19 @@ func newMethodGen(doc *openapi3.T, sf ssacparser.ServiceFunc, modulePath string,
 		}
 		symbols[d.ID] = d.Symbol
 	}
+	// Pre-compute the var→type map from all Result bindings in the
+	// service func's sequences. Populated before any buildX call so a
+	// later @response can look up the model even when the assignment
+	// appeared earlier in the sequence list.
+	varTypes := make(map[string]string)
+	for _, seq := range sf.Sequences {
+		if seq.Result != nil && seq.Result.Var != "" && seq.Result.Type != "" {
+			varTypes[seq.Result.Var] = seq.Result.Type
+		}
+	}
 	g := &methodGen{
 		SuccessStatus: 200, // overwritten by extractFromOpenAPI for real ops
+		VarTypes:      varTypes,
 		FuncName:      sf.Name,
 		FileName:      sf.FileName,
 		ModulePath:    modulePath,

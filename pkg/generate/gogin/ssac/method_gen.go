@@ -52,4 +52,12 @@ type methodGen struct {
 	// populated alongside SuccessStatus. Used by diagnostics that reference
 	// the source-of-truth HTTP method.
 	Method string
+	// VarTypes maps an SSaC result variable name (e.g. "updated", "act")
+	// to the declared sqlc row type (e.g. "Workflow", "Action"). Populated
+	// when each sequence with a Result binding is visited. buildResponse
+	// consults this map so it can route `@response <var>` through
+	// convert<Model>(<var>) instead of casting the sqlc row to the api
+	// DTO — the two types diverge on acronym casing and JSONB encoding,
+	// so the conversion helper is mandatory (BUG-003 / BUG-005).
+	VarTypes map[string]string
 }
