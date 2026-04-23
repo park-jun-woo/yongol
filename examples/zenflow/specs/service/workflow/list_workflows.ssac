@@ -1,7 +1,0 @@
-package service
-
-// @auth "ListWorkflows" "organization" {ResourceID: currentUser.OrgID} "Forbidden" 403
-// @get []Workflow items = Workflow.ListByOrg({OrgID: currentUser.OrgID, Page: request.page, PerPage: request.per_page, SortBy: request.sort_by, SortDir: request.sort_dir})
-// @get int64 total = Workflow.CountByOrg({OrgID: currentUser.OrgID})
-// @response { items: items, total: total }
-func ListWorkflows() {}
