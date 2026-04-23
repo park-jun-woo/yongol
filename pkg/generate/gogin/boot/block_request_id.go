@@ -36,25 +36,3 @@ func blockRequestID(fs *yongol.Fullstack, modulePath string) MainBlock {
 		Lines: lines,
 	}
 }
-
-// resolveRequestIDConfig reads manifest.backend.error.request_id with
-// sensible defaults when the block is absent. trust_upstream defaults to
-// true; header defaults to "X-Request-Id".
-func resolveRequestIDConfig(fs *yongol.Fullstack) (bool, string) {
-	trust := true
-	header := "X-Request-Id"
-	if fs == nil || fs.Manifest == nil {
-		return trust, header
-	}
-	e := fs.Manifest.Backend.Error
-	if e == nil || e.RequestID == nil {
-		return trust, header
-	}
-	if e.RequestID.TrustUpstream != nil {
-		trust = *e.RequestID.TrustUpstream
-	}
-	if e.RequestID.Header != "" {
-		header = e.RequestID.Header
-	}
-	return trust, header
-}

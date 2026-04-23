@@ -5,15 +5,8 @@ package boot
 
 import (
 	"fmt"
-	"sort"
 
 	"github.com/park-jun-woo/yongol/pkg/yongol"
-	"github.com/park-jun-woo/yongol/pkg/generate/gogin/middleware"
-)
-
-const (
-	defaultBodyLimit      = int64(1 << 20) // 1 MiB
-	defaultMultipartLimit = int64(32 << 20) // 32 MiB
 )
 
 // blockBodyLimit emits the body-limit middleware registration. Active
@@ -59,79 +52,3 @@ func blockBodyLimit(fs *yongol.Fullstack, modulePath string) MainBlock {
 		Lines: lines,
 	}
 }
-
-// resolveHTTPLimits computes effective global + per-op limits from
-// manifest. Missing manifest → defaults only. Parse failures fall back to
-// defaults (SEC validation rule catches bad values at validate-time — the
-// generator stays forgiving so a single bad override does not halt codegen).
-func resolveHTTPLimits(fs *yongol.Fullstack) (bodyLimit, multipartLimit int64, bodyOverrides, multipartOverrides map[string]int64) {
-	bodyLimit = defaultBodyLimit
-	multipartLimit = defaultMultipartLimit
-	bodyOverrides = map[string]int64{}
-	multipartOverrides = map[string]int64{}
-
-	if fs == nil || fs.Manifest == nil || fs.Manifest.Backend.HTTP == nil {
-		return
-	}
-	h := fs.Manifest.Backend.HTTP
-	if h.BodyLimit != "" {
-		if n, err := middleware.ParseSize(h.BodyLimit); err == nil {
-			bodyLimit = n
-		}
-	}
-	if h.MultipartLimit != "" {
-		if n, err := middleware.ParseSize(h.MultipartLimit); err == nil {
-			multipartLimit = n
-		}
-	}
-
-	// Build operationId → "METHOD PATH" index from OpenAPI doc.
-	opToRoute := buildOperationRouteIndex(fs)
-	for opID, ov := range h.Overrides {
-		route, ok := opToRoute[opID]
-		if !ok {
-			continue
-		}
-		if ov.BodyLimit != "" {
-			if n, err := middleware.ParseSize(ov.BodyLimit); err == nil {
-				bodyOverrides[route] = n
-			}
-		}
-		if ov.MultipartLimit != "" {
-			if n, err := middleware.ParseSize(ov.MultipartLimit); err == nil {
-				multipartOverrides[route] = n
-			}
-		}
-	}
-	return
-}
-
-// buildOperationRouteIndex walks the OpenAPI doc and maps each
-// operationId to its gin route key ("METHOD /path"). Returns empty map
-// when the doc is nil so callers can still iterate safely.
-func buildOperationRouteIndex(fs *yongol.Fullstack) map[string]string {
-	idx := map[string]string{}
-	if fs == nil || fs.OpenAPIDoc == nil || fs.OpenAPIDoc.Paths == nil {
-		return idx
-	}
-	for path, pi := range fs.OpenAPIDoc.Paths.Map() {
-		for method, op := range pi.Operations() {
-			if op == nil || op.OperationID == "" {
-				continue
-			}
-			idx[op.OperationID] = method + " " + openAPIPathToGin(path)
-		}
-	}
-	return idx
-}
-
-// sortedKeys returns the keys of m sorted deterministically for codegen.
-func sortedKeys(m map[string]int64) []string {
-	keys := make([]string, 0, len(m))
-	for k := range m {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-	return keys
-}
-

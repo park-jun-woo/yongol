@@ -31,17 +31,3 @@ func blockErrorEnvelope(fs *yongol.Fullstack, modulePath string) MainBlock {
 		Lines: lines,
 	}
 }
-
-// resolveExposeInternalError returns the compile-time default for the
-// ExposeInternalError flag. Defaults to false (production-safe). Reads
-// manifest.backend.error.expose_internal_error when present.
-func resolveExposeInternalError(fs *yongol.Fullstack) bool {
-	if fs == nil || fs.Manifest == nil {
-		return false
-	}
-	e := fs.Manifest.Backend.Error
-	if e == nil || e.ExposeInternalError == nil {
-		return false
-	}
-	return *e.ExposeInternalError
-}

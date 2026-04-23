@@ -22,16 +22,3 @@ func hasPrometheus(fs *yongol.Fullstack) bool {
 	}
 	return *obs.Metrics.Enabled
 }
-
-// prometheusPath resolves the scrape endpoint path. Empty / unset manifest
-// → "/metrics" default.
-func prometheusPath(fs *yongol.Fullstack) string {
-	if fs == nil || fs.Manifest == nil {
-		return "/metrics"
-	}
-	obs := fs.Manifest.Backend.Observability
-	if obs == nil || obs.Metrics == nil || obs.Metrics.Path == "" {
-		return "/metrics"
-	}
-	return obs.Metrics.Path
-}
