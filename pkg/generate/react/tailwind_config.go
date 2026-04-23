@@ -1,5 +1,5 @@
 //ff:func feature=gen-react type=generator control=sequence
-//ff:what tailwind.config.js / postcss.config.js 방출 (manifest.theme 반영)
+//ff:what writeTailwindConfig — tailwind.config.js / postcss.config.js / index.css 방출 (manifest.theme 반영)
 
 package react
 
@@ -65,32 +65,3 @@ func writeTailwindConfig(frontendDir string, theme *manifest.FrontendTheme) erro
 `
 	return os.WriteFile(filepath.Join(frontendDir, "src", "index.css"), []byte(index), 0o644)
 }
-
-// writeColorToken emits a {DEFAULT, foreground} pair under `colors.<name>`.
-// shadcn conventions expect both so `bg-<name>` and `text-<name>-foreground`
-// work out of the box.
-func writeColorToken(b *strings.Builder, name, def, foreground string) {
-	b.WriteString(fmt.Sprintf("        %s: { DEFAULT: '%s', foreground: '%s' },\n", name, def, foreground))
-}
-
-// orDefault returns the manifest-supplied value when non-empty, else def.
-func orDefault(theme *manifest.FrontendTheme, pick func(*manifest.FrontendTheme) string, def string) string {
-	if theme == nil {
-		return def
-	}
-	v := pick(theme)
-	if v == "" {
-		return def
-	}
-	return v
-}
-
-func pickPrimary(t *manifest.FrontendTheme) string     { return t.Primary }
-func pickSecondary(t *manifest.FrontendTheme) string   { return t.Secondary }
-func pickAccent(t *manifest.FrontendTheme) string      { return t.Accent }
-func pickDestructive(t *manifest.FrontendTheme) string { return t.Destructive }
-func pickMuted(t *manifest.FrontendTheme) string       { return t.Muted }
-func pickBackground(t *manifest.FrontendTheme) string  { return t.Background }
-func pickForeground(t *manifest.FrontendTheme) string  { return t.Foreground }
-func pickBorder(t *manifest.FrontendTheme) string      { return t.Border }
-func pickRadius(t *manifest.FrontendTheme) string      { return t.Radius }

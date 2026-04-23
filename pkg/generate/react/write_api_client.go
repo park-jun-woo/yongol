@@ -1,10 +1,9 @@
 //ff:func feature=gen-react type=generator control=iteration dimension=1
-//ff:what api.ts — operationId 기반 apiClient 객체 방출 (openapi-fetch + openapi-typescript 타입)
+//ff:what writeAPIClient — src/api.ts 에 operationId 기반 apiClient 객체 방출
 
 package react
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
@@ -46,57 +45,4 @@ func writeAPIClient(srcDir string, doc *openapi3.T) error {
 	b.WriteString("}\n")
 
 	return os.WriteFile(filepath.Join(srcDir, "api.ts"), []byte(b.String()), 0644)
-}
-
-// writeApiClientEntry emits a single apiClient.<OperationID>(args) entry.
-// Path params are lifted out of `args` into the openapi-fetch `path` option;
-// remaining properties flow as query (GET) or body (mutation).
-func writeApiClientEntry(b *strings.Builder, ep endpoint) {
-	method := strings.ToUpper(ep.method)
-	pathLit := ep.path
-
-	// args parameter signature — always optional so AI can call apiClient.X().
-	b.WriteString("  ")
-	b.WriteString(ep.opID)
-	b.WriteString(": (args?: Record<string, any>) => {\n")
-
-	if len(ep.pathParams) > 0 {
-		// Extract path params by name.
-		b.WriteString("    const path: Record<string, any> = {}\n")
-		for _, pp := range ep.pathParams {
-			b.WriteString(fmt.Sprintf("    if (args && args['%s'] !== undefined) path['%s'] = args['%s']\n", pp, pp, pp))
-		}
-	}
-	if method == "GET" {
-		if len(ep.pathParams) > 0 {
-			b.WriteString("    const query: Record<string, any> = {}\n")
-			b.WriteString("    if (args) {\n")
-			b.WriteString("      for (const [k, v] of Object.entries(args)) {\n")
-			b.WriteString("        if (v == null) continue\n")
-			b.WriteString("        if (!(k in path)) query[k] = v\n")
-			b.WriteString("      }\n")
-			b.WriteString("    }\n")
-			b.WriteString(fmt.Sprintf("    return client.GET('%s' as any, { params: { path, query } } as any).then(r => (r as any).data)\n", pathLit))
-		} else {
-			b.WriteString(fmt.Sprintf("    return client.GET('%s' as any, { params: { query: args ?? {} } } as any).then(r => (r as any).data)\n", pathLit))
-		}
-	} else {
-		verbCall := "POST"
-		switch method {
-		case "PUT", "PATCH", "DELETE":
-			verbCall = method
-		}
-		if len(ep.pathParams) > 0 {
-			b.WriteString("    const body: Record<string, any> = {}\n")
-			b.WriteString("    if (args) {\n")
-			b.WriteString("      for (const [k, v] of Object.entries(args)) {\n")
-			b.WriteString("        if (!(k in path)) body[k] = v\n")
-			b.WriteString("      }\n")
-			b.WriteString("    }\n")
-			b.WriteString(fmt.Sprintf("    return client.%s('%s' as any, { params: { path }, body } as any).then(r => (r as any).data)\n", verbCall, pathLit))
-		} else {
-			b.WriteString(fmt.Sprintf("    return client.%s('%s' as any, { body: args ?? {} } as any).then(r => (r as any).data)\n", verbCall, pathLit))
-		}
-	}
-	b.WriteString("  },\n")
 }
