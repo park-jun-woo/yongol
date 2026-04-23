@@ -1,5 +1,5 @@
 //ff:func feature=cli type=test control=iteration dimension=1
-//ff:what test: import subcommand end-to-end 3 cases (file-source-happy / missing-args / bad-source)
+//ff:what import file-source-happy — escrow fixture 기반 성공 시나리오
 
 package main
 
@@ -38,39 +38,5 @@ func TestIntegrationImport_FileSourceHappy(t *testing.T) {
 	}
 	if !found {
 		t.Errorf("expected at least one .go file under %s, got %v", outDir, entries)
-	}
-}
-
-// TestIntegrationImport_MissingArgs verifies that `import <source>` (outDir
-// missing) yields exit 2 via *usageError — consistent with the other
-// subcommands that wrap cobra.ExactArgs through usageArgs.
-func TestIntegrationImport_MissingArgs(t *testing.T) {
-	_, _, err := runCmd(t, "import", "some-source.yaml")
-	if err == nil {
-		t.Fatal("expected usage error for missing outDir, got nil")
-	}
-	if !isUsageError(err) {
-		t.Fatalf("expected *usageError (exit 2), got %T: %v", err, err)
-	}
-}
-
-// TestIntegrationImport_BadSource points at a non-existent file and expects
-// exit 1 with an error message that surfaces the read-source failure. The
-// path deliberately lives under t.TempDir() so no stray FS access occurs.
-func TestIntegrationImport_BadSource(t *testing.T) {
-	missing := filepath.Join(t.TempDir(), "no-such-file.yaml")
-	outDir := t.TempDir()
-	_, _, err := runCmd(t, "import", missing, outDir)
-	if err == nil {
-		t.Fatal("expected error for missing source file, got nil")
-	}
-	if isUsageError(err) {
-		t.Fatalf("bad-source must be exit 1, not usage error: %v", err)
-	}
-	if !strings.Contains(err.Error(), "import failed") {
-		t.Errorf("expected error to wrap with `import failed`, got: %v", err)
-	}
-	if !strings.Contains(err.Error(), "read source") {
-		t.Errorf("expected error to mention `read source`, got: %v", err)
 	}
 }

@@ -1,5 +1,5 @@
 //ff:func feature=cli type=test control=sequence
-//ff:what test: status subcommand end-to-end 2 cases (happy / missing-dir)
+//ff:what status happy — zenflow specs 로 status dashboard 성공 시나리오
 
 package main
 
@@ -23,20 +23,5 @@ func TestIntegrationStatus_Happy(t *testing.T) {
 	// OpenAPI endpoints row is always rendered for a populated zenflow tree.
 	if !strings.Contains(stdout, "OpenAPI") {
 		t.Errorf("expected stdout to mention OpenAPI in summary, got:\n%s", stdout)
-	}
-}
-
-// TestIntegrationStatus_MissingDir expects exit 1 (not a usage error) with
-// a `detect SSOTs` message when the specs-dir does not exist.
-func TestIntegrationStatus_MissingDir(t *testing.T) {
-	_, _, err := runCmd(t, "status", "/does/not/exist/yongol-status-test")
-	if err == nil {
-		t.Fatal("expected error for missing specs-dir, got nil")
-	}
-	if isUsageError(err) {
-		t.Fatalf("missing dir should be exit 1, not usage error: %v", err)
-	}
-	if !strings.Contains(err.Error(), "detect SSOTs") {
-		t.Errorf("expected error to mention `detect SSOTs`, got: %v", err)
 	}
 }

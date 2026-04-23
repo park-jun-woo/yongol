@@ -1,5 +1,5 @@
 //ff:func feature=cli type=test control=sequence
-//ff:what test: chain subcommand end-to-end 2 cases (happy / unknown-op)
+//ff:what chain happy — ExecuteWorkflow 추적 성공 및 header/링크 검증
 
 package main
 
@@ -25,22 +25,5 @@ func TestIntegrationChain_Happy(t *testing.T) {
 	}
 	if !strings.Contains(stdout, "OpenAPI") {
 		t.Errorf("expected stdout to list OpenAPI link, got:\n%s", stdout)
-	}
-}
-
-// TestIntegrationChain_UnknownOp passes a non-existent operationId and
-// expects exit 1 with a `not found in OpenAPI` error. Chain.Chain fails
-// fast when traceOpenAPI yields nil.
-func TestIntegrationChain_UnknownOp(t *testing.T) {
-	specs := zenflowSpecsDir(t)
-	_, _, err := runCmd(t, "chain", "DefinitelyNoSuchOp", specs)
-	if err == nil {
-		t.Fatal("expected error for unknown operationId, got nil")
-	}
-	if isUsageError(err) {
-		t.Fatalf("unknown-op should be exit 1, not usage error: %v", err)
-	}
-	if !strings.Contains(err.Error(), "not found in OpenAPI") {
-		t.Errorf("expected error to mention `not found in OpenAPI`, got: %v", err)
 	}
 }
