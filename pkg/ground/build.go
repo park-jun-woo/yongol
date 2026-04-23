@@ -1,4 +1,4 @@
-//ff:func feature=rule type=loader control=sequence
+//ff:func feature=ground type=loader control=iteration dimension=1
 //ff:what Build — Fullstack에서 완전한 rule.Ground를 구축
 package ground
 

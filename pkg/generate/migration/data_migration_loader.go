@@ -1,4 +1,4 @@
-//ff:func feature=migration type=parser control=sequence
+//ff:func feature=migration type=parser control=iteration dimension=1
 //ff:what DataMigrationLoader — @data_migration file=... sidecar SQL 읽기 + 누락 검증
 package migration
 

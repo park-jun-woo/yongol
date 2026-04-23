@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=test control=selection
+//ff:func feature=gen-gogin type=test control=iteration dimension=1
 //ff:what TestBuildSequenceUnhandled — 알 수 없는 seq.Type 에 대해 buildSequence 가 error 반환
 
 package ssac

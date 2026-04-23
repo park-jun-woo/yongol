@@ -1,4 +1,4 @@
-//ff:func feature=cli type=reporter control=sequence topic=json
+//ff:func feature=cli type=reporter control=iteration dimension=1 topic=json
 //ff:what printReportJSON — prints validate.Report as yongol bespoke flat JSON to stdout
 package main
 

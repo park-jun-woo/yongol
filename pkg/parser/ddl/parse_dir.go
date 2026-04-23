@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=parser control=iteration dimension=1
+//ff:func feature=ddl type=parser control=sequence
 //ff:what 디렉토리 내 모든 .sql 파일을 pg_query_go로 파싱
 package ddl
 

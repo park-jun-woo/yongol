@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=test control=sequence topic=csrf
+//ff:func feature=gen-gogin type=test control=iteration dimension=1 topic=csrf
 //ff:what csrf_source render snapshot — verifies that the double-submit cookie skeleton is present
 
 package middleware

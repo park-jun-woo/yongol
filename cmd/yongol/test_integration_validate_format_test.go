@@ -1,4 +1,4 @@
-//ff:func feature=cli type=test control=iteration dimension=1 topic=format
+//ff:func feature=cli type=test control=sequence topic=format
 //ff:what test: yongol validate --format md|sarif|<bad> end-to-end cases (md default, sarif JSON, usage error)
 package main
 

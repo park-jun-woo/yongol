@@ -1,4 +1,4 @@
-//ff:func feature=migration type=util control=sequence
+//ff:func feature=migration type=util control=iteration dimension=1
 //ff:what EmitSQL — Operation 리스트를 BEGIN;…COMMIT; 래핑 + 주석 헤더 붙여 단일 SQL 파일 문자열로
 package migration
 

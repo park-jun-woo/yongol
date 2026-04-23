@@ -1,4 +1,4 @@
-//ff:func feature=validate type=test control=sequence topic=manifest-observability
+//ff:func feature=validate type=test control=iteration dimension=1 topic=manifest-observability
 //ff:what OBS-001 테스트 — metrics.path golden (정상 경로 / 미설정)
 
 package manifest

@@ -1,4 +1,4 @@
-//ff:func feature=migration type=test control=iteration dimension=1
+//ff:func feature=migration type=test control=sequence
 //ff:what Diff e2e — zenflow users 테이블에 컬럼 1개 추가 시나리오
 package migration
 

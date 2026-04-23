@@ -1,4 +1,4 @@
-//ff:func feature=validate type=rule control=sequence topic=manifest-observability
+//ff:func feature=validate type=rule control=selection topic=manifest-observability
 //ff:what OBS-003 — backend.observability.tracing.exporter must be one of otlp/stdout/noop
 
 package manifest

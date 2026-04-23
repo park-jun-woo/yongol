@@ -1,4 +1,4 @@
-//ff:func feature=cli type=test control=iteration dimension=1
+//ff:func feature=cli type=test control=sequence
 //ff:what test: chain subcommand end-to-end 2 cases (happy / unknown-op)
 
 package main

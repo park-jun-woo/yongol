@@ -1,4 +1,4 @@
-//ff:func feature=validate type=rule control=sequence topic=manifest-security-headers
+//ff:func feature=validate type=rule control=iteration dimension=1 topic=manifest-security-headers
 //ff:what SEC-301 — WARNING when CSP default-src permits '*' or 'unsafe-eval'
 
 package manifest

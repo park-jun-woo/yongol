@@ -1,4 +1,4 @@
-//ff:func feature=validate type=rule control=sequence topic=manifest-auth
+//ff:func feature=validate type=rule control=iteration dimension=1 topic=manifest-auth
 //ff:what SEC-401 — backend.auth.secret literal is forbidden; only secret_env is allowed
 
 package manifest

@@ -1,4 +1,4 @@
-//ff:func feature=rule type=test control=sequence dimension=1
+//ff:func feature=ground type=test control=iteration dimension=1
 //ff:what capitalizeFirst — 첫 글자 대문자 변환 + non-letter 보존
 
 package ground

@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=sequence topic=security-headers
+//ff:func feature=gen-gogin type=util control=iteration dimension=1 topic=security-headers
 //ff:what buildCSPValue — directives map → "key1 src1 src2; key2 src3" 형식의 CSP 문자열 조합
 
 package middleware

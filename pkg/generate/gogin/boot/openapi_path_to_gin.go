@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=sequence topic=path-convert
+//ff:func feature=gen-gogin type=util control=iteration dimension=1 topic=path-convert
 //ff:what openAPIPathToGin — OpenAPI "/x/{id}" → gin "/x/:id" 경로 변환
 
 package boot

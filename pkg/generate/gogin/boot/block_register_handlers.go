@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=sequence
+//ff:func feature=gen-gogin type=generator control=iteration dimension=1
 //ff:what blockRegisterHandlers — strict-server NewStrictHandler + per-op 미들웨어 + RegisterHandlers
 package boot
 

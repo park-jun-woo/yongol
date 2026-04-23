@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=sequence
+//ff:func feature=gen-gogin type=util control=iteration dimension=1
 //ff:what newMethodGen — methodGen 생성 + OpenAPI 메타데이터 주입
 
 package ssac

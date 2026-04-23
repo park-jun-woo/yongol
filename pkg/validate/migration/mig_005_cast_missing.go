@@ -1,4 +1,4 @@
-//ff:func feature=validate type=rule control=iteration dimension=1 topic=migration-safety
+//ff:func feature=validate type=rule control=sequence topic=migration-safety
 //ff:what MIG-005 — 타입 변경 + @cast 힌트 없음 (int↔text 등) → WARNING
 package migration
 

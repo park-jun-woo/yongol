@@ -1,4 +1,4 @@
-//ff:func feature=cli type=test control=iteration dimension=1
+//ff:func feature=cli type=test control=sequence
 //ff:what test: status subcommand end-to-end 2 cases (happy / missing-dir)
 
 package main

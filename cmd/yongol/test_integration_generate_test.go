@@ -1,4 +1,4 @@
-//ff:func feature=cli type=test control=iteration dimension=1
+//ff:func feature=cli type=test control=sequence
 //ff:what test: generate subcommand end-to-end 2 cases (args-count / validation-block)
 
 package main

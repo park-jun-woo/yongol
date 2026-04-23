@@ -1,4 +1,4 @@
-//ff:func feature=migration type=util control=sequence
+//ff:func feature=migration type=util control=iteration dimension=1
 //ff:what NextSequenceNumber — artifacts/db/migrations/ 를 스캔해 다음 NNNN 반환
 package migration
 

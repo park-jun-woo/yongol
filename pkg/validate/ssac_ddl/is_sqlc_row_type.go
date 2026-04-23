@@ -1,4 +1,4 @@
-//ff:func feature=validate type=util control=sequence topic=ssac-ddl
+//ff:func feature=validate type=util control=iteration dimension=1 topic=ssac-ddl
 //ff:what isSqlcRowType — fs.SQLcQueries[*].RowType 조회 (sqlc 합성 row struct 매칭)
 
 package ssac_ddl

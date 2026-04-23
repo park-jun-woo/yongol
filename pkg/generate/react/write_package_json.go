@@ -1,4 +1,4 @@
-//ff:func feature=gen-react type=generator control=iteration dimension=1
+//ff:func feature=gen-react type=generator control=sequence
 //ff:what package.json — React 19 + Vite + TanStack Query + shadcn 에코시스템 의존성
 
 package react

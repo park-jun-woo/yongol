@@ -1,4 +1,4 @@
-//ff:func feature=cli type=test control=iteration dimension=1
+//ff:func feature=cli type=test control=sequence
 //ff:what test: validate subcommand end-to-end 4 cases (happy / missing-dir / missing-args / parse-fail)
 
 package main

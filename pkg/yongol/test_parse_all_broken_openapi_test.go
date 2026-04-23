@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=test control=sequence
+//ff:func feature=orchestrator type=test control=iteration dimension=1
 //ff:what ParseAll — 잘못된 openapi.yaml 이 fs.ParseDiagnostics 로 전파되는지 (P04 게이트 회귀)
 package yongol
 

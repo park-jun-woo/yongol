@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=validator control=sequence
+//ff:func feature=gen-gogin type=validator control=iteration dimension=1
 //ff:what checkSqlcOutPath — sqlc.yaml out 경로가 <artifacts>/backend/internal/db 인지 검증
 
 package gogin

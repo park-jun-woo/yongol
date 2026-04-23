@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=sequence topic=observability
+//ff:func feature=gen-gogin type=generator control=selection topic=observability
 //ff:what blockOtelInit — OpenTelemetry TracerProvider 초기화 (exporter/sampler/shutdown)
 
 package boot

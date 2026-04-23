@@ -1,4 +1,4 @@
-//ff:func feature=rule type=test control=sequence dimension=1
+//ff:func feature=ground type=test control=iteration dimension=1
 //ff:what populateGoReservedWords — Go 예약어 셋 정확성 회귀 방지
 
 package ground

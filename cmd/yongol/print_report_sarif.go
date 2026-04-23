@@ -1,4 +1,4 @@
-//ff:func feature=cli type=reporter control=sequence topic=sarif
+//ff:func feature=cli type=reporter control=iteration dimension=1 topic=sarif
 //ff:what printReportSARIF — prints validate.Report as SARIF 2.1.0 JSON to stdout
 package main
 

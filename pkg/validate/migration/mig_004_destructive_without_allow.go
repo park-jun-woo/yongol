@@ -1,4 +1,4 @@
-//ff:func feature=validate type=rule control=iteration dimension=1 topic=migration-safety
+//ff:func feature=validate type=rule control=sequence topic=migration-safety
 //ff:what MIG-004 — DROP TABLE/COLUMN 인데 @allow_destructive 없음 → WARNING
 package migration
 

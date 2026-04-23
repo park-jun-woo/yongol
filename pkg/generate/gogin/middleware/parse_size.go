@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=sequence topic=size-parse
+//ff:func feature=gen-gogin type=util control=iteration dimension=1 topic=size-parse
 //ff:what ParseSize — "1MiB" / "32MiB" / "500KB" 같은 human-readable size 를 bytes 로 변환
 
 package middleware

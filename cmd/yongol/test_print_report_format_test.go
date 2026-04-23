@@ -1,4 +1,4 @@
-//ff:func feature=cli type=test control=iteration dimension=1 topic=format
+//ff:func feature=cli type=test control=sequence topic=format
 //ff:what test: printReport dispatcher — md/sarif format dispatch + invalid value error
 package main
 

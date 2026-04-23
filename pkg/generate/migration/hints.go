@@ -1,4 +1,4 @@
-//ff:func feature=migration type=parser control=sequence
+//ff:func feature=migration type=parser control=iteration dimension=1 topic=migration-hints
 //ff:what ParseHints — pkg/parser/ddl 의 HintComment 로부터 Hints 구조체 구성
 package migration
 
