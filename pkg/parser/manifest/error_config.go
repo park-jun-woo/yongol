@@ -1,5 +1,5 @@
 //ff:type feature=projectconfig type=model
-//ff:what ErrorConfig 구조체 — backend.error (envelope 포맷 + request_id 정책)
+//ff:what ErrorConfig — backend.error 섹션 모델 (envelope 포맷 + request_id 정책)
 
 package manifest
 
@@ -19,12 +19,4 @@ type ErrorConfig struct {
 	RequestID           *RequestIDConfig `yaml:"request_id,omitempty"`
 	DefaultLocale       string           `yaml:"default_locale,omitempty"`
 	ExposeInternalError *bool            `yaml:"expose_internal_error,omitempty"`
-}
-
-// RequestIDConfig controls the request_id middleware. TrustUpstream=nil falls
-// back to true (LB/API Gateway may already inject the header). Header=""
-// falls back to "X-Request-Id".
-type RequestIDConfig struct {
-	TrustUpstream *bool  `yaml:"trust_upstream,omitempty"`
-	Header        string `yaml:"header,omitempty"`
 }

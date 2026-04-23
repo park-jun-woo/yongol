@@ -1,5 +1,6 @@
 //ff:type feature=projectconfig type=model
-//ff:what 쿠키 인증 / CSRF 설정 구조체 (backend.auth.cookie, backend.auth.csrf)
+//ff:what CookieConfig — backend.auth.cookie 섹션 모델 (access/refresh 쿠키 이름, SameSite)
+
 package manifest
 
 // CookieConfig mirrors the backend.auth.cookie: section. It carries the
@@ -36,22 +37,4 @@ type CookieConfig struct {
 	// Secure=true, which the __Host- prefix already enforces). An empty
 	// value resolves to "Lax" at generation time.
 	SameSite string `yaml:"same_site"`
-}
-
-// CsrfConfig mirrors the backend.auth.csrf: section. Double-submit cookie
-// defense: server sets CookieName (JS-readable), client duplicates it into
-// HeaderName on state-changing requests. Safe methods (GET/HEAD/OPTIONS)
-// and ExemptPaths skip verification.
-//
-// env overrides:
-//   BACKEND_AUTH_CSRF_ENABLED=false  — emergency disable.
-type CsrfConfig struct {
-	Enabled     bool     `yaml:"enabled"`
-	CookieName  string   `yaml:"cookie_name"`   // default "XSRF-TOKEN"
-	HeaderName  string   `yaml:"header_name"`   // default "X-XSRF-TOKEN"
-	ExemptPaths []string `yaml:"exempt_paths"`  // prefix match
-	// MaxAge is the CSRF cookie lifetime in seconds (default 86400).
-	// Distinct from the session cookie MaxAge — this one is for the
-	// JS-readable XSRF token, whose expiry can legitimately differ.
-	MaxAge int `yaml:"max_age"`
 }

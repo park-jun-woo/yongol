@@ -1,5 +1,5 @@
-//ff:func feature=manifest type=parser control=sequence
-//ff:what frontend.theme 블록 파싱 검증 (Phase003)
+//ff:func feature=manifest type=test control=sequence
+//ff:what Load — frontend.theme 블록이 있으면 primary/destructive/radius 파싱
 
 package manifest
 
@@ -42,28 +42,5 @@ frontend:
 	}
 	if cfg.Frontend.Theme.Radius != "0.75rem" {
 		t.Errorf("radius: want 0.75rem, got %q", cfg.Frontend.Theme.Radius)
-	}
-}
-
-func TestLoad_FrontendTheme_Absent(t *testing.T) {
-	dir := t.TempDir()
-	content := `apiVersion: yongol/v1
-kind: Project
-metadata:
-  name: no-theme
-backend:
-  module: github.com/test/no-theme
-frontend:
-  framework: react
-`
-	if err := os.WriteFile(filepath.Join(dir, "manifest.yaml"), []byte(content), 0644); err != nil {
-		t.Fatal(err)
-	}
-	cfg, diags := Load(dir)
-	if len(diags) > 0 {
-		t.Fatalf("Load() diagnostics: %v", diags)
-	}
-	if cfg.Frontend.Theme != nil {
-		t.Errorf("expected nil Theme when block omitted, got %+v", cfg.Frontend.Theme)
 	}
 }
