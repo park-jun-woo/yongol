@@ -1,5 +1,5 @@
 //ff:func feature=report type=test control=iteration dimension=1 topic=json
-//ff:what test: Emit — verifies flat JSON snake_case structure, summary counting, and rule_id extraction
+//ff:what TestEmitEmpty — clean report 에서 zero counts + snake_case 키 노출 검증
 package json
 
 import (
@@ -7,7 +7,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/park-jun-woo/yongol/pkg/diagnostic"
 	"github.com/park-jun-woo/yongol/pkg/validate"
 )
 
@@ -47,94 +46,5 @@ func TestEmitEmpty(t *testing.T) {
 		if !strings.Contains(raw, key) {
 			t.Errorf("missing snake_case key %s in output:\n%s", key, raw)
 		}
-	}
-}
-
-// TestEmitWithDiagnostics: rule_id extraction + uppercase level + count.
-func TestEmitWithDiagnostics(t *testing.T) {
-	r := &validate.Report{Steps: []validate.StepResult{
-		{
-			Name:   "ssac",
-			Status: validate.StatusFail,
-			Diagnostics: []diagnostic.Diagnostic{
-				{
-					File:    "service/auth/login.ssac",
-					Line:    15,
-					Phase:   diagnostic.PhaseValidate,
-					Level:   diagnostic.LevelError,
-					Message: "[S-27] variable foo is not declared",
-				},
-				{
-					File:    "service/workflow/update.ssac",
-					Line:    8,
-					Phase:   diagnostic.PhaseValidate,
-					Level:   diagnostic.LevelWarning,
-					Message: "[S-36] stale @response",
-				},
-			},
-		},
-	}}
-	data, err := Emit(r, "v0.1.21", "", 182)
-	if err != nil {
-		t.Fatalf("Emit: %v", err)
-	}
-	var doc Document
-	if err := stdjson.Unmarshal(data, &doc); err != nil {
-		t.Fatalf("unmarshal: %v", err)
-	}
-	if doc.Summary.Errors != 1 || doc.Summary.Warnings != 1 {
-		t.Errorf("summary counts: %+v", doc.Summary)
-	}
-	if doc.Summary.Checks != 182 {
-		t.Errorf("summary.checks: got %d, want 182", doc.Summary.Checks)
-	}
-	if len(doc.Diagnostics) != 2 {
-		t.Fatalf("diagnostics: got %d, want 2", len(doc.Diagnostics))
-	}
-	d0 := doc.Diagnostics[0]
-	if d0.RuleID != "S-27" || d0.Level != "ERROR" {
-		t.Errorf("diagnostics[0]: rule_id=%q level=%q, want S-27/ERROR", d0.RuleID, d0.Level)
-	}
-	if d0.Line != 15 || d0.File != "service/auth/login.ssac" {
-		t.Errorf("diagnostics[0] location: %+v", d0)
-	}
-	if strings.Contains(d0.Message, "[S-27]") {
-		t.Errorf("diagnostics[0].message should not include [S-27]: %q", d0.Message)
-	}
-	d1 := doc.Diagnostics[1]
-	if d1.Level != "WARNING" {
-		t.Errorf("diagnostics[1].level: got %q, want WARNING", d1.Level)
-	}
-}
-
-// TestEmitRuleIDMissing: plain message (no prefix) → rule_id is empty string.
-func TestEmitRuleIDMissing(t *testing.T) {
-	r := &validate.Report{Steps: []validate.StepResult{
-		{
-			Name:   "misc",
-			Status: validate.StatusFail,
-			Diagnostics: []diagnostic.Diagnostic{
-				{
-					File:    "x.ssac",
-					Phase:   diagnostic.PhaseValidate,
-					Level:   diagnostic.LevelError,
-					Message: "plain error without rule id",
-				},
-			},
-		},
-	}}
-	data, err := Emit(r, "v0.1.21", "", 0)
-	if err != nil {
-		t.Fatalf("Emit: %v", err)
-	}
-	var doc Document
-	if err := stdjson.Unmarshal(data, &doc); err != nil {
-		t.Fatalf("unmarshal: %v", err)
-	}
-	if len(doc.Diagnostics) != 1 {
-		t.Fatalf("diagnostics: got %d, want 1", len(doc.Diagnostics))
-	}
-	if doc.Diagnostics[0].RuleID != "" {
-		t.Errorf("rule_id should be empty, got %q", doc.Diagnostics[0].RuleID)
 	}
 }

@@ -1,21 +1,14 @@
-//ff:func feature=report type=emitter control=iteration dimension=2 topic=json
+//ff:func feature=report type=emitter control=sequence topic=json
 //ff:what Emit — validate.Report → yongol bespoke flat JSON ([]byte) 변환
 package json
 
 import (
 	stdjson "encoding/json"
 	"path/filepath"
-	"regexp"
-	"strings"
 
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
 	"github.com/park-jun-woo/yongol/pkg/validate"
 )
-
-// ruleIDPattern matches a leading "[RULE-ID]" prefix in diagnostic messages
-// (same shape as the SARIF emitter's pattern: uppercase letters + dash +
-// digits; supports compound prefixes like XOS-15).
-var ruleIDPattern = regexp.MustCompile(`^\[([A-Z]+(?:-[A-Z]+)*-\d+)\]\s*`)
 
 // Emit converts a validate.Report into the yongol flat JSON document and
 // returns pretty-printed bytes.
@@ -31,9 +24,9 @@ var ruleIDPattern = regexp.MustCompile(`^\[([A-Z]+(?:-[A-Z]+)*-\d+)\]\s*`)
 func Emit(report *validate.Report, yongolVersion, specsDir string, checks int) ([]byte, error) {
 	doc := Document{
 		YongolVersion: yongolVersion,
-		SpecsDir:       specsDir,
-		Summary:        Summary{Checks: checks},
-		Diagnostics:    []Diagnostic{},
+		SpecsDir:      specsDir,
+		Summary:       Summary{Checks: checks},
+		Diagnostics:   []Diagnostic{},
 	}
 
 	absSpecs, _ := filepath.Abs(specsDir)
@@ -65,39 +58,4 @@ func Emit(report *validate.Report, yongolVersion, specsDir string, checks int) (
 	}
 
 	return stdjson.MarshalIndent(doc, "", "  ")
-}
-
-// extractRuleID pulls a leading "[RULE-ID]" token out of a diagnostic message.
-// Returns (ruleID, remainingMessage). When no prefix is present the original
-// message is returned with an empty ruleID.
-func extractRuleID(msg string) (string, string) {
-	m := ruleIDPattern.FindStringSubmatchIndex(msg)
-	if m == nil {
-		return "", msg
-	}
-	id := msg[m[2]:m[3]]
-	rest := strings.TrimSpace(msg[m[1]:])
-	return id, rest
-}
-
-// relativeFile rebases a file path against specsDir when possible. Mirrors
-// the SARIF emitter behaviour for consistency across formats.
-func relativeFile(file, specsDir, absSpecs string) string {
-	if file == "" {
-		return ""
-	}
-	if specsDir == "" {
-		return filepath.ToSlash(file)
-	}
-	if rel, err := filepath.Rel(specsDir, file); err == nil && !strings.HasPrefix(rel, "..") {
-		return filepath.ToSlash(rel)
-	}
-	if absSpecs != "" {
-		if absFile, err := filepath.Abs(file); err == nil {
-			if rel, err := filepath.Rel(absSpecs, absFile); err == nil && !strings.HasPrefix(rel, "..") {
-				return filepath.ToSlash(rel)
-			}
-		}
-	}
-	return filepath.ToSlash(file)
 }
