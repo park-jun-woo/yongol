@@ -49,6 +49,11 @@ required:
     validate: "pkg/validate 통합 진입점 — per-SSOT + pair 검증 오케스트레이션"
     ground: "Fullstack → rule.Ground 적재 어댑터"
     stat: "Go AST 기반 코드 통계 스크립트"
+    ddl: "DDL 파서/워커 (pkg/parser/ddl/*.sql 순회)"
+    migration: "DDL 변경 감지 + 마이그레이션 파일 생성 (MIG-* 규칙, artifacts/db/migrations/ 출력)"
+    openapi-parse: "OpenAPI 문서 파싱/해석 보조 (pkg/parser/openapi)"
+    report: "검증 결과 직렬화 — JSON flat / SARIF 2.1.0 에미터 (pkg/report)"
+    util: "범용 유틸 패키지 — case 변환 등 (pkg/util/*)"
   type:
     command: "CLI 명령 엔트리포인트"
     rule: "검증 규칙"
@@ -63,6 +68,9 @@ required:
     accessor: "getter/setter/인터페이스 메서드"
     test: "테스트 함수"
     test-helper: "테스트 헬퍼 함수"
+    emitter: "검증 결과 직렬화 포맷터 (JSON / SARIF 등 출력 에미터)"
+    logger: "slog 기반 구조화 로그 헬퍼"
+    validator: "경로·설정·입력값 등 코드 생성 전 사전 검증기"
 
 optional:
   topic:
@@ -134,6 +142,29 @@ optional:
     tsx: "TSX 자체 정합성 (로컬 컴포넌트 import 존재 등) — T-*"
     tsx-openapi: "TSX apiClient 호출 ↔ OpenAPI operationId/params/body — XOT-*"
     preserve-safety: "preserved 파일 런타임 안전 가드 — panic, type assertion, unmarshal/Scan 에러, nil/slice/map, defer close (PRV-10~17)"
+    # --- report emitters (pkg/report/*) ---
+    json: "yongol bespoke flat JSON 리포트 에미터 — pkg/report/json"
+    sarif: "SARIF 2.1.0 full-catalog 리포트 에미터 — pkg/report/sarif"
+    md: "Markdown 리포트 출력 — cmd/yongol/print_report_md.go"
+    format: "리포트 포맷 선택 (--format text/json/sarif/md) 통합 처리"
+    # --- rule catalog (pkg/rule/catalog) ---
+    catalog: "rulebook.md 파싱 + RuleMeta 카탈로그 로더 — pkg/rule/catalog"
+    # --- gogin middleware / boot runtime topics ---
+    csrf: "CSRF 보호 미들웨어 생성/등록 (Phase005) — pkg/generate/gogin/boot/*csrf*.go, middleware/*csrf*.go"
+    request-id: "X-Request-ID 미들웨어 생성/등록 (Phase004) — pkg/generate/gogin/boot/*request_id*.go, middleware/*request_id*.go"
+    security-headers: "SecurityHeaders 미들웨어 (CSP/HSTS 등) 생성/등록 — pkg/generate/gogin/boot/*security_headers*.go, middleware/*security_headers*.go"
+    error-envelope: "ErrorEnvelope 미들웨어 (표준 에러 응답) 생성/등록 (Phase004) — pkg/generate/gogin/boot/*error_envelope*.go, middleware/*error_envelope*.go"
+    dos-guard: "BodyLimit / MultipartLimit 등 DoS 방어 미들웨어 등록 — pkg/generate/gogin/boot/block_body_limit.go"
+    path-convert: "OpenAPI 경로 템플릿 ↔ gin 라우트 변환 — pkg/generate/gogin/boot/openapi_path_to_gin.go"
+    size-parse: "human-readable size(1MiB 등) → bytes 변환 — pkg/generate/gogin/middleware/parse_size.go"
+    http-config: "manifest backend.http 섹션 (body_limit / multipart_limit / overrides) 파싱"
+    # --- manifest security / auth rules ---
+    manifest-auth: "manifest auth / csrf / JWT 정책 검증 (SEC-201/401/402/403)"
+    manifest-security-headers: "manifest backend.security_headers 정책 검증 (SEC-301 CSP / SEC-302 HSTS)"
+    # --- migration generator / validator topics ---
+    migration-hints: "@rename / @backfill / @data_migration 힌트 파서 + MIG-001/003 규칙"
+    migration-safety: "NOT NULL / DROP / CAST 등 파괴적 DDL 안전성 검사 (MIG-002/004/005)"
+    migration-snapshot: ".generated_schema.sql 스냅샷 무결성 검증 (MIG-006)"
   ssot:
     openapi: ""
     ddl: ""
