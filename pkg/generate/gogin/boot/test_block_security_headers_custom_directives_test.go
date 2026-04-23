@@ -1,0 +1,41 @@
+//ff:func feature=gen-gogin type=test control=sequence topic=security-headers
+//ff:what TestBlockSecurityHeaders_CustomDirectives — manifest CSP directives 가 기본값을 대체
+
+package boot
+
+import (
+	"strings"
+	"testing"
+
+	"github.com/park-jun-woo/yongol/pkg/yongol"
+	pmanifest "github.com/park-jun-woo/yongol/pkg/parser/manifest"
+)
+
+// TestBlockSecurityHeaders_CustomDirectives ensures CSP directives from the
+// manifest override the built-in defaults.
+func TestBlockSecurityHeaders_CustomDirectives(t *testing.T) {
+	fs := &yongol.Fullstack{
+		Manifest: &pmanifest.ProjectConfig{
+			Backend: pmanifest.Backend{
+				Module: "example.com/zenflow",
+				SecurityHeaders: &pmanifest.SecurityHeadersConfig{
+					CSP: &pmanifest.CSPConfig{
+						Directives: map[string][]string{
+							"default-src": {"'self'"},
+							"script-src":  {"'self'", "cdn.example.com"},
+						},
+					},
+				},
+			},
+		},
+	}
+	body := strings.Join(blockSecurityHeaders(fs, "example.com/zenflow").Lines, "\n")
+	if !strings.Contains(body, `"script-src": []string{"'self'", "cdn.example.com"}`) {
+		t.Fatalf("custom script-src not emitted; got:\n%s", body)
+	}
+	// custom directives map replaces defaults entirely — frame-ancestors
+	// should NOT appear since the custom map omitted it.
+	if strings.Contains(body, `"frame-ancestors"`) {
+		t.Fatalf("custom directives should replace defaults; frame-ancestors leaked:\n%s", body)
+	}
+}

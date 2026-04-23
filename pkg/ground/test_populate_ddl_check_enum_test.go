@@ -1,4 +1,4 @@
-//ff:func feature=rule type=test control=sequence dimension=1
+//ff:func feature=rule type=test control=sequence
 //ff:what populateDDLCheck — CHECK IN enum 값이 Lookup+Schemas에 등록
 
 package ground
@@ -30,16 +30,5 @@ func TestPopulateDDLCheck_EnumValues(t *testing.T) {
 	vals := g.Schemas["DDL.check.orders.status"]
 	if len(vals) != 3 {
 		t.Fatalf("Schemas[DDL.check.orders.status] = %v, want 3 values", vals)
-	}
-}
-
-// TestPopulateDDLCheck_Empty verifies no panic/extra keys when no CHECK enum.
-func TestPopulateDDLCheck_Empty(t *testing.T) {
-	tab := ddl.Table{Name: "empty"}
-	g := newGround()
-	populateDDLCheck(g, tab)
-
-	if _, ok := g.Lookup["DDL.check.empty.status"]; ok {
-		t.Errorf("unexpected DDL.check key for empty CheckEnums")
 	}
 }

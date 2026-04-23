@@ -33,32 +33,16 @@ func sec04HTTPOverridesOperationID(fs *yongol.Fullstack) []diagnostic.Diagnostic
 
 	var diags []diagnostic.Diagnostic
 	for _, k := range keys {
-		if !opIDs[k] {
-			diags = append(diags, diagnostic.Diagnostic{
-				File:    "manifest.yaml",
-				Phase:   diagnostic.PhaseValidate,
-				Level:   diagnostic.LevelError,
-				Message: "[SEC-04] backend.http.overrides.\"" + k + "\" does not exist as an OpenAPI operationId",
-				Advice:  "Check that the key matches the OpenAPI operationId exactly (case-sensitive)",
-			})
+		if opIDs[k] {
+			continue
 		}
+		diags = append(diags, diagnostic.Diagnostic{
+			File:    "manifest.yaml",
+			Phase:   diagnostic.PhaseValidate,
+			Level:   diagnostic.LevelError,
+			Message: "[SEC-04] backend.http.overrides.\"" + k + "\" does not exist as an OpenAPI operationId",
+			Advice:  "Check that the key matches the OpenAPI operationId exactly (case-sensitive)",
+		})
 	}
 	return diags
-}
-
-// operationIDSet collects all operationIds declared in the OpenAPI doc.
-func operationIDSet(fs *yongol.Fullstack) map[string]bool {
-	s := map[string]bool{}
-	if fs == nil || fs.OpenAPIDoc == nil || fs.OpenAPIDoc.Paths == nil {
-		return s
-	}
-	for _, pi := range fs.OpenAPIDoc.Paths.Map() {
-		for _, op := range pi.Operations() {
-			if op == nil || op.OperationID == "" {
-				continue
-			}
-			s[op.OperationID] = true
-		}
-	}
-	return s
 }

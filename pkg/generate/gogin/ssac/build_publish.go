@@ -35,29 +35,7 @@ func (g *methodGen) buildPublish(seq ssacparser.Sequence) ([]string, []string) {
 	imports := []string{`"github.com/park-jun-woo/ssac/pkg/queue"`}
 
 	if g.UseTx {
-		// tx-bound outbox: failure propagates so defer tx.Rollback fires.
-		lines := []string{
-			fmt.Sprintf("if err := queue.PublishTx(ctx, tx, %q, map[string]any{", seq.Topic),
-		}
-		lines = append(lines, fields...)
-		lines = append(lines,
-			"}); err != nil {",
-			"\treturn nil, err",
-			"}",
-		)
-		return lines, imports
+		return buildPublishTx(seq, fields, imports), imports
 	}
-
-	// tx-less: best-effort, log-and-continue.
-	imports = append(imports, `"log/slog"`)
-	lines := []string{
-		fmt.Sprintf("if err := queue.Publish(ctx, %q, map[string]any{", seq.Topic),
-	}
-	lines = append(lines, fields...)
-	lines = append(lines,
-		"}); err != nil {",
-		fmt.Sprintf("\tslog.Error(\"publish failed\", \"op\", %q, \"topic\", %q, \"err\", err)", g.FuncName, seq.Topic),
-		"}",
-	)
-	return lines, imports
+	return g.buildPublishBestEffort(seq, fields, &imports), imports
 }

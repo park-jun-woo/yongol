@@ -1,12 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=sequence topic=observability
-//ff:what prometheusSourceTemplate — GeneratePrometheus 가 기록하는 prometheus.go 템플릿
-
 package middleware
-
-import (
-	"fmt"
-	"strings"
-)
 
 // prometheusSourceTemplate carries the verbatim Go source for
 // internal/middleware/prometheus.go. __BUCKETS__ is replaced with the
@@ -102,25 +94,3 @@ func PrometheusHandler() gin.HandlerFunc {
 	return gin.WrapH(promhttp.Handler())
 }
 `
-
-// renderPrometheusSource substitutes __BUCKETS__ with the buckets literal.
-// When buckets is empty prometheus.DefBuckets is emitted so operators can
-// still tune the slice without regenerating.
-func renderPrometheusSource(buckets []float64) string {
-	lit := bucketsLiteral(buckets)
-	return strings.ReplaceAll(prometheusSourceTemplate, "__BUCKETS__", lit)
-}
-
-// bucketsLiteral formats the histogram buckets as a Go expression. An empty
-// or nil slice yields "prometheus.DefBuckets" so the generated code keeps
-// the widely-recognised web-API default (0.005s ~ 10s).
-func bucketsLiteral(buckets []float64) string {
-	if len(buckets) == 0 {
-		return "prometheus.DefBuckets"
-	}
-	parts := make([]string, 0, len(buckets))
-	for _, b := range buckets {
-		parts = append(parts, fmt.Sprintf("%g", b))
-	}
-	return "[]float64{" + strings.Join(parts, ", ") + "}"
-}

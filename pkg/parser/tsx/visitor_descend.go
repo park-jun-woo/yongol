@@ -13,23 +13,8 @@ func (v *visitor) descend(raw json.RawMessage) {
 	// Fast reject: only objects / arrays contain children.
 	switch raw[0] {
 	case '{':
-		var obj map[string]json.RawMessage
-		if err := json.Unmarshal(raw, &obj); err != nil {
-			return
-		}
-		for k, child := range obj {
-			if k == "type" || k == "span" {
-				continue
-			}
-			v.walkAny(child)
-		}
+		v.descendObject(raw)
 	case '[':
-		var arr []json.RawMessage
-		if err := json.Unmarshal(raw, &arr); err != nil {
-			return
-		}
-		for _, child := range arr {
-			v.walkAny(child)
-		}
+		v.descendArray(raw)
 	}
 }

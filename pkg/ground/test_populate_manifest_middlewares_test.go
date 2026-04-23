@@ -1,4 +1,4 @@
-//ff:func feature=rule type=test control=sequence dimension=1
+//ff:func feature=rule type=test control=sequence
 //ff:what populateManifest — middleware/claims/roles/queue 등록 및 Config flags
 
 package ground
@@ -6,8 +6,8 @@ package ground
 import (
 	"testing"
 
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/parser/manifest"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // TestPopulateManifest_FullSettings covers middleware + auth claims + roles +
@@ -52,14 +52,5 @@ func TestPopulateManifest_FullSettings(t *testing.T) {
 	}
 	if !g.Config["backend.auth.claims"] {
 		t.Errorf("Config[backend.auth.claims] = false, want true")
-	}
-}
-
-// TestPopulateManifest_NilManifest: nil manifest must short-circuit.
-func TestPopulateManifest_NilManifest(t *testing.T) {
-	g := newGround()
-	populateManifest(g, newMinimalFullstack())
-	if len(g.Lookup) != 0 || len(g.Config) != 0 {
-		t.Errorf("expected no keys, got Lookup=%d Config=%d", len(g.Lookup), len(g.Config))
 	}
 }

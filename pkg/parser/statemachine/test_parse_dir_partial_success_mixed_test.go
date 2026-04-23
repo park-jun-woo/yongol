@@ -36,11 +36,12 @@ func TestParseDirPartialSuccessMixed(t *testing.T) {
 
 	var found bool
 	for _, d := range diagrams {
-		if d.ID == "gig" {
-			found = true
-			if len(d.Transitions) == 0 {
-				t.Errorf("gig diagram has no transitions")
-			}
+		if d.ID != "gig" {
+			continue
+		}
+		found = true
+		if len(d.Transitions) == 0 {
+			t.Errorf("gig diagram has no transitions")
 		}
 	}
 	if !found {

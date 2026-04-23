@@ -1,4 +1,4 @@
-//ff:func feature=validate type=rule control=sequence topic=config-check
+//ff:func feature=validate type=rule control=iteration dimension=1 topic=config-check
 //ff:what XNS-57 — warns when queue.backend=memory is combined with a tx-bound @publish
 
 package ssac_manifest
@@ -8,7 +8,6 @@ import (
 
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
-	ssacparser "github.com/park-jun-woo/yongol/pkg/parser/ssac"
 )
 
 // xns57MemoryTxPublish warns when manifest queue.backend is "memory" and any
@@ -45,30 +44,4 @@ func xns57MemoryTxPublish(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		})
 	}
 	return diags
-}
-
-// queueBackend returns the manifest queue.backend value ("postgres"/"memory"/...)
-// or "" if unset. Ground's Config map only flags key presence, so we read the
-// manifest struct directly.
-func queueBackend(fs *yongol.Fullstack) string {
-	if fs.Manifest == nil || fs.Manifest.Queue == nil {
-		return ""
-	}
-	return fs.Manifest.Queue.Backend
-}
-
-// hasTxBoundPublish returns true when the service func has both a mutating
-// sequence (which triggers tx generation in yongol codegen) and a @publish
-// sequence. This mirrors pkg/generate/gogin/ssac/needs_transaction.go.
-func hasTxBoundPublish(fn ssacparser.ServiceFunc) bool {
-	var hasMutation, hasPublish bool
-	for _, seq := range fn.Sequences {
-		switch seq.Type {
-		case "post", "put", "delete":
-			hasMutation = true
-		case "publish":
-			hasPublish = true
-		}
-	}
-	return hasMutation && hasPublish
 }

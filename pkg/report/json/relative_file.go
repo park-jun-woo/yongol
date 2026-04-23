@@ -19,12 +19,8 @@ func relativeFile(file, specsDir, absSpecs string) string {
 	if rel, err := filepath.Rel(specsDir, file); err == nil && !strings.HasPrefix(rel, "..") {
 		return filepath.ToSlash(rel)
 	}
-	if absSpecs != "" {
-		if absFile, err := filepath.Abs(file); err == nil {
-			if rel, err := filepath.Rel(absSpecs, absFile); err == nil && !strings.HasPrefix(rel, "..") {
-				return filepath.ToSlash(rel)
-			}
-		}
+	if abs := tryAbsRelativeFile(file, absSpecs); abs != "" {
+		return abs
 	}
 	return filepath.ToSlash(file)
 }

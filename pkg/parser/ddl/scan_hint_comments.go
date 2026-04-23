@@ -23,56 +23,22 @@ func scanHintComments(r interface{ Read([]byte) (int, error) }, path string) ([]
 		lineNum++
 		ln := sc.Text()
 		trim := strings.TrimSpace(ln)
-
-		// Detect CREATE TABLE header.
 		upper := strings.ToUpper(trim)
 		if strings.HasPrefix(upper, "CREATE TABLE") {
-			tableCtx = parseCreateTableName(trim)
-			// consume any pending standalone hints as "above CREATE TABLE"
-			for _, h := range pending {
-				h.TableCtx = tableCtx
-				h.BlockAbove = true
-				out = append(out, *h)
-			}
-			pending = nil
+			tableCtx, out, pending = handleCreateTableLine(trim, pending, out)
 			continue
 		}
-
-		// Comment-only line?
 		if strings.HasPrefix(trim, "--") {
-			hint := parseHintLine(trim, path, lineNum, tableCtx, "")
-			if hint != nil {
-				// Standalone: attach to the next DDL line.
-				pending = append(pending, hint)
-			}
+			pending = appendPendingHint(trim, path, lineNum, tableCtx, pending)
 			continue
 		}
-
-		// Line containing DDL + optional trailing `-- @...` comment.
 		ddlPart, comment := splitTrailingComment(ln)
 		ddlTrim := strings.TrimSpace(ddlPart)
-		// Drain pending hints at the first real content.
 		if len(pending) > 0 && ddlTrim != "" {
-			column := extractColumnNameFromLine(ddlTrim)
-			for _, h := range pending {
-				if column != "" {
-					h.ColumnCtx = column
-				}
-				h.TableCtx = tableCtx
-				out = append(out, *h)
-			}
-			pending = nil
+			out, pending = drainPendingHints(pending, tableCtx, ddlTrim, out)
 		}
 		if comment != "" {
-			column := extractColumnNameFromLine(ddlTrim)
-			hint := parseHintLine("-- "+comment, path, lineNum, tableCtx, column)
-			if hint != nil {
-				out = append(out, *hint)
-			}
-		}
-		if strings.HasSuffix(ddlTrim, ";") || strings.Contains(ddlTrim, ");") {
-			// Conservative: end of statement clears table context.
-			// (Works well enough for validation purposes.)
+			out = applyTrailingCommentHint(comment, ddlTrim, path, lineNum, tableCtx, out)
 		}
 	}
 	// Any pending hints without a following DDL line are dropped.

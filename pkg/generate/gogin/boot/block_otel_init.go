@@ -54,13 +54,7 @@ func blockOtelInit(fs *yongol.Fullstack, modulePath string) MainBlock {
 	endpoint := otelOtlpEndpoint(fs)
 	sampleRate := otelSampleRate(fs)
 
-	imports := []string{
-		`"go.opentelemetry.io/otel"`,
-		`"go.opentelemetry.io/otel/propagation"`,
-		`sdktrace "go.opentelemetry.io/otel/sdk/trace"`,
-		`"go.opentelemetry.io/otel/sdk/resource"`,
-		`semconv "go.opentelemetry.io/otel/semconv/v1.26.0"`,
-	}
+	imports := otelBaseImports()
 
 	lines := []string{
 		fmt.Sprintf(`otelServiceName := envString("BACKEND_OBSERVABILITY_TRACING_SERVICE_NAME", %q)`, serviceName),
@@ -75,66 +69,16 @@ func blockOtelInit(fs *yongol.Fullstack, modulePath string) MainBlock {
 
 	switch exporter {
 	case "otlp":
-		imports = append(imports, `otlpgrpc "go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"`)
-		lines = append(lines,
-			`	case "otlp":`,
-			fmt.Sprintf(`		otlpEndpoint := envString("BACKEND_OBSERVABILITY_TRACING_OTLP_ENDPOINT", %q)`, endpoint),
-			`		exp, err := otlpgrpc.New(ctx,`,
-			`			otlpgrpc.WithEndpoint(otlpEndpoint),`,
-			`			otlpgrpc.WithInsecure(),`,
-			`		)`,
-			`		if err != nil { slog.Error("otel otlp exporter", "err", err); os.Exit(1) }`,
-			`		spanExporter = exp`,
-		)
+		imports = append(imports, otelOtlpImport())
+		lines = append(lines, otelOtlpCaseLines(endpoint)...)
 	case "stdout":
-		imports = append(imports, `"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"`)
-		lines = append(lines,
-			`	case "stdout":`,
-			`		exp, err := stdouttrace.New(stdouttrace.WithPrettyPrint())`,
-			`		if err != nil { slog.Error("otel stdout exporter", "err", err); os.Exit(1) }`,
-			`		spanExporter = exp`,
-		)
+		imports = append(imports, otelStdoutImport())
+		lines = append(lines, otelStdoutCaseLines()...)
 	case "noop":
-		lines = append(lines,
-			`	case "noop":`,
-			`		spanExporter = nil`,
-		)
+		lines = append(lines, otelNoopCaseLines()...)
 	}
 
-	lines = append(lines,
-		`	default:`,
-		`		slog.Error("otel exporter not supported by this build", "exporter", otelExporter)`,
-		`		os.Exit(1)`,
-		`	}`,
-		`	res, err := resource.New(ctx, resource.WithAttributes(`,
-		`		semconv.ServiceName(otelServiceName),`,
-		`	))`,
-		`	if err != nil { slog.Error("otel resource", "err", err); os.Exit(1) }`,
-		`	tpOpts := []sdktrace.TracerProviderOption{`,
-		`		sdktrace.WithResource(res),`,
-		`		sdktrace.WithSampler(sdktrace.TraceIDRatioBased(otelSampleRate)),`,
-		`	}`,
-		`	if spanExporter != nil {`,
-		`		tpOpts = append(tpOpts, sdktrace.WithBatcher(spanExporter))`,
-		`	}`,
-		`	tp := sdktrace.NewTracerProvider(tpOpts...)`,
-		`	otel.SetTracerProvider(tp)`,
-		`	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(`,
-		`		propagation.TraceContext{},`,
-		`		propagation.Baggage{},`,
-		`	))`,
-		`	otelShutdown = tp.Shutdown`,
-		`	slog.Info("otel tracing initialized", "service", otelServiceName, "exporter", otelExporter, "sample_rate", otelSampleRate)`,
-		`}`,
-		`defer func() {`,
-		`	if otelShutdown == nil { return }`,
-		`	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)`,
-		`	defer cancel()`,
-		`	if err := otelShutdown(shutdownCtx); err != nil {`,
-		`		slog.Warn("otel shutdown", "err", err)`,
-		`	}`,
-		`}()`,
-	)
+	lines = append(lines, otelTailLines()...)
 
 	// Ensure `time` is available for the shutdown timeout even if no other
 	// block already imported it.

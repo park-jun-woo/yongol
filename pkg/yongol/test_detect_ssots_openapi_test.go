@@ -1,5 +1,5 @@
 //ff:func feature=orchestrator type=test control=sequence
-//ff:what DetectSSOTs — api/openapi.yaml presence 회귀
+//ff:what DetectSSOTs — api/openapi.yaml present → SSOTPopulated
 package yongol
 
 import (
@@ -27,19 +27,5 @@ func TestDetectSSOTsOpenAPIPresent(t *testing.T) {
 	}
 	if filepath.Base(d.Path) != "openapi.yaml" {
 		t.Fatalf("unexpected Path %q", d.Path)
-	}
-}
-
-// TestDetectSSOTsOpenAPIAbsent confirms that a bare specs root with no api/
-// directory produces no KindOpenAPI entry at all (SSOTAbsent is omitted).
-func TestDetectSSOTsOpenAPIAbsent(t *testing.T) {
-	tmp := newTmpSpecsDir(t)
-
-	detected, err := DetectSSOTs(tmp)
-	if err != nil {
-		t.Fatalf("DetectSSOTs: %v", err)
-	}
-	if _, ok := hasKind(detected, KindOpenAPI); ok {
-		t.Fatalf("KindOpenAPI unexpectedly detected; detected=%+v", detected)
 	}
 }

@@ -1,4 +1,4 @@
-//ff:func feature=rule type=test control=sequence dimension=1
+//ff:func feature=rule type=test control=sequence
 //ff:what populateDDLIndexes — Index.Columns가 DDL.index.<table> 셋에 등록
 
 package ground
@@ -28,14 +28,5 @@ func TestPopulateDDLIndexes_Columns(t *testing.T) {
 	}
 	if len(set) != 3 {
 		t.Errorf("len = %d, want 3", len(set))
-	}
-}
-
-// TestPopulateDDLIndexes_NoIndexes — empty set key still exists.
-func TestPopulateDDLIndexes_NoIndexes(t *testing.T) {
-	g := newGround()
-	populateDDLIndexes(g, ddl.Table{Name: "empty"})
-	if _, ok := g.Lookup["DDL.index.empty"]; !ok {
-		t.Errorf("DDL.index.empty key should exist (possibly empty)")
 	}
 }

@@ -4,11 +4,7 @@
 package openapi_ssac
 
 import (
-	"fmt"
-	"sort"
-
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
-	yopenapi "github.com/park-jun-woo/yongol/pkg/parser/openapi"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
@@ -34,41 +30,7 @@ func xos80SuccessStatusMismatch(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	opMap := buildOperationMethodMap(fs.OpenAPIDoc)
 	var diags []diagnostic.Diagnostic
 	for _, fn := range fs.ServiceFuncs {
-		if !hasResponseSequence(fn) {
-			continue
-		}
-		entry, ok := opMap[fn.Name]
-		if !ok {
-			continue
-		}
-		if yopenapi.DeriveSuccessStatus(entry.Op, entry.Method) != 0 {
-			continue
-		}
-		// Unreachable as long as XOS-22 is also installed (it fires on
-		// the empty-2xx case first). Kept so XOS-80 has a well-defined
-		// meaning if XOS-22 is ever relaxed.
-		declared := sortedKeys(yopenapi.Declared2xx(entry.Op))
-		diags = append(diags, diagnostic.Diagnostic{
-			File:  fn.FileName,
-			Line:  fn.Line,
-			Phase: diagnostic.PhaseValidate,
-			Level: diagnostic.LevelError,
-			Message: fmt.Sprintf(
-				"[XOS-80] operation %s (%s) cannot derive a success status — declared 2xx: %v",
-				fn.Name, entry.Method, declared),
-			Advice: "Declare a conventional 2xx response for this method (POST→201, PUT/PATCH→200, DELETE→204, GET→200)",
-		})
+		diags = append(diags, xos80CheckFunc(fn, opMap)...)
 	}
 	return diags
-}
-
-// sortedKeys returns the int keys of m in ascending order — used only by
-// diagnostic messages so the output is deterministic across runs.
-func sortedKeys(m map[int]bool) []int {
-	out := make([]int, 0, len(m))
-	for k := range m {
-		out = append(out, k)
-	}
-	sort.Ints(out)
-	return out
 }

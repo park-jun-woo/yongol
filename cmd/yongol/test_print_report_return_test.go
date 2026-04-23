@@ -4,8 +4,6 @@
 package main
 
 import (
-	"bytes"
-	"strings"
 	"testing"
 
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
@@ -19,33 +17,7 @@ import (
 // "validation failed: N errors, M warnings" shape that stderr-only CI
 // pipelines rely on.
 func TestPrintReportReturnValues(t *testing.T) {
-	errDiag := func(msg string) diagnostic.Diagnostic {
-		return diagnostic.Diagnostic{
-			File:    "x.ssac",
-			Line:    1,
-			Phase:   diagnostic.PhaseValidate,
-			Level:   diagnostic.LevelError,
-			Message: msg,
-		}
-	}
-	warnDiag := func(msg string) diagnostic.Diagnostic {
-		return diagnostic.Diagnostic{
-			File:    "x.ssac",
-			Line:    1,
-			Phase:   diagnostic.PhaseValidate,
-			Level:   diagnostic.LevelWarning,
-			Message: msg,
-		}
-	}
-
-	cases := []struct {
-		name         string
-		report       *validate.Report
-		wantErrors   int
-		wantWarnings int
-		wantErr      bool
-		wantMsgHas   string
-	}{
+	cases := []printReportCase{
 		{
 			name: "no-fail",
 			report: &validate.Report{Steps: []validate.StepResult{
@@ -62,7 +34,7 @@ func TestPrintReportReturnValues(t *testing.T) {
 					Name:   "step-err",
 					Status: validate.StatusFail,
 					Diagnostics: []diagnostic.Diagnostic{
-						errDiag("E-1"), errDiag("E-2"), errDiag("E-3"),
+						printReportErrDiag("E-1"), printReportErrDiag("E-2"), printReportErrDiag("E-3"),
 					},
 				},
 			}},
@@ -78,7 +50,7 @@ func TestPrintReportReturnValues(t *testing.T) {
 					Name:   "step-warn",
 					Status: validate.StatusPass,
 					Diagnostics: []diagnostic.Diagnostic{
-						warnDiag("W-1"), warnDiag("W-2"),
+						printReportWarnDiag("W-1"), printReportWarnDiag("W-2"),
 					},
 				},
 			}},
@@ -93,8 +65,8 @@ func TestPrintReportReturnValues(t *testing.T) {
 					Name:   "step-mix",
 					Status: validate.StatusFail,
 					Diagnostics: []diagnostic.Diagnostic{
-						errDiag("E-1"),
-						warnDiag("W-1"), warnDiag("W-2"), warnDiag("W-3"), warnDiag("W-4"),
+						printReportErrDiag("E-1"),
+						printReportWarnDiag("W-1"), printReportWarnDiag("W-2"), printReportWarnDiag("W-3"), printReportWarnDiag("W-4"),
 					},
 				},
 			}},
@@ -107,28 +79,6 @@ func TestPrintReportReturnValues(t *testing.T) {
 
 	for _, tc := range cases {
 		tc := tc
-		t.Run(tc.name, func(t *testing.T) {
-			var buf bytes.Buffer
-			gotErrs, gotWarns, gotErr := printReport(&buf, tc.report, formatMD, "")
-			if gotErrs != tc.wantErrors {
-				t.Errorf("errors: got %d, want %d", gotErrs, tc.wantErrors)
-			}
-			if gotWarns != tc.wantWarnings {
-				t.Errorf("warnings: got %d, want %d", gotWarns, tc.wantWarnings)
-			}
-			if tc.wantErr {
-				if gotErr == nil {
-					t.Fatalf("expected non-nil err, got nil")
-				}
-				if tc.wantMsgHas != "" && !strings.Contains(gotErr.Error(), tc.wantMsgHas) {
-					t.Errorf("err message missing %q: got %q", tc.wantMsgHas, gotErr.Error())
-				}
-				if !strings.HasPrefix(gotErr.Error(), "validation failed:") {
-					t.Errorf("err message must begin with 'validation failed:'; got %q", gotErr.Error())
-				}
-			} else if gotErr != nil {
-				t.Errorf("expected nil err, got %v", gotErr)
-			}
-		})
+		t.Run(tc.name, func(t *testing.T) { runPrintReportCase(t, tc) })
 	}
 }

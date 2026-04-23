@@ -23,25 +23,8 @@ func parseRequiredFromOptions(arg json.RawMessage) bool {
 		return false
 	}
 	for _, p := range w.Expression.Properties {
-		var kv struct {
-			Type string `json:"type"`
-			Key  struct {
-				Type  string `json:"type"`
-				Value string `json:"value"`
-			} `json:"key"`
-			Value struct {
-				Type  string `json:"type"`
-				Value bool   `json:"value"`
-			} `json:"value"`
-		}
-		if err := json.Unmarshal(p, &kv); err != nil {
-			continue
-		}
-		if kv.Type != "KeyValueProperty" {
-			continue
-		}
-		if kv.Key.Value == "required" && kv.Value.Type == "BooleanLiteral" {
-			return kv.Value.Value
+		if val, ok := matchRequiredProperty(p); ok {
+			return val
 		}
 	}
 	return false

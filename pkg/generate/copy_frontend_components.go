@@ -1,13 +1,11 @@
-//ff:func feature=generate type=util control=iteration dimension=1
-//ff:what copyFrontendSources — specs/frontend/** (components, pages, 기타 .tsx/.ts/.css) 를 arts/frontend/src/ 아래로 복제
+//ff:func feature=generate type=util control=sequence
+//ff:what copyFrontendComponents — specs/frontend/** (components, pages, 기타 .tsx/.ts/.css) 를 arts/frontend/src/ 아래로 복제
 package generate
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 // copyFrontendComponents mirrors user-authored frontend sources from
@@ -42,76 +40,5 @@ func copyFrontendComponents(specsDir, artifactsDir string) error {
 		return nil
 	}
 	dstRoot := filepath.Join(artifactsDir, "frontend", "src")
-	return filepath.Walk(srcRoot, func(path string, fi os.FileInfo, walkErr error) error {
-		if walkErr != nil {
-			return walkErr
-		}
-		if fi.IsDir() {
-			// Skip node_modules in case a stray copy landed.
-			if fi.Name() == "node_modules" {
-				return filepath.SkipDir
-			}
-			return nil
-		}
-		rel, err := filepath.Rel(srcRoot, path)
-		if err != nil {
-			return err
-		}
-		if isYongolManaged(rel) {
-			return nil
-		}
-		if !isCopiedExtension(path) {
-			return nil
-		}
-		dst := filepath.Join(dstRoot, rel)
-		if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
-			return fmt.Errorf("mkdir %s: %w", filepath.Dir(dst), err)
-		}
-		return copyUserComponentFile(path, dst)
-	})
-}
-
-// isYongolManaged is true when the relative path (inside specs/frontend/)
-// names a subtree that the generator owns and should never be overwritten
-// from specs. Users are free to author there but any conflict is resolved
-// in favor of the generator.
-func isYongolManaged(rel string) bool {
-	rel = filepath.ToSlash(rel)
-	switch {
-	case rel == "src/api.ts",
-		strings.HasPrefix(rel, "src/types/"),
-		strings.HasPrefix(rel, "src/lib/"),
-		strings.HasPrefix(rel, "src/components/ui/"):
-		return true
-	}
-	return false
-}
-
-// isCopiedExtension whitelists file types relevant to a React source tree.
-// CSS is included because shadcn primitives rely on tailwind utility classes
-// but users sometimes override with custom stylesheets.
-func isCopiedExtension(path string) bool {
-	ext := strings.ToLower(filepath.Ext(path))
-	switch ext {
-	case ".tsx", ".ts", ".jsx", ".js", ".css", ".svg":
-		return true
-	}
-	return false
-}
-
-func copyUserComponentFile(src, dst string) error {
-	in, err := os.Open(src)
-	if err != nil {
-		return fmt.Errorf("open %s: %w", src, err)
-	}
-	defer in.Close()
-	out, err := os.Create(dst)
-	if err != nil {
-		return fmt.Errorf("create %s: %w", dst, err)
-	}
-	defer out.Close()
-	if _, err := io.Copy(out, in); err != nil {
-		return fmt.Errorf("copy %s → %s: %w", src, dst, err)
-	}
-	return nil
+	return filepath.Walk(srcRoot, makeFrontendCopyWalker(srcRoot, dstRoot))
 }

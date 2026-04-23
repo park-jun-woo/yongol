@@ -1,4 +1,4 @@
-//ff:func feature=rule type=test control=sequence dimension=1
+//ff:func feature=rule type=test control=sequence
 //ff:what registerSSaCModelRef — Model 이름 + pluralized DDL table 등록
 
 package ground
@@ -15,14 +15,5 @@ func TestRegisterSSaCModelRef_Plural(t *testing.T) {
 	}
 	if !set["courses"] {
 		t.Errorf("plural 'courses' missing: %v", set)
-	}
-}
-
-// TestRegisterSSaCModelRef_NoDot — no dot → no insert.
-func TestRegisterSSaCModelRef_NoDot(t *testing.T) {
-	set := map[string]bool{}
-	registerSSaCModelRef("NoDot", set)
-	if len(set) != 0 {
-		t.Errorf("expected empty set for no-dot input, got %v", set)
 	}
 }

@@ -1,0 +1,21 @@
+//ff:func feature=migration type=util control=sequence
+//ff:what renderColumn — CREATE TABLE / ADD COLUMN 의 컬럼 clause 생성
+package migration
+
+import "strings"
+
+// renderColumn emits a column clause for CREATE TABLE / ADD COLUMN.
+func renderColumn(c *Column) string {
+	b := strings.Builder{}
+	b.WriteString(c.Name)
+	b.WriteByte(' ')
+	b.WriteString(c.Type.SQL())
+	if !c.Nullable {
+		b.WriteString(" NOT NULL")
+	}
+	if c.Default != "" {
+		b.WriteString(" DEFAULT ")
+		b.WriteString(c.Default)
+	}
+	return b.String()
+}

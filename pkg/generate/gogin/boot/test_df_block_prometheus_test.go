@@ -1,5 +1,5 @@
 //ff:func feature=gen-gogin type=test control=sequence topic=observability
-//ff:what blockPrometheus 활성/비활성 + 경로 override 테스트
+//ff:what TestBlockPrometheus_DefaultActive — 기본 설정에서 /metrics + middleware 등록
 
 package boot
 
@@ -33,41 +33,5 @@ func TestBlockPrometheus_DefaultActive(t *testing.T) {
 	}
 	if !strings.Contains(body, `BACKEND_OBSERVABILITY_METRICS_ENABLED`) {
 		t.Fatalf("expected env toggle, got:\n%s", body)
-	}
-}
-
-func TestBlockPrometheus_DisabledExplicitly(t *testing.T) {
-	disabled := false
-	fs := &yongol.Fullstack{
-		Manifest: &pmanifest.ProjectConfig{
-			Backend: pmanifest.Backend{
-				Module: "example.com/zenflow",
-				Observability: &pmanifest.Observability{
-					Metrics: &pmanifest.ObservabilityMetrics{Enabled: &disabled},
-				},
-			},
-		},
-	}
-	block := blockPrometheus(fs, "example.com/zenflow")
-	if len(block.Lines) != 0 {
-		t.Fatalf("expected inert block when metrics disabled, got lines: %+v", block.Lines)
-	}
-}
-
-func TestBlockPrometheus_CustomPath(t *testing.T) {
-	fs := &yongol.Fullstack{
-		Manifest: &pmanifest.ProjectConfig{
-			Backend: pmanifest.Backend{
-				Module: "example.com/zenflow",
-				Observability: &pmanifest.Observability{
-					Metrics: &pmanifest.ObservabilityMetrics{Path: "/internal/metrics"},
-				},
-			},
-		},
-	}
-	block := blockPrometheus(fs, "example.com/zenflow")
-	body := strings.Join(block.Lines, "\n")
-	if !strings.Contains(body, `"/internal/metrics"`) {
-		t.Fatalf("expected custom path in block, got:\n%s", body)
 	}
 }

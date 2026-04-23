@@ -37,38 +37,16 @@ func DetectSSOTs(root string) ([]DetectedSSOT, error) {
 		found = append(found, DetectedSSOT{Kind: KindOpenAPI, Path: openapiPath, Presence: SSOTPopulated})
 	}
 
-	type dirSSOT struct {
-		kind  SSOTKind
-		dir   string
-		globs []string
-	}
-	dirs := []dirSSOT{
-		{KindDDL, filepath.Join(abs, "db"), []string{"*.sql"}},
-		{KindSSaC, filepath.Join(abs, "service"), []string{"*.ssac", "*/*.ssac"}},
-		{KindStates, filepath.Join(abs, "states"), []string{"*.md"}},
-		{KindPolicy, filepath.Join(abs, "policy"), []string{"*.rego"}},
-		{KindScenario, filepath.Join(abs, "tests"), []string{"scenario-*.hurl", "invariant-*.hurl"}},
-		{KindFunc, filepath.Join(abs, "func"), []string{"*/*.go"}},
-		{KindTSX, filepath.Join(abs, "frontend"), []string{"*.tsx", "*/*.tsx", "*/*/*.tsx", "*/*/*/*.tsx"}},
-	}
+	dirs := directorySSOTs(abs)
 	for _, d := range dirs {
-		count := 0
-		for _, g := range d.globs {
-			pattern := filepath.Join(d.dir, g)
-			matches, err := filepath.Glob(pattern)
-			if err != nil {
-				// filepath.Glob only returns ErrBadPattern (syntax error).
-				// Patterns are hard-coded so this is effectively unreachable,
-				// but surface it as a diagnostic to prevent silent pass.
-				return nil, fmt.Errorf("detect SSOTs glob failed for %s: %w", pattern, err)
-			}
-			count += len(matches)
+		entry, err := detectDirSSOT(d)
+		if err != nil {
+			return nil, err
 		}
-		p := dirPresence(d.dir, count)
-		if p == SSOTAbsent {
+		if entry.Presence == SSOTAbsent {
 			continue
 		}
-		found = append(found, DetectedSSOT{Kind: d.kind, Path: d.dir, Presence: p})
+		found = append(found, entry)
 	}
 
 	return found, nil

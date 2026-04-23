@@ -1,5 +1,5 @@
-//ff:func feature=gen-gogin type=test control=sequence topic=security-headers
-//ff:what security_headers_source 렌더 스냅샷 + buildCSPValue / Profile 3종 시뮬레이션
+//ff:func feature=gen-gogin type=test control=iteration dimension=1 topic=security-headers
+//ff:what TestSecurityHeadersSource_Contains — 수기 템플릿 상수 내 주요 심볼 존재 확인
 
 package middleware
 
@@ -26,25 +26,6 @@ func TestSecurityHeadersSource_Contains(t *testing.T) {
 	} {
 		if !strings.Contains(securityHeadersSource, must) {
 			t.Errorf("security_headers source missing fragment %q", must)
-		}
-	}
-}
-
-// runtimeCfg mirrors the in-source SecurityHeadersConfig so we can exercise
-// the rendering helpers by re-implementing them in the test (cannot import
-// the generated code). Instead we rely on string fragments — the
-// block_security_headers_test covers the end-to-end shape.
-func TestSecurityHeadersSource_ProfileBranches(t *testing.T) {
-	// The profile branches are expressed as string comparisons in source;
-	// verify each branch literal is present so a refactor cannot silently
-	// remove a profile.
-	for _, must := range []string{
-		`profile != "dev"`,
-		`profile == "api"`,
-		`profile == "dev"`,
-	} {
-		if !strings.Contains(securityHeadersSource, must) {
-			t.Errorf("security_headers source missing profile branch %q", must)
 		}
 	}
 }

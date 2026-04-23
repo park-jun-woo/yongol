@@ -1,5 +1,5 @@
-//ff:func feature=rule type=test control=sequence
-//ff:what BaseSpec.SpecName — Rule 필드를 그대로 반환하는지 검증
+//ff:func feature=rule type=test control=iteration dimension=1
+//ff:what TestBaseSpec_SpecName — BaseSpec.SpecName 이 Rule 필드를 그대로 반환하는지 테이블 기반 검증
 
 package rule
 
@@ -18,20 +18,5 @@ func TestBaseSpec_SpecName(t *testing.T) {
 		if got := c.in.SpecName(); got != c.want {
 			t.Errorf("SpecName(%+v) = %q; want %q", c.in, got, c.want)
 		}
-	}
-}
-
-func TestBaseSpec_SpecName_EmbeddedInConcrete(t *testing.T) {
-	vd := VarDeclaredSpec{BaseSpec: BaseSpec{Rule: "VD-1", Level: "ERROR"}}
-	if vd.SpecName() != "VD-1" {
-		t.Fatalf("VarDeclaredSpec.SpecName() = %q; want VD-1", vd.SpecName())
-	}
-	cc := CoverageCheckSpec{BaseSpec: BaseSpec{Rule: "CC-1", Level: "WARNING"}, LookupKey: "k"}
-	if cc.SpecName() != "CC-1" {
-		t.Fatalf("CoverageCheckSpec.SpecName() = %q; want CC-1", cc.SpecName())
-	}
-	fr := FieldRequiredSpec{BaseSpec: BaseSpec{Rule: "FR-1", Level: "ERROR"}, Field: "x", Required: true}
-	if fr.SpecName() != "FR-1" {
-		t.Fatalf("FieldRequiredSpec.SpecName() = %q; want FR-1", fr.SpecName())
 	}
 }

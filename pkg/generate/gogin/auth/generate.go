@@ -54,39 +54,3 @@ func Generate(fs *yongol.Fullstack, artifactsDir string) error {
 	}
 	return nil
 }
-
-// authKeepFiles lists the files generateAuth is expected to produce. Any
-// other *.go in authDir is a leftover from a previous yongol version and
-// will be removed by cleanStaleAuthFiles.
-var authKeepFiles = map[string]bool{
-	"claim.go":    true,
-	"reexport.go": true,
-}
-
-// cleanStaleAuthFiles removes *.go files in authDir that are not in
-// authKeepFiles. Directories and non-.go files are ignored.
-func cleanStaleAuthFiles(authDir string) error {
-	entries, err := os.ReadDir(authDir)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return nil
-		}
-		return err
-	}
-	for _, e := range entries {
-		if e.IsDir() {
-			continue
-		}
-		name := e.Name()
-		if filepath.Ext(name) != ".go" {
-			continue
-		}
-		if authKeepFiles[name] {
-			continue
-		}
-		if err := os.Remove(filepath.Join(authDir, name)); err != nil {
-			return err
-		}
-	}
-	return nil
-}

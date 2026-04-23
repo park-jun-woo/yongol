@@ -1,16 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=sequence
-//ff:what rateLimitSourceTemplate — FixedRateLimit 헬퍼만 방출 (비즈니스 결합 가드 전용)
-
 package middleware
-
-import (
-	"fmt"
-	"os"
-	"path/filepath"
-	"strings"
-
-	"github.com/park-jun-woo/yongol/pkg/yongol"
-)
 
 // rateLimitSourceTemplate carries the verbatim Go source for
 // internal/middleware/rate_limit.go with __MODULE__ replaced by the
@@ -92,32 +80,3 @@ func fixedRateLimitKey(c *gin.Context, key string) string {
 	return ""
 }
 `
-
-// renderRateLimitSource substitutes __MODULE__ with the actual module path.
-func renderRateLimitSource(modulePath string) string {
-	return strings.ReplaceAll(rateLimitSourceTemplate, "__MODULE__", modulePath)
-}
-
-// GenerateRateLimit emits internal/middleware/rate_limit.go containing only
-// FixedRateLimit — used by Phase002 /auth/refresh guard (block_auth_refresh).
-// The pre-deprecation rate_limit_store.go is no longer produced; callers
-// that need gateway-layer rate limiting should configure their CDN/WAF or
-// API gateway (see plans/deprecated/Phase006-DeprecateAppLayerRateLimit.md).
-func GenerateRateLimit(fs *yongol.Fullstack, artifactsDir string) error {
-	if fs == nil || fs.Manifest == nil {
-		return nil
-	}
-	modulePath := fs.Manifest.Backend.Module
-	if modulePath == "" {
-		return nil
-	}
-	mwDir := filepath.Join(artifactsDir, "backend", "internal", "middleware")
-	if err := os.MkdirAll(mwDir, 0o755); err != nil {
-		return fmt.Errorf("mkdir middleware: %w", err)
-	}
-	rlPath := filepath.Join(mwDir, "rate_limit.go")
-	if err := os.WriteFile(rlPath, []byte(renderRateLimitSource(modulePath)), 0o644); err != nil {
-		return fmt.Errorf("write rate_limit.go: %w", err)
-	}
-	return nil
-}

@@ -1,4 +1,4 @@
-//ff:func feature=rule type=test control=sequence dimension=1
+//ff:func feature=rule type=test control=sequence
 //ff:what populateSSaCSymbols — DDL row → Struct.<Model>.<PascalField> 타입 등록
 
 package ground
@@ -31,18 +31,5 @@ func TestPopulateSSaCSymbols_StructTypes(t *testing.T) {
 	}
 	if got := g.Types["Struct.User.CreatedAt"]; got != "time.Time" {
 		t.Errorf("Struct.User.CreatedAt = %q, want time.Time", got)
-	}
-}
-
-// TestPopulateSSaCSymbols_EmptyTables: no panics / no Struct.* keys when no
-// DDL tables.
-func TestPopulateSSaCSymbols_EmptyTables(t *testing.T) {
-	g := newGround()
-	populateSSaCSymbols(g, newMinimalFullstack())
-
-	for k := range g.Types {
-		if len(k) >= len("Struct.") && k[:len("Struct.")] == "Struct." {
-			t.Errorf("unexpected Struct.* key %q when no DDL tables", k)
-		}
 	}
 }

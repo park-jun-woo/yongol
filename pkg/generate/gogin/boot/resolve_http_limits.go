@@ -3,10 +3,7 @@
 
 package boot
 
-import (
-	"github.com/park-jun-woo/yongol/pkg/generate/gogin/middleware"
-	"github.com/park-jun-woo/yongol/pkg/yongol"
-)
+import "github.com/park-jun-woo/yongol/pkg/yongol"
 
 // resolveHTTPLimits computes effective global + per-op limits from
 // manifest. Missing manifest → defaults only. Parse failures fall back to
@@ -22,34 +19,17 @@ func resolveHTTPLimits(fs *yongol.Fullstack) (bodyLimit, multipartLimit int64, b
 		return
 	}
 	h := fs.Manifest.Backend.HTTP
-	if h.BodyLimit != "" {
-		if n, err := middleware.ParseSize(h.BodyLimit); err == nil {
-			bodyLimit = n
-		}
+	if n, ok := parseHTTPSize(h.BodyLimit); ok {
+		bodyLimit = n
 	}
-	if h.MultipartLimit != "" {
-		if n, err := middleware.ParseSize(h.MultipartLimit); err == nil {
-			multipartLimit = n
-		}
+	if n, ok := parseHTTPSize(h.MultipartLimit); ok {
+		multipartLimit = n
 	}
 
 	// Build operationId → "METHOD PATH" index from OpenAPI doc.
 	opToRoute := buildOperationRouteIndex(fs)
 	for opID, ov := range h.Overrides {
-		route, ok := opToRoute[opID]
-		if !ok {
-			continue
-		}
-		if ov.BodyLimit != "" {
-			if n, err := middleware.ParseSize(ov.BodyLimit); err == nil {
-				bodyOverrides[route] = n
-			}
-		}
-		if ov.MultipartLimit != "" {
-			if n, err := middleware.ParseSize(ov.MultipartLimit); err == nil {
-				multipartOverrides[route] = n
-			}
-		}
+		applyHTTPOverride(opToRoute, opID, ov, bodyOverrides, multipartOverrides)
 	}
 	return
 }

@@ -1,5 +1,5 @@
 //ff:func feature=gen-gogin type=test control=iteration dimension=1 topic=size-parse
-//ff:what ParseSize 테스트 — 다양한 suffix + invalid 처리
+//ff:what TestParseSize_ValidForms — 다양한 단위 suffix 파싱 성공 확인
 
 package middleware
 
@@ -31,15 +31,6 @@ func TestParseSize_ValidForms(t *testing.T) {
 		}
 		if got != c.want {
 			t.Errorf("ParseSize(%q) = %d, want %d", c.in, got, c.want)
-		}
-	}
-}
-
-func TestParseSize_Invalid(t *testing.T) {
-	cases := []string{"", "abc", "-1MiB", "1ZZ"}
-	for _, c := range cases {
-		if _, err := ParseSize(c); err == nil {
-			t.Errorf("ParseSize(%q) expected error, got nil", c)
 		}
 	}
 }

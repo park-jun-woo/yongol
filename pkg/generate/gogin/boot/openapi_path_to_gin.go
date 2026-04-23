@@ -13,17 +13,7 @@ func openAPIPathToGin(p string) string {
 	b.Grow(len(p))
 	i := 0
 	for i < len(p) {
-		if p[i] == '{' {
-			end := strings.IndexByte(p[i:], '}')
-			if end > 0 {
-				b.WriteByte(':')
-				b.WriteString(p[i+1 : i+end])
-				i += end + 1
-				continue
-			}
-		}
-		b.WriteByte(p[i])
-		i++
+		i = openAPIPathStep(p, i, &b)
 	}
 	return b.String()
 }

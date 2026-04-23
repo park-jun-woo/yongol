@@ -3,8 +3,6 @@
 package migration
 
 import (
-	"fmt"
-
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
 	"github.com/park-jun-woo/yongol/pkg/generate/migration"
 )
@@ -18,55 +16,10 @@ func Mig001RenameMismatch(prev, curr *migration.Schema, hints *migration.Hints) 
 	}
 	var diags []diagnostic.Diagnostic
 	for _, r := range hints.RenameTables {
-		if _, ok := prev.Tables[r.From]; !ok {
-			diags = append(diags, diagnostic.Diagnostic{
-				Phase:   diagnostic.PhaseValidate,
-				Level:   diagnostic.LevelError,
-				Message: fmt.Sprintf("[MIG-001] @rename from=%s (table) not present in previous snapshot", r.From),
-				Advice:  "remove the hint or fix the 'from' to match the old snapshot table name",
-			})
-		}
-		if _, ok := curr.Tables[r.To]; !ok {
-			diags = append(diags, diagnostic.Diagnostic{
-				Phase:   diagnostic.PhaseValidate,
-				Level:   diagnostic.LevelError,
-				Message: fmt.Sprintf("[MIG-001] @rename to=%s (table) not present in current DDL", r.To),
-				Advice:  "rename the CREATE TABLE in specs/db/*.sql to match 'to'",
-			})
-		}
+		diags = append(diags, mig001CheckRenameTable(prev, curr, r)...)
 	}
 	for _, r := range hints.RenameColumns {
-		pt, pok := prev.Tables[r.Table]
-		ct, cok := curr.Tables[r.Table]
-		if pok {
-			if !hasColumn(pt, r.From) {
-				diags = append(diags, diagnostic.Diagnostic{
-					Phase:   diagnostic.PhaseValidate,
-					Level:   diagnostic.LevelError,
-					Message: fmt.Sprintf("[MIG-001] @rename from=%s not in previous snapshot %s", r.From, r.Table),
-					Advice:  "fix the 'from' value to match the old column name",
-				})
-			}
-		}
-		if cok {
-			if !hasColumn(ct, r.To) {
-				diags = append(diags, diagnostic.Diagnostic{
-					Phase:   diagnostic.PhaseValidate,
-					Level:   diagnostic.LevelError,
-					Message: fmt.Sprintf("[MIG-001] @rename to=%s not in current DDL %s", r.To, r.Table),
-					Advice:  "rename the column in specs/db/*.sql to match 'to'",
-				})
-			}
-		}
+		diags = append(diags, mig001CheckRenameColumn(prev, curr, r)...)
 	}
 	return diags
-}
-
-func hasColumn(t *migration.Table, name string) bool {
-	for _, c := range t.Columns {
-		if c.Name == name {
-			return true
-		}
-	}
-	return false
 }

@@ -1,5 +1,5 @@
 //ff:func feature=gen-gogin type=test control=sequence topic=observability
-//ff:what blockDBInit — tracing 활성 시 otelsql.Open 분기 회귀 방지
+//ff:what TestBlockDBInit_OtelWrapsOpen — tracing 활성 시 otelsql.Open 분기 회귀 방지
 
 package boot
 
@@ -43,21 +43,5 @@ func TestBlockDBInit_OtelWrapsOpen(t *testing.T) {
 	}
 	if !strings.Contains(body, "defer conn.Close()") {
 		t.Fatalf("tracing branch must still defer conn.Close(), got:\n%s", body)
-	}
-}
-
-func TestBlockDBInit_NonOtelKeepsSqlOpen(t *testing.T) {
-	fs := &yongol.Fullstack{
-		Manifest: &pmanifest.ProjectConfig{
-			Backend: pmanifest.Backend{},
-		},
-	}
-	block := blockDBInit(fs, "example.com/zenflow")
-	body := strings.Join(block.Lines, "\n")
-	if !strings.Contains(body, `sql.Open("postgres"`) {
-		t.Fatalf("non-tracing db-init must keep sql.Open, got:\n%s", body)
-	}
-	if strings.Contains(body, "otelsql") {
-		t.Fatalf("non-tracing db-init must NOT import otelsql, got:\n%s", body)
 	}
 }

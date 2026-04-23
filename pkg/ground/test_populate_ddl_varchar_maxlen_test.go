@@ -1,4 +1,4 @@
-//ff:func feature=rule type=test control=sequence dimension=1
+//ff:func feature=rule type=test control=sequence
 //ff:what populateDDLVarchar — VARCHAR(N) 길이가 Types["DDL.varchar..."]로 등록
 
 package ground
@@ -27,15 +27,5 @@ func TestPopulateDDLVarchar_MaxLen(t *testing.T) {
 	}
 	if got := g.Types["DDL.varchar.users.name"]; got != "50" {
 		t.Errorf("DDL.varchar.users.name = %q, want 50", got)
-	}
-}
-
-// TestPopulateDDLVarchar_Empty ensures no keys are written when VarcharLen is
-// empty.
-func TestPopulateDDLVarchar_Empty(t *testing.T) {
-	g := newGround()
-	populateDDLVarchar(g, ddl.Table{Name: "x"})
-	if len(g.Types) != 0 {
-		t.Errorf("expected no Types entries, got %d", len(g.Types))
 	}
 }

@@ -38,16 +38,3 @@ func GeneratePrometheus(fs *yongol.Fullstack, artifactsDir string) error {
 	}
 	return nil
 }
-
-// prometheusBuckets resolves the histogram buckets from manifest. Missing
-// config returns nil so renderPrometheusSource emits prometheus.DefBuckets.
-func prometheusBuckets(fs *yongol.Fullstack) []float64 {
-	if fs == nil || fs.Manifest == nil {
-		return nil
-	}
-	obs := fs.Manifest.Backend.Observability
-	if obs == nil || obs.Metrics == nil {
-		return nil
-	}
-	return obs.Metrics.Buckets
-}

@@ -5,14 +5,6 @@ package openapi_ssac
 
 import "github.com/getkin/kin-openapi/openapi3"
 
-// OperationEntry pairs an OpenAPI operation with the HTTP method it is
-// served under. Required by XOS-80/82 which need the method to choose
-// the conventional 2xx status (see openapi.DeriveSuccessStatus).
-type OperationEntry struct {
-	Method string
-	Op     *openapi3.Operation
-}
-
 // buildOperationMethodMap builds an operationId → (method, Operation) map
 // from the OpenAPI doc. buildOperationMap drops the method which is fine
 // for the older rules but not for XOS-80/82 where the method determines

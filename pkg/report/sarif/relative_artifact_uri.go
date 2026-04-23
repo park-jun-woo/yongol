@@ -16,17 +16,11 @@ func relativeArtifactURI(file, specsDir, absSpecs string) string {
 	if specsDir == "" {
 		return filepath.ToSlash(file)
 	}
-	// Try: file is already relative or under specsDir literally.
 	if rel, err := filepath.Rel(specsDir, file); err == nil && !strings.HasPrefix(rel, "..") {
 		return filepath.ToSlash(rel)
 	}
-	// Try: absolute-versus-absolute comparison.
-	if absSpecs != "" {
-		if absFile, err := filepath.Abs(file); err == nil {
-			if rel, err := filepath.Rel(absSpecs, absFile); err == nil && !strings.HasPrefix(rel, "..") {
-				return filepath.ToSlash(rel)
-			}
-		}
+	if abs := tryAbsRelativeURI(file, absSpecs); abs != "" {
+		return abs
 	}
 	return filepath.ToSlash(file)
 }

@@ -10,19 +10,17 @@ import "strings"
 // single-quoted string literals.
 func splitTrailingComment(line string) (string, string) {
 	inSQ := false
-	for i := 0; i < len(line)-1; i++ {
+	i := 0
+	for i < len(line)-1 {
 		c := line[i]
 		if c == '\'' {
-			if inSQ && i+1 < len(line) && line[i+1] == '\'' {
-				i++
-				continue
-			}
-			inSQ = !inSQ
+			inSQ, i = advanceSingleQuote(line, i, inSQ)
 			continue
 		}
 		if !inSQ && c == '-' && line[i+1] == '-' {
 			return line[:i], strings.TrimSpace(line[i+2:])
 		}
+		i++
 	}
 	return line, ""
 }

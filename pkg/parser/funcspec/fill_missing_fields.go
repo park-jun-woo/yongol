@@ -18,16 +18,8 @@ func fillMissingFields(specs []FuncSpec, specDirs []string) []diagnostic.Diagnos
 			continue
 		}
 		dir := specDirs[i]
-		typeMap, ok := cache[dir]
-		if !ok {
-			var d []diagnostic.Diagnostic
-			typeMap, d = collectPackageTypes(dir)
-			cache[dir] = typeMap
-			if _, seen := seenDir[dir]; !seen {
-				diags = append(diags, d...)
-				seenDir[dir] = struct{}{}
-			}
-		}
+		var typeMap map[string][]Field
+		typeMap, diags = loadTypeMapForDir(dir, cache, seenDir, diags)
 		fillSpecFromTypeMap(&specs[i], typeMap)
 	}
 	return diags

@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=iteration dimension=1 topic=dos-guard
+//ff:func feature=gen-gogin type=util control=iteration dimension=2 topic=dos-guard
 //ff:what buildOperationRouteIndex — OpenAPI 의 operationId → "METHOD /path" 매핑
 
 package boot
@@ -8,6 +8,9 @@ import "github.com/park-jun-woo/yongol/pkg/yongol"
 // buildOperationRouteIndex walks the OpenAPI doc and maps each
 // operationId to its gin route key ("METHOD /path"). Returns empty map
 // when the doc is nil so callers can still iterate safely.
+//
+// Nested loop structure (path → methods) is intrinsic to the OpenAPI
+// document shape, so this func declares dimension=2 rather than flattening.
 func buildOperationRouteIndex(fs *yongol.Fullstack) map[string]string {
 	idx := map[string]string{}
 	if fs == nil || fs.OpenAPIDoc == nil || fs.OpenAPIDoc.Paths == nil {

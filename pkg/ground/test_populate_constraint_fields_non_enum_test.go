@@ -1,4 +1,4 @@
-//ff:func feature=rule type=test control=sequence dimension=1
+//ff:func feature=rule type=test control=sequence
 //ff:what populateConstraintFields non-enum/required/maxLength/format 케이스
 
 package ground
@@ -40,13 +40,7 @@ func TestPopulateConstraintFields_RequiredMaxLengthFormat(t *testing.T) {
 	if len(req) != 2 {
 		t.Fatalf("required len = %d, want 2 (email, age); got %v", len(req), req)
 	}
-	saw := map[string]bool{}
-	for _, n := range req {
-		saw[n] = true
-	}
-	if !saw["email"] || !saw["age"] {
-		t.Errorf("required missing entry: %v", req)
-	}
+	assertConstraintRequiredContainsEmailAndAge(t, req)
 
 	// MaxLength / Format via Types
 	if got := g.Types["OpenAPI.request.Foo.maxLength.email"]; got != "255" {
@@ -59,19 +53,5 @@ func TestPopulateConstraintFields_RequiredMaxLengthFormat(t *testing.T) {
 	// enumFields must not exist when no field has Enum.
 	if _, ok := g.Schemas["OpenAPI.request.Foo.enumFields"]; ok {
 		t.Errorf("enumFields should not exist when no enum fields present")
-	}
-}
-
-// TestPopulateConstraintFields_Empty covers the empty-input branch — no keys
-// should be written.
-func TestPopulateConstraintFields_Empty(t *testing.T) {
-	g := newGround()
-	populateConstraintFields(g, "OpenAPI.request.Empty", map[string]oapiparser.FieldConstraint{})
-
-	if _, ok := g.Schemas["OpenAPI.request.Empty.required"]; ok {
-		t.Errorf("required should not exist for empty input")
-	}
-	if _, ok := g.Schemas["OpenAPI.request.Empty.enumFields"]; ok {
-		t.Errorf("enumFields should not exist for empty input")
 	}
 }

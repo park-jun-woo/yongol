@@ -24,29 +24,6 @@ func (v *visitor) handleImport(raw json.RawMessage) {
 	}
 	line, _ := v.resolve(d.Span.Start)
 	for _, spec := range d.Specifiers {
-		var s struct {
-			Type  string `json:"type"`
-			Local struct {
-				Value string `json:"value"`
-			} `json:"local"`
-			Imported *struct {
-				Value string `json:"value"`
-			} `json:"imported"`
-		}
-		if err := json.Unmarshal(spec, &s); err != nil {
-			continue
-		}
-		name := s.Local.Value
-		if s.Imported != nil && s.Imported.Value != "" {
-			name = s.Imported.Value
-		}
-		if name == "" {
-			continue
-		}
-		v.page.Imports = append(v.page.Imports, ComponentImport{
-			Name: name,
-			Path: d.Source.Value,
-			Line: line,
-		})
+		v.appendComponentImport(spec, d.Source.Value, line)
 	}
 }

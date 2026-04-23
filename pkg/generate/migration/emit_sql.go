@@ -8,12 +8,6 @@ import (
 	"time"
 )
 
-// EmitOptions tunes the header yongol writes above each migration.
-type EmitOptions struct {
-	YongolVersion string    // "v0.1.21"
-	GeneratedAt    time.Time // zero => time.Now() at call time
-}
-
 // EmitSQL produces the full text of a migration file from ops.
 func EmitSQL(ops []Operation, opt EmitOptions) string {
 	ts := opt.GeneratedAt
@@ -25,7 +19,6 @@ func EmitSQL(ops []Operation, opt EmitOptions) string {
 		ver = "vX.Y.Z"
 	}
 	b := strings.Builder{}
-	// Header
 	fmt.Fprintf(&b, "%s%s at %s\n",
 		MigrationGeneratedHeaderPrefix, ver, ts.UTC().Format(time.RFC3339))
 	b.WriteString("-- Changes:\n")
@@ -33,7 +26,6 @@ func EmitSQL(ops []Operation, opt EmitOptions) string {
 		fmt.Fprintf(&b, "--   * %s\n", op.Description())
 	}
 	b.WriteByte('\n')
-	// Transaction
 	b.WriteString("BEGIN;\n\n")
 	for _, op := range ops {
 		b.WriteString(op.SQL())

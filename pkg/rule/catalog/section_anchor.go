@@ -13,17 +13,7 @@ func sectionAnchor(title string) string {
 	b.Grow(len(title))
 	prevDash := false
 	for _, r := range strings.ToLower(title) {
-		switch {
-		case r >= 'a' && r <= 'z', r >= '0' && r <= '9':
-			b.WriteRune(r)
-			prevDash = false
-		case r == ' ', r == '-', r == '.', r == '/':
-			if !prevDash && b.Len() > 0 {
-				b.WriteByte('-')
-				prevDash = true
-			}
-		}
+		prevDash = writeSectionAnchorRune(&b, r, prevDash)
 	}
-	out := b.String()
-	return strings.TrimRight(out, "-")
+	return strings.TrimRight(b.String(), "-")
 }

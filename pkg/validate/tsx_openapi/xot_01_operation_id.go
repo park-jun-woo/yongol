@@ -25,19 +25,7 @@ func xot01OperationID(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	}
 	var diags []diagnostic.Diagnostic
 	for _, page := range fs.TSXPages {
-		for _, call := range page.Calls {
-			if opIDs[call.OperationID] {
-				continue
-			}
-			diags = append(diags, diagnostic.Diagnostic{
-				File:    page.File,
-				Line:    call.Line,
-				Phase:   diagnostic.PhaseValidate,
-				Level:   diagnostic.LevelError,
-				Message: "[XOT-1] apiClient." + call.OperationID + "() has no matching OpenAPI operationId",
-				Advice:  "Add operationId: " + call.OperationID + " to openapi.yaml, or check for a typo in the call name",
-			})
-		}
+		diags = append(diags, xot01CheckPage(page, opIDs)...)
 	}
 	return diags
 }

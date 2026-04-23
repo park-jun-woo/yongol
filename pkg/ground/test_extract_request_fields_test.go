@@ -1,4 +1,4 @@
-//ff:func feature=rule type=test control=sequence dimension=1
+//ff:func feature=rule type=test control=iteration dimension=1
 //ff:what extractRequestFields — requestBody JSON 스키마 → field 이름 셋
 
 package ground
@@ -28,12 +28,5 @@ func TestExtractRequestFields_JSONSchema(t *testing.T) {
 		if !got[f] {
 			t.Errorf("missing %q: %v", f, got)
 		}
-	}
-}
-
-func TestExtractRequestFields_NilContent(t *testing.T) {
-	body := &openapi3.RequestBody{}
-	if got := extractRequestFields(body); got != nil {
-		t.Errorf("expected nil for empty body, got %v", got)
 	}
 }

@@ -1,4 +1,4 @@
-//ff:func feature=validate type=rule control=iteration dimension=2 topic=tsx-openapi
+//ff:func feature=validate type=rule control=iteration dimension=1 topic=tsx-openapi
 //ff:what XOT-2 — verifies that path/query parameter object keys in apiClient calls exist in the OpenAPI parameters
 package tsx_openapi
 
@@ -29,39 +29,7 @@ func xot02ParameterMatch(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	opIDs := g.Lookup["OpenAPI.operationId"]
 	var diags []diagnostic.Diagnostic
 	for _, page := range fs.TSXPages {
-		for _, call := range page.Calls {
-			if !opIDs[call.OperationID] {
-				continue // XOT-1 already reports this
-			}
-			params := g.Lookup["OpenAPI.param."+call.OperationID]
-			for _, arg := range call.Args {
-				if isTransportKey(arg.Key) {
-					continue
-				}
-				if params[arg.Key] {
-					continue
-				}
-				diags = append(diags, diagnostic.Diagnostic{
-					File:    page.File,
-					Line:    call.Line,
-					Phase:   diagnostic.PhaseValidate,
-					Level:   diagnostic.LevelError,
-					Message: "[XOT-2] apiClient." + call.OperationID + "({" + arg.Key + ": ...}) — '" + arg.Key + "' is not declared as an OpenAPI parameter",
-					Advice:  "Add " + arg.Key + " to the parameters of the operation in openapi.yaml, or correct the argument name in the call",
-				})
-			}
-		}
+		diags = append(diags, xot02CheckPage(page, opIDs, g.Lookup)...)
 	}
 	return diags
-}
-
-// isTransportKey returns true for argument keys that are wrappers around
-// the request body rather than actual OpenAPI parameters. XOT-3 validates
-// the body contents; XOT-2 must skip them to avoid double-counting.
-func isTransportKey(key string) bool {
-	switch key {
-	case "body", "data", "payload", "json":
-		return true
-	}
-	return false
 }

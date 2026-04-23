@@ -1,5 +1,5 @@
-//ff:func feature=gen-gogin type=test control=sequence topic=error-envelope
-//ff:what error_envelope_source 스냅샷 — envelope 구조체 + status 매핑 + 미들웨어 심볼
+//ff:func feature=gen-gogin type=test control=iteration dimension=1 topic=error-envelope
+//ff:what TestErrorEnvelopeSource_ContainsKeySymbols — envelope 구조체/함수 심볼 존재 확인
 
 package middleware
 
@@ -31,11 +31,5 @@ func TestErrorEnvelopeSource_ContainsKeySymbols(t *testing.T) {
 		if !strings.Contains(src, must) {
 			t.Errorf("errorEnvelopeSource missing fragment %q", must)
 		}
-	}
-}
-
-func TestErrorEnvelopeSource_HasPackageHeader(t *testing.T) {
-	if !strings.Contains(errorEnvelopeSource, "package middleware") {
-		t.Fatalf("errorEnvelopeSource missing package header")
 	}
 }

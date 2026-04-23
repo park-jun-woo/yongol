@@ -1,10 +1,9 @@
 //ff:func feature=rule type=test control=iteration dimension=1
-//ff:what BaseSpec.Validate 가 Rule/Level 빈 문자열을 거부하는지 검증
+//ff:what TestBaseSpec_Validate — BaseSpec.Validate 가 Rule/Level 빈 문자열을 거부하는지 검증
 
 package rule
 
 import (
-	"strings"
 	"testing"
 )
 
@@ -45,20 +44,6 @@ func TestBaseSpec_Validate(t *testing.T) {
 		},
 	}
 	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			err := tc.spec.Validate()
-			if tc.wantErr {
-				if err == nil {
-					t.Fatalf("Validate() = nil; want error containing %q", tc.wantSub)
-				}
-				if tc.wantSub != "" && !strings.Contains(err.Error(), tc.wantSub) {
-					t.Fatalf("Validate() error = %q; want substring %q", err.Error(), tc.wantSub)
-				}
-				return
-			}
-			if err != nil {
-				t.Fatalf("Validate() = %v; want nil", err)
-			}
-		})
+		t.Run(tc.name, runBaseSpecValidateCase(tc.spec, tc.wantErr, tc.wantSub))
 	}
 }

@@ -4,10 +4,7 @@
 package openapi_ssac
 
 import (
-	"fmt"
-
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
-	yopenapi "github.com/park-jun-woo/yongol/pkg/parser/openapi"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
@@ -25,38 +22,7 @@ func xos82UnreachableSuccessStatus(fs *yongol.Fullstack) []diagnostic.Diagnostic
 	opMap := buildOperationMethodMap(fs.OpenAPIDoc)
 	var diags []diagnostic.Diagnostic
 	for _, fn := range fs.ServiceFuncs {
-		if !hasResponseSequence(fn) {
-			continue
-		}
-		entry, ok := opMap[fn.Name]
-		if !ok {
-			continue
-		}
-		selected := yopenapi.DeriveSuccessStatus(entry.Op, entry.Method)
-		if selected == 0 {
-			continue
-		}
-		declared := yopenapi.Declared2xx(entry.Op)
-		if len(declared) <= 1 {
-			continue
-		}
-		unreachable := make(map[int]bool, len(declared))
-		for code := range declared {
-			if code != selected {
-				unreachable[code] = true
-			}
-		}
-		diags = append(diags, diagnostic.Diagnostic{
-			File:  fn.FileName,
-			Line:  fn.Line,
-			Phase: diagnostic.PhaseValidate,
-			Level: diagnostic.LevelWarning,
-			Message: fmt.Sprintf(
-				"[XOS-82] operation %s declares 2xx %v but only %d is reachable from SSaC",
-				fn.Name, sortedKeys(declared), selected),
-			Advice: fmt.Sprintf("Either remove the unused 2xx declarations %v or extend SSaC to emit them",
-				sortedKeys(unreachable)),
-		})
+		diags = append(diags, xos82CheckFunc(fn, opMap)...)
 	}
 	return diags
 }

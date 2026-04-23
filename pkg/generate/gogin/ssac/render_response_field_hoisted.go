@@ -18,24 +18,7 @@ func (g *methodGen) renderResponseFieldHoisted(
 	rf, hasSchema := g.RespFields[jsonName]
 
 	if hasSchema && rf.RefType != "" {
-		if rf.IsArray {
-			local := listLocal[jsonName]
-			// convert<Type>List returns ([]api.Type, error) — local is
-			// already the slice value. Required fields expect []api.Type;
-			// optional want a pointer.
-			if rf.IsRequired {
-				return fmt.Sprintf("\t%s: %s,", goFieldName, local)
-			}
-			return fmt.Sprintf("\t%s: ptrOf(%s),", goFieldName, local)
-		}
-		local := scalarLocal[jsonName]
-		// convert<Type> returns (*api.Type, error) — local is *api.Type.
-		// Required fields want api.Type (deref); optional fields want
-		// *api.Type (as-is).
-		if rf.IsRequired {
-			return fmt.Sprintf("\t%s: *%s,", goFieldName, local)
-		}
-		return fmt.Sprintf("\t%s: %s,", goFieldName, local)
+		return renderRefResponseField(goFieldName, jsonName, rf, scalarLocal, listLocal)
 	}
 	if hasSchema && rf.IsRequired {
 		return fmt.Sprintf("\t%s: %s,", goFieldName, varExpr)

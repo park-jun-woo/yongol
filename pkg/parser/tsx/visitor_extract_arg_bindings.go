@@ -23,37 +23,9 @@ func (v *visitor) extractArgBindings(arg json.RawMessage) []ArgBinding {
 	}
 	out := make([]ArgBinding, 0, len(w.Expression.Properties))
 	for _, p := range w.Expression.Properties {
-		var kv struct {
-			Type string `json:"type"`
-			Key  struct {
-				Type  string `json:"type"`
-				Value string `json:"value"`
-			} `json:"key"`
-			Value struct {
-				Span astSpan `json:"span"`
-			} `json:"value"`
+		if b, ok := v.parseArgBindingProperty(p); ok {
+			out = append(out, b)
 		}
-		if err := json.Unmarshal(p, &kv); err != nil {
-			continue
-		}
-		// Shorthand: { id } → Type="Identifier" with same Value as key.
-		if kv.Type == "Identifier" {
-			var ident struct {
-				Value string  `json:"value"`
-				Span  astSpan `json:"span"`
-			}
-			if err := json.Unmarshal(p, &ident); err == nil && ident.Value != "" {
-				out = append(out, ArgBinding{Key: ident.Value, Value: ident.Value})
-			}
-			continue
-		}
-		if kv.Type != "KeyValueProperty" || kv.Key.Value == "" {
-			continue
-		}
-		out = append(out, ArgBinding{
-			Key:   kv.Key.Value,
-			Value: v.snippet(kv.Value.Span),
-		})
 	}
 	return out
 }
