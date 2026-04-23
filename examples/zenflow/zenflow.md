@@ -137,6 +137,6 @@ allow {
    - Dummy SMTP (if `@call mail.*` is used): run `python3 scripts/dummy-smtp.py` from the yongol repo root (accepts all, discards).
    - Hurl CLI (`hurl`) on PATH for the smoke step above.
 6. Build only from `manual-for-ai.md`. Do not consult other full-stack scaffolds, generated code from prior attempts, or unrelated implementations.
-7. If `yongol` itself errors, do **not** monkey-patch. Report at `~/.clari/repos/fullend/bugs/BUG000.md` and stop only if blocked outright.
+7. If `yongol` itself errors, do **not** monkey-patch. Report at `~/.clari/repos/fullend/bugs/BUG-NNN.md` and stop only if blocked outright.
 8. On completion, record the timing breakdown (initial build, each incremental add) for benchmarking. and report in `examples/zenflow/REPORT.md`
 9. Shell caveat: in a PTY, `!` is history-expanded — avoid it in passwords.
