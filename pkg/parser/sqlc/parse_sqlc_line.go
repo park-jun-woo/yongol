@@ -30,15 +30,3 @@ func parseSQLCLine(line, model, file string, lineNo int) (QuerySpec, bool) {
 		Line:        lineNo,
 	}, true
 }
-
-// rowTypeFor returns the sqlc row struct name for a query, or "" when the
-// query's cardinality produces no rows. sqlc default naming is "<Name>Row".
-func rowTypeFor(name, cardinality string) string {
-	switch cardinality {
-	case "one", "many":
-		return name + "Row"
-	default:
-		// "exec" / "execresult" / unknown → no row struct.
-		return ""
-	}
-}

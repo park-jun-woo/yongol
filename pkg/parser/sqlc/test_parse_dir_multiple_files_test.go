@@ -1,5 +1,6 @@
-//ff:func feature=orchestrator type=parser control=iteration dimension=1
-//ff:what ParseDir 통합 테스트 — 복수 파일 합산 / 없는 디렉토리 / 파일 존재 확인
+//ff:func feature=orchestrator type=test control=sequence
+//ff:what ParseDir — 복수 sql 파일 합산 결과 검증 (non-sql 파일은 무시)
+
 package sqlc
 
 import (
@@ -35,16 +36,5 @@ INSERT INTO workflows (name) VALUES (@name) RETURNING *;
 	}
 	if len(specs) != 3 {
 		t.Fatalf("want 3 specs (1 users + 2 workflows), got %d: %+v", len(specs), specs)
-	}
-}
-
-func TestParseDir_MissingDir(t *testing.T) {
-	// non-existent directory is not an error (empty result)
-	specs, diags := ParseDir("/nonexistent/dir/for/sqlc/parse/dir")
-	if len(specs) != 0 {
-		t.Errorf("want 0 specs, got %d", len(specs))
-	}
-	if len(diags) != 0 {
-		t.Errorf("want 0 diags, got %d: %v", len(diags), diags)
 	}
 }
