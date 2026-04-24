@@ -21,6 +21,7 @@ func ParseAll(root string, detected []DetectedSSOT) *Fullstack {
 	parseScenarioIfPresent(fs, has)
 	parseTSXIfPresent(fs, has)
 	parseYongolPkgSpecs(fs)
+	parseSsacInterfaces(fs)
 
 	return fs
 }

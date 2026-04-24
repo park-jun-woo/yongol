@@ -1,5 +1,5 @@
 //ff:func feature=gen-gogin type=generator control=sequence
-//ff:what blockQueueInit — queue.Init + Subscribe + Start + defer Close 블록
+//ff:what blockQueueInit — queue.Init + SetBackend (memory or postgres infra 어댑터) + Subscribe + Start + defer Close
 
 package boot
 
@@ -16,15 +16,28 @@ import (
 // (matches pre-Phase001 behavior: "postgres" when manifest silent).
 // serviceFuncs carries the Subscribe metadata so this function stays
 // free of raw fs access.
-func blockQueueInit(q prepared.Queue, serviceFuncs []ssac.ServiceFunc) MainBlock {
+//
+// Phase002 (ssac/purify) — durable (postgres) backends no longer accept
+// ssac-native Init("postgres", conn). ssac accepts only "memory" as a
+// built-in backend; the postgres driver is provided by yongol-generated
+// infra at `<module>/internal/infra/queue`. The emitter wires the
+// adapter through queue.SetBackend after Init("memory").
+func blockQueueInit(q prepared.Queue, serviceFuncs []ssac.ServiceFunc, modulePath string) MainBlock {
 	lines := []string{
 		`slog.Info("initializing queue")`,
-		fmt.Sprintf(`if err := queue.Init(ctx, %q, conn); err != nil {`, q.Backend),
+		`if err := queue.Init(ctx, "memory"); err != nil {`,
 		`	slog.Error("queue init", "err", err)`,
 		`	os.Exit(1)`,
 		`}`,
-		`defer queue.Close()`,
 	}
+	imports := []string{`"github.com/park-jun-woo/ssac/pkg/queue"`}
+	if q.Backend == "postgres" {
+		lines = append(lines,
+			`queue.SetBackend(infraqueue.NewPostgres(queries))`,
+		)
+		imports = append(imports, fmt.Sprintf(`infraqueue "%s/internal/infra/queue"`, modulePath))
+	}
+	lines = append(lines, `defer queue.Close()`)
 	lines = appendQueueSubscribeLines(lines, serviceFuncs)
 	lines = append(lines,
 		`go func() {`,
@@ -33,11 +46,12 @@ func blockQueueInit(q prepared.Queue, serviceFuncs []ssac.ServiceFunc) MainBlock
 		`	}`,
 		`}()`,
 	)
+	_ = q // silence unused when backend != postgres — q.Backend is still read above
 	return MainBlock{
 		Name: "queue-init",
 		// Active left nil: collectActiveBlocks appends this block only
 		// when prepared.State.ActiveBackends.Queue != nil.
-		Imports: []string{`"github.com/park-jun-woo/ssac/pkg/queue"`},
+		Imports: imports,
 		Lines:   lines,
 	}
 }

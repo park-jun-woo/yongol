@@ -10,6 +10,7 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/generate/filefunc"
 	"github.com/park-jun-woo/yongol/pkg/generate/gogin/auth"
 	"github.com/park-jun-woo/yongol/pkg/generate/gogin/boot"
+	"github.com/park-jun-woo/yongol/pkg/generate/gogin/infra"
 	"github.com/park-jun-woo/yongol/pkg/generate/gogin/middleware"
 	"github.com/park-jun-woo/yongol/pkg/generate/gogin/sqlcpost"
 	ssacgen "github.com/park-jun-woo/yongol/pkg/generate/gogin/ssac"
@@ -43,6 +44,14 @@ func Generate(fs *yongol.Fullstack, artifactsDir string) error {
 	}
 	if err := sqlcpost.Generate(fs, artifactsDir); err != nil {
 		return fmt.Errorf("sqlc post (log masking): %w", err)
+	}
+	// Phase002 (ssac/purify) — emit postgres adapters for every ssac package
+	// that declares an interface.yaml with at least one active port under the
+	// current manifest. The generated adapters live under
+	// `backend/internal/infra/<pkg>/postgres.go` and are wired by boot/
+	// block_infra_wiring.go below.
+	if err := infra.EmitAll(fs, artifactsDir, fs.Manifest.Backend.Module); err != nil {
+		return fmt.Errorf("infra postgres adapters: %w", err)
 	}
 	if err := auth.Generate(fs, p, artifactsDir); err != nil {
 		return fmt.Errorf("auth: %w", err)

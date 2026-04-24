@@ -11,15 +11,30 @@ import (
 
 // buildAuthRefreshStoreCall emits the call block for the two Phase009 auth
 // endpoints that do NOT follow the SSaC "one XRequest struct" calling
-// convention: auth.RefreshRotate and auth.Logout. Both take
-// (ctx, *RefreshStore, refreshToken string). The emitter:
+// convention: auth.RefreshRotate and auth.Logout.
+//
+// Phase002 (ssac/purify) updates the call shape:
+//
+//   - auth.RefreshRotate(ctx, store, refreshToken, detectReuseLogoutAll bool)
+//   - auth.Logout(ctx, store, refreshToken)
+//
+// with `store` now a nil-fallback: when nil, ssac/pkg/auth reads the
+// singleton installed at boot by auth.Init(infraauth.NewPostgres(queries)).
+// The handler therefore passes `nil` instead of `server.RefreshStore`,
+// which is no longer a field on the Server struct.
+//
+// detectReuseLogoutAll (bool) is a hard-coded literal — Phase002 hoists it
+// out of the removed `&auth.RefreshStore{DetectReuseLogoutAll: true}`
+// literal in main.go and surfaces it as the fourth argument of
+// RefreshRotate. Default false keeps zenflow behavior; future manifest
+// config can flip the literal.
+//
+// The emitter:
 //
 //   - Pulls the single "RefreshToken" input from seq.Inputs and maps its
-//     right-hand side via g.mapValue (so `request.refresh_token` becomes
-//     `request.Body.RefreshToken`, etc).
-//   - Emits `server.RefreshStore` as the store argument — the Server struct
-//     gained a RefreshStore pointer in Phase004 and block_auth_init wires
-//     it at boot.
+//     right-hand side via g.mapValue.
+//   - Emits `nil` as the store argument so ssac falls back to its
+//     package-level singleton.
 //   - Reuses the same tracing span-wrap + error-to-JSON branch as buildCall
 //     so generated handlers look identical except for the call shape.
 func (g *methodGen) buildAuthRefreshStoreCall(seq ssacparser.Sequence, callFunc string) ([]string, []string) {
@@ -55,9 +70,17 @@ func (g *methodGen) buildAuthRefreshStoreCall(seq ssacparser.Sequence, callFunc 
 		spanCtxVar = "callCtx"
 	}
 
+	// Phase002 (ssac/purify) — store is passed as nil so ssac falls back to
+	// the auth.Init(...) singleton installed in main.go. RefreshRotate now
+	// also accepts a detectReuseLogoutAll bool; Logout keeps the 3-arg shape.
+	var callExpr string
+	if callFunc == "RefreshRotate" {
+		callExpr = fmt.Sprintf("%s.%s(%s, nil, %s, false)", pkgName, callFunc, spanCtxVar, tokenArg)
+	} else {
+		callExpr = fmt.Sprintf("%s.%s(%s, nil, %s)", pkgName, callFunc, spanCtxVar, tokenArg)
+	}
 	lines = append(lines,
-		fmt.Sprintf("%s, err %s %s.%s(%s, server.RefreshStore, %s)",
-			varName, assign, pkgName, callFunc, spanCtxVar, tokenArg),
+		fmt.Sprintf("%s, err %s %s", varName, assign, callExpr),
 	)
 	if g.WrapCalls {
 		lines = append(lines, "callSpan.End()")

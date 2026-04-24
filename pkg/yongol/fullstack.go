@@ -20,6 +20,7 @@ import (
 	sqlcparser "github.com/park-jun-woo/yongol/pkg/parser/sqlc"
 	"github.com/park-jun-woo/yongol/pkg/parser/tsx"
 	"github.com/park-jun-woo/yongol/pkg/rule"
+	"github.com/park-jun-woo/yongol/pkg/ssacmeta"
 )
 
 // Fullstack holds all SSOT parsing results.
@@ -49,5 +50,11 @@ type Fullstack struct {
 	ResponseConstraints map[string]map[string]oapiparser.FieldConstraint
 	ParseDiagnostics    []diagnostic.Diagnostic // All errors collected during the parser phase. Gated at the CLI level.
 	Presences           map[SSOTKind]SSOTPresence // Presence state (Absent/Declared/Populated) per SSOT kind.
+	// SsacInterfaces holds parsed ssac/pkg/*/interface.yaml documents keyed
+	// by package name. Populated by parseSsacInterfaces during ParseAll and
+	// consumed by Phase002 codegen (pkg/generate/gogin/infra/) plus Phase004/005
+	// validate rules. Absent key ⇒ package declares no DB ports (or is not a
+	// DB-using ssac package).
+	SsacInterfaces      map[string]*ssacmeta.PackageInterface
 	ground              *rule.Ground
 }

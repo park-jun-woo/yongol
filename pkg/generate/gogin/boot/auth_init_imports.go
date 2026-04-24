@@ -3,19 +3,23 @@
 
 package boot
 
+import "fmt"
+
 // authInitImports returns the imports blockAuthInit requires. Isolated so
 // blockAuthInit stays a short orchestration that does no string literal
 // composition of its own.
 //
 // Phase001 UserClaimUnification — auth import now targets ssac/pkg/auth
 // directly; the project-local internal/auth package is no longer generated.
-// The modulePath argument is retained so the signature is stable for the
-// boot orchestration layer but is intentionally unused here.
+//
+// Phase002 (ssac/purify) — the yongol-generated postgres RefreshStore lives
+// at `<module>/internal/infra/auth` and is imported as `infraauth`. The
+// block installs it at boot via auth.Init(infraauth.NewPostgres(queries)).
 func authInitImports(modulePath string) []string {
-	_ = modulePath
 	return []string{
 		`"github.com/park-jun-woo/ssac/pkg/auth"`,
 		`"net/http"`,
 		`"time"`,
+		fmt.Sprintf(`infraauth "%s/internal/infra/auth"`, modulePath),
 	}
 }

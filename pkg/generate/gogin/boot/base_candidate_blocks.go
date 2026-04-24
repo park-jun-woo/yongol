@@ -22,17 +22,17 @@ func baseCandidateBlocks(fs *yongol.Fullstack, p prepared.State, modulePath stri
 		blockAuthzInit(fs),
 	}
 	if p.ActiveBackends.Session != nil {
-		blocks = append(blocks, blockSessionInit(*p.ActiveBackends.Session))
+		blocks = append(blocks, blockSessionInit(*p.ActiveBackends.Session, modulePath))
 	}
 	if p.ActiveBackends.Cache != nil {
-		blocks = append(blocks, blockCacheInit(*p.ActiveBackends.Cache))
+		blocks = append(blocks, blockCacheInit(*p.ActiveBackends.Cache, modulePath))
 	}
 	if p.ActiveBackends.File != nil {
 		blocks = append(blocks, blockFileInit(*p.ActiveBackends.File))
 	}
 	blocks = append(blocks, blockServerStruct(fs, modulePath))
 	if p.ActiveBackends.Queue != nil {
-		blocks = append(blocks, blockQueueInit(*p.ActiveBackends.Queue, fs.ServiceFuncs))
+		blocks = append(blocks, blockQueueInit(*p.ActiveBackends.Queue, fs.ServiceFuncs, modulePath))
 	}
 	blocks = append(blocks,
 		blockOtelInit(fs, modulePath),

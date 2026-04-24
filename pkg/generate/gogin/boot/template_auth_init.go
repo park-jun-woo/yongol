@@ -60,25 +60,26 @@ var authInitSameSiteSwitchLines = []string{
 	`}`,
 }
 
-// authInitDDLBootstrapLines — idempotent refresh_tokens DDL bootstrap.
-var authInitDDLBootstrapLines = []string{
-	`// Phase002 — bootstrap refresh_tokens schema (idempotent). Kept in`,
-	`// main.go so a fresh DB is usable without running a separate`,
-	`// migration tool; real deployments should instead run the DDL via`,
-	`// their migration pipeline and drop this block.`,
-	`if _, err := conn.ExecContext(ctx, auth.RefreshTokensDDL); err != nil {`,
-	`	slog.Error("refresh_tokens DDL", "err", err)`,
-	`	os.Exit(1)`,
-	`}`,
-}
-
-// authInitStoreInjectionLines — RefreshStore 주입 + srv 필드 대입.
+// authInitStoreInjectionLines — yongol-generated postgres RefreshStore 를
+// package-level singleton 으로 설치 (ssac/purify Phase002).
+//
+// Before Phase002: main.go built a `&auth.RefreshStore{DB: conn}` struct
+// literal and stored it on srv.RefreshStore; SSaC handlers referenced
+// `server.RefreshStore` at every call site.
+//
+// After Phase002: ssac/pkg/auth exposes RefreshStore as an interface and
+// auth.Init(store) sets the package-level default. Handlers now call
+// auth.RefreshRotate(ctx, nil, token, ...) — ssac falls back to the
+// singleton when store is nil, so no field threading is needed.
+//
+// The refresh_tokens DDL that used to live here (idempotent CREATE TABLE
+// via auth.RefreshTokensDDL) is owned by the user's specs/db/ files now —
+// Phase004 validate enforces that the refresh_tokens table is present
+// when backend.auth is configured.
 var authInitStoreInjectionLines = []string{
-	`// Phase004/Phase009 — inject the RefreshStore into the Server so SSaC`,
-	`// handlers that call auth.RefreshToken / auth.RefreshRotate / auth.Logout`,
-	`// can reach it via server.RefreshStore without threading the DB handle`,
-	`// through every handler signature. Phase009 moved the auth-refresh`,
-	`// route onto the canonical openapi + SSaC path, so this block does`,
-	`// not mount any gin route — it only wires store + config.`,
-	`srv.RefreshStore = refreshStore`,
+	`// Phase002 (ssac/purify) — install the yongol-generated postgres`,
+	`// RefreshStore as the package-level auth singleton. Handlers that call`,
+	`// auth.RefreshRotate / auth.Logout pass a nil store and let ssac fall`,
+	`// back to this default.`,
+	`auth.Init(infraauth.NewPostgres(queries))`,
 }

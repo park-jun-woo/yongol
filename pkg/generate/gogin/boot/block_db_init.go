@@ -1,22 +1,20 @@
 //ff:func feature=gen-gogin type=generator control=sequence
-//ff:what blockDBInit — pgxpool 생성 + ssac용 sql.DB 브릿지 + sqlc Queries 초기화
+//ff:what blockDBInit — pgxpool 생성 + sqlc Queries 초기화 (ssac database/sql 브릿지 없음)
 
 package boot
 
 import "github.com/park-jun-woo/yongol/pkg/yongol"
 
 // blockDBInit produces the db connection + pool tuning + sqlc Queries init
-// block. Phase005 (pgx/v5 refit) — the primary connection is a
-// *pgxpool.Pool created via pgxpool.ParseConfig + New. Pool tuning is
-// configured on the pgxpool.Config before New() using the same env var
-// surface (DB_MAX_OPEN_CONNS, DB_MAX_IDLE_CONNS, DB_CONN_MAX_LIFETIME)
-// mapped onto pgxpool fields.
+// block.
 //
-// A secondary *sql.DB (`conn`) is derived from the pool via
-// stdlib.OpenDBFromPool. ssac packages (auth / queue / authz / cache /
-// session) still require *sql.DB, and migrating their signatures is out
-// of scope for this Phase. The bridge keeps the pool as the single source
-// of connections while preserving the existing ssac API surface.
+// Phase005 (pgx/v5 refit) established *pgxpool.Pool as the single source of
+// connections. Phase002 (ssac/purify) removed the previous
+// stdlib.OpenDBFromPool bridge — ssac no longer touches database/sql, so the
+// parallel *sql.DB handle has no consumer. Every DB-using ssac adapter is
+// now emitted by yongol codegen (pkg/generate/gogin/infra) and reaches the
+// database through the user's sqlc Queries, which themselves wrap the
+// pgxpool.Pool.
 //
 // OpenTelemetry tracing (previous otelsql path) is temporarily removed;
 // reinstating otel via otelpgx is a follow-up (plans notes, obs01 /
@@ -26,9 +24,7 @@ func blockDBInit(fs *yongol.Fullstack, modulePath string) MainBlock {
 	imports := []string{
 		`"context"`,
 		`"time"`,
-		`"database/sql"`,
 		`"github.com/jackc/pgx/v5/pgxpool"`,
-		`"github.com/jackc/pgx/v5/stdlib"`,
 		`"` + modulePath + `/internal/db"`,
 	}
 	lines := []string{
@@ -49,13 +45,6 @@ func blockDBInit(fs *yongol.Fullstack, modulePath string) MainBlock {
 		`	os.Exit(1)`,
 		`}`,
 		`defer pool.Close()`,
-		`// Bridge *pgxpool.Pool → *sql.DB so ssac packages (auth / queue /`,
-		`// authz / cache / session) that still take database/sql handles work`,
-		`// against the same underlying pool. stdlib.OpenDBFromPool shares the`,
-		`// pool; no additional connection resources are allocated. Explicit`,
-		`// *sql.DB annotation keeps the database/sql import marked as used.`,
-		`var conn *sql.DB = stdlib.OpenDBFromPool(pool)`,
-		`defer func() { _ = conn.Close() }()`,
 		`queries := db.New(pool)`,
 		`slog.Info("database connected", "max_conns", poolCfg.MaxConns)`,
 	}

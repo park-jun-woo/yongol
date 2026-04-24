@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/generate/gogin/ffannot"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // generateServerGo writes internal/service/server.go containing only the
@@ -17,6 +17,15 @@ import (
 // helpers (strPtr, ptrOf, derefInt, derefStr, derefInt64, derefBool,
 // derefEnum) are emitted as sibling 1-file-1-func files via
 // generateServerHelpers so filefunc F1 passes on the service surface.
+//
+// Phase002 (ssac/purify) — the former Server.RefreshStore field is removed.
+// ssac/pkg/auth now exposes RefreshRotate / Logout with a nil-store fallback
+// that reads the package-level singleton installed by auth.Init(...) during
+// boot. Handlers therefore no longer reach through Server; they pass nil as
+// the store argument and let ssac resolve it. This keeps Server limited to
+// the two genuine shared resources (the pgxpool and the sqlc Queries) and
+// treats cache / session / queue / auth uniformly as singleton-Init'd
+// packages.
 func generateServerGo(fs *yongol.Fullstack, artifactsDir, modulePath string) error {
 	dir := filepath.Join(artifactsDir, "backend", "internal", "service")
 	if err := os.MkdirAll(dir, 0o755); err != nil {
@@ -25,33 +34,19 @@ func generateServerGo(fs *yongol.Fullstack, artifactsDir, modulePath string) err
 	var sb strings.Builder
 	sb.WriteString(ffannot.EmitAnnotationBlock(ffannot.Block{
 		Type: ffannot.TypeAnnot{Feature: "service", Type: "model"},
-		What: "Server — StrictServerInterface 구조체 (pgxpool.Pool/Queries 보관, auth 활성 시 RefreshStore 추가)",
+		What: "Server — StrictServerInterface 구조체 (pgxpool.Pool + sqlc Queries 보관)",
 	}))
 	sb.WriteString("package service\n\nimport (\n")
 	// Phase005 pgx/v5 refit — Server.DB is *pgxpool.Pool so sqlc Queries.WithTx
-	// can receive pgx.Tx from Pool.Begin. ssac packages (auth/queue/authz)
-	// continue to expect *sql.DB and are wired via a stdlib.OpenDBFromPool
-	// bridge in main.go (not on the Server struct).
+	// can receive pgx.Tx from Pool.Begin. Phase002 (ssac/purify) removed the
+	// former database/sql bridge because ssac is now DB-free.
 	sb.WriteString("\t\"github.com/jackc/pgx/v5/pgxpool\"\n")
 	sb.WriteString("\t\"" + modulePath + "/internal/db\"\n")
-	authActive := fs.Manifest != nil && fs.Manifest.Backend.Auth != nil && len(fs.Manifest.Backend.Auth.Claims) > 0
-	if authActive {
-		// Phase001 UserClaimUnification — RefreshStore lives in ssac/pkg/auth;
-		// the project-local internal/auth package is no longer generated.
-		sb.WriteString("\t\"github.com/park-jun-woo/ssac/pkg/auth\"\n")
-	}
 	sb.WriteString(")\n\n")
 	sb.WriteString("// Server implements api.StrictServerInterface.\n")
 	sb.WriteString("type Server struct {\n")
 	sb.WriteString("\tDB      *pgxpool.Pool\n")
 	sb.WriteString("\tQueries *db.Queries\n")
-	if authActive {
-		// Phase004 — RefreshStore is injected so SSaC handlers that emit a
-		// refresh token (e.g. Login after @call auth.RefreshToken) can
-		// persist the new row via s.RefreshStore.Create. Nil when auth is
-		// disabled — the Server struct simply omits the field.
-		sb.WriteString("\tRefreshStore *auth.RefreshStore\n")
-	}
 	sb.WriteString("}\n")
 	return os.WriteFile(filepath.Join(dir, "server.go"), []byte(sb.String()), 0o644)
 }
