@@ -341,6 +341,22 @@ into `authz.CheckRequest.Owners` before calling authz.Check.
 |---|---|---|---|
 | XQP-30 | ERROR | `@ownership <res>: <table>.<col>` requires sqlc query `OwnerLookup<Pascal(res)>` to exist | `pkg/validate/query_rego/xqp_30_owner_lookup_query.go` |
 
+## P3. Manifest-driven DB requirements (XN*-90)
+
+Phase004 (ssac/purify) — when the manifest opts into a DB-backed built-in
+(cache / session / queue / auth refresh), the user must provide the
+canonical DDL + sqlc queries declared in the matching
+`ssac/pkg/<x>/interface.yaml`. Missing entries surface as ERROR with a
+copy-pasteable advice block sourced from the interface.yaml's
+`canonical_ddl` + `canonical_queries`.
+
+| Rule ID | Level | Description | Source |
+|---|---|---|---|
+| XNC-90 | ERROR | `manifest.cache.backend=postgres` requires `fullend_cache` DDL + `CacheSet/CacheGet/CacheDelete` sqlc queries | `pkg/validate/manifest/xnc_90_cache_backend_requires_sqlc.go` |
+| XNS-90 | ERROR | `manifest.session.backend=postgres` requires `fullend_sessions` DDL + `SessionSet/SessionGet/SessionDelete` sqlc queries | `pkg/validate/manifest/xns_90_session_backend_requires_sqlc.go` |
+| XNQ-90 | ERROR | `manifest.queue.backend=postgres` requires `fullend_queue` DDL + `QueuePublish/QueuePoll/QueueAck` sqlc queries | `pkg/validate/manifest/xnq_90_queue_backend_requires_sqlc.go` |
+| XNA-90 | ERROR | `manifest.backend.auth` configured requires `refresh_tokens` DDL + `RefreshTokenInsert/FindByHash/Revoke/RevokeAll` sqlc queries | `pkg/validate/manifest/xna_90_refresh_requires_sqlc.go` |
+
 ## R. Miscellaneous (Hurl / StateMachine / Rego / Func / OpenAPI ↔ Hurl)
 
 | Rule ID | Level | Description | Source |

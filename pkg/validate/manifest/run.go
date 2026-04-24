@@ -27,5 +27,10 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	diags = append(diags, sec401JWTSecretEnvRequired(fs)...)
 	diags = append(diags, sec402AccessTTLUpperBound(fs)...)
 	diags = append(diags, sec403AuthModeEnum(fs)...)
+	// Phase004 (ssac/purify) — manifest-driven DB requirement checks.
+	diags = append(diags, xnc90CacheBackendRequiresSQLC(fs)...)
+	diags = append(diags, xns90SessionBackendRequiresSQLC(fs)...)
+	diags = append(diags, xnq90QueueBackendRequiresSQLC(fs)...)
+	diags = append(diags, xna90RefreshRequiresSQLC(fs)...)
 	return diags
 }
