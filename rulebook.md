@@ -248,6 +248,7 @@ Cross-consistency between SSaC `@state` and Mermaid stateDiagram.
 | XMS-25 | ERROR | `@state` transition event must be defined in stateDiagram | `pkg/validate/ssac_statemachine/xms_25_state_event.go` |
 | XSM-23 | ERROR | stateDiagram transition event must exist as a SSaC function | `pkg/validate/ssac_statemachine/xsm_23_transition_to_func.go` |
 | XSM-26 | WARNING | Function participating in a state transition has no `@state` declaration | `pkg/validate/ssac_statemachine/xsm_26_missing_state_guard.go` |
+| XSM-27 | WARNING | POST/PUT/DELETE on a stateful resource must declare either `@state` or `// @state-neutral` | `pkg/validate/ssac_statemachine/xsm_27_state_intent_declaration.go` |
 
 ## J. SSaC ↔ Rego
 
