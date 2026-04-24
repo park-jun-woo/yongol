@@ -3,9 +3,16 @@
 package migration
 
 // createTableWithDeps returns the ops needed to materialise a brand-new
-// table: CreateTable, then its indexes, FKs and check constraints.
+// table: CreateTable, its sentinel INSERTs, then its indexes, FKs and
+// check constraints. Phase sorting (sortByDependency) guarantees that
+// every CreateTable executes before any InsertSentinel, and every
+// InsertSentinel executes before any AddForeignKey — so FK references
+// always find their sentinel target rows pre-seeded.
 func createTableWithDeps(c *Table) []Operation {
 	ops := []Operation{CreateTable{Table: c}}
+	for _, s := range c.Sentinels {
+		ops = append(ops, InsertSentinel{Table: c.Name, Body: s.SQL})
+	}
 	for _, idx := range c.Indexes {
 		ops = append(ops, CreateIndex{Table: c.Name, Index: idx})
 	}

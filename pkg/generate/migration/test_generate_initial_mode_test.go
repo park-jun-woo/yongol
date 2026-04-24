@@ -15,6 +15,9 @@ func TestGenerate_InitialMode(t *testing.T) {
 	artsDir := t.TempDir()
 	writeSpec(t, filepath.Join(specsDir, "db"), "users.sql", `
 CREATE TABLE users (id BIGSERIAL PRIMARY KEY, name TEXT NOT NULL DEFAULT '');
+
+-- @sentinel
+INSERT INTO users (id, name) VALUES (0, 'nobody') ON CONFLICT DO NOTHING;
 `)
 	res, diags, err := Generate(specsDir, artsDir, Options{
 		YongolVersion: "v0.1.22",
@@ -30,8 +33,20 @@ CREATE TABLE users (id BIGSERIAL PRIMARY KEY, name TEXT NOT NULL DEFAULT '');
 		t.Errorf("expected MigrationFile=0001_initial.up.sql, got %q", res.MigrationFile)
 	}
 	upPath := filepath.Join(artsDir, "db", "migrations", "0001_initial.up.sql")
-	if _, err := os.Stat(upPath); err != nil {
-		t.Errorf("0001_initial.up.sql missing: %v", err)
+	upData, err := os.ReadFile(upPath)
+	if err != nil {
+		t.Fatalf("0001_initial.up.sql missing: %v", err)
+	}
+	up := string(upData)
+	// Sentinel INSERT must be present and appear AFTER CREATE TABLE.
+	if !strings.Contains(up, "INSERT INTO users") {
+		t.Errorf("initial migration missing sentinel INSERT:\n%s", up)
+	}
+	createIdx := strings.Index(up, "CREATE TABLE")
+	insertIdx := strings.Index(up, "INSERT INTO users")
+	if createIdx < 0 || insertIdx < 0 || createIdx >= insertIdx {
+		t.Errorf("sentinel INSERT must follow CREATE TABLE; createIdx=%d insertIdx=%d\n%s",
+			createIdx, insertIdx, up)
 	}
 	downPath := filepath.Join(artsDir, "db", "migrations", "0001_initial.down.sql")
 	if _, err := os.Stat(downPath); err != nil {
@@ -48,5 +63,8 @@ CREATE TABLE users (id BIGSERIAL PRIMARY KEY, name TEXT NOT NULL DEFAULT '');
 	data, _ := os.ReadFile(snapPath)
 	if !strings.HasPrefix(string(data), SnapshotHashHeaderPrefix) {
 		t.Errorf("snapshot missing hash header:\n%s", data)
+	}
+	if !strings.Contains(string(data), "INSERT INTO users") {
+		t.Errorf("snapshot missing sentinel INSERT body:\n%s", data)
 	}
 }

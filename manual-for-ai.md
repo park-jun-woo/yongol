@@ -132,6 +132,7 @@ Standard SQL DDL and sqlc. Details: [`docs/ddl.md`](docs/ddl.md).
 | `-- @backfill default=<value>` | column line | Populates existing rows before adding NOT NULL. Resolves MIG-002. |
 | `-- @data_migration file=<path>` | CREATE TABLE | Inlines a sidecar SQL file into the migration. |
 | `-- @allow_destructive` | CREATE TABLE | Suppresses DROP warnings for this table. Resolves MIG-004. |
+| `-- @sentinel` | INSERT statement | Copies the annotated `INSERT` verbatim into the migration between CREATE TABLE and CREATE INDEX/ADD FK. Required on every top-level INSERT in `specs/db/*.sql` (D-9); must include `ON CONFLICT DO NOTHING` (D-10). Enables the `DEFAULT 0` sentinel FK pattern. |
 
 Patterns such as `password`, `secret`, `hash`, `token` without `@sensitive`
 emit a WARNING.

@@ -2,7 +2,7 @@
 //ff:what phaseOf — Operation 타입을 1~12 단계 정수로 매핑
 package migration
 
-// phaseOf returns the sort phase (1..12) of an Operation.
+// phaseOf returns the sort phase (1..13) of an Operation.
 func phaseOf(op Operation) int {
 	switch op.(type) {
 	case RenameTable, RenameColumn:
@@ -19,16 +19,18 @@ func phaseOf(op Operation) int {
 		return 6
 	case CreateTable:
 		return 7
-	case AddColumn:
+	case InsertSentinel:
 		return 8
-	case AlterColumnType, AlterColumnNullable, AlterColumnDefault:
+	case AddColumn:
 		return 9
-	case AddCheck:
+	case AlterColumnType, AlterColumnNullable, AlterColumnDefault:
 		return 10
-	case CreateIndex:
+	case AddCheck:
 		return 11
-	case AddForeignKey:
+	case CreateIndex:
 		return 12
+	case AddForeignKey:
+		return 13
 	}
 	return 99
 }

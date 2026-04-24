@@ -8,6 +8,7 @@ CREATE TABLE users (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- @sentinel
 INSERT INTO users (id, org_id, email, password_hash, role, name)
 OVERRIDING SYSTEM VALUE
 VALUES (0, 0, 'nobody@system', '', 'system', 'Nobody')

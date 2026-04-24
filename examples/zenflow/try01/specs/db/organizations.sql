@@ -6,6 +6,7 @@ CREATE TABLE organizations (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- @sentinel
 INSERT INTO organizations (id, name, plan_type, credits_balance)
 OVERRIDING SYSTEM VALUE
 VALUES (0, 'system', 'free', 0)

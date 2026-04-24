@@ -22,4 +22,24 @@ func parseDDLContent(content string, tables map[string]*Table, file string) {
 		// annotation was consumed by whichever line followed it
 		pendingArchived = false
 	}
+
+	// Second pass: collect @sentinel INSERT blocks and attach them to
+	// their target tables. Non-annotated top-level INSERTs are silently
+	// skipped here; validation (D-9) flags them.
+	for _, r := range parseSentinelInserts(content) {
+		if !r.Annotated {
+			continue
+		}
+		t := tables[r.Table]
+		if t == nil {
+			// INSERT targets a table not defined in this directory.
+			// Keep permissive at parse time; validation can decide.
+			continue
+		}
+		t.Sentinels = append(t.Sentinels, SentinelInsert{
+			SQL:  r.SQL,
+			Line: r.StartLine,
+			File: file,
+		})
+	}
 }

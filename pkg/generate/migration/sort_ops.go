@@ -15,11 +15,12 @@ import "sort"
 //   5. DropColumn
 //   6. DropTable
 //   7. CreateTable
-//   8. AddColumn
-//   9. AlterColumn* (Type / Nullable / Default)
-//  10. AddCheck
-//  11. CreateIndex
-//  12. AddForeignKey
+//   8. InsertSentinel                    (sentinel rows — FK targets must exist before AddForeignKey)
+//   9. AddColumn
+//  10. AlterColumn* (Type / Nullable / Default)
+//  11. AddCheck
+//  12. CreateIndex
+//  13. AddForeignKey
 func sortByDependency(ops []Operation) []Operation {
 	keyed := make([]keyedOp, len(ops))
 	for i, op := range ops {

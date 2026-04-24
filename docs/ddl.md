@@ -148,12 +148,50 @@ Avoid nullable FKs by using `NOT NULL DEFAULT 0` + an id=0 row in the referenced
 freelancer_id BIGINT NOT NULL DEFAULT 0 REFERENCES users(id)
 
 -- users.sql
+-- @sentinel
 INSERT INTO users (id, email, password_hash, role, name)
+OVERRIDING SYSTEM VALUE
 VALUES (0, 'nobody@system', '', 'system', 'Nobody')
 ON CONFLICT DO NOTHING;
 ```
 
 Benefit: Go struct stays `int64` — no `*int64` / nil checks.
+
+### @sentinel
+
+`-- @sentinel` marks a top-level `INSERT` as a sentinel-row seed. `yongol generate` copies the annotated `INSERT` verbatim into the migration, placed **after** all `CREATE TABLE` statements and **before** any `CREATE INDEX` / `ALTER TABLE ... ADD CONSTRAINT ... FOREIGN KEY`. This guarantees that rows referenced by `DEFAULT 0` FKs exist before the FK constraint is enforced.
+
+Rules (enforced by validation):
+
+| Rule | Requirement |
+|---|---|
+| D-9 (ERROR) | Every top-level `INSERT` in `specs/db/*.sql` must have `-- @sentinel` directly above it. Blank lines are allowed between; other comments are not. Without the annotation, the INSERT would be silently dropped — the annotation is an explicit acknowledgement that this INSERT should ship in the migration. |
+| D-10 (ERROR) | The `@sentinel` INSERT must include `ON CONFLICT DO NOTHING` so re-applying the migration does not break with PK conflict. |
+
+Ordering within the migration:
+
+1. All `CREATE TABLE`
+2. All `@sentinel` `INSERT` (DDL-file alphabetical order, intra-file definition order)
+3. `CREATE INDEX`
+4. `ALTER TABLE ... ADD CONSTRAINT ... FOREIGN KEY`
+
+Multiple `@sentinel` blocks per file are allowed (common for lookup tables). `OVERRIDING SYSTEM VALUE` is required when inserting a fixed `id` into a `GENERATED ALWAYS AS IDENTITY` column.
+
+```sql
+-- specs/db/organizations.sql
+CREATE TABLE organizations (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);
+
+-- @sentinel
+INSERT INTO organizations (id, name)
+OVERRIDING SYSTEM VALUE
+VALUES (0, 'system')
+ON CONFLICT DO NOTHING;
+```
+
+The sentinel body is also serialized into `specs/db/.generated_schema.sql`, so any edit invalidates the snapshot hash and surfaces as drift.
 
 ### @archived
 

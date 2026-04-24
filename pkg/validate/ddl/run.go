@@ -18,6 +18,8 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	diags = append(diags, d06SqlcYamlQueriesPath(fs)...)
 	diags = append(diags, d07SqlcPositionalParam(fs)...)
 	diags = append(diags, d08SerialTypeBanned(fs)...)
+	diags = append(diags, d09TopLevelInsertWithoutSentinel(fs)...)
+	diags = append(diags, d10SentinelWithoutOnConflict(fs)...)
 	diags = append(diags, xdd61SensitiveNoAnnotation(fs)...)
 	return diags
 }
