@@ -1,5 +1,15 @@
 # zenflow try01 — 완료 보고서
 
+## 실행 메타
+
+- **시작**: 2026-04-24 23:35:01 KST (`specs/` 디렉토리 생성 시각)
+- **종료**: 2026-04-24 23:43:50 KST (최종 commit `1fc1eab` 시각)
+- **소요**: **8 분 49 초**
+- **모델**: `claude-opus-4-7[1m]` (Claude Opus 4.7, 1M context)
+- **Claude Code 버전**: 2.1.119
+- **Agent 타입**: general-purpose (백그라운드)
+- **수단**: `Agent` tool + `run_in_background: true`
+
 ## 요약
 
 - **작성 일자**: 2026-04-24
