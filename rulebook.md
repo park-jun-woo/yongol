@@ -171,6 +171,7 @@ sqlc query file self-consistency.
 | Q-8 | ERROR | Declared parameter is unused in the query body | `pkg/validate/query/q_08_unused_param.go` |
 | Q-9 | ERROR | `:exec` query returns `SELECT` | `pkg/validate/query/q_09_select_on_exec.go` |
 | Q-10 | ERROR | `sql[].gen.go.out` in `sqlc.yaml` must resolve to `<artifacts>/backend/internal/db` (generate-time; requires `<artifacts>` CLI argument) | `pkg/generate/gogin/check_sqlc_out_path.go` |
+| Q-11 | ERROR | `sql[].gen.go.sql_package` in `sqlc.yaml` must be `pgx/v5` (yongol backend codegen is unified on pgx/v5) | `pkg/validate/query/q_11_sql_package_pgx_v5.go` |
 
 ## E. DDL
 

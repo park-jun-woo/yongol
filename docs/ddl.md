@@ -13,7 +13,22 @@ yongol does not generate SQL. The author writes DDL and queries; sqlc emits Go c
 
 Recommended `sqlc.yaml` `gen.go.out`: `../../artifacts/<project>/backend/internal/db`. `yongol generate` runs `sqlc generate --file db/sqlc.yaml` before handler codegen.
 
-Rules: D-4 (sqlc.yaml required), D-5 (`sql[].schema` must cover `db/*.sql`), D-6 (`sql[].queries` must cover `db/queries/`).
+**`sql_package: pgx/v5` is required** (Q-11). yongol's backend codegen (server bootstrap, handler transaction, convert functions, ErrNoRows handling) is unified on the pgx/v5 driver. `database/sql`, `pgx/v4`, `lib/pq`, or an absent `sql_package` field are rejected at `yongol validate` time.
+
+```yaml
+version: "2"
+sql:
+  - engine: "postgresql"
+    schema: "."
+    queries: "queries/"
+    gen:
+      go:
+        package: "db"
+        out: "../../artifacts/<project>/backend/internal/db"
+        sql_package: "pgx/v5"   # required
+```
+
+Rules: D-4 (sqlc.yaml required), D-5 (`sql[].schema` must cover `db/*.sql`), D-6 (`sql[].queries` must cover `db/queries/`), Q-11 (`sql_package` must be `pgx/v5`).
 
 ## sqlc Cardinality -> SSaC Type
 

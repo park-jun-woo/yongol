@@ -7,3 +7,4 @@ sql:
       go:
         package: "db"
         out: "../../arts/backend/internal/db"
+        sql_package: "pgx/v5"

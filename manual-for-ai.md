@@ -104,6 +104,9 @@ Standard SQL DDL and sqlc. Details: [`docs/ddl.md`](docs/ddl.md).
   trailing `s`).
 - `db/sqlc.yaml` is required (D-4). `sql[].schema` covers `db/*.sql`,
   `sql[].queries` covers `db/queries/`.
+- **`sql_package: pgx/v5` is required** (Q-11). yongol's backend codegen
+  is unified on pgx/v5; `database/sql` / `pgx/v4` / `lib/pq` / absent are
+  rejected at `yongol validate`.
 - Recommended `gen.go.out`: `../../artifacts/<project>/backend/internal/db`.
 - Queries use a **global sqlc namespace** — prefix each `-- name:` with the
   Model (`UserCreate`, `GigFindByID`). In SSaC the prefix is auto-stripped:
