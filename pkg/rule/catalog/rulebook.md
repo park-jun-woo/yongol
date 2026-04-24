@@ -336,9 +336,15 @@ SSaC `@result` / `@input` 이 DDL 테이블/컬럼과 일치하는지 양방향 
 | F-1 | WARNING | Func 이름이 built-in 패키지명(`auth`/`session`/`cache`/`file`)과 충돌 | `pkg/validate/funcspec/f_01_builtin_override.go` |
 | XFF-40 | ERROR | Func 본체 미구현 (`panic("TODO")` / `// TODO` / 빈 본체) | `pkg/validate/funcspec/xff_40_func_body_todo.go` |
 | XFF-41 | ERROR | Func 본체에 I/O 패키지 (`database/sql`, `net/http`, `grpc` 등) import 금지 | `pkg/validate/funcspec/xff_41_func_forbidden_import.go` |
-| XOH-35 | ERROR | Hurl path → OpenAPI 경로 존재 | `pkg/validate/openapi_hurl/xoh_35_hurl_path_openapi.go` |
-| XOH-36 | ERROR | Hurl method → OpenAPI 메서드 존재 | `pkg/validate/openapi_hurl/xoh_36_hurl_method_openapi.go` |
-| XOH-37 | WARNING | Hurl status code 가 OpenAPI 에 정의되지 않음 | `pkg/validate/openapi_hurl/xoh_37_hurl_status_not_defined.go` |
+| XOH-01 | ERROR | Hurl URL + method 가 OpenAPI operation 으로 선언됨 | `pkg/validate/hurl_openapi/xoh_01_url_method.go` |
+| XOH-02 | ERROR | Hurl `HTTP <status>` 가 OpenAPI responses 에 선언됨 | `pkg/validate/hurl_openapi/xoh_02_status_declared.go` |
+| XOH-03 | ERROR | Hurl 요청 JSON 필드가 OpenAPI request schema 에 존재 | `pkg/validate/hurl_openapi/xoh_03_request_field_in_schema.go` |
+| XOH-04 | ERROR | Hurl assert jsonpath 이 OpenAPI response schema 에 도달 가능 | `pkg/validate/hurl_openapi/xoh_04_assert_path_in_schema.go` |
+| XOH-05 | WARNING | Hurl 호출 순서가 state machine 전이 규칙을 준수 | `pkg/validate/hurl_statemachine/xoh_05_state_transition_order.go` |
+| XOH-06 | WARNING | 보호 구간 Hurl 호출 전에 인증 스텝 선행 | `pkg/validate/hurl_manifest/xoh_06_auth_precondition.go` |
+| XOH-07 | WARNING | cookie 모드 mutation 요청에 `X-CSRF-Token` 헤더 포함 | `pkg/validate/hurl_manifest/xoh_07_csrf_on_mutation.go` |
+| XOH-08 | ERROR | Hurl capture jsonpath 이 OpenAPI response schema 에 존재 | `pkg/validate/hurl_openapi/xoh_08_capture_path_in_schema.go` |
+| XOH-09 | WARNING | Hurl [Captures] 로 저장한 변수가 같은 파일에서 사용됨 | `pkg/validate/hurl_openapi/xoh_09_unused_capture.go` |
 | XDM-27 | ERROR | `@state` field 가 DDL 컬럼에 존재 | `pkg/validate/ddl_statemachine/xdm_27_state_field_column.go` |
 | XDM-28 | ERROR | stateDiagram `[*] → X` 초기 전이 ↔ DDL `DEFAULT 'X'` 일치 | `pkg/validate/ddl_statemachine/xdm_28_default_initial_state.go` |
 
@@ -460,6 +466,10 @@ Allowlist:
 | M-2 | `model/*.go` struct 타입이 `@dto` 또는 DDL 테이블 중 하나와 매칭됨 | 동일 |
 | XNS-77 | manifest `auth.claims` 있는데 SSaC 에 `auth.IssueToken` 호출 없음 (WARNING) | Login 누락은 true positive 극히 희박 + 검증자-전용 마이크로서비스에서 false positive. 런타임 첫 로그인 시도로 즉시 드러나므로 정적 검증 가치 낮음 (`plans/deprecated/Phase005-RemoveXNS77.md`) |
 | SEC-03 | `backend.rate_limit.endpoints.<key>` 의 `<key>` 가 OpenAPI operationId 에 존재 (ERROR) | 애플리케이션 계층 rate_limit 자체 폐기 — CDN/WAF/Gateway 계층 책임으로 이관. `FixedRateLimit` 하드코딩 가드(/auth/refresh)만 유지 (`plans/deprecated/Phase006-DeprecateAppLayerRateLimit.md`) |
+| XOH-35 | Hurl path → OpenAPI path 존재 | XOH-01 로 흡수 (2026-04-24, hurl_openapi 재편). path + method 를 단일 판정. |
+| XOH-36 | Hurl method → OpenAPI method 존재 | XOH-01 로 흡수 (2026-04-24). |
+| XOH-37 | Hurl status code → OpenAPI responses | XOH-02 로 이관 (2026-04-24). 심각도 WARNING → ERROR. |
+| `pkg/generate/hurl/` | 자동 smoke/scenario 생성 엔진 | 2026-04-24 디렉토리 통째 삭제 (`plans/gen/hurl/Phase001`). Hurl 은 사용자 소유, yongol 은 `specs/tests/` → `arts/tests/` 미러링만 수행. |
 
 ---
 

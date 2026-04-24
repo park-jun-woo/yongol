@@ -9,10 +9,12 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/validate/ddl_statemachine"
 	"github.com/park-jun-woo/yongol/pkg/validate/funcspec"
 	"github.com/park-jun-woo/yongol/pkg/validate/hurl"
+	"github.com/park-jun-woo/yongol/pkg/validate/hurl_manifest"
+	"github.com/park-jun-woo/yongol/pkg/validate/hurl_openapi"
+	"github.com/park-jun-woo/yongol/pkg/validate/hurl_statemachine"
 	"github.com/park-jun-woo/yongol/pkg/validate/manifest"
 	"github.com/park-jun-woo/yongol/pkg/validate/openapi"
 	"github.com/park-jun-woo/yongol/pkg/validate/openapi_ddl"
-	"github.com/park-jun-woo/yongol/pkg/validate/openapi_hurl"
 	"github.com/park-jun-woo/yongol/pkg/validate/openapi_manifest"
 	"github.com/park-jun-woo/yongol/pkg/validate/openapi_ssac"
 	"github.com/park-jun-woo/yongol/pkg/validate/query"
@@ -46,7 +48,9 @@ func allSteps() []step {
 		{Name: "funcspec", Kinds: []yongol.SSOTKind{yongol.KindFunc}, Run: funcspec.Run},
 		{Name: "openapi_ddl", Kinds: []yongol.SSOTKind{yongol.KindOpenAPI, yongol.KindDDL}, Run: openapi_ddl.Run},
 		{Name: "openapi_ssac", Kinds: []yongol.SSOTKind{yongol.KindOpenAPI, yongol.KindSSaC}, Run: openapi_ssac.Run},
-		{Name: "openapi_hurl", Kinds: []yongol.SSOTKind{yongol.KindOpenAPI, yongol.KindScenario}, Run: openapi_hurl.Run},
+		{Name: "hurl_openapi", Kinds: []yongol.SSOTKind{yongol.KindScenario, yongol.KindOpenAPI}, Run: hurl_openapi.Run},
+		{Name: "hurl_statemachine", Kinds: []yongol.SSOTKind{yongol.KindScenario, yongol.KindStates}, Run: hurl_statemachine.Run},
+		{Name: "hurl_manifest", Kinds: []yongol.SSOTKind{yongol.KindScenario, yongol.KindConfig}, Run: hurl_manifest.Run},
 		{Name: "openapi_manifest", Kinds: []yongol.SSOTKind{yongol.KindOpenAPI, yongol.KindConfig}, Run: openapi_manifest.Run},
 		{Name: "ssac_ddl", Kinds: []yongol.SSOTKind{yongol.KindSSaC, yongol.KindDDL}, Run: ssac_ddl.Run},
 		{Name: "ssac_statemachine", Kinds: []yongol.SSOTKind{yongol.KindSSaC, yongol.KindStates}, Run: ssac_statemachine.Run},
