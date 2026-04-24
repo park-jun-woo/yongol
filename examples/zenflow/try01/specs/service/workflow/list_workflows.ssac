@@ -1,7 +1,0 @@
-package service
-
-// @auth "ListWorkflows" "workflow" {} "Forbidden"
-// @get []Workflow items = Workflow.ListByOwnerID({OwnerID: currentUser.ID, Page: request.page, PerPage: request.per_page})
-// @get int64 total = Workflow.CountByOwnerID({OwnerID: currentUser.ID})
-// @response { items: items, total: total }
-func ListWorkflows() {}

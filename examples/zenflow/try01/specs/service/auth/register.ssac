@@ -1,8 +1,0 @@
-package service
-
-import "github.com/park-jun-woo/ssac/pkg/auth"
-
-// @call auth.HashPasswordResponse hp = auth.HashPassword({Password: request.password})
-// @post User user = User.Create({Email: request.email, PasswordHash: hp.HashedPassword, Role: "admin"})
-// @response { user: user }
-func Register() {}
