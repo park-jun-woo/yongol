@@ -1,0 +1,27 @@
+apiVersion: yongol/v1
+kind: Project
+metadata:
+  name: zenflow
+  description: "ZenFlow — workflow automation SaaS (try03 clean-room smoke)"
+backend:
+  lang: go
+  framework: gin
+  module: github.com/park-jun-woo/zenflow-try03
+  middleware:
+    - bearerAuth
+  auth:
+    type: jwt
+    mode: bearer
+    secret_env: JWT_SECRET
+    claims:
+      ID: user_id:int64
+      Email: email
+      Role: role
+      OrgID: org_id:int64
+    roles:
+      - admin
+frontend:
+  lang: typescript
+  framework: react
+  bundler: vite
+  name: zenflow-web

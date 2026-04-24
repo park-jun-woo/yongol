@@ -1,0 +1,12 @@
+package service
+
+// @auth "ActivateWorkflow" "workflow" {ResourceID: request.id} "Forbidden"
+// @get Workflow wf = Workflow.FindByID({ID: request.id})
+// @empty wf "Workflow not found" 404
+// @get Organization org = Organization.FindWithCredits({ID: wf.OrgID})
+// @empty org "Insufficient credits" 402
+// @state workflow {status: wf.Status} "ActivateWorkflow" "Invalid state transition" 409
+// @put Workflow.UpdateStatus({ID: wf.ID, Status: "active"})
+// @get Workflow updated = Workflow.FindByID({ID: wf.ID})
+// @response { workflow: updated }
+func ActivateWorkflow() {}

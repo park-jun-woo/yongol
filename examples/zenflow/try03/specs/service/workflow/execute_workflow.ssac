@@ -1,0 +1,12 @@
+package service
+
+// @auth "ExecuteWorkflow" "workflow" {ResourceID: request.id} "Forbidden"
+// @get Workflow wf = Workflow.FindByID({ID: request.id})
+// @empty wf "Workflow not found" 404
+// @get Organization org = Organization.FindWithCredits({ID: wf.OrgID})
+// @empty org "Insufficient credits" 402
+// @state workflow {status: wf.Status} "ExecuteWorkflow" "Workflow not active" 409
+// @put Organization.DeductCredits({ID: wf.OrgID, Amount: 1})
+// @post ExecutionLog log = ExecutionLog.Create({WorkflowID: wf.ID, OrgID: wf.OrgID, Status: "success", CreditsSpent: 1})
+// @response { log: log }
+func ExecuteWorkflow() {}
