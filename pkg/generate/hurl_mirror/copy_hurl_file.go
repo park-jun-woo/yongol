@@ -1,16 +1,22 @@
 //ff:func feature=gen-hurl type=util control=sequence
-//ff:what copyHurlFile — src → dst verbatim 파일 복사
+//ff:what copyHurlFile — src → dst verbatim 복사 (상위 디렉토리 lazy 생성)
 
-package hurl
+package hurl_mirror
 
 import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 )
 
-// copyHurlFile copies src → dst verbatim. Truncates dst if it exists.
+// copyHurlFile copies src to dst byte-for-byte. The parent directory of
+// dst is created on demand so nested layouts under specs/tests/ are
+// preserved without a pre-walk step.
 func copyHurlFile(src, dst string) error {
+	if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
+		return fmt.Errorf("mkdir %s: %w", filepath.Dir(dst), err)
+	}
 	in, err := os.Open(src)
 	if err != nil {
 		return fmt.Errorf("open %s: %w", src, err)

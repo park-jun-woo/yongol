@@ -5,7 +5,7 @@ package generate
 import (
 	"fmt"
 
-	"github.com/park-jun-woo/yongol/pkg/generate/hurl"
+	"github.com/park-jun-woo/yongol/pkg/generate/hurl_mirror"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
@@ -25,8 +25,10 @@ func Generate(fs *yongol.Fullstack, artifactsDir string, backend BackendType, fr
 	if err := runFrontend(fs, artifactsDir, frontend); err != nil {
 		return fmt.Errorf("frontend: %w", err)
 	}
-	if err := hurl.Generate(fs, artifactsDir); err != nil {
-		return fmt.Errorf("hurl: %w", err)
+	if fs != nil {
+		if _, err := hurl_mirror.MirrorSpecsTests(fs.SpecsDir, artifactsDir); err != nil {
+			return fmt.Errorf("hurl mirror: %w", err)
+		}
 	}
 	if err := copyOPARego(fs, artifactsDir); err != nil {
 		return fmt.Errorf("opa rego: %w", err)
