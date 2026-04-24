@@ -1,0 +1,26 @@
+apiVersion: yongol/v1
+kind: Project
+metadata:
+  name: zenflow_try01
+  description: "ZenFlow workflow automation demo — clean-room try01"
+backend:
+  lang: go
+  framework: gin
+  module: github.com/example/zenflow_try01
+  middleware:
+    - bearerAuth
+  auth:
+    type: jwt
+    mode: bearer
+    secret_env: JWT_SECRET
+    claims:
+      ID: user_id:int64
+      Email: email
+      Role: role
+    roles:
+      - admin
+frontend:
+  lang: typescript
+  framework: react
+  bundler: vite
+  name: ZenflowTry01-web
