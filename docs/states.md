@@ -69,6 +69,23 @@ A single operationId can appear across diagrams when multiple states transition 
 | Transition label -> SSaC funcName | Identical |
 | `[*] --> X` -> DDL column DEFAULT | XDM-28 exact match |
 | Node names -> DDL CHECK allowed values | Intersection if CHECK exists |
+| Stateful resource POST/PUT/DELETE on `/{resource}/{id}/...` -> SSaC `@state` or `// @state-neutral` | XSM-27 |
+
+### XSM-27 — state intent declaration
+
+A resource is **stateful** when a stateDiagram exists for it and the DDL
+`DEFAULT` on its state column matches the `[*] --> X` initial state. Every
+`POST`/`PUT`/`DELETE` operation on such a resource that loads it with
+`@get <Model>.FindByID({ID: request.id})` must declare its state intent:
+
+- `@state <diagramID> {...} "<event>" ...` — the operation depends on the
+  resource's state. If the diagram has no matching transition, add one
+  (self-loop allowed).
+- `// @state-neutral` — the operation is intentionally independent of state.
+
+The rule protects smoke-test ordering: without an explicit declaration the
+generator cannot tell whether an operation should run before or after a
+state transition, so it may sequence it incorrectly.
 
 ## Further Reading
 

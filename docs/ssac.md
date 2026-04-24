@@ -49,6 +49,34 @@ When using `@call pkg.Func`, the package must appear in the file's `import` bloc
 
 Suppress WARNINGs with `!` suffix: `@delete!`, `@response!`.
 
+### Function-level annotations
+
+Directives that live above the `func` declaration and control how validation
+treats the whole function. They are not sequences; they do not execute.
+
+| Annotation | Purpose |
+|---|---|
+| `// @no-pagination` | Exempts list endpoints from the pagination rule S-63. |
+| `// @state-neutral` | Declares that this operation is intentionally independent of the target resource's state machine. Exempts the function from XSM-27; the author asserts that the operation applies in every state. |
+
+Example:
+
+```go
+package service
+
+// @state-neutral
+// @auth "LikeWorkflow" "workflow" {ResourceID: request.id} "Forbidden"
+// @get Workflow wf = Workflow.FindByID({ID: request.id})
+// @put Workflow.IncrementLikes({ID: wf.ID})
+// @response { ok: true }
+func LikeWorkflow() {}
+```
+
+`@state-neutral` is a **declaration of intent**, not an escape hatch: use it
+only when the operation truly does not depend on the resource's state. For
+state-dependent operations, add a `@state` guard (and the corresponding
+transition — a self-loop if there is no state change) in the diagram.
+
 ### @verify-password
 
 Single-line bundle of `FindByEmail` + bcrypt compare + dummy-hash fallback. Prevents response-time oracle on user existence.

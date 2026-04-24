@@ -169,6 +169,13 @@ build). Full reference: [`docs/ssac.md`](docs/ssac.md).
 
 Append `!` to suppress WARNINGs (`@delete!`, `@response!`).
 
+Function-level annotations (placed above `func`): `// @no-pagination` exempts
+list endpoints from S-63; `// @state-neutral` declares that the operation is
+intentionally independent of the target resource's state machine and exempts
+the function from XSM-27 (use it as an intent declaration, not an escape
+hatch — state-dependent operations should add a `@state` guard and the
+corresponding transition, self-loop if there is no state change).
+
 `@put` returns nothing; re-query with `@get` if the response needs the updated
 row.
 

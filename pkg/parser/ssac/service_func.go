@@ -14,4 +14,5 @@ type ServiceFunc struct {
 	Param        *ParamInfo     // function parameter (for subscribe functions)
 	Structs      []StructInfo   // Go structs declared in the .ssac file
 	NoPagination bool           // true when a // @no-pagination comment is present — exempts from S-63
+	StateNeutral bool           // true when a // @state-neutral comment is present — exempts from XSM-27
 }

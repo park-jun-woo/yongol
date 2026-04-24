@@ -14,5 +14,6 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	diags = append(diags, xms24StateDiagramExists(fs)...)
 	diags = append(diags, xms25StateEvent(fs)...)
 	diags = append(diags, xsm26MissingStateGuard(fs)...)
+	diags = append(diags, xsm27StateIntentDeclaration(fs)...)
 	return diags
 }

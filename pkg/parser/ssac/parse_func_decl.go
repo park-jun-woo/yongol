@@ -30,6 +30,7 @@ func parseFuncDecl(fset *token.FileSet, fn *ast.FuncDecl, f *ast.File, path stri
 	}
 
 	noPagination := hasNoPaginationComment(comments)
+	stateNeutral := hasStateNeutralComment(comments)
 
 	sf := ServiceFunc{
 		Name:         fn.Name.Name,
@@ -39,6 +40,7 @@ func parseFuncDecl(fset *token.FileSet, fn *ast.FuncDecl, f *ast.File, path stri
 		Structs:      structs,
 		Param:        extractParamInfo(fn),
 		NoPagination: noPagination,
+		StateNeutral: stateNeutral,
 	}
 
 	// @subscribe extraction: function metadata, not a sequence
