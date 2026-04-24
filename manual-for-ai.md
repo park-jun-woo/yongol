@@ -26,8 +26,9 @@ label, and Hurl scenario references the same PascalCase identifier.
 ├── func/<pkg>/*.go               # Custom @call funcs (optional)
 ├── states/*.md                   # Mermaid stateDiagram
 ├── policy/*.rego                 # OPA Rego v1
-├── tests/scenario-*.hurl         # Hurl scenarios (optional)
-├── tests/invariant-*.hurl        # Hurl invariants (optional)
+├── tests/smoke.hurl              # user-owned smoke (write it yourself)
+├── tests/scenario-*.hurl         # user-owned scenarios
+├── tests/invariant-*.hurl        # user-owned invariants
 └── frontend/
     ├── pages/*.tsx
     └── components/*.tsx
@@ -314,13 +315,42 @@ Unused OpenAPI operations are intentionally not reported.
 
 ## Hurl tests
 
-Standard Hurl — [`docs/scenario.md`](docs/scenario.md).
+Standard Hurl — [`docs/scenario.md`](docs/scenario.md). yongol adds no DSL.
 
-- Location: `tests/scenario-*.hurl`, `tests/invariant-*.hurl`. Smoke tests
-  (`smoke.hurl`) are auto-generated separately.
+- Location: `specs/tests/*.hurl` — **every hurl file is user-authored**
+  (`smoke.hurl`, `scenario-*.hurl`, `invariant-*.hurl`). yongol does not
+  generate any hurl.
+- `yongol generate` only mirrors `specs/tests/` → `arts/tests/` verbatim;
+  orphaned `.hurl` files under `arts/tests/` that no longer exist in specs
+  are pruned so the two directories stay in sync.
 - `.feature` files are deprecated (H-1 ERROR).
-- Crosscheck (Hurl → OpenAPI, one-way): path exists (ERROR), method defined
-  (ERROR), expected status in responses (WARNING).
+- Cross-validation covers Hurl ↔ OpenAPI / State Machine / Manifest
+  (rulebook sections R / R2 / R3 / R4): URL+method (XOH-01, ERROR), response
+  status (XOH-02, ERROR), request body field (XOH-03, ERROR), assert
+  jsonpath (XOH-04, ERROR), state order (XOH-05, WARNING), auth
+  precondition (XOH-06, WARNING), CSRF on mutation (XOH-07, WARNING),
+  capture jsonpath (XOH-08, ERROR), unused capture (XOH-09, WARNING).
+
+### Authoring quick-start
+
+Copy a starter template from [`docs/scenario.md`](docs/scenario.md) —
+there are ready-to-edit snippets for both auth modes:
+
+- **Cookie mode** (`backend.auth.mode: cookie`, the 2026 default): login
+  captures the CSRF token from a response header; every mutation carries
+  `X-CSRF-Token: {{csrf}}`.
+- **Bearer mode** (`backend.auth.mode: bearer`): login captures
+  `access_token` from the response body; every protected call carries
+  `Authorization: Bearer {{token}}`.
+
+Common mistakes caught at validate time:
+
+- Capturing `$.access_token` on a Register response that only returns
+  `user` — XOH-08 reports the drift.
+- Calling a protected endpoint without a preceding auth step — XOH-06.
+- Omitting `X-CSRF-Token` on a POST/PUT/DELETE in cookie mode — XOH-07.
+- Invoking a state transition before its prerequisite transitions —
+  XOH-05 (e.g. `ExecuteWorkflow` before `ActivateWorkflow`).
 
 ## Func Spec
 
@@ -453,7 +483,10 @@ hatch: `// nolint:prv-NN` (or `// nolint:panic` for PRV-10). Full spec:
    generated code.
 6. **Start server** with `JWT_SECRET` + `OPA_POLICY_PATH` + DSN. `OPA_POLICY_PATH`
    is mandatory; the server exits at startup if unset.
-7. **Run tests:** `hurl --test --variable host=http://localhost:8080 tests/*.hurl`.
+7. **Run tests:** `hurl --test --variable host=http://localhost:8080 arts/<project>/tests/*.hurl`
+   (generate mirrors `specs/tests/` → `arts/tests/`). Initial smoke.hurl
+   draft: copy the template from `docs/scenario.md` to
+   `specs/tests/smoke.hurl` and edit for your domain.
 
 ### Authoring invariants
 
@@ -478,3 +511,4 @@ hatch: `// nolint:prv-NN` (or `// nolint:panic` for PRV-10). Full spec:
 | `go build` config | `config.*` is banned in SSaC; funcs read env vars. |
 | `go build` other | SSOT or codegen bug — never edit `artifacts/`. |
 | `hurl --test` fails | Classify SSOT vs codegen, report. |
+| `XOH-NN` ERROR at validate | Hurl drifted from another SSOT. Fix the hurl, or fix OpenAPI / state machine / manifest so they agree. |

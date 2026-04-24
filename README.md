@@ -51,7 +51,9 @@ yongol validate examples/zenflow
 ✓ funcspec
 ✓ openapi_ddl
 ✓ openapi_ssac
-✓ openapi_hurl
+✓ hurl_openapi
+✓ hurl_statemachine
+✓ hurl_manifest
 ✓ openapi_manifest
 ✓ ssac_ddl
 ✓ ssac_statemachine
@@ -112,8 +114,9 @@ specs/
 ├── func/<pkg>/*.go            → custom function implementations (optional)
 ├── states/*.md                → Mermaid stateDiagram (state transitions)
 ├── policy/*.rego              → OPA Rego (authorization)
-├── tests/scenario-*.hurl      → Hurl business scenarios
-├── tests/invariant-*.hurl     → Hurl cross-endpoint invariants
+├── tests/smoke.hurl           → user-owned smoke (write it yourself)
+├── tests/scenario-*.hurl      → user-owned business scenarios
+├── tests/invariant-*.hurl     → user-owned cross-endpoint invariants
 ├── frontend/pages/*.tsx       → React TSX — apiClient calls, forms
 └── frontend/components/*.tsx  → shared React components
 ```
@@ -171,7 +174,9 @@ Individual SSOT validation followed by cross-layer consistency checks.
 ✓ funcspec
 ✓ openapi_ddl
 ✓ openapi_ssac
-✓ openapi_hurl
+✓ hurl_openapi
+✓ hurl_statemachine
+✓ hurl_manifest
 ✓ openapi_manifest
 ✓ ssac_ddl
 ✓ ssac_statemachine
@@ -241,7 +246,9 @@ Individual tools (SSaC, TypeScript/TSX) validate their own layer. yongol catches
 - **Policy ↔ SSaC** — `@auth` (action, resource) pairs match Rego allow rules
 - **Policy ↔ DDL** — `@ownership` table/column references exist
 - **Policy ↔ States** — state transitions with `@auth` have Rego rules
-- **Hurl ↔ OpenAPI** — tests reference declared endpoints
+- **Hurl ↔ OpenAPI** — URL/method/status/request+response fields (XOH-01~04, XOH-08~09)
+- **Hurl ↔ State Machine** — call order vs declared transitions (XOH-05)
+- **Hurl ↔ Manifest** — auth precondition + CSRF headers (XOH-06~07)
 - **Queue** — `@publish` topics match `@subscribe` functions, payload fields agree
 - **Func ↔ SSaC** — `@call` references have implementations, arg count/types match
 - **TSX ↔ OpenAPI** — `apiClient.<op>()` ↔ operationId (XOT-1), call args ↔ parameters (XOT-2), `register('x')` ↔ request body schema (XOT-3, WARNING)
@@ -310,13 +317,20 @@ Applying migrations to the actual database is delegated to standard tools (`gola
 
 ## Runtime Testing
 
-`yongol generate` emits [Hurl](https://hurl.dev) tests from the OpenAPI spec.
+All hurl tests are **user-authored**. Write them under `specs/tests/`;
+`yongol generate` mirrors that directory into `arts/tests/` without
+modification. At validate time, rules **XOH-01 ~ XOH-09** cross-check
+your Hurl against OpenAPI, the state machine, and manifest.auth
+(rulebook sections R / R2 / R3 / R4).
+
+See [`docs/scenario.md`](docs/scenario.md) for authoring guidance and
+cookie / bearer templates you can copy as starting points.
 
 ```bash
 hurl --test --variable host=http://localhost:8080 artifacts/my-project/tests/*.hurl
 ```
 
-- **smoke.hurl** — endpoint smoke tests (auto-generated)
+- **smoke.hurl** — endpoint smoke (user-authored)
 - **scenario-\*.hurl** — business scenario tests (user-authored)
 - **invariant-\*.hurl** — cross-endpoint invariant tests (user-authored)
 

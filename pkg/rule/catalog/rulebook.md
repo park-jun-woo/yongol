@@ -324,27 +324,49 @@ SSaC `@result` / `@input` 이 DDL 테이블/컬럼과 일치하는지 양방향 
 | XDS-12 | WARNING | `@result` 타입에 대응하는 sqlc row type 또는 DDL 테이블 매칭 | `pkg/validate/ssac_ddl/xds_12_result_no_ddl_table.go` |
 | XSD-55 | ERROR | DDL 테이블이 SSaC `@model` 에서 참조됨 (커버리지) | `pkg/validate/ssac_ddl/xsd_55_ddl_to_model_ref.go` |
 
-## R. 기타 (Hurl / StateMachine / Rego / Func / OpenAPI ↔ Hurl)
+## R. Hurl 내부
 
 | Rule ID | Level | Description | Source |
 |---|---|---|---|
 | H-1 | ERROR | `.feature` 파일 존재 (deprecated, Hurl `.hurl` 사용) | `pkg/validate/hurl/h_01_deprecated_feature.go` |
 | H-2 | WARNING | `tests/` 디렉토리 비어있음 | `pkg/validate/hurl/h_02_empty_tests_dir.go` |
+
+## R2. Hurl ↔ OpenAPI
+
+`specs/tests/` 의 Hurl 파일은 전부 사용자 소유. yongol 은 Hurl 파일을 생성하지 않으며, `generate` 는 `specs/tests/` → `arts/tests/` 를 그대로 미러링한다. 본 규칙들은 작성된 Hurl 과 OpenAPI SSOT 사이의 드리프트를 validate 단계에서 잡는다.
+
+| Rule ID | Level | Description | Source |
+|---|---|---|---|
+| XOH-01 | ERROR | Hurl URL + method 가 OpenAPI operation 으로 선언됨 | `pkg/validate/hurl_openapi/xoh_01_url_method.go` |
+| XOH-02 | ERROR | Hurl `HTTP <status>` 가 OpenAPI responses 에 선언됨 | `pkg/validate/hurl_openapi/xoh_02_status_declared.go` |
+| XOH-03 | ERROR | Hurl 요청 JSON 필드가 OpenAPI request schema 에 존재 | `pkg/validate/hurl_openapi/xoh_03_request_field_in_schema.go` |
+| XOH-04 | ERROR | Hurl assert jsonpath 이 OpenAPI response schema 에 도달 가능 | `pkg/validate/hurl_openapi/xoh_04_assert_path_in_schema.go` |
+| XOH-08 | ERROR | Hurl capture jsonpath 이 OpenAPI response schema 에 존재 | `pkg/validate/hurl_openapi/xoh_08_capture_path_in_schema.go` |
+| XOH-09 | WARNING | Hurl [Captures] 로 저장한 변수가 같은 파일에서 사용됨 | `pkg/validate/hurl_openapi/xoh_09_unused_capture.go` |
+
+## R3. Hurl ↔ State Machine
+
+| Rule ID | Level | Description | Source |
+|---|---|---|---|
+| XOH-05 | WARNING | Hurl 호출 순서가 state machine 전이 규칙을 준수 | `pkg/validate/hurl_statemachine/xoh_05_state_transition_order.go` |
+
+## R4. Hurl ↔ Manifest
+
+| Rule ID | Level | Description | Source |
+|---|---|---|---|
+| XOH-06 | WARNING | 보호 구간 Hurl 호출 전에 인증 스텝 선행 | `pkg/validate/hurl_manifest/xoh_06_auth_precondition.go` |
+| XOH-07 | WARNING | cookie 모드 mutation 요청에 `X-CSRF-Token` 헤더 포함 | `pkg/validate/hurl_manifest/xoh_07_csrf_on_mutation.go` |
+
+## R5. State Machine / Rego / Func
+
+| Rule ID | Level | Description | Source |
+|---|---|---|---|
 | ST-1 | ERROR | Mermaid stateDiagram 파싱 검증 | `pkg/validate/statemachine/st_01_parse.go` |
 | P-1 | ERROR | Rego 정책 파싱 검증 | `pkg/validate/rego/p_01_parse.go` |
 | XPP-30 | ERROR | Rego 가 `resource_owner` 참조하는데 `@ownership` 어노테이션 없음 | `pkg/validate/rego/xpp_30_ownership_no_annotation.go` |
 | F-1 | WARNING | Func 이름이 built-in 패키지명(`auth`/`session`/`cache`/`file`)과 충돌 | `pkg/validate/funcspec/f_01_builtin_override.go` |
 | XFF-40 | ERROR | Func 본체 미구현 (`panic("TODO")` / `// TODO` / 빈 본체) | `pkg/validate/funcspec/xff_40_func_body_todo.go` |
 | XFF-41 | ERROR | Func 본체에 I/O 패키지 (`database/sql`, `net/http`, `grpc` 등) import 금지 | `pkg/validate/funcspec/xff_41_func_forbidden_import.go` |
-| XOH-01 | ERROR | Hurl URL + method 가 OpenAPI operation 으로 선언됨 | `pkg/validate/hurl_openapi/xoh_01_url_method.go` |
-| XOH-02 | ERROR | Hurl `HTTP <status>` 가 OpenAPI responses 에 선언됨 | `pkg/validate/hurl_openapi/xoh_02_status_declared.go` |
-| XOH-03 | ERROR | Hurl 요청 JSON 필드가 OpenAPI request schema 에 존재 | `pkg/validate/hurl_openapi/xoh_03_request_field_in_schema.go` |
-| XOH-04 | ERROR | Hurl assert jsonpath 이 OpenAPI response schema 에 도달 가능 | `pkg/validate/hurl_openapi/xoh_04_assert_path_in_schema.go` |
-| XOH-05 | WARNING | Hurl 호출 순서가 state machine 전이 규칙을 준수 | `pkg/validate/hurl_statemachine/xoh_05_state_transition_order.go` |
-| XOH-06 | WARNING | 보호 구간 Hurl 호출 전에 인증 스텝 선행 | `pkg/validate/hurl_manifest/xoh_06_auth_precondition.go` |
-| XOH-07 | WARNING | cookie 모드 mutation 요청에 `X-CSRF-Token` 헤더 포함 | `pkg/validate/hurl_manifest/xoh_07_csrf_on_mutation.go` |
-| XOH-08 | ERROR | Hurl capture jsonpath 이 OpenAPI response schema 에 존재 | `pkg/validate/hurl_openapi/xoh_08_capture_path_in_schema.go` |
-| XOH-09 | WARNING | Hurl [Captures] 로 저장한 변수가 같은 파일에서 사용됨 | `pkg/validate/hurl_openapi/xoh_09_unused_capture.go` |
 | XDM-27 | ERROR | `@state` field 가 DDL 컬럼에 존재 | `pkg/validate/ddl_statemachine/xdm_27_state_field_column.go` |
 | XDM-28 | ERROR | stateDiagram `[*] → X` 초기 전이 ↔ DDL `DEFAULT 'X'` 일치 | `pkg/validate/ddl_statemachine/xdm_28_default_initial_state.go` |
 

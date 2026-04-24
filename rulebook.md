@@ -357,27 +357,49 @@ copy-pasteable advice block sourced from the interface.yaml's
 | XNQ-90 | ERROR | `manifest.queue.backend=postgres` requires `fullend_queue` DDL + `QueuePublish/QueuePoll/QueueAck` sqlc queries | `pkg/validate/manifest/xnq_90_queue_backend_requires_sqlc.go` |
 | XNA-90 | ERROR | `manifest.backend.auth` configured requires `refresh_tokens` DDL + `RefreshTokenInsert/FindByHash/Revoke/RevokeAll` sqlc queries | `pkg/validate/manifest/xna_90_refresh_requires_sqlc.go` |
 
-## R. Miscellaneous (Hurl / StateMachine / Rego / Func / OpenAPI ↔ Hurl)
+## R. Hurl Internal
 
 | Rule ID | Level | Description | Source |
 |---|---|---|---|
 | H-1 | ERROR | `.feature` files exist (deprecated; use Hurl `.hurl`) | `pkg/validate/hurl/h_01_deprecated_feature.go` |
 | H-2 | WARNING | `tests/` directory is empty | `pkg/validate/hurl/h_02_empty_tests_dir.go` |
+
+## R2. Hurl ↔ OpenAPI
+
+All Hurl files under `specs/tests/` are user-authored. yongol does not emit any Hurl; `generate` mirrors `specs/tests/` → `arts/tests/` verbatim. These rules catch drift between user-authored Hurl and the OpenAPI SSOT at validate time.
+
+| Rule ID | Level | Description | Source |
+|---|---|---|---|
+| XOH-01 | ERROR | Hurl URL + method declared in OpenAPI | `pkg/validate/hurl_openapi/xoh_01_url_method.go` |
+| XOH-02 | ERROR | Hurl `HTTP <status>` declared in OpenAPI responses | `pkg/validate/hurl_openapi/xoh_02_status_declared.go` |
+| XOH-03 | ERROR | Hurl JSON body field in OpenAPI request schema | `pkg/validate/hurl_openapi/xoh_03_request_field_in_schema.go` |
+| XOH-04 | ERROR | Hurl assert jsonpath reachable in OpenAPI response schema | `pkg/validate/hurl_openapi/xoh_04_assert_path_in_schema.go` |
+| XOH-08 | ERROR | Hurl capture jsonpath reachable in OpenAPI response schema | `pkg/validate/hurl_openapi/xoh_08_capture_path_in_schema.go` |
+| XOH-09 | WARNING | Hurl captured variable is referenced later in the file | `pkg/validate/hurl_openapi/xoh_09_unused_capture.go` |
+
+## R3. Hurl ↔ State Machine
+
+| Rule ID | Level | Description | Source |
+|---|---|---|---|
+| XOH-05 | WARNING | Hurl call order satisfies state machine transitions | `pkg/validate/hurl_statemachine/xoh_05_state_transition_order.go` |
+
+## R4. Hurl ↔ Manifest
+
+| Rule ID | Level | Description | Source |
+|---|---|---|---|
+| XOH-06 | WARNING | Protected Hurl call preceded by an auth step | `pkg/validate/hurl_manifest/xoh_06_auth_precondition.go` |
+| XOH-07 | WARNING | Cookie-mode mutation includes `X-CSRF-Token` header | `pkg/validate/hurl_manifest/xoh_07_csrf_on_mutation.go` |
+
+## R5. State Machine / Rego / Func
+
+| Rule ID | Level | Description | Source |
+|---|---|---|---|
 | ST-1 | ERROR | Mermaid stateDiagram parsing validation | `pkg/validate/statemachine/st_01_parse.go` |
 | P-1 | ERROR | Rego policy parsing validation | `pkg/validate/rego/p_01_parse.go` |
 | XPP-30 | ERROR | Rego references `resource_owner` but no `@ownership` annotation is present | `pkg/validate/rego/xpp_30_ownership_no_annotation.go` |
 | F-1 | WARNING | Func name collides with a built-in package name (`auth`/`session`/`cache`/`file`) | `pkg/validate/funcspec/f_01_builtin_override.go` |
 | XFF-40 | ERROR | Func body is unimplemented (`panic("TODO")` / `// TODO` / empty body) | `pkg/validate/funcspec/xff_40_func_body_todo.go` |
 | XFF-41 | ERROR | Func body must not import I/O packages (`database/sql`, `net/http`, `grpc`, etc.) | `pkg/validate/funcspec/xff_41_func_forbidden_import.go` |
-| XOH-01 | ERROR | Hurl URL + method declared in OpenAPI | `pkg/validate/hurl_openapi/xoh_01_url_method.go` |
-| XOH-02 | ERROR | Hurl `HTTP <status>` declared in OpenAPI responses | `pkg/validate/hurl_openapi/xoh_02_status_declared.go` |
-| XOH-03 | ERROR | Hurl JSON body field in OpenAPI request schema | `pkg/validate/hurl_openapi/xoh_03_request_field_in_schema.go` |
-| XOH-04 | ERROR | Hurl assert jsonpath reachable in OpenAPI response schema | `pkg/validate/hurl_openapi/xoh_04_assert_path_in_schema.go` |
-| XOH-05 | WARNING | Hurl call order satisfies state machine transitions | `pkg/validate/hurl_statemachine/xoh_05_state_transition_order.go` |
-| XOH-06 | WARNING | Protected Hurl call preceded by an auth step | `pkg/validate/hurl_manifest/xoh_06_auth_precondition.go` |
-| XOH-07 | WARNING | Cookie-mode mutation includes `X-CSRF-Token` header | `pkg/validate/hurl_manifest/xoh_07_csrf_on_mutation.go` |
-| XOH-08 | ERROR | Hurl capture jsonpath reachable in OpenAPI response schema | `pkg/validate/hurl_openapi/xoh_08_capture_path_in_schema.go` |
-| XOH-09 | WARNING | Hurl captured variable is referenced later in the file | `pkg/validate/hurl_openapi/xoh_09_unused_capture.go` |
 | XDM-27 | ERROR | `@state` field must exist as a DDL column | `pkg/validate/ddl_statemachine/xdm_27_state_field_column.go` |
 | XDM-28 | ERROR | stateDiagram `[*] → X` initial transition must match DDL `DEFAULT 'X'` | `pkg/validate/ddl_statemachine/xdm_28_default_initial_state.go` |
 
