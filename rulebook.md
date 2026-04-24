@@ -202,6 +202,7 @@ Cross-consistency between DDL tables/columns and OpenAPI schemas / extension fie
 | XDO-75 | ERROR | OpenAPI optional + DDL `NOT NULL` + no `DEFAULT` | `pkg/validate/openapi_ddl/xdo_75_optional_not_null_no_default.go` |
 | XDO-76 | WARNING | OpenAPI required + DDL nullable | `pkg/validate/openapi_ddl/xdo_76_required_nullable.go` |
 | XDO-77 | ERROR | DDL column type ↔ OpenAPI field type mismatch | `pkg/validate/openapi_ddl/xdo_77_column_type_mismatch.go` |
+| XDO-78 | ERROR | OpenAPI `enum` declared but DDL column has no matching `CHECK IN` constraint (reverse of XDO-68) | `pkg/validate/openapi_ddl/xdo_78_enum_no_check.go` |
 | XOD-10 | WARNING | DDL column is missing from an OpenAPI response schema (coverage) | `pkg/validate/openapi_ddl/xod_10_ddl_to_response.go` |
 
 ## G. OpenAPI ↔ SSaC

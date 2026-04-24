@@ -1,0 +1,292 @@
+openapi: 3.0.3
+info:
+  title: ZenFlow API
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080
+security:
+  - bearerAuth: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Organization:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        name: { type: string }
+        plan_type: { type: string }
+        credits_balance: { type: integer, format: int64 }
+        created_at: { type: string, format: date-time }
+    User:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        org_id: { type: integer, format: int64 }
+        email: { type: string }
+        role: { type: string }
+        name: { type: string }
+        created_at: { type: string, format: date-time }
+    Workflow:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        org_id: { type: integer, format: int64 }
+        title: { type: string }
+        trigger_event: { type: string }
+        status: { type: string }
+        created_at: { type: string, format: date-time }
+    Action:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        workflow_id: { type: integer, format: int64 }
+        action_type: { type: string }
+        payload_template: { type: string }
+        sequence_order: { type: integer, format: int64 }
+    ExecutionLog:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        workflow_id: { type: integer, format: int64 }
+        org_id: { type: integer, format: int64 }
+        status: { type: string }
+        credits_spent: { type: integer, format: int64 }
+        executed_at: { type: string, format: date-time }
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error: { type: string }
+        code: { type: string }
+        details:
+          type: object
+          additionalProperties: true
+paths:
+  /auth/signup:
+    post:
+      operationId: Signup
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password, name, org_name, plan_type, credits_balance]
+              properties:
+                email: { type: string, format: email, maxLength: 255 }
+                password: { type: string, minLength: 8 }
+                name: { type: string, maxLength: 255 }
+                org_name: { type: string, maxLength: 255 }
+                plan_type: { type: string, maxLength: 32, enum: [free, pro, enterprise] }
+                credits_balance: { type: integer, format: int64 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user: { $ref: '#/components/schemas/User' }
+                  organization: { $ref: '#/components/schemas/Organization' }
+                  access_token: { type: string }
+        '409':
+          description: Conflict
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        '500':
+          description: Internal Server Error
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+
+  /auth/login:
+    post:
+      operationId: Login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email, maxLength: 255 }
+                password: { type: string, minLength: 8 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token: { type: string }
+        '401':
+          description: Unauthorized
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        '500':
+          description: Internal Server Error
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+
+  /users/me:
+    get:
+      operationId: GetCurrentUser
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user: { $ref: '#/components/schemas/User' }
+        '404':
+          description: Not Found
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+
+  /workflows:
+    post:
+      operationId: CreateWorkflow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, trigger_event]
+              properties:
+                title: { type: string, maxLength: 255 }
+                trigger_event: { type: string, maxLength: 255 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workflow: { $ref: '#/components/schemas/Workflow' }
+        '403':
+          description: Forbidden
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+    get:
+      operationId: ListWorkflows
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workflows:
+                    type: array
+                    items: { $ref: '#/components/schemas/Workflow' }
+        '403':
+          description: Forbidden
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+
+  /workflows/{id}/actions:
+    post:
+      operationId: AddAction
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action_type, payload_template, sequence_order]
+              properties:
+                action_type: { type: string, maxLength: 100 }
+                payload_template: { type: string }
+                sequence_order: { type: integer, format: int64 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  action: { $ref: '#/components/schemas/Action' }
+        '403':
+          description: Forbidden
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        '404':
+          description: Not Found
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+
+  /workflows/{id}/activate:
+    post:
+      operationId: ActivateWorkflow
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workflow: { $ref: '#/components/schemas/Workflow' }
+        '402':
+          description: Payment Required
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        '403':
+          description: Forbidden
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        '404':
+          description: Not Found
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        '409':
+          description: Conflict
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        '500':
+          description: Internal Server Error
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+
+  /workflows/{id}/execute:
+    post:
+      operationId: ExecuteWorkflow
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  log: { $ref: '#/components/schemas/ExecutionLog' }
+        '402':
+          description: Payment Required
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        '403':
+          description: Forbidden
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        '404':
+          description: Not Found
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        '409':
+          description: Conflict
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        '500':
+          description: Internal Server Error
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }

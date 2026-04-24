@@ -9,9 +9,15 @@ package ssac
 // Only formats that (a) produce a wrapper type AND (b) have a trivial cast
 // to a primitive are listed. date/date-time are omitted — oapi-codegen
 // emits time.Time which needs formatting, not a simple cast.
+//
+// The synthetic "enum" key handles string properties with an `enum:` facet
+// — oapi-codegen emits a named string type per field (e.g.
+// api.SignupJSONBodyPlanType) whose underlying is string but cannot be
+// assigned implicitly to the plain-string sqlc param (BUG-020).
 var openAPIFormatToPrimitive = map[string]string{
 	"email": "string",
 	"uuid":  "string",
+	"enum":  "string",
 }
 
 // formatPrimitiveCast returns the Go primitive type (e.g. "string") when the

@@ -20,8 +20,15 @@ func (g *methodGen) extractBodyFormats(op *openapi3.Operation) {
 		if propRef == nil || propRef.Value == nil {
 			continue
 		}
-		if propRef.Value.Format != "" {
+		switch {
+		case propRef.Value.Format != "":
 			g.BodyFormats[propName] = propRef.Value.Format
+		case propRef.Value.Type != nil && propRef.Value.Type.Is("string") && len(propRef.Value.Enum) > 0:
+			// BUG-020 — oapi-codegen emits a named string type per
+			// `enum:` string property (e.g. api.SignupJSONBodyPlanType).
+			// Flag it so mapRequestValue wraps the access with a
+			// `string(...)` cast when passed to sqlc params.
+			g.BodyFormats[propName] = "enum"
 		}
 		// Record JSONB-shaped properties so sqlcArgs can hoist a
 		// json.Marshal call for them (BUG-005 request direction).

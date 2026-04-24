@@ -14,6 +14,7 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	diags = append(diags, xdo67MaxLengthVarchar(fs)...)
 	diags = append(diags, xdo68CheckInEnum(fs)...)
 	diags = append(diags, xdo69CheckValuesEnum(fs)...)
+	diags = append(diags, xdo78EnumNoCheck(fs)...)
 	diags = append(diags, xdo70MaxLengthExceedsVarchar(fs)...)
 	diags = append(diags, xdo75OptionalNotNullNoDefault(fs)...)
 	diags = append(diags, xdo76RequiredNullable(fs)...)

@@ -1,0 +1,35 @@
+apiVersion: yongol/v1
+kind: Project
+metadata:
+  name: zenflow
+backend:
+  lang: go
+  framework: gin
+  module: github.com/park-jun-woo/zenflow
+  middleware:
+    - bearerAuth
+  auth:
+    type: jwt
+    mode: bearer
+    secret_env: JWT_SECRET
+    claims:
+      ID: user_id:int64
+      Email: email
+      Role: role
+      OrgID: org_id:int64
+    roles:
+      - admin
+  cors:
+    enabled: true
+    allow_origins:
+      - http://localhost:3000
+    allow_methods: [GET, POST, PUT, PATCH, DELETE]
+    allow_headers: [Origin, Content-Type, Authorization]
+    expose_headers: [Content-Length]
+    allow_credentials: true
+    max_age: 1h
+frontend:
+  lang: typescript
+  framework: react
+  bundler: vite
+  name: zenflow-web
