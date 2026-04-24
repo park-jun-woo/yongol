@@ -11,8 +11,9 @@ import (
 )
 
 // writeLogValueFields writes one slog attribute line per column. Sensitive
-// columns are masked as slog.String(name, "[REDACTED]"); other columns use
-// the slog constructor matching their Go type (see slogAttrLine).
+// columns are masked as slog.String(name, "[REDACTED]"); all other columns
+// go through slogAttrLine which emits slog.Any(name, r.Field) uniformly
+// (see slogAttrLine for rationale / BUG-024).
 func writeLogValueFields(b *strings.Builder, t ddl.Table, cols []string) {
 	for _, col := range cols {
 		goType := t.Columns[col]

@@ -14,6 +14,11 @@ import (
 // renderLogValueFile produces the full Go source for one <table>_log.go file.
 // Uses Table.ColumnOrder for DDL-declared order; falls back to sorted
 // Columns keys when ColumnOrder is empty (defensive).
+//
+// All non-sensitive fields are emitted as slog.Any (see slogAttrLine for
+// rationale / BUG-024). The only typed constructor we keep is
+// slog.String(name, "[REDACTED]") for sensitive columns, so the generated
+// file only ever imports "log/slog".
 func renderLogValueFile(t ddl.Table) (string, error) {
 	structName := structNameFor(t.Name)
 	cols := t.ColumnOrder
@@ -36,24 +41,9 @@ func renderLogValueFile(t ddl.Table) (string, error) {
 		What: structName + ".LogValue — sensitive 컬럼 [REDACTED] 마스킹 slog.Value 반환",
 	}))
 	b.WriteString("package db\n\n")
-	needsTime, needsJSON := scanImports(t, cols)
 	b.WriteString("import (\n")
 	b.WriteString("\t\"log/slog\"\n")
-	if needsTime {
-		b.WriteString("\t\"time\"\n")
-	}
-	if needsJSON {
-		b.WriteString("\t\"encoding/json\"\n")
-	}
 	b.WriteString(")\n\n")
-	// silence unused-import warnings when struct has no time/json columns —
-	// the imports above are conditional so this blank is only for safety.
-	if needsTime {
-		b.WriteString("var _ time.Time\n\n")
-	}
-	if needsJSON {
-		b.WriteString("var _ json.RawMessage\n\n")
-	}
 
 	// LogValue implementation.
 	b.WriteString(fmt.Sprintf("// LogValue masks sensitive columns when this row is logged via slog.\n"))
