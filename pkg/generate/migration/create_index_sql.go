@@ -13,7 +13,7 @@ func (op CreateIndex) SQL() string {
 		uniq = "UNIQUE "
 	}
 	using := ""
-	if op.Index.Method != "" && op.Index.Method != "btree" {
+	if op.Index.Method != "" {
 		using = " USING " + op.Index.Method
 	}
 	where := ""

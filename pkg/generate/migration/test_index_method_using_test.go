@@ -38,7 +38,7 @@ CREATE INDEX refresh_tokens_claims_idx ON refresh_tokens USING GIN (claims);
 }
 
 // TestBuildASTFromSQL_IndexUsingBTREE verifies an explicit btree is
-// parsed as "btree" (the emitter later normalises it away).
+// parsed as "btree" and preserved verbatim by the emitter.
 func TestBuildASTFromSQL_IndexUsingBTREE(t *testing.T) {
 	sql := `
 CREATE TABLE t (id BIGSERIAL PRIMARY KEY, name TEXT);
@@ -57,8 +57,9 @@ CREATE INDEX idx_t_name ON t USING BTREE (name);
 	}
 }
 
-// TestCreateIndex_SQL_EmitsUsing verifies emit round-trips the method for
-// non-btree indexes and omits it for btree (postgres default).
+// TestCreateIndex_SQL_EmitsUsing verifies emit preserves the user-declared
+// method verbatim (including explicit btree) and omits USING only when no
+// method was declared in the DDL.
 func TestCreateIndex_SQL_EmitsUsing(t *testing.T) {
 	tests := []struct {
 		name   string
@@ -77,9 +78,9 @@ func TestCreateIndex_SQL_EmitsUsing(t *testing.T) {
 			substr: "USING hash",
 		},
 		{
-			name:   "btree is omitted",
+			name:   "explicit btree is preserved",
 			idx:    &Index{Name: "i", Columns: []string{"c"}, Method: "btree"},
-			notHas: "USING",
+			substr: "USING btree",
 		},
 		{
 			name:   "empty method is omitted",

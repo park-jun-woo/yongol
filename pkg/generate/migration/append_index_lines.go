@@ -20,7 +20,7 @@ func appendIndexLines(b *strings.Builder, t *Table) {
 			uniq = "UNIQUE "
 		}
 		using := ""
-		if idx.Method != "" && idx.Method != "btree" {
+		if idx.Method != "" {
 			using = " USING " + idx.Method
 		}
 		where := ""
