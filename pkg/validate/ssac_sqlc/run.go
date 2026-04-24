@@ -15,5 +15,6 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	diags = append(diags, xqs16InputKeyMissing(fs)...)
 	diags = append(diags, xqs17ParamKeyMissing(fs)...)
 	diags = append(diags, xqs18ParamTypeMismatch(fs)...)
+	diags = append(diags, xqs19SsacBuiltinQueryRequired(fs)...)
 	return diags
 }
