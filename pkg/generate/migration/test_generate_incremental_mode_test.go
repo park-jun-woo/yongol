@@ -1,8 +1,9 @@
 //ff:func feature=migration type=test control=sequence
-//ff:what TestGenerate_IncrementalMode — 스냅샷 존재 상태에서 DDL 변경 시 0002_* 파일 생성
+//ff:what TestGenerate_IncrementalMode — 스냅샷 존재 상태에서 DDL 변경 시 0002_*.up.sql / .down.sql 짝 생성
 package migration
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -30,5 +31,20 @@ CREATE TABLE users (id BIGSERIAL PRIMARY KEY, name TEXT NOT NULL DEFAULT '', age
 	}
 	if !strings.Contains(res.MigrationFile, "0002_") {
 		t.Errorf("expected 0002_* file, got %q", res.MigrationFile)
+	}
+	if !strings.HasSuffix(res.MigrationFile, ".up.sql") {
+		t.Errorf("expected .up.sql suffix, got %q", res.MigrationFile)
+	}
+
+	// Derive the matching .down.sql name and assert the stub file exists
+	// with the marker line.
+	downName := strings.TrimSuffix(res.MigrationFile, ".up.sql") + ".down.sql"
+	downPath := filepath.Join(artsDir, "db", "migrations", downName)
+	if _, err := os.Stat(downPath); err != nil {
+		t.Errorf("down stub %s missing: %v", downName, err)
+	}
+	downData, _ := os.ReadFile(downPath)
+	if !strings.Contains(string(downData), "Down stub — intentionally empty.") {
+		t.Errorf("down stub missing marker line:\n%s", downData)
 	}
 }

@@ -1,5 +1,5 @@
 //ff:func feature=migration type=test control=sequence
-//ff:what TestGenerate_InitialMode — 스냅샷 없는 상태에서 0001_initial.sql + 스냅샷 헤더 생성
+//ff:what TestGenerate_InitialMode — 스냅샷 없는 상태에서 0001_initial.up.sql + down stub + 스냅샷 헤더 생성
 package migration
 
 import (
@@ -26,9 +26,20 @@ CREATE TABLE users (id BIGSERIAL PRIMARY KEY, name TEXT NOT NULL DEFAULT '');
 	if res.Mode != ModeInitial {
 		t.Errorf("expected initial, got %v", res.Mode)
 	}
-	migPath := filepath.Join(artsDir, "db", "migrations", "0001_initial.sql")
-	if _, err := os.Stat(migPath); err != nil {
-		t.Errorf("0001_initial.sql missing: %v", err)
+	if res.MigrationFile != "0001_initial.up.sql" {
+		t.Errorf("expected MigrationFile=0001_initial.up.sql, got %q", res.MigrationFile)
+	}
+	upPath := filepath.Join(artsDir, "db", "migrations", "0001_initial.up.sql")
+	if _, err := os.Stat(upPath); err != nil {
+		t.Errorf("0001_initial.up.sql missing: %v", err)
+	}
+	downPath := filepath.Join(artsDir, "db", "migrations", "0001_initial.down.sql")
+	if _, err := os.Stat(downPath); err != nil {
+		t.Errorf("0001_initial.down.sql missing: %v", err)
+	}
+	downData, _ := os.ReadFile(downPath)
+	if !strings.Contains(string(downData), "Down stub — intentionally empty.") {
+		t.Errorf("down stub missing marker line:\n%s", downData)
 	}
 	snapPath := filepath.Join(specsDir, "db", ".generated_schema.sql")
 	if _, err := os.Stat(snapPath); err != nil {

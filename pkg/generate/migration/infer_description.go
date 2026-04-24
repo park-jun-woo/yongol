@@ -3,7 +3,8 @@
 package migration
 
 // InferDescription returns a snake_case string used as the <desc> in
-// artifacts/db/migrations/NNNN_<desc>.sql. Rules:
+// artifacts/db/migrations/NNNN_<desc>.up.sql (and the paired .down.sql
+// stub). Rules:
 //   - empty ops        -> "noop"
 //   - single op        -> mnemonic derived from op.Description()
 //   - all CreateTable  -> "initial"

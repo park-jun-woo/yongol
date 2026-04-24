@@ -1,6 +1,6 @@
 # DDL Migration
 
-`yongol generate` diffs `specs/db/*.sql` against a baseline snapshot and emits `artifacts/db/migrations/NNNN_<desc>.sql`. The **DDL is always the SSOT** — migration files are derived artifacts.
+`yongol generate` diffs `specs/db/*.sql` against a baseline snapshot and emits `artifacts/db/migrations/NNNN_<desc>.up.sql` plus a companion `NNNN_<desc>.down.sql` **stub**. The **DDL is always the SSOT** — migration files are derived artifacts. The filename layout matches [golang-migrate](https://github.com/golang-migrate/migrate) so the CLI can consume the directory directly.
 
 ## Layout
 
@@ -8,7 +8,8 @@
 |---|---|
 | DDL SSOT (user-edited) | `specs/db/<table>.sql` |
 | Snapshot baseline | `specs/db/.generated_schema.sql` (managed by yongol) |
-| Migration artifacts | `artifacts/db/migrations/NNNN_<snake_case_desc>.sql` |
+| Migration artifacts (up) | `artifacts/db/migrations/NNNN_<snake_case_desc>.up.sql` |
+| Migration artifacts (down stub) | `artifacts/db/migrations/NNNN_<snake_case_desc>.down.sql` |
 | Apply tool | `golang-migrate` / `flyway` (user choice) |
 
 ## Flow
@@ -17,13 +18,17 @@
 yongol generate <specs-dir> <artifacts-dir>
   - Validate (incl. MIG-001~006)
   - Migration emit
-      - No snapshot   -> initial -> 0001_initial.sql
-      - Snapshot + diff -> NNNN_<desc>.sql
+      - No snapshot   -> initial -> 0001_initial.up.sql (+ 0001_initial.down.sql stub)
+      - Snapshot + diff -> NNNN_<desc>.up.sql (+ NNNN_<desc>.down.sql stub)
       - No changes   -> skip
       - Refresh snapshot (with hash header)
   - Backend codegen
   - Frontend codegen
 ```
+
+### Down stubs
+
+Every up file is paired with a `.down.sql` stub that contains only a comment banner — no schema changes. yongol does **not** auto-generate reverse migrations; the stub exists so `golang-migrate` accepts the directory layout (it refuses single-suffix `.sql` files with `first .: file does not exist`). To roll back, check out the previous `specs/` revision and re-run `yongol generate`, which produces a new forward migration that restores the prior schema. The rationale is recorded in `plans/gen/migration/Phase007-GolangMigrateCompatFilenames.md`.
 
 ## DDL Comment Hints
 
@@ -43,7 +48,8 @@ Ambiguities the diff cannot resolve are declared via DDL comments.
 
 ```bash
 yongol generate specs arts
-# -> arts/db/migrations/0001_initial.sql
+# -> arts/db/migrations/0001_initial.up.sql
+# -> arts/db/migrations/0001_initial.down.sql   (stub — no-op)
 # -> specs/db/.generated_schema.sql
 ```
 
@@ -116,7 +122,7 @@ CREATE TABLE users ( ... );
 
 - **Edit the snapshot?** No. Edit `specs/db/*.sql` and re-run generate.
 - **Number collisions on merges?** `.generated_schema.sql` conflicts first. Resolve the git merge, re-run generate.
-- **Rollback?** v1 is UP-only; DOWN is scheduled for v2.
+- **Rollback?** v1 is UP-only; the `.down.sql` files are empty stubs (see above). DOWN content is scheduled for v2.
 - **MySQL / SQLite?** v1 is PostgreSQL-only.
 
 ## References

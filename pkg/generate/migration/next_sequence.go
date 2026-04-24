@@ -9,8 +9,9 @@ import (
 )
 
 // NextSequenceNumber returns the next 1-based sequence number for a new
-// migration file. Scans <dir> for entries matching `NNNN_*.sql`;
-// returns 1 when the directory is empty or missing.
+// migration file. Scans <dir> for entries matching `NNNN_*.up.sql`;
+// returns 1 when the directory is empty or missing. Down stub files
+// (`.down.sql`) are skipped so every sequence number is counted once.
 func NextSequenceNumber(dir string) (int, error) {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
@@ -22,7 +23,7 @@ func NextSequenceNumber(dir string) (int, error) {
 	max := 0
 	for _, e := range entries {
 		name := e.Name()
-		if !strings.HasSuffix(name, ".sql") {
+		if !strings.HasSuffix(name, ".up.sql") {
 			continue
 		}
 		// Up to the first `_`.

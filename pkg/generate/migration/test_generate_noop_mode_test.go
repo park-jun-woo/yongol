@@ -25,8 +25,10 @@ CREATE TABLE users (id BIGSERIAL PRIMARY KEY);
 	if res.Mode != ModeNoop {
 		t.Errorf("expected noop, got %v", res.Mode)
 	}
+	// After Phase007 each migration emits an .up.sql + .down.sql pair, so
+	// the initial run leaves 2 files. A noop run must not add more.
 	entries, _ := os.ReadDir(filepath.Join(artsDir, "db", "migrations"))
-	if len(entries) != 1 {
-		t.Errorf("expected exactly 1 migration file after noop, got %d: %+v", len(entries), entries)
+	if len(entries) != 2 {
+		t.Errorf("expected exactly 2 migration files (up+down stub) after noop, got %d: %+v", len(entries), entries)
 	}
 }

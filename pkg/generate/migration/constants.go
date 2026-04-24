@@ -21,11 +21,22 @@ const (
 	// numbered migration .sql files are emitted.
 	MigrationsSubdir = "db/migrations"
 
-	// MigrationFilenameFormat is a Printf format that produces a
-	// migration file name from (sequence int, description string):
+	// MigrationFilenameFormat is a Printf format that produces the
+	// up migration file name from (sequence int, description string):
 	//   fmt.Sprintf(MigrationFilenameFormat, 1, "initial")
-	//     => "0001_initial.sql"
-	MigrationFilenameFormat = "%04d_%s.sql"
+	//     => "0001_initial.up.sql"
+	// The `.up.sql` suffix matches golang-migrate's expected layout
+	// (NNNN_<desc>.up.sql / NNNN_<desc>.down.sql). See Phase007.
+	MigrationFilenameFormat = "%04d_%s.up.sql"
+
+	// MigrationDownFilenameFormat is a Printf format that produces the
+	// companion stub down migration file name:
+	//   fmt.Sprintf(MigrationDownFilenameFormat, 1, "initial")
+	//     => "0001_initial.down.sql"
+	// yongol emits a no-op stub only — reverse migrations are not
+	// auto-generated. See pkg/generate/migration/emit_down_stub.go and
+	// docs/MIGRATION.md for the rationale.
+	MigrationDownFilenameFormat = "%04d_%s.down.sql"
 
 	// InitialMigrationDesc is the description used for the very first
 	// migration emitted when no snapshot exists yet.

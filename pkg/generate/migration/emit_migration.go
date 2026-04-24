@@ -22,15 +22,20 @@ func emitMigration(specsDir, artifactsDir string, curr *Schema, ops []Operation,
 	if mode == ModeInitial {
 		desc = InitialMigrationDesc
 	}
-	filename := fmt.Sprintf(MigrationFilenameFormat, seq, desc)
-	sql := EmitSQL(ops, EmitOptions{YongolVersion: yongolVersion, GeneratedAt: now})
+	upName := fmt.Sprintf(MigrationFilenameFormat, seq, desc)
+	downName := fmt.Sprintf(MigrationDownFilenameFormat, seq, desc)
+	upSQL := EmitSQL(ops, EmitOptions{YongolVersion: yongolVersion, GeneratedAt: now})
+	downSQL := RenderDownStub(yongolVersion, now)
 
-	migPath := filepath.Join(artifactsDir, MigrationsSubdir, filename)
-	if err := os.MkdirAll(filepath.Dir(migPath), 0755); err != nil {
+	migDir := filepath.Join(artifactsDir, MigrationsSubdir)
+	if err := os.MkdirAll(migDir, 0755); err != nil {
 		return nil, diags, fmt.Errorf("mkdir migrations: %w", err)
 	}
-	if err := os.WriteFile(migPath, []byte(sql), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(migDir, upName), []byte(upSQL), 0644); err != nil {
 		return nil, diags, fmt.Errorf("write migration: %w", err)
+	}
+	if err := os.WriteFile(filepath.Join(migDir, downName), []byte(downSQL), 0644); err != nil {
+		return nil, diags, fmt.Errorf("write down stub: %w", err)
 	}
 
 	snapshotPath := filepath.Join(specsDir, SnapshotSubdir, SnapshotFileName)
@@ -40,7 +45,7 @@ func emitMigration(specsDir, artifactsDir string, curr *Schema, ops []Operation,
 
 	return &Result{
 		Mode:          mode,
-		MigrationFile: filename,
+		MigrationFile: upName,
 		SnapshotFile:  filepath.Join(SnapshotSubdir, SnapshotFileName),
 		OpsCount:      len(ops),
 		Operations:    ops,

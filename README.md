@@ -280,9 +280,13 @@ specs/db/
 └── .generated_schema.sql      # baseline snapshot (yongol-managed)
 
 artifacts/db/migrations/
-├── 0001_initial.sql           # first generate
-└── 0002_add_users_email.sql   # incremental ALTER after that
+├── 0001_initial.up.sql        # first generate
+├── 0001_initial.down.sql      # stub — yongol does not auto-generate reverse migrations
+├── 0002_add_users_email.up.sql    # incremental ALTER after that
+└── 0002_add_users_email.down.sql  # stub
 ```
+
+The `.up.sql` / `.down.sql` pair matches [golang-migrate](https://github.com/golang-migrate/migrate)'s expected layout. `.down.sql` files are no-op stubs — to roll back, check out the previous `specs/` revision and re-run `yongol generate`.
 
 Ambiguous changes (column rename, type cast, NOT NULL backfill) are disambiguated via DDL comment hints (`-- @rename`, `-- @cast`, `-- @backfill`, `-- @data_migration`, `-- @allow_destructive`). Six rules (`MIG-001`..`MIG-006`) gate risky operations.
 

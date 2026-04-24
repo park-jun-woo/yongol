@@ -19,7 +19,7 @@ func printMigrationSnapshotInfo(w io.Writer, snapshotPath string) bool {
 	data, err := os.ReadFile(snapshotPath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			fmt.Fprintf(w, "snapshot: (absent — next generate will emit 0001_initial.sql)\n")
+			fmt.Fprintf(w, "snapshot: (absent — next generate will emit 0001_initial.up.sql)\n")
 			return true
 		}
 		fmt.Fprintf(w, "snapshot: ERROR %s\n", err)
