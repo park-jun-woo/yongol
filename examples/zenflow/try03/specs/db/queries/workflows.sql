@@ -25,3 +25,6 @@ SELECT COUNT(*) FROM workflows WHERE org_id = @org_id;
 UPDATE workflows
 SET status = @status
 WHERE id = @id;
+
+-- name: OwnerLookupWorkflow :one
+SELECT org_id FROM workflows WHERE id = @id;

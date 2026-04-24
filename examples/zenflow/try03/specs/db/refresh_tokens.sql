@@ -3,7 +3,7 @@ CREATE TABLE refresh_tokens (
     token_hash  TEXT        PRIMARY KEY, -- @nosensitive
     claims      JSONB       NOT NULL,
     expires_at  TIMESTAMPTZ NOT NULL,
-    revoked_at  TIMESTAMPTZ, -- @nullable (intentionally NOT NULL-free: see BUG-028 — D-2 ignores @nullable)
+    revoked_at  TIMESTAMPTZ, -- @nullable
     created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
