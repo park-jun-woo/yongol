@@ -19,12 +19,16 @@ func blockHealth(fs *yongol.Fullstack) MainBlock {
 	withDB := hasDDL(fs)
 	lines = append(lines, readyHandlerLines(withDB)...)
 	funcs := []string{}
+	imports := []string{`"context"`, `"time"`}
 	if withDB {
 		funcs = append(funcs, healthHelperReadyWithDB())
+		// pgxpool is only needed when the /ready helper is emitted; the
+		// no-DB branch stays free of driver imports.
+		imports = append(imports, `"github.com/jackc/pgx/v5/pgxpool"`)
 	}
 	return MainBlock{
 		Name:    "health",
-		Imports: []string{`"context"`, `"database/sql"`, `"time"`},
+		Imports: imports,
 		Lines:   lines,
 		Funcs:   funcs,
 	}

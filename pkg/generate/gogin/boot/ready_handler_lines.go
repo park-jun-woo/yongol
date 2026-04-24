@@ -16,6 +16,6 @@ func readyHandlerLines(withDB bool) []string {
 		}
 	}
 	return []string{
-		`r.GET("/ready", readyHandlerWithDB(conn))`,
+		`r.GET("/ready", readyHandlerWithDB(pool))`,
 	}
 }
