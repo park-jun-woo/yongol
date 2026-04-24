@@ -68,8 +68,17 @@ func (g *methodGen) buildAuth(seq ssacparser.Sequence) ([]string, []string) {
 	ownersExpr := "nil"
 	imports := []string{`"github.com/park-jun-woo/ssac/pkg/authz"`, `"log/slog"`}
 
-	if mapping != nil {
-		ridExpr := g.mapValue(seq.Inputs["ResourceID"])
+	// Phase005 (BUG-033): for creation-form endpoints the ResourceID is
+	// statically zero — the resource does not exist yet. Calling
+	// OwnerLookup<Res>(ctx, 0) always yields sql.ErrNoRows → 403. Skip
+	// the owner-lookup injection (and leave Owners nil) so the Rego
+	// policy evaluates role-only rules that gate the create action.
+	// Update/Delete/Get still carry a non-zero ResourceID and keep the
+	// lookup. Detection is static — based on the SSaC AST expression
+	// (absent, "0", empty string, nil, null).
+	rawRID, hasRID := seq.Inputs["ResourceID"]
+	if mapping != nil && hasRID && !isResourceIDZero(rawRID) {
+		ridExpr := g.mapValue(rawRID)
 		if ridExpr == "" {
 			ridExpr = "0"
 		}
@@ -141,4 +150,26 @@ func findOwnershipMapping(ownerships []rego.OwnershipMapping, resource string) *
 // lockstep with pkg/validate/query_rego/xqp_30_owner_lookup_query.go.
 func ownerLookupQueryName(resource string) string {
 	return "OwnerLookup" + pascalCase(resource)
+}
+
+// isResourceIDZero reports whether the ResourceID expression pulled
+// from a `@auth` sequence's Inputs map is statically zero — i.e. the
+// handler is a creation form and no resource exists yet. Detection is
+// by inspection of the SSaC AST expression; runtime zeros (e.g. a
+// variable that happens to resolve to 0) are out of scope. Matched
+// literals: empty string, `0`, `""`, `nil`, `null` (case-insensitive),
+// with surrounding whitespace ignored.
+//
+// The caller (buildAuth) combines this with a presence check: a
+// missing ResourceID key also counts as zero. See Phase005 (BUG-033).
+func isResourceIDZero(expr string) bool {
+	s := strings.TrimSpace(expr)
+	if s == "" {
+		return true
+	}
+	switch strings.ToLower(s) {
+	case "0", `""`, "''", "nil", "null":
+		return true
+	}
+	return false
 }
