@@ -27,7 +27,7 @@ func buildReads(ctx *scenarioCtx) []step {
 			if strings.ToUpper(method) != "GET" {
 				continue
 			}
-			if op.OperationID == "" || isAuthOpID(op.OperationID) {
+			if op.OperationID == "" || isAuthOpID(ctx, op.OperationID) {
 				continue
 			}
 			collected = append(collected, pathedOp{path: path, opID: op.OperationID, method: "GET"})

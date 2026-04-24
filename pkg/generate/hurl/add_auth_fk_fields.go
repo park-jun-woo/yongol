@@ -9,9 +9,11 @@ import (
 )
 
 // addAuthFKFields adds FK resource names from auth operations in the pathItem.
-func addAuthFKFields(pathItem *openapi3.PathItem, needed map[string]bool) {
+// ctx.authOpIDs (populated by detectAuthOps) decides which operations
+// count as auth — no more Register/Login name literals.
+func addAuthFKFields(ctx *scenarioCtx, pathItem *openapi3.PathItem, needed map[string]bool) {
 	for _, op := range pathItem.Operations() {
-		if op.OperationID == "" || !isAuthOpID(op.OperationID) {
+		if op.OperationID == "" || !isAuthOpID(ctx, op.OperationID) {
 			continue
 		}
 		for _, name := range extractBodyFieldNames(op) {

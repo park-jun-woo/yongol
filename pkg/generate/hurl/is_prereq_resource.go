@@ -4,16 +4,17 @@ package hurl
 
 import (
 	"strings"
-
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
-// isPrereqResource checks if a resource is needed as a prerequisite for auth.
-func isPrereqResource(fs *yongol.Fullstack, resource string) bool {
+// isPrereqResource checks if a resource is needed as a prerequisite for
+// auth (i.e. referenced via <resource>_id in a signup/login request body).
+// Uses ctx.authOpIDs (shape-detected) to decide which ops are auth.
+func isPrereqResource(ctx *scenarioCtx, resource string) bool {
+	fs := ctx.fs
 	if fs.Manifest == nil || fs.Manifest.Backend.Auth == nil || fs.OpenAPIDoc == nil {
 		return false
 	}
-	needed := collectAuthFKResources(fs)
+	needed := collectAuthFKResources(ctx)
 	for name := range needed {
 		if strings.EqualFold(name, resource) {
 			return true

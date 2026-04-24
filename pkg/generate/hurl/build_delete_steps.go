@@ -8,7 +8,7 @@ func buildDeleteSteps(ctx *scenarioCtx) []step {
 	if fs.OpenAPIDoc == nil {
 		return nil
 	}
-	deletes := collectDeleteOps(fs)
+	deletes := collectDeleteOps(ctx)
 	sortDeleteOps(deletes, fs.DDLTables)
 	return deleteOpsToSteps(deletes, ctx)
 }

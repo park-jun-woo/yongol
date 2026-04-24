@@ -15,7 +15,7 @@ func buildUpdateSteps(ctx *scenarioCtx) []step {
 			if upper != "PUT" && upper != "PATCH" {
 				continue
 			}
-			if op.OperationID == "" || isAuthOpID(op.OperationID) {
+			if op.OperationID == "" || isAuthOpID(ctx, op.OperationID) {
 				continue
 			}
 			if !canResolvePathParams(path, ctx.captures) {

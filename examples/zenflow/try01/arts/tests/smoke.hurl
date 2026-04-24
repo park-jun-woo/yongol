@@ -4,6 +4,16 @@
 
 
 # ===== Auth =====
+# Signup
+POST {{host}}/auth/signup
+Content-Type: application/json
+[Options]
+variable: smoke_email=smoke-{{newUuid}}@example.com
+{"credits_balance":1,"email":"{{smoke_email}}","name":"test","org_name":"test","password":"Password1234!","plan_type":"free"}
+HTTP 200
+[Captures]
+token: jsonpath "$.access_token"
+
 # Login
 POST {{host}}/auth/login
 Content-Type: application/json
@@ -14,18 +24,6 @@ token: jsonpath "$.access_token"
 
 
 # ===== CRUD =====
-# Signup
-POST {{host}}/auth/signup
-Content-Type: application/json
-{"credits_balance":1,"email":"smoke-{{newUuid}}@example.com","name":"test","org_name":"test","password":"Password1234!","plan_type":"free"}
-HTTP 200
-[Captures]
-organization_id: jsonpath "$.organization.id"
-[Asserts]
-jsonpath "$.access_token" exists
-jsonpath "$.organization" exists
-jsonpath "$.user" exists
-
 # CreateWorkflow
 POST {{host}}/workflows
 Authorization: Bearer {{token}}

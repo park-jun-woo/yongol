@@ -8,7 +8,7 @@ func buildPrereqSteps(ctx *scenarioCtx) []step {
 	if fs.Manifest == nil || fs.Manifest.Backend.Auth == nil || fs.OpenAPIDoc == nil {
 		return nil
 	}
-	needed := collectAuthFKResources(fs)
+	needed := collectAuthFKResources(ctx)
 	if len(needed) == 0 {
 		return nil
 	}

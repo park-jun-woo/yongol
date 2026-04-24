@@ -17,7 +17,7 @@ func buildCreateSteps(ctx *scenarioCtx) []step {
 			continue
 		}
 		opID := pathItem.Post.OperationID
-		if isAuthOpID(opID) || isPrereqResource(fs, resourceFromPath(sp.Path)) {
+		if isAuthOpID(ctx, opID) || isPrereqResource(ctx, resourceFromPath(sp.Path)) {
 			continue
 		}
 		if stateOps[opID] {
