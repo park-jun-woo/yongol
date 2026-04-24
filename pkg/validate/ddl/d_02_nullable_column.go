@@ -20,11 +20,23 @@ func d02NullableColumn(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		return nil
 	}
 
+	// Build a lookup of NullableAnnot maps keyed by table name so we can
+	// honor the `-- @nullable` annotation that the parser already captured
+	// in fs.DDLTables. Without this lookup the advice message would be
+	// misleading: it promises exemption on `-- @nullable` but the rule
+	// would still fire. (BUG-028)
+	nullableByTable := make(map[string]map[string]bool, len(fs.DDLTables))
+	for i := range fs.DDLTables {
+		tbl := &fs.DDLTables[i]
+		nullableByTable[tbl.Name] = tbl.NullableAnnot
+	}
+
 	var diags []diagnostic.Diagnostic
 	for _, f := range files {
 		blocks := extractTableBlocks(f)
 		for _, blk := range blocks {
 			lines := strings.Split(blk.body, "\n")
+			nullableCols := nullableByTable[blk.tableName]
 			for offset, line := range lines {
 				trimmed := strings.TrimSpace(line)
 				if isSkippableDDLLine(trimmed) {
@@ -37,6 +49,11 @@ func d02NullableColumn(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				colName := m[1]
 				upper := strings.ToUpper(trimmed)
 				if strings.Contains(upper, "PRIMARY KEY") || strings.Contains(upper, "NOT NULL") {
+					continue
+				}
+				// `-- @nullable` on the column exempts it — the parser
+				// already recorded this in Table.NullableAnnot.
+				if nullableCols != nil && nullableCols[colName] {
 					continue
 				}
 				diags = append(diags, diagnostic.Diagnostic{
