@@ -28,6 +28,26 @@ Authorization policies in OPA Rego. Every SSaC `@auth` emits an auto-generated `
 
 Default authz package: `github.com/park-jun-woo/ssac/pkg/authz`. Override via `manifest.authz.package`.
 
+### Lookup injection on creation endpoints
+
+`yongol` injects `qtx.OwnerLookup<Resource>(ctx, rid)` before the `authz.Check`
+call **only when `ResourceID` is statically non-zero** in the SSaC `@auth`
+directive. For resource-creation endpoints (`@auth "CreateX" "x" {}` or
+`{ResourceID: 0}`) the lookup is **skipped** — the resource does not exist
+yet, so `data.owners.<resource>` stays empty for that call and the Rego
+policy must rely on role / claim-only conditions (BUG-033 / Phase005).
+
+| SSaC | Lookup emitted? | Rego must |
+|---|---|---|
+| `@auth "CreateX" "x" {}` | skip | allow via role / claim only |
+| `@auth "CreateX" "x" {ResourceID: 0}` | skip | same |
+| `@auth "UpdateX" "x" {ResourceID: x.ID}` | emit | use `data.owners.x[...]` for owner-based rules |
+| `@auth "GetX" "x" {ResourceID: path.id}` | emit | same |
+
+The XQP-30 rule still requires the `OwnerLookup<Resource>` sqlc query to
+exist whenever `@ownership` is declared — it is used for the non-zero
+paths.
+
 ## 5 Allow Patterns
 
 | Pattern | Conditions |

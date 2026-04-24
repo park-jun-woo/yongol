@@ -206,7 +206,32 @@ VALUES (0, 'system')
 ON CONFLICT DO NOTHING;
 ```
 
-The sentinel body is also serialized into `specs/db/.generated_schema.sql`, so any edit invalidates the snapshot hash and surfaces as drift.
+The sentinel body is also serialized into the baseline snapshot (`arts/db/.latest_schema.sql`), so any edit invalidates the snapshot hash and surfaces as drift.
+
+## CREATE INDEX — supported `USING <method>`
+
+`yongol` preserves the index access method declared in DDL. All PostgreSQL
+built-in methods work:
+
+```sql
+CREATE INDEX idx_users_email       ON users (email);                        -- btree (default, USING omitted)
+CREATE INDEX idx_users_email_btree ON users USING btree (email);            -- explicit btree, preserved verbatim
+CREATE INDEX refresh_claims_idx    ON refresh_tokens USING GIN (claims);    -- JSONB / full-text
+CREATE INDEX events_time_idx       ON events USING BRIN (created_at);       -- time-series, huge tables
+CREATE INDEX sessions_id_hash      ON sessions USING HASH (session_id);     -- equality-only
+CREATE INDEX docs_geom_idx         ON docs USING GIST (geom);               -- geometry / ranges
+```
+
+`parse_create_index` extracts the `USING <method>` token into `Index.Method`
+and migration emit re-outputs it as-is (method is lower-cased for internal
+normalization). Method change in DDL (e.g. `btree → gin`) is detected by
+the diff engine and emitted as **DROP INDEX + CREATE INDEX** in the next
+incremental migration.
+
+Out of scope for the parser (may still work but not guaranteed):
+- opclass arguments — `USING gin (claims jsonb_path_ops)`
+- expression indexes — `USING gin (to_tsvector('english', body))`
+- storage parameters — `WITH (fillfactor=90)`
 
 ### @archived
 
