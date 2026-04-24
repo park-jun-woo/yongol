@@ -88,18 +88,18 @@ arts/backend/internal/service/
 **전부 `package service`** (flat). Server 메서드이므로 같은 패키지 필수.
 파일명은 `snake_case(funcName).go`.
 
-## Server struct
+## Server struct (Phase005 pgx/v5 refit)
 
 ```go
 package service
 
 import (
-    "database/sql"
+    "github.com/jackc/pgx/v5/pgxpool"
     "<module>/internal/db"
 )
 
 type Server struct {
-    DB      *sql.DB
+    DB      *pgxpool.Pool
     Queries *db.Queries
 }
 ```
@@ -111,7 +111,7 @@ middleware 가 gin context 에서 처리하고, StrictServerInterface 메서드�
 ## main.go 배선 (boot/)
 
 ```go
-srv := &service.Server{DB: conn, Queries: queries}
+srv := &service.Server{DB: pool, Queries: queries}
 strictHandler := api.NewStrictHandlerWithOptions(srv, nil, api.StrictHTTPServerOptions{})
 r := gin.Default()
 r.Use(middleware.BearerAuth(jwtSecret))
@@ -128,18 +128,22 @@ DB 트랜잭션으로 감싼다.
 | 조건 | 트랜잭션 |
 |---|---|
 | mutating seq (@post/@put/@delete) **0개** | ❌ tx 없음 — `server.Queries` 직접 사용 |
-| mutating seq **1개 이상** | ✅ `BeginTx` + `defer Rollback` + `Commit` |
+| mutating seq **1개 이상** | ✅ `Begin(ctx)` + `defer Rollback(ctx)` + `Commit(ctx)` (pgx/v5) |
 
-### 생성 코드 (mutating — ActivateWorkflow 예시)
+### 생성 코드 (mutating — ActivateWorkflow 예시, Phase005 pgx/v5 refit)
 
 ```go
 func (server *Server) ActivateWorkflow(ctx context.Context, request api.ActivateWorkflowRequestObject) (api.ActivateWorkflowResponseObject, error) {
-    // ── Begin Transaction ──
-    tx, err := server.DB.BeginTx(ctx, nil)
+    // ── Begin Transaction (pgx.Tx) ──
+    tx, err := server.DB.Begin(ctx)
     if err != nil {
         return nil, err
     }
-    defer tx.Rollback()
+    defer func() {
+        if err := tx.Rollback(ctx); err != nil && !errors.Is(err, pgx.ErrTxClosed) {
+            slog.Warn("rollback failed", "op", "ActivateWorkflow", "err", err)
+        }
+    }()
     qtx := server.Queries.WithTx(tx)
 
     // @get Workflow wf = Workflow.FindByID({ID: request.id})
@@ -181,7 +185,7 @@ func (server *Server) ActivateWorkflow(ctx context.Context, request api.Activate
     }
 
     // ── Commit ──
-    if err := tx.Commit(); err != nil {
+    if err := tx.Commit(ctx); err != nil {
         return nil, err
     }
 
@@ -282,7 +286,7 @@ main.go: `queue.Subscribe("workflow.executed", srv.OnWorkflowExecuted)`
 | project custom func | `<module>/internal/<pkg>` |
 | statemachine | `<module>/internal/statemachine` |
 | model (CurrentUser) | `<module>/internal/model` |
-| 표준 | `"context"`, `"database/sql"`, `"encoding/json"` |
+| 표준 | `"context"`, `"encoding/json"` (+ pgx 가드에 `"github.com/jackc/pgx/v5"`) |
 
 ## 파일 구조 (예정)
 

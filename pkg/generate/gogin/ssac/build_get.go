@@ -14,9 +14,8 @@ import (
 // return 404, @exists checks ID != 0 to return 409 (and skips on absence).
 // Without a matching guard sequence, ErrNoRows propagates as 500 (same as before).
 //
-// Phase005 pgx/v5 refit — sqlc pgx/v5 returns pgx.ErrNoRows (not
-// sql.ErrNoRows) on an empty :one select. The error check switches to the
-// pgx sentinel; imports follow.
+// Phase005 pgx/v5 refit — sqlc pgx/v5 returns pgx.ErrNoRows on an empty
+// :one select. The error check uses the pgx sentinel; imports follow.
 func (g *methodGen) buildGet(seq ssacparser.Sequence, next *ssacparser.Sequence) ([]string, []string) {
 	method := resolveSQLCMethod(seq.Model)
 	varName := "_"

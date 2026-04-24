@@ -118,7 +118,7 @@ go 1.22
 
 require (
     github.com/gin-gonic/gin v1.x
-    github.com/lib/pq v1.x
+    github.com/jackc/pgx/v5 v5.x           // pgxpool + stdlib bridge (ssac 호환)
     github.com/park-jun-woo/ssac v0.x     // authz, queue, session, cache, file, auth
     github.com/golang-jwt/jwt/v5 v5.x     // auth codegen
     github.com/oapi-codegen/runtime v1.x   // oapi-codegen generated code

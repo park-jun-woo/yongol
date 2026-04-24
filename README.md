@@ -335,7 +335,7 @@ yongol is built on top of these projects.
 
 - [React](https://react.dev/), [React Router](https://reactrouter.com/), [TanStack Query](https://tanstack.com/query), [React Hook Form](https://react-hook-form.com/)
 - [Vite](https://vite.dev/), [Tailwind CSS](https://tailwindcss.com/), [TypeScript](https://www.typescriptlang.org/)
-- [Gin](https://gin-gonic.com/), [lib/pq](https://github.com/lib/pq)
+- [Gin](https://gin-gonic.com/), [pgx/v5](https://github.com/jackc/pgx)
 
 ## License
 

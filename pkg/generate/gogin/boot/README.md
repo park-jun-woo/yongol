@@ -58,7 +58,7 @@ type MainBlock struct {
 |---|---|---|---|---|---|
 | 0 | `block_logger_init.go` | `logger-init` | 항상 (최상단) | — | `slog.SetDefault(slog.New(handler))` — `LOG_LEVEL`/`LOG_FORMAT` 환경변수 기반 |
 | 0.5 | `block_env_helpers.go` | `env-helpers` | 항상 | — | top-level `envInt`, `envDuration`, `envStringList`, `envBool` (main 외부) |
-| 1 | `block_db_init.go` | `db-init` | 항상 | — | `sql.Open("postgres", os.Getenv("DATABASE_URL"))` + `SetMaxOpenConns`/`SetMaxIdleConns`/`SetConnMaxLifetime`, `db.New(conn)` |
+| 1 | `block_db_init.go` | `db-init` | 항상 | — | `pgxpool.NewWithConfig(ctx, poolCfg)` + `stdlib.OpenDBFromPool(pool)` 브릿지, `db.New(pool)` (Phase005 pgx/v5 refit) |
 | 2 | `block_jwt_secret.go` | `jwt-secret` | `manifest.backend.auth` 존재 | — | `os.Getenv(manifest.auth.secret_env)` |
 | 3 | `block_authz_init.go` | `authz-init` | SSaC 에 `@auth` 사용 | `ssac/pkg/authz` | `authz.Init(conn, []authz.OwnershipMapping{...})` |
 | 4 | `block_queue_init.go` | `queue-init` | `manifest.queue.backend` 존재 | `ssac/pkg/queue` | `queue.Init(ctx, "postgres", conn)` + `queue.Subscribe(...)` + `queue.Start(ctx)` + `defer queue.Close()` |
@@ -196,7 +196,8 @@ import (
     "time"
 
     "github.com/gin-gonic/gin"
-    _ "github.com/lib/pq"
+    "github.com/jackc/pgx/v5/pgxpool"
+    "github.com/jackc/pgx/v5/stdlib"
 
     "github.com/park-jun-woo/ssac/pkg/authz"
     "github.com/park-jun-woo/ssac/pkg/cache"
@@ -229,16 +230,24 @@ func main() {
     }
     slog.SetDefault(slog.New(handler))
 
-    // [1] db-init
+    // [1] db-init (Phase005 pgx/v5 refit)
     ctx := context.Background()
     slog.Info("connecting to database")
-    conn, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
+    poolCfg, err := pgxpool.ParseConfig(os.Getenv("DATABASE_URL"))
+    if err != nil {
+        slog.Error("db init: parse DATABASE_URL", "err", err)
+        os.Exit(1)
+    }
+    pool, err := pgxpool.NewWithConfig(ctx, poolCfg)
     if err != nil {
         slog.Error("db init", "err", err)
         os.Exit(1)
     }
-    defer conn.Close()
-    queries := db.New(conn)
+    defer pool.Close()
+    // Bridge pool → *sql.DB for ssac packages (auth / queue / authz / cache / session).
+    var conn *sql.DB = stdlib.OpenDBFromPool(pool)
+    defer func() { _ = conn.Close() }()
+    queries := db.New(pool)
     slog.Info("database connected")
 
     // [2] jwt-secret
@@ -372,8 +381,8 @@ func Generate(fs *yongol.Fullstack, artifactsDir, modulePath string) error {
 | ssac 런타임 | `github.com/park-jun-woo/ssac/pkg/<pkg>` | `ssac/pkg/authz`, `ssac/pkg/queue` |
 | 프로젝트 내부 | `<manifest.backend.module>/internal/<pkg>` | `zenflow/internal/api`, `zenflow/internal/db` |
 | 프로젝트 custom func | `<manifest.backend.module>/internal/<func-pkg>` | `zenflow/internal/billing` |
-| 표준 라이브러리 | 그대로 | `"database/sql"`, `"context"`, `"os"` |
-| 외부 의존 | 그대로 | `"github.com/gin-gonic/gin"`, `_ "github.com/lib/pq"` |
+| 표준 라이브러리 | 그대로 | `"database/sql"` (ssac 브릿지 전용), `"context"`, `"os"` |
+| 외부 의존 | 그대로 | `"github.com/gin-gonic/gin"`, `"github.com/jackc/pgx/v5/pgxpool"`, `"github.com/jackc/pgx/v5/stdlib"` |
 
 생성된 프로젝트의 `go.mod` 에는 `require github.com/park-jun-woo/ssac` 가 포함되어야 함.
 `go.mod` 생성도 후속 블록 또는 별도 Phase 로 처리.
