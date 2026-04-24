@@ -1,6 +1,0 @@
-package service
-
-// @get User user = User.FindByID({ID: currentUser.ID})
-// @empty user "User not found" 404
-// @response { user: user }
-func GetCurrentUser() {}
