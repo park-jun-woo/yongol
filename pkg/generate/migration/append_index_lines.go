@@ -19,11 +19,15 @@ func appendIndexLines(b *strings.Builder, t *Table) {
 		if idx.Unique {
 			uniq = "UNIQUE "
 		}
+		using := ""
+		if idx.Method != "" && idx.Method != "btree" {
+			using = " USING " + idx.Method
+		}
 		where := ""
 		if idx.Where != "" {
 			where = " WHERE " + idx.Where
 		}
-		fmt.Fprintf(b, "CREATE %sINDEX %s ON %s (%s)%s;\n",
-			uniq, idx.Name, t.Name, strings.Join(idx.Columns, ", "), where)
+		fmt.Fprintf(b, "CREATE %sINDEX %s ON %s%s (%s)%s;\n",
+			uniq, idx.Name, t.Name, using, strings.Join(idx.Columns, ", "), where)
 	}
 }

@@ -12,11 +12,15 @@ func (op CreateIndex) SQL() string {
 	if op.Index.Unique {
 		uniq = "UNIQUE "
 	}
+	using := ""
+	if op.Index.Method != "" && op.Index.Method != "btree" {
+		using = " USING " + op.Index.Method
+	}
 	where := ""
 	if op.Index.Where != "" {
 		where = " WHERE " + op.Index.Where
 	}
-	return fmt.Sprintf("CREATE %sINDEX %s ON %s (%s)%s;",
-		uniq, op.Index.Name, op.Table,
+	return fmt.Sprintf("CREATE %sINDEX %s ON %s%s (%s)%s;",
+		uniq, op.Index.Name, op.Table, using,
 		strings.Join(op.Index.Columns, ", "), where)
 }

@@ -23,10 +23,16 @@ func parseCreateIndex(line string, tables map[string]*Table) {
 	if len(afterParts) < 2 {
 		return
 	}
-	tableName := strings.TrimSpace(afterParts[0])
+	tableField := strings.TrimSpace(afterParts[0])
+	tableName := tableField
+	method := ""
+	if idx := strings.Index(strings.ToUpper(tableField), " USING "); idx >= 0 {
+		tableName = strings.TrimSpace(tableField[:idx])
+		method = strings.ToLower(strings.TrimSpace(tableField[idx+len(" USING "):]))
+	}
 	cols := extractParenColumns("(" + afterParts[1])
 	isUnique := strings.Contains(upper, "UNIQUE")
 	if t := tables[tableName]; t != nil && len(cols) > 0 {
-		t.Indexes = append(t.Indexes, Index{Name: idxName, Columns: cols, IsUnique: isUnique})
+		t.Indexes = append(t.Indexes, Index{Name: idxName, Columns: cols, IsUnique: isUnique, Method: method})
 	}
 }
