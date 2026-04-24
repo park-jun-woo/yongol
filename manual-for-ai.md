@@ -430,6 +430,7 @@ hatch: `// nolint:prv-NN` (or `// nolint:panic` for PRV-10). Full spec:
 
 | Command | Description |
 |---|---|
+| `yongol init <ProjectID> "<description>" [--dir <path>] [--module <go-module>] [-f]` | Scaffold a minimal SSOT skeleton (manifest + OpenAPI + sqlc + rego) in an empty directory so `yongol validate specs` passes with zero errors. One-shot bootstrap — infra (`cache`/`session`/`queue`) and feature templates belong to `yongol get` / `yongol add`. |
 | `yongol validate [-f md\|json\|sarif] <specs-dir>` | Per-SSOT + cross validation. Non-zero on any ERROR. |
 | `yongol generate [--backend go-gin] [--frontend react] <specs-dir> <artifacts-dir>` | Runs validate then emits code. Refuses on any ERROR or WARNING. |
 | `yongol status <specs-dir> [<arts-dir>]` | Read-only dashboard. With `<arts-dir>`, lists preserved files and PRV-01~17 drift. Never fails. |

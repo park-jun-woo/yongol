@@ -1,0 +1,25 @@
+apiVersion: yongol/v1
+kind: Project
+metadata:
+  name: {{.ProjectIDNormalized}}
+  description: "{{.Description}}"
+backend:
+  lang: go
+  framework: gin
+  module: {{.Module}}
+  middleware:
+    - bearerAuth
+  auth:
+    type: jwt
+    mode: bearer
+    secret_env: JWT_SECRET
+    claims:
+      ID: user_id:int64
+      Email: email
+      Role: role
+    roles: []
+frontend:
+  lang: typescript
+  framework: react
+  bundler: vite
+  name: {{.ProjectID}}-web
