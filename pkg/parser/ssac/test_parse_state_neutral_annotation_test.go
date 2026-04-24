@@ -1,36 +1,15 @@
 //ff:func feature=ssac-parse type=test control=iteration dimension=1
-//ff:what hasStateNeutralComment — @state-neutral 함수 레벨 어노테이션 파싱 단위 테스트
+//ff:what TestHasStateNeutralComment — @state-neutral 함수 레벨 어노테이션 파싱 단위 테스트
 
 package ssac
 
 import (
-	"go/ast"
-	"go/parser"
-	"go/token"
 	"testing"
 )
 
-func parseSSaCSource(t *testing.T, src string) []*ast.Comment {
-	t.Helper()
-	fset := token.NewFileSet()
-	f, err := parser.ParseFile(fset, "x.ssac", src, parser.ParseComments)
-	if err != nil {
-		t.Fatalf("parse: %v", err)
-	}
-	// Pick the first FuncDecl and collect preceding comments (mirrors
-	// collectFuncComments) so the test exercises the same comment surface
-	// the production parser sees.
-	for _, d := range f.Decls {
-		fn, ok := d.(*ast.FuncDecl)
-		if !ok {
-			continue
-		}
-		return collectFuncComments(f, fn.Pos())
-	}
-	t.Fatalf("no FuncDecl in source")
-	return nil
-}
-
+// TestHasStateNeutralComment exercises the @state-neutral comment
+// detector across four representative source shapes (present / absent /
+// similar-prefix / whitespace-tolerant).
 func TestHasStateNeutralComment(t *testing.T) {
 	cases := []struct {
 		name string

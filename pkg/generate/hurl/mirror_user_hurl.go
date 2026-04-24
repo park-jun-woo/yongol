@@ -4,10 +4,8 @@ package hurl
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 // mirrorUserHurlFiles copies user-authored scenario-*.hurl and
@@ -46,58 +44,5 @@ func mirrorUserHurlFiles(specsDir, artifactsDir string) error {
 		return fmt.Errorf("readdir %s: %w", srcDir, err)
 	}
 	dstDir := filepath.Join(artifactsDir, "tests")
-	var mirrored bool
-	for _, e := range entries {
-		if e.IsDir() {
-			continue
-		}
-		name := e.Name()
-		if !isUserHurlName(name) {
-			continue
-		}
-		if !mirrored {
-			if err := os.MkdirAll(dstDir, 0o755); err != nil {
-				return fmt.Errorf("mkdir %s: %w", dstDir, err)
-			}
-			mirrored = true
-		}
-		src := filepath.Join(srcDir, name)
-		dst := filepath.Join(dstDir, name)
-		if err := copyHurlFile(src, dst); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// isUserHurlName reports whether name is a user-authored hurl file
-// that should be mirrored. smoke.hurl is explicitly excluded so the
-// auto-generator never clashes with a stray user file of the same
-// name.
-func isUserHurlName(name string) bool {
-	if !strings.HasSuffix(name, ".hurl") {
-		return false
-	}
-	if name == "smoke.hurl" {
-		return false
-	}
-	return strings.HasPrefix(name, "scenario-") || strings.HasPrefix(name, "invariant-")
-}
-
-// copyHurlFile copies src → dst verbatim. Truncates dst if it exists.
-func copyHurlFile(src, dst string) error {
-	in, err := os.Open(src)
-	if err != nil {
-		return fmt.Errorf("open %s: %w", src, err)
-	}
-	defer in.Close()
-	out, err := os.Create(dst)
-	if err != nil {
-		return fmt.Errorf("create %s: %w", dst, err)
-	}
-	defer out.Close()
-	if _, err := io.Copy(out, in); err != nil {
-		return fmt.Errorf("copy %s -> %s: %w", src, dst, err)
-	}
-	return nil
+	return mirrorUserHurlEntries(srcDir, dstDir, entries)
 }

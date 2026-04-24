@@ -5,17 +5,10 @@ package ddl
 
 import (
 	"fmt"
-	"regexp"
-	"strings"
 
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
-
-// insertIntoLineRe captures the target table name from an INSERT INTO line
-// (used only for error messages). Duplicated locally to keep validate self-
-// contained (parser owns the canonical scanner).
-var insertIntoLineRe = regexp.MustCompile(`(?i)^\s*INSERT\s+INTO\s+([A-Za-z_][A-Za-z0-9_]*)`)
 
 // d09TopLevelInsertWithoutSentinel validates D-9: any top-level INSERT
 // inside a DDL file (specs/db/*.sql) must be preceded by a `-- @sentinel`
@@ -45,82 +38,4 @@ func d09TopLevelInsertWithoutSentinel(fs *yongol.Fullstack) []diagnostic.Diagnos
 		}
 	}
 	return diags
-}
-
-// scanInsertsWithAnnotations is a thin adapter that calls the parser's
-// sentinel scanner. We depend on the regex-driven scanner living in the
-// parser package (pkg/parser/ddl) through a private helper to avoid
-// duplicating the quote-aware terminator logic.
-//
-// To keep this package free of a cycle on parser/ddl we re-implement the
-// light-weight scan here. The parser has its own authoritative copy; both
-// must agree on what "top-level INSERT" means.
-func scanInsertsWithAnnotations(content string) []insertScan {
-	lines := strings.Split(content, "\n")
-	var results []insertScan
-	annotated := false
-	i := 0
-	for i < len(lines) {
-		trimmed := strings.TrimSpace(lines[i])
-		if trimmed == "" {
-			i++
-			continue
-		}
-		if trimmed == "-- @sentinel" || strings.TrimSpace(strings.TrimPrefix(trimmed, "--")) == "@sentinel" {
-			annotated = true
-			i++
-			continue
-		}
-		if m := insertIntoLineRe.FindStringSubmatch(lines[i]); m != nil {
-			table := m[1]
-			start := i
-			// collect INSERT body through unquoted `;`
-			var buf strings.Builder
-			j := i
-			done := false
-			inSingle := false
-			for j < len(lines) && !done {
-				ln := lines[j]
-				if j > i {
-					buf.WriteByte('\n')
-				}
-				for k := 0; k < len(ln); k++ {
-					ch := ln[k]
-					if ch == '\'' {
-						if inSingle && k+1 < len(ln) && ln[k+1] == '\'' {
-							k++
-							continue
-						}
-						inSingle = !inSingle
-						continue
-					}
-					if ch == ';' && !inSingle {
-						done = true
-						break
-					}
-				}
-				buf.WriteString(ln)
-				j++
-			}
-			results = append(results, insertScan{
-				Table:     table,
-				SQL:       buf.String(),
-				StartLine: start + 1,
-				Annotated: annotated,
-			})
-			annotated = false
-			i = j
-			continue
-		}
-		annotated = false
-		i++
-	}
-	return results
-}
-
-type insertScan struct {
-	Table     string
-	SQL       string
-	StartLine int
-	Annotated bool
 }

@@ -1,10 +1,9 @@
-//ff:func feature=validate type=rule control=sequence topic=query-structural
+//ff:func feature=validate type=rule control=iteration dimension=1 topic=query-structural
 //ff:what Q-11 — sqlc.yaml sql_package 이 pgx/v5 가 아니면 ERROR
 
 package query
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -35,45 +34,15 @@ func q11SqlPackagePgxV5(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		// D-4 already reports sqlc.yaml missing; stay silent here.
 		return nil
 	}
-	var cfg struct {
-		SQL []struct {
-			Gen struct {
-				Go struct {
-					SqlPackage string `yaml:"sql_package"`
-				} `yaml:"go"`
-			} `yaml:"gen"`
-		} `yaml:"sql"`
-	}
+	var cfg sqlcPackageConfig
 	if err := yaml.Unmarshal(data, &cfg); err != nil {
 		return nil
 	}
 	var diags []diagnostic.Diagnostic
 	for i, entry := range cfg.SQL {
-		pkg := entry.Gen.Go.SqlPackage
-		if pkg == "pgx/v5" {
-			continue
+		if d := diagnoseSqlcPackageEntry(i, entry.Gen.Go.SqlPackage); d != nil {
+			diags = append(diags, *d)
 		}
-		current := pkg
-		if current == "" {
-			current = "(absent; sqlc defaults to database/sql)"
-		} else {
-			current = fmt.Sprintf("%q", current)
-		}
-		diags = append(diags, diagnostic.Diagnostic{
-			File:  "db/sqlc.yaml",
-			Line:  0,
-			Phase: diagnostic.PhaseValidate,
-			Level: diagnostic.LevelError,
-			Message: fmt.Sprintf(
-				"[Q-11] sqlc.yaml sql[%d].gen.go.sql_package must be \"pgx/v5\" (current: %s)",
-				i, current,
-			),
-			Advice: "yongol's backend codegen is unified on pgx/v5. Update db/sqlc.yaml:\n" +
-				"  gen:\n" +
-				"    go:\n" +
-				"      sql_package: pgx/v5\n" +
-				"Then re-run `yongol generate <specs> <arts>`. database/sql / pgx/v4 support was removed.",
-		})
 	}
 	return diags
 }

@@ -4,7 +4,6 @@
 package sqlcpost
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/park-jun-woo/yongol/pkg/parser/ddl"
@@ -36,29 +35,5 @@ func TestRenderLogValueFile_PgtypeOnlyImportsSlog(t *testing.T) {
 	if err != nil {
 		t.Fatalf("renderLogValueFile: %v", err)
 	}
-
-	// Import block should be exactly log/slog — nothing else.
-	wantImportBlock := "import (\n\t\"log/slog\"\n)\n\n"
-	if !strings.Contains(src, wantImportBlock) {
-		t.Errorf("expected import block %q in output, got:\n%s", wantImportBlock, src)
-	}
-	for _, banned := range []string{"\"time\"", "\"encoding/json\"", "time.Time", "json.RawMessage"} {
-		if strings.Contains(src, banned) {
-			t.Errorf("generated source must not reference %s anymore (BUG-024):\n%s", banned, src)
-		}
-	}
-
-	// LogValue body must be slog.Any + REDACTED.
-	for _, line := range []string{
-		"\t\tslog.Any(\"id\", r.ID),\n",
-		"\t\tslog.Any(\"org_id\", r.OrgID),\n",
-		"\t\tslog.Any(\"email\", r.Email),\n",
-		"\t\tslog.String(\"password_hash\", \"[REDACTED]\"),\n",
-		"\t\tslog.Any(\"role\", r.Role),\n",
-		"\t\tslog.Any(\"created_at\", r.CreatedAt),\n",
-	} {
-		if !strings.Contains(src, line) {
-			t.Errorf("missing line %q in generated source:\n%s", line, src)
-		}
-	}
+	assertRenderLogValueFileOutput(t, src)
 }

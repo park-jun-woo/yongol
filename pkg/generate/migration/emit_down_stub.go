@@ -1,4 +1,4 @@
-//ff:func feature=migration type=generator control=pure dimension=0
+//ff:func feature=migration type=generator control=sequence
 //ff:what RenderDownStub — golang-migrate 호환용 down 파일의 고정 본문 생성
 package migration
 

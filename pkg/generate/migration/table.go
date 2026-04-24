@@ -14,10 +14,3 @@ type Table struct {
 	Sentinels   []SentinelInsert   // @sentinel INSERT blocks attached to this table
 	errs        []string           // column-level parse errors (IDENTITY+DEFAULT conflict etc.)
 }
-
-// SentinelInsert captures one `-- @sentinel` INSERT statement verbatim,
-// so the migration emitter can embed it unchanged after all CREATE TABLE
-// and before CREATE INDEX / ALTER TABLE ADD FOREIGN KEY statements.
-type SentinelInsert struct {
-	SQL string // raw SQL through the final `;`
-}

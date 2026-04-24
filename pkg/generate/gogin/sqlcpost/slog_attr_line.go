@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=selection
+//ff:func feature=gen-gogin type=util control=sequence
 //ff:what slogAttrLine — 비민감 컬럼을 slog.Any 로 통일 emit (pgtype.* 호환)
 
 package sqlcpost

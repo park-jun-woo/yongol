@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what writeLogValueFields — REDACTED sensitive + slog.Any 비민감 라인 emit
 
 package sqlcpost

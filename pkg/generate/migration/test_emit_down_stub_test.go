@@ -1,4 +1,4 @@
-//ff:func feature=migration type=test control=pure dimension=0
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestRenderDownStub — stub 본문에 version/timestamp/marker 라인이 포함되는지 확인
 package migration
 
@@ -8,6 +8,9 @@ import (
 	"time"
 )
 
+// TestRenderDownStub verifies the down stub contains the yongol version,
+// the UTC timestamp and the explanatory marker lines so downstream
+// tooling can parse / recognise yongol-generated stubs.
 func TestRenderDownStub(t *testing.T) {
 	now := time.Date(2026, 4, 24, 12, 34, 56, 0, time.UTC)
 	body := RenderDownStub("v0.2.3", now)
@@ -22,18 +25,5 @@ func TestRenderDownStub(t *testing.T) {
 		if !strings.Contains(body, want) {
 			t.Errorf("down stub missing %q. body:\n%s", want, body)
 		}
-	}
-}
-
-func TestRenderDownStub_UTCConversion(t *testing.T) {
-	// Non-UTC input must be normalised to UTC in the header.
-	loc, err := time.LoadLocation("Asia/Seoul")
-	if err != nil {
-		t.Skipf("Asia/Seoul tzdata unavailable: %v", err)
-	}
-	kst := time.Date(2026, 4, 24, 21, 34, 56, 0, loc) // == 12:34:56Z
-	body := RenderDownStub("v1", kst)
-	if !strings.Contains(body, "2026-04-24T12:34:56Z") {
-		t.Errorf("expected UTC timestamp in body, got:\n%s", body)
 	}
 }

@@ -4,8 +4,6 @@
 package hurl
 
 import (
-	"strings"
-
 	"github.com/park-jun-woo/yongol/pkg/parser/ssac"
 )
 
@@ -30,48 +28,6 @@ func isSignupShape(fn *ssac.ServiceFunc) bool {
 		}
 		if matchesHashPassword(seq.Model) {
 			return true
-		}
-	}
-	return false
-}
-
-// matchesHashPassword checks for the `auth.HashPassword` target in an
-// @call sequence's Model field. parseCallExprInputs keeps the full
-// "pkg.Func" form for @call (splitPackagePrefix is only applied to
-// @get/@post/@put/@delete), so a direct suffix match on ".HashPassword"
-// with a leading "auth" package segment is correct.
-func matchesHashPassword(model string) bool {
-	if model == "" {
-		return false
-	}
-	// Exact form seen in yongol: "auth.HashPassword"
-	if model == "auth.HashPassword" {
-		return true
-	}
-	// Defensive: tolerate whitespace or trailing tokens (should not occur
-	// after parser, but keeps the check robust to future syntax tweaks).
-	m := strings.TrimSpace(model)
-	return m == "auth.HashPassword" || strings.HasSuffix(m, ".auth.HashPassword")
-}
-
-// hasUserCreatePost checks for a companion `@post <Model>.Create` sequence
-// that wires a PasswordHash-like column. Used only to emit a WARNING
-// when signup shape is suspicious (HashPassword without a Create post).
-func hasUserCreatePost(fn *ssac.ServiceFunc) bool {
-	if fn == nil {
-		return false
-	}
-	for _, seq := range fn.Sequences {
-		if seq.Type != ssac.SeqPost {
-			continue
-		}
-		if !strings.HasSuffix(seq.Model, ".Create") {
-			continue
-		}
-		for k := range seq.Inputs {
-			if strings.EqualFold(k, "PasswordHash") {
-				return true
-			}
 		}
 	}
 	return false
