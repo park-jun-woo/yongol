@@ -27,6 +27,9 @@ CREATE TABLE users (id BIGSERIAL PRIMARY KEY);
 	}
 	// After Phase007 each migration emits an .up.sql + .down.sql pair, so
 	// the initial run leaves 2 files. A noop run must not add more.
+	// Phase010 (BUG-034) moved the baseline out of migrations/ into
+	// arts/db/, so the migrations/ directory still only holds 2 files
+	// after initial + noop.
 	entries, _ := os.ReadDir(filepath.Join(artsDir, "db", "migrations"))
 	if len(entries) != 2 {
 		t.Errorf("expected exactly 2 migration files (up+down stub) after noop, got %d: %+v", len(entries), entries)

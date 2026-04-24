@@ -18,9 +18,12 @@ func readSQLDir(dir string) []sqlFile {
 		if e.IsDir() || !strings.HasSuffix(e.Name(), ".sql") {
 			continue
 		}
-		// Skip yongol's migration snapshot baseline — it is generated
-		// output, not a DDL SSOT (see pkg/generate/migration).
-		if e.Name() == ".generated_schema.sql" {
+		// Defensive: skip yongol's migration baseline even if it leaks
+		// into the DDL directory. Phase010 (BUG-034) moved it to
+		// arts/db/migrations/.latest_schema.sql; only pre-Phase010
+		// leftover files would land here and generate removes them on
+		// entry.
+		if e.Name() == ".latest_schema.sql" || e.Name() == ".generated_schema.sql" {
 			continue
 		}
 		full := filepath.Join(dir, e.Name())

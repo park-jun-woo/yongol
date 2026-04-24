@@ -15,8 +15,8 @@ import (
 // dashboard never fails.
 func printMigrationStatus(w io.Writer, specsDir, artsDir string) {
 	fmt.Fprintln(w, "\n── Migration Status ──")
-	ddlDir := filepath.Join(specsDir, migration.SnapshotSubdir)
-	snapshotPath := filepath.Join(ddlDir, migration.SnapshotFileName)
+	ddlDir := filepath.Join(specsDir, migration.DDLSubdir)
+	snapshotPath := filepath.Join(artsDir, migration.BaselineSubdir, migration.SnapshotFileName)
 
 	if !printMigrationSnapshotInfo(w, snapshotPath) {
 		return

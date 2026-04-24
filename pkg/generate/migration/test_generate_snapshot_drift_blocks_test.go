@@ -17,7 +17,7 @@ func TestGenerate_SnapshotDrift_Blocks(t *testing.T) {
 	if _, _, err := Generate(specsDir, artsDir, Options{YongolVersion: "v1", Now: time.Now().UTC()}); err != nil {
 		t.Fatalf("initial: %v", err)
 	}
-	snapPath := filepath.Join(specsDir, "db", ".generated_schema.sql")
+	snapPath := filepath.Join(artsDir, BaselineSubdir, SnapshotFileName)
 	data, _ := os.ReadFile(snapPath)
 	tampered := append(data, []byte("\n-- tampered\n")...)
 	if err := os.WriteFile(snapPath, tampered, 0644); err != nil {

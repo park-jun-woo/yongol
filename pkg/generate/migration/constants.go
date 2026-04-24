@@ -7,19 +7,43 @@ package migration
 // (implementation). Changing any value here is a breaking change for
 // existing projects with committed snapshots / migration files.
 const (
-	// SnapshotFileName is the baseline snapshot stored under <specs>/db/.
+	// SnapshotFileName is the baseline snapshot file name. As of Phase010
+	// (BUG-034) it lives under <artifacts-dir>/db/ — directly under the
+	// db directory, NOT inside db/migrations/. This keeps it out of the
+	// scan path of external migration tools (golang-migrate / flyway /
+	// goose) that treat db/migrations/ as their sources directory.
+	//   <artifacts-dir>/<BaselineSubdir>/<SnapshotFileName>
 	// yongol generate reads it at the start of the migration step and
 	// overwrites it on success.
-	SnapshotFileName = ".generated_schema.sql"
+	SnapshotFileName = ".latest_schema.sql"
 
-	// SnapshotSubdir is the sub-path under <specs-dir> that contains DDL
-	// files AND the snapshot file. The snapshot lives at
-	//   <specs-dir>/<SnapshotSubdir>/<SnapshotFileName>
-	SnapshotSubdir = "db"
+	// DDLSubdir is the sub-path under <specs-dir> that contains the DDL
+	// SSOT files (`*.sql`). Baseline snapshots are no longer stored here;
+	// see BaselineSubdir for the current baseline location.
+	DDLSubdir = "db"
+
+	// SnapshotSubdir is an alias for DDLSubdir kept for source
+	// compatibility with callers that still compute DDL directory paths
+	// via this name. Prefer DDLSubdir in new code.
+	//
+	// Deprecated: use DDLSubdir. The baseline no longer lives under
+	// <specs-dir>/<SnapshotSubdir>/; see BaselineSubdir.
+	SnapshotSubdir = DDLSubdir
+
+	// BaselineSubdir is the sub-path under <artifacts-dir> where the
+	// baseline snapshot is written. Phase010 (BUG-034) placed it at
+	// <artifacts-dir>/db/ — one level above the migrations/ directory —
+	// so external migration tools do not mistake it for a migration.
+	BaselineSubdir = "db"
 
 	// MigrationsSubdir is the sub-path under <artifacts-dir> where
 	// numbered migration .sql files are emitted.
 	MigrationsSubdir = "db/migrations"
+
+	// LegacySnapshotFileName is the pre-Phase010 baseline file name.
+	// generate removes any file with this name under <specs-dir>/db/
+	// because the baseline now lives in arts/ (see BUG-034).
+	LegacySnapshotFileName = ".generated_schema.sql"
 
 	// MigrationFilenameFormat is a Printf format that produces the
 	// up migration file name from (sequence int, description string):

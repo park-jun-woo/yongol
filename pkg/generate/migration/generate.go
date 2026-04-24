@@ -15,12 +15,14 @@ import (
 // MIG-* ERROR diagnostics; the caller (yongol generate) should surface
 // those via the normal report pipeline.
 func Generate(specsDir, artifactsDir string, opt Options) (*Result, []diagnostic.Diagnostic, error) {
-	ddlDir := filepath.Join(specsDir, SnapshotSubdir)
-	snapshotPath := filepath.Join(ddlDir, SnapshotFileName)
+	ddlDir := filepath.Join(specsDir, DDLSubdir)
+	removeLegacyBaseline(ddlDir)
+
+	snapshotPath := filepath.Join(artifactsDir, BaselineSubdir, SnapshotFileName)
 
 	prev, mode, errDiags := loadPrevSnapshot(snapshotPath, artifactsDir)
 
-	curr, err := BuildASTFromDir(ddlDir, []string{SnapshotFileName})
+	curr, err := BuildASTFromDir(ddlDir, nil)
 	if err != nil {
 		return nil, errDiags, fmt.Errorf("build current AST: %w", err)
 	}

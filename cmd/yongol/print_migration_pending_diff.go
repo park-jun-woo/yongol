@@ -18,7 +18,7 @@ func printMigrationPendingDiff(w io.Writer, ddlDir, snapshotPath string) bool {
 	if prev == nil {
 		prev = migration.NewSchema()
 	}
-	curr, err := migration.BuildASTFromDir(ddlDir, []string{migration.SnapshotFileName})
+	curr, err := migration.BuildASTFromDir(ddlDir, nil)
 	if err != nil {
 		fmt.Fprintf(w, "pending: (parse error: %s)\n", err)
 		return false

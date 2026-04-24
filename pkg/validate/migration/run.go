@@ -9,9 +9,11 @@ import (
 
 // Run executes every MIG-* rule against the prev/curr schemas and the
 // hints. missing is the sidecar-file list from LoadDataMigrationSQL.
-// specsDir is required for MIG-006 (snapshot drift check).
+// artsDir is required for MIG-006 (snapshot drift check). As of Phase010
+// (BUG-034) the baseline lives under artsDir/db/migrations/ — not
+// specsDir/db/.
 func Run(
-	specsDir string,
+	artsDir string,
 	prev, curr *migration.Schema,
 	hints *migration.Hints,
 	issues []migration.SafetyIssue,
@@ -23,6 +25,6 @@ func Run(
 	diags = append(diags, Mig003DataMigrationMissing(missing)...)
 	diags = append(diags, Mig004DestructiveWithoutAllow(issues)...)
 	diags = append(diags, Mig005CastMissing(issues)...)
-	diags = append(diags, Mig006SnapshotDrift(specsDir)...)
+	diags = append(diags, Mig006SnapshotDrift(artsDir)...)
 	return diags
 }

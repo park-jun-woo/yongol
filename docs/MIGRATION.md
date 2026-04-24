@@ -7,7 +7,7 @@
 | Item | Path |
 |---|---|
 | DDL SSOT (user-edited) | `specs/db/<table>.sql` |
-| Snapshot baseline | `specs/db/.generated_schema.sql` (managed by yongol) |
+| Snapshot baseline | `arts/db/.latest_schema.sql` (managed by yongol; Phase010 / BUG-034 moved it out of `specs/`) |
 | Migration artifacts (up) | `artifacts/db/migrations/NNNN_<snake_case_desc>.up.sql` |
 | Migration artifacts (down stub) | `artifacts/db/migrations/NNNN_<snake_case_desc>.down.sql` |
 | Apply tool | `golang-migrate` / `flyway` (user choice) |
@@ -50,7 +50,7 @@ Ambiguities the diff cannot resolve are declared via DDL comments.
 yongol generate specs arts
 # -> arts/db/migrations/0001_initial.up.sql
 # -> arts/db/migrations/0001_initial.down.sql   (stub — no-op)
-# -> specs/db/.generated_schema.sql
+# -> arts/db/.latest_schema.sql                 (baseline snapshot)
 ```
 
 Apply: `migrate -path arts/db/migrations -database $DB up`.
@@ -121,7 +121,7 @@ CREATE TABLE users ( ... );
 ## FAQ
 
 - **Edit the snapshot?** No. Edit `specs/db/*.sql` and re-run generate.
-- **Number collisions on merges?** `.generated_schema.sql` conflicts first. Resolve the git merge, re-run generate.
+- **Number collisions on merges?** `arts/db/.latest_schema.sql` conflicts first. Resolve the git merge, re-run generate.
 - **Rollback?** v1 is UP-only; the `.down.sql` files are empty stubs (see above). DOWN content is scheduled for v2.
 - **MySQL / SQLite?** v1 is PostgreSQL-only.
 

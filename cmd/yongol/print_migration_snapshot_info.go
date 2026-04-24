@@ -35,6 +35,6 @@ func printMigrationSnapshotInfo(w io.Writer, snapshotPath string) bool {
 		mark = "DRIFT (MIG-006)"
 	}
 	fmt.Fprintf(w, "snapshot: %s  hash=%s  %s\n",
-		filepath.Join(migration.SnapshotSubdir, migration.SnapshotFileName), short, mark)
+		filepath.Join(migration.BaselineSubdir, migration.SnapshotFileName), short, mark)
 	return true
 }

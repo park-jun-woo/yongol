@@ -17,11 +17,13 @@ import (
 // the sha256 of the remaining canonical SQL body. A drift implies the
 // user (or AI) hand-edited the snapshot, which invalidates diff.
 //
-// specsDir is the SSOT directory; the snapshot lives at
-// specsDir/db/.generated_schema.sql. If the file is absent the rule
-// is a no-op (first-run initial is valid).
-func Mig006SnapshotDrift(specsDir string) []diagnostic.Diagnostic {
-	snap := filepath.Join(specsDir, migration.SnapshotSubdir, migration.SnapshotFileName)
+// As of Phase010 (BUG-034) the snapshot lives at
+// <artsDir>/db/.latest_schema.sql — directly under the db directory so
+// external migration tools (golang-migrate / flyway / goose) do not
+// mistake it for a migration. If the file is absent the rule is a
+// no-op (first-run initial is valid).
+func Mig006SnapshotDrift(artsDir string) []diagnostic.Diagnostic {
+	snap := filepath.Join(artsDir, migration.BaselineSubdir, migration.SnapshotFileName)
 	data, err := os.ReadFile(snap)
 	if err != nil {
 		return nil // absent = initial mode; handled by generate entrypoint.

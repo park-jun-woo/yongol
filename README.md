@@ -299,15 +299,18 @@ Package-level `@model` interfaces for non-DDL I/O. Configured via `manifest.yaml
 
 ```
 specs/db/
-├── users.sql                  # SSOT — user edits live here
-└── .generated_schema.sql      # baseline snapshot (yongol-managed)
+└── users.sql                  # SSOT — user edits live here (pure SSOT; no yongol state)
 
-artifacts/db/migrations/
-├── 0001_initial.up.sql        # first generate
-├── 0001_initial.down.sql      # stub — yongol does not auto-generate reverse migrations
-├── 0002_add_users_email.up.sql    # incremental ALTER after that
-└── 0002_add_users_email.down.sql  # stub
+artifacts/db/
+├── .latest_schema.sql         # baseline snapshot (yongol-managed, Phase010 / BUG-034)
+└── migrations/
+    ├── 0001_initial.up.sql        # first generate
+    ├── 0001_initial.down.sql      # stub — yongol does not auto-generate reverse migrations
+    ├── 0002_add_users_email.up.sql    # incremental ALTER after that
+    └── 0002_add_users_email.down.sql  # stub
 ```
+
+The baseline sits **next to** `migrations/` (not inside it) so external migration tools (`golang-migrate` / `flyway` / `goose`) that scan `migrations/` never mistake the dotfile for a migration. `rm -rf arts/` resets baseline and migrations atomically, eliminating BUG-034's orphan edge case.
 
 The `.up.sql` / `.down.sql` pair matches [golang-migrate](https://github.com/golang-migrate/migrate)'s expected layout. `.down.sql` files are no-op stubs — to roll back, check out the previous `specs/` revision and re-run `yongol generate`.
 

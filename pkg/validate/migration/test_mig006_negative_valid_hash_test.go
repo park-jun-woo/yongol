@@ -15,14 +15,14 @@ import (
 
 func TestMIG006_Negative_ValidHash(t *testing.T) {
 	tmp := t.TempDir()
-	dbDir := filepath.Join(tmp, "db")
-	if err := os.MkdirAll(dbDir, 0755); err != nil {
+	baselineDir := filepath.Join(tmp, migration.BaselineSubdir)
+	if err := os.MkdirAll(baselineDir, 0755); err != nil {
 		t.Fatal(err)
 	}
 	body := "CREATE TABLE t (id INTEGER);\n"
 	sum := sha256.Sum256([]byte(body))
 	content := migration.SnapshotHashHeaderPrefix + hex.EncodeToString(sum[:]) + "\n" + body
-	if err := os.WriteFile(filepath.Join(dbDir, migration.SnapshotFileName), []byte(content), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(baselineDir, migration.SnapshotFileName), []byte(content), 0644); err != nil {
 		t.Fatal(err)
 	}
 	diags := Mig006SnapshotDrift(tmp)

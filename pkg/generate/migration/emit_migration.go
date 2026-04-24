@@ -38,15 +38,20 @@ func emitMigration(specsDir, artifactsDir string, curr *Schema, ops []Operation,
 		return nil, diags, fmt.Errorf("write down stub: %w", err)
 	}
 
-	snapshotPath := filepath.Join(specsDir, SnapshotSubdir, SnapshotFileName)
+	baselineDir := filepath.Join(artifactsDir, BaselineSubdir)
+	if err := os.MkdirAll(baselineDir, 0755); err != nil {
+		return nil, diags, fmt.Errorf("mkdir baseline: %w", err)
+	}
+	snapshotPath := filepath.Join(baselineDir, SnapshotFileName)
 	if err := WriteSnapshot(snapshotPath, curr, yongolVersion, now); err != nil {
 		return nil, diags, fmt.Errorf("write snapshot: %w", err)
 	}
+	_ = specsDir // reserved: legacy baseline cleanup happens in Generate.
 
 	return &Result{
 		Mode:          mode,
 		MigrationFile: upName,
-		SnapshotFile:  filepath.Join(SnapshotSubdir, SnapshotFileName),
+		SnapshotFile:  filepath.Join(BaselineSubdir, SnapshotFileName),
 		OpsCount:      len(ops),
 		Operations:    ops,
 		Hints:         hints,

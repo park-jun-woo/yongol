@@ -56,7 +56,7 @@ INSERT INTO users (id, name) VALUES (0, 'nobody') ON CONFLICT DO NOTHING;
 	if !strings.Contains(string(downData), "Down stub — intentionally empty.") {
 		t.Errorf("down stub missing marker line:\n%s", downData)
 	}
-	snapPath := filepath.Join(specsDir, "db", ".generated_schema.sql")
+	snapPath := filepath.Join(artsDir, BaselineSubdir, SnapshotFileName)
 	if _, err := os.Stat(snapPath); err != nil {
 		t.Errorf("snapshot missing: %v", err)
 	}
@@ -66,5 +66,17 @@ INSERT INTO users (id, name) VALUES (0, 'nobody') ON CONFLICT DO NOTHING;
 	}
 	if !strings.Contains(string(data), "INSERT INTO users") {
 		t.Errorf("snapshot missing sentinel INSERT body:\n%s", data)
+	}
+	// Baseline must NOT leak into the migrations/ directory (Phase010 /
+	// BUG-034). External migration tools scan that directory for
+	// sources and would mistake a dotfile baseline for a migration.
+	strayPath := filepath.Join(artsDir, "db", "migrations", SnapshotFileName)
+	if _, err := os.Stat(strayPath); err == nil {
+		t.Errorf("baseline must not be written under migrations/: %s (see BUG-034)", strayPath)
+	}
+	// Legacy location must NOT receive the baseline.
+	legacyPath := filepath.Join(specsDir, "db", ".generated_schema.sql")
+	if _, err := os.Stat(legacyPath); err == nil {
+		t.Errorf("legacy baseline must not be written at %s (see BUG-034)", legacyPath)
 	}
 }

@@ -32,11 +32,12 @@ func walkSQLFiles(dir string, handler func(path string, data []byte) []diagnosti
 		if e.IsDir() || !strings.HasSuffix(e.Name(), ".sql") {
 			continue
 		}
-		// Skip yongol's own migration snapshot baseline. Its path is
-		// fixed at `.generated_schema.sql` (see pkg/generate/migration).
-		// The file is generated output — not a DDL SSOT — so existing
-		// DDL validators must ignore it.
-		if e.Name() == ".generated_schema.sql" {
+		// Defensive: skip yongol's migration baseline if it somehow
+		// appears under the DDL directory. Phase010 (BUG-034) moved the
+		// baseline to arts/db/migrations/.latest_schema.sql so this
+		// guard now only covers leftover files from pre-Phase010 runs
+		// (generate also removes them on entry).
+		if e.Name() == ".latest_schema.sql" || e.Name() == ".generated_schema.sql" {
 			continue
 		}
 		path := filepath.Join(dir, e.Name())

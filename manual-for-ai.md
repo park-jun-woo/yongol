@@ -412,7 +412,7 @@ command — runs after validate, before backend/frontend codegen.
 
 - SSOT is the DDL (`specs/db/*.sql`). Users edit `CREATE TABLE` directly; never
   hand-author migration files.
-- Baseline snapshot: `specs/db/.generated_schema.sql` (yongol-maintained, normalised form).
+- Baseline snapshot: `arts/db/.latest_schema.sql` (yongol-maintained, normalised form). Phase010 (BUG-034) moved the baseline out of `specs/` so the SSOT directory holds only user-authored DDL; the baseline now sits next to `arts/db/migrations/` (same parent), so `rm -rf arts/` resets baseline + migrations atomically.
 - First run (no snapshot) → `0001_initial.up.sql` with all CREATE TABLE/INDEX/FK
   and an empty `0001_initial.down.sql` stub.
   Subsequent runs emit only the diff as ALTER statements (plus matching down

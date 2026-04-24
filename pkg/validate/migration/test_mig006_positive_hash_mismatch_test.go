@@ -14,12 +14,12 @@ import (
 
 func TestMIG006_Positive_HashMismatch(t *testing.T) {
 	tmp := t.TempDir()
-	dbDir := filepath.Join(tmp, "db")
-	if err := os.MkdirAll(dbDir, 0755); err != nil {
+	baselineDir := filepath.Join(tmp, migration.BaselineSubdir)
+	if err := os.MkdirAll(baselineDir, 0755); err != nil {
 		t.Fatal(err)
 	}
 	content := migration.SnapshotHashHeaderPrefix + "deadbeef\nCREATE TABLE t (id INTEGER);\n"
-	if err := os.WriteFile(filepath.Join(dbDir, migration.SnapshotFileName), []byte(content), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(baselineDir, migration.SnapshotFileName), []byte(content), 0644); err != nil {
 		t.Fatal(err)
 	}
 	diags := Mig006SnapshotDrift(tmp)
