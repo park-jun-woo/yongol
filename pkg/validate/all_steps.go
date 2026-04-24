@@ -16,6 +16,7 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/validate/openapi_manifest"
 	"github.com/park-jun-woo/yongol/pkg/validate/openapi_ssac"
 	"github.com/park-jun-woo/yongol/pkg/validate/query"
+	"github.com/park-jun-woo/yongol/pkg/validate/query_rego"
 	"github.com/park-jun-woo/yongol/pkg/validate/rego"
 	"github.com/park-jun-woo/yongol/pkg/validate/rego_manifest"
 	"github.com/park-jun-woo/yongol/pkg/validate/ssac"
@@ -56,6 +57,7 @@ func allSteps() []step {
 		{Name: "ssac_sqlc", Kinds: []yongol.SSOTKind{yongol.KindSSaC, yongol.KindDDL}, Run: ssac_sqlc.Run},
 		{Name: "ddl_statemachine", Kinds: []yongol.SSOTKind{yongol.KindDDL, yongol.KindStates}, Run: ddl_statemachine.Run},
 		{Name: "ddl_rego", Kinds: []yongol.SSOTKind{yongol.KindDDL, yongol.KindPolicy}, Run: ddl_rego.Run},
+		{Name: "query_rego", Kinds: []yongol.SSOTKind{yongol.KindDDL, yongol.KindPolicy}, Run: query_rego.Run},
 		{Name: "rego_manifest", Kinds: []yongol.SSOTKind{yongol.KindPolicy, yongol.KindConfig}, Run: rego_manifest.Run},
 		{Name: "tsx", Kinds: []yongol.SSOTKind{yongol.KindTSX}, Run: tsx.Run},
 		{Name: "tsx_openapi", Kinds: []yongol.SSOTKind{yongol.KindTSX, yongol.KindOpenAPI}, Run: tsx_openapi.Run},

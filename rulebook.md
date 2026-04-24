@@ -319,6 +319,7 @@ Validates that the names, case, and count of SSaC Input keys match sqlc Params e
 | XQS-16 | ERROR | SSaC Input key must exist in sqlc Params | `pkg/validate/ssac_sqlc/xqs_16_input_key_missing.go` |
 | XQS-17 | ERROR | sqlc Params field must be provided by SSaC Input | `pkg/validate/ssac_sqlc/xqs_17_param_key_missing.go` |
 | XQS-18 | ERROR | OpenAPI param type must be compatible with the sqlc param Go type | `pkg/validate/ssac_sqlc/xqs_18_param_type_mismatch.go` |
+| XQS-19 | ERROR | SSaC call to a DB-using ssac built-in requires the corresponding sqlc query (per ssac `interface.yaml`) | `pkg/validate/ssac_sqlc/xqs_19_ssac_builtin_query_required.go` |
 
 ## P. SSaC ↔ DDL
 
@@ -328,6 +329,17 @@ Bidirectional validation that SSaC `@result` / `@input` matches DDL tables/colum
 |---|---|---|---|
 | XDS-12 | WARNING | `@result` type must match a sqlc row type or DDL table | `pkg/validate/ssac_ddl/xds_12_result_no_ddl_table.go` |
 | XSD-55 | ERROR | DDL table must be referenced in a SSaC `@model` (coverage) | `pkg/validate/ssac_ddl/xsd_55_ddl_to_model_ref.go` |
+
+## P2. sqlc ↔ Rego
+
+Phase003 (ssac/purify) — every Rego `@ownership` annotation must be backed
+by a user-authored `OwnerLookup<Resource>` sqlc query. ssac/pkg/authz is
+DB-free: the handler performs the owner lookup and injects the result
+into `authz.CheckRequest.Owners` before calling authz.Check.
+
+| Rule ID | Level | Description | Source |
+|---|---|---|---|
+| XQP-30 | ERROR | `@ownership <res>: <table>.<col>` requires sqlc query `OwnerLookup<Pascal(res)>` to exist | `pkg/validate/query_rego/xqp_30_owner_lookup_query.go` |
 
 ## R. Miscellaneous (Hurl / StateMachine / Rego / Func / OpenAPI ↔ Hurl)
 

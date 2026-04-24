@@ -21,7 +21,7 @@ import (
 // Signature: func (server *Server) OnXxx(ctx context.Context, msg []byte) error
 func generateSubscribeMethod(sf ssacparser.ServiceFunc, fs *yongol.Fullstack, serviceDir, modulePath string) error {
 	useTx := needsTransaction(sf)
-	g := newMethodGen(fs.OpenAPIDoc, sf, modulePath, useTx, fs.ProjectFuncSpecs, fs.YongolPkgSpecs, tracingWrapCalls(fs), fs.StateDiagrams)
+	g := newMethodGen(fs.OpenAPIDoc, sf, modulePath, useTx, fs.ProjectFuncSpecs, fs.YongolPkgSpecs, tracingWrapCalls(fs), fs.StateDiagrams, collectOwnerships(fs))
 	g.IsSubscribe = true
 
 	var imports []string

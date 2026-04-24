@@ -5,6 +5,7 @@ package ssac
 
 import (
 	"github.com/park-jun-woo/yongol/pkg/parser/funcspec"
+	"github.com/park-jun-woo/yongol/pkg/parser/rego"
 )
 
 // methodGen holds all context needed to generate one StrictServerInterface method.
@@ -68,4 +69,10 @@ type methodGen struct {
 	// sqlcArgs can wrap the source with json.Marshal(...) before
 	// assigning into the params struct (BUG-005 request direction).
 	BodyJSONBFields map[string]bool
+	// Ownerships carries every Rego `@ownership` mapping parsed from the
+	// project's policy files. Consumed by buildAuth (Phase003 ssac/purify)
+	// to emit the corresponding OwnerLookup<Resource> sqlc call and
+	// populate authz.CheckRequest.Owners. Nil / empty when the project has
+	// no ownership annotations — buildAuth then emits an empty owners map.
+	Ownerships []rego.OwnershipMapping
 }
