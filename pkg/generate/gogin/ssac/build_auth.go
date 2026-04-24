@@ -56,6 +56,11 @@ func (g *methodGen) buildAuth(seq ssacparser.Sequence) ([]string, []string) {
 		msg = neutralMessage(status)
 	}
 	extraFields := g.mapFields(seq.Inputs)
+
+	// `assign` selects := vs = for the final authz.Check call. When the
+	// ownership branch below runs it re-evaluates assignOp after emitting
+	// the owner lookup (which itself declares err via :=), so `assign`
+	// must remain reactive to methodGen's FirstErr state. (BUG-029)
 	assign := g.assignOp(false)
 
 	mapping := findOwnershipMapping(g.Ownerships, seq.Resource)
@@ -74,8 +79,15 @@ func (g *methodGen) buildAuth(seq ssacparser.Sequence) ([]string, []string) {
 		if !g.UseTx {
 			queriesRecv = "server.Queries"
 		}
+		// LHS introduces a new variable (ownerVar) alongside err. Go's
+		// short-declaration `:=` is required — and permitted — when at
+		// least one LHS name is new, regardless of whether err was
+		// already declared in the enclosing tx preamble. Using `=`
+		// would yield `undefined: owner<Resource>` at compile time.
+		// (BUG-029)
+		ownerAssign := g.assignOp(true)
 		lines = append(lines,
-			fmt.Sprintf("%s, err %s %s.%s(ctx, %s)", ownerVar, assign, queriesRecv, queryName, ridExpr),
+			fmt.Sprintf("%s, err %s %s.%s(ctx, %s)", ownerVar, ownerAssign, queriesRecv, queryName, ridExpr),
 			"if err != nil {",
 			fmt.Sprintf("\t%s(\"handler: %s\", \"op\", %q, \"status\", %d, \"err\", err)", logLevelFuncForStatus(status), logTagForStatus(status), g.FuncName, status),
 			fmt.Sprintf("\treturn api.%s%dJSONResponse{Error: %q, Code: strPtr(%q)}, nil", g.FuncName, status, msg, neutralCode(status)),
