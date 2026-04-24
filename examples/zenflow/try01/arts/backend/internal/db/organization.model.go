@@ -7,7 +7,7 @@
 package db
 
 import (
-	"time"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Organization struct {
@@ -15,5 +15,5 @@ type Organization struct {
 	Name           string
 	PlanType       string
 	CreditsBalance int64
-	CreatedAt      time.Time
+	CreatedAt      pgtype.Timestamp
 }

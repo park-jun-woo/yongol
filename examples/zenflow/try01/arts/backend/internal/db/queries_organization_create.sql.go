@@ -5,7 +5,7 @@
 
 //ff:func feature=db type=query control=sequence
 //ff:what Queries.OrganizationCreate
-//ff:checked llm=yongol-gen hash=9f07d6ee
+//ff:checked llm=yongol-gen hash=9c08b758
 package db
 
 import (
@@ -13,7 +13,7 @@ import (
 )
 
 func (q *Queries) OrganizationCreate(ctx context.Context, arg OrganizationCreateParams) (Organization, error) {
-	row := q.db.QueryRowContext(ctx, organizationCreate, arg.Name, arg.PlanType, arg.CreditsBalance)
+	row := q.db.QueryRow(ctx, organizationCreate, arg.Name, arg.PlanType, arg.CreditsBalance)
 	var i Organization
 	err := row.Scan(
 		&i.ID,

@@ -5,7 +5,7 @@
 
 //ff:func feature=db type=query control=iteration dimension=1
 //ff:what +no-pagination per-tenant workflow list is bounded in UI
-//ff:checked llm=yongol-gen hash=a471dc12
+//ff:checked llm=yongol-gen hash=68e97e06
 package db
 
 import (
@@ -14,7 +14,7 @@ import (
 
 // +no-pagination per-tenant workflow list is bounded in UI
 func (q *Queries) WorkflowListByOrgID(ctx context.Context, orgID int64) ([]Workflow, error) {
-	rows, err := q.db.QueryContext(ctx, workflowListByOrgID, orgID)
+	rows, err := q.db.Query(ctx, workflowListByOrgID, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -33,9 +33,6 @@ func (q *Queries) WorkflowListByOrgID(ctx context.Context, orgID int64) ([]Workf
 			return nil, err
 		}
 		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

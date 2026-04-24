@@ -1,6 +1,6 @@
 //ff:func feature=service type=util control=sequence topic=response-serialize
 //ff:what convertWorkflow — db.Workflow row → *api.Workflow 변환
-//ff:checked llm=yongol-gen hash=63a9fa79
+//ff:checked llm=yongol-gen hash=028cc088
 package service
 
 import (
@@ -10,7 +10,7 @@ import (
 
 func convertWorkflow(row db.Workflow) (*api.Workflow, error) {
 	return &api.Workflow{
-		CreatedAt: ptrOf(row.CreatedAt),
+		CreatedAt: ptrOf(row.CreatedAt.Time),
 		Id: ptrOf(row.ID),
 		OrgId: ptrOf(row.OrgID),
 		Status: ptrOf(row.Status),

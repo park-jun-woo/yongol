@@ -1,13 +1,13 @@
 //ff:func feature=service type=handler control=sequence
 //ff:what ActivateWorkflow — HTTP handler
-//ff:checked llm=yongol-gen hash=872c237c
+//ff:checked llm=yongol-gen hash=2df0a04a
 package service
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/jackc/pgx/v5"
 	"github.com/park-jun-woo/ssac/pkg/authz"
 	"github.com/park-jun-woo/zenflow/internal/api"
 	"github.com/park-jun-woo/zenflow/internal/billing"
@@ -25,31 +25,31 @@ func (server *Server) ActivateWorkflow(ctx context.Context, request api.Activate
 		return nil, fmt.Errorf("missing currentUser in authenticated handler: op=ActivateWorkflow")
 	}
 
-	tx, err := server.DB.BeginTx(ctx, nil)
+	tx, err := server.DB.Begin(ctx)
 	if err != nil { return nil, err }
 	defer func() {
-		if err := tx.Rollback(); err != nil && !errors.Is(err, sql.ErrTxDone) {
+		if err := tx.Rollback(ctx); err != nil && !errors.Is(err, pgx.ErrTxClosed) {
 			slog.Warn("rollback failed", "op", "ActivateWorkflow", "err", err)
 		}
 	}()
 	qtx := server.Queries.WithTx(tx)
 
 	wf, err := qtx.WorkflowFindByID(ctx, request.Id)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) { return nil, err }
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) { return nil, err }
 
 	if wf.ID == 0 {
 		slog.Warn("handler: 4xx", "op", "ActivateWorkflow", "status", 404)
 		return api.ActivateWorkflow404JSONResponse{Error: "Workflow not found", Code: strPtr("not_found")}, nil
 	}
 
-	_, err = authz.Check(authz.CheckRequest{Ctx: ctx, Tx: tx, Action: "ActivateWorkflow", Resource: "workflow", Claim: currentUser, ResourceID: wf.ID})
+	_, err = authz.Check(authz.CheckRequest{Ctx: ctx, Tx: nil, Action: "ActivateWorkflow", Resource: "workflow", Claim: currentUser, ResourceID: wf.ID})
 	if err != nil {
 		slog.Warn("handler: 4xx", "op", "ActivateWorkflow", "status", 403, "err", err)
 		return api.ActivateWorkflow403JSONResponse{Error: "Forbidden", Code: strPtr("forbidden")}, nil
 	}
 
 	org, err := qtx.OrganizationFindByID(ctx, wf.OrgID)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) { return nil, err }
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) { return nil, err }
 
 	if org.ID == 0 {
 		slog.Warn("handler: 4xx", "op", "ActivateWorkflow", "status", 404)
@@ -73,7 +73,7 @@ func (server *Server) ActivateWorkflow(ctx context.Context, request api.Activate
 	updated, err := qtx.WorkflowFindByID(ctx, wf.ID)
 	if err != nil { return nil, err }
 
-	if err := tx.Commit(); err != nil { return nil, err }
+	if err := tx.Commit(ctx); err != nil { return nil, err }
 
 	workflowConverted, err := convertWorkflow(updated)
 	if err != nil { return nil, err }

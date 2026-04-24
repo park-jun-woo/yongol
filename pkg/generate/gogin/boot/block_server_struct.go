@@ -16,8 +16,12 @@ import (
 // secret from os.Getenv via auth.Configure). The block only emits DB and
 // Queries; auth-related dependencies (RefreshStore) are injected by
 // blockAuthInit directly on the Server value (Phase004 / Phase009).
+//
+// Phase005 pgx/v5 refit — Server.DB is *pgxpool.Pool, so the assignment
+// targets the `pool` variable declared by blockDBInit rather than the
+// ssac-compat `conn` bridge.
 func blockServerStruct(fs *yongol.Fullstack, modulePath string) MainBlock {
-	fields := []string{`DB: conn,`, `Queries: queries,`}
+	fields := []string{`DB: pool,`, `Queries: queries,`}
 	lines := []string{`srv := &service.Server{`}
 	for _, f := range fields {
 		lines = append(lines, "\t"+f)

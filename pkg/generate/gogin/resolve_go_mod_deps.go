@@ -15,12 +15,14 @@ func resolveGoModDeps(fs *yongol.Fullstack) []string {
 	if tracing == nil {
 		return deps
 	}
+	// Phase005 pgx/v5 refit removed the otelsql DB wrapper; tracing over
+	// pgx is deferred to a follow-up via otelpgx. Until then the otelsql
+	// module is omitted from deps to keep go.sum clean.
 	deps = append(deps,
 		"go.opentelemetry.io/otel@"+otelVersion,
 		"go.opentelemetry.io/otel/sdk@"+otelVersion,
 		"go.opentelemetry.io/otel/trace@"+otelVersion,
 		"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin@"+otelContribGinVer,
-		"github.com/XSAM/otelsql@"+otelSQLVer,
 	)
 	switch tracing.Exporter {
 	case "otlp", "":

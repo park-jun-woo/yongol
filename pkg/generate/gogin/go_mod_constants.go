@@ -21,10 +21,13 @@ const (
 // They use @latest at `go get` time — semver-major pins live in the import
 // path (e.g. `jwt/v5`), so @latest only picks minor/patch upgrades. The
 // generated project's own go.sum freezes the exact resolution per build.
+//
+// Phase005 pgx/v5 refit — pgx/v5 replaces lib/pq. The pgxpool + stdlib
+// sub-packages are reached via the single github.com/jackc/pgx/v5 module.
 var coreDeps = []string{
 	"github.com/gin-gonic/gin@latest",
 	"github.com/gin-contrib/cors@latest",
-	"github.com/lib/pq@latest",
+	"github.com/jackc/pgx/v5@latest",
 	"github.com/golang-jwt/jwt/v5@latest",
 	"github.com/oapi-codegen/runtime@latest",
 	"github.com/getkin/kin-openapi@latest",

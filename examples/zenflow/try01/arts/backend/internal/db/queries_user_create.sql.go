@@ -5,7 +5,7 @@
 
 //ff:func feature=db type=query control=sequence
 //ff:what Queries.UserCreate
-//ff:checked llm=yongol-gen hash=1245baca
+//ff:checked llm=yongol-gen hash=d8d09311
 package db
 
 import (
@@ -13,7 +13,7 @@ import (
 )
 
 func (q *Queries) UserCreate(ctx context.Context, arg UserCreateParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, userCreate,
+	row := q.db.QueryRow(ctx, userCreate,
 		arg.OrgID,
 		arg.Email,
 		arg.PasswordHash,

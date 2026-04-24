@@ -51,11 +51,14 @@ func generateSubscribeMethod(sf ssacparser.ServiceFunc, fs *yongol.Fullstack, se
 	}
 
 	if useTx {
-		imports = append(imports, `"database/sql"`, `"errors"`)
-		body = append(body, "", "tx, err := server.DB.BeginTx(ctx, nil)")
+		// Phase005 pgx/v5 refit — mirror the HTTP handler path: Begin(ctx)
+		// returns pgx.Tx; Rollback/Commit accept ctx. pgx.ErrTxClosed
+		// replaces sql.ErrTxDone.
+		imports = append(imports, `"github.com/jackc/pgx/v5"`, `"errors"`)
+		body = append(body, "", "tx, err := server.DB.Begin(ctx)")
 		body = append(body, "if err != nil { return fmt.Errorf(\"begin tx: %w\", err) }")
 		body = append(body, "defer func() {")
-		body = append(body, fmt.Sprintf(`	if err := tx.Rollback(); err != nil && !errors.Is(err, sql.ErrTxDone) {`))
+		body = append(body, fmt.Sprintf(`	if err := tx.Rollback(ctx); err != nil && !errors.Is(err, pgx.ErrTxClosed) {`))
 		body = append(body, fmt.Sprintf(`		slog.Warn("rollback failed", "op", %q, "err", err)`, sf.Name))
 		body = append(body, "	}")
 		body = append(body, "}()")
@@ -85,7 +88,7 @@ func generateSubscribeMethod(sf ssacparser.ServiceFunc, fs *yongol.Fullstack, se
 	}
 
 	if useTx {
-		body = append(body, "", "if err := tx.Commit(); err != nil { return fmt.Errorf(\"commit: %w\", err) }")
+		body = append(body, "", "if err := tx.Commit(ctx); err != nil { return fmt.Errorf(\"commit: %w\", err) }")
 	}
 	if len(postCommit) > 0 {
 		body = append(body, "")

@@ -59,8 +59,18 @@ func Generate(fs *yongol.Fullstack, artifactsDir string) error {
 			filtered[name] = true
 		}
 	}
-	if err := emitAllConverterFiles(fs.OpenAPIDoc, serviceDir, modulePath, filtered, usedNames); err != nil {
+	if err := emitAllConverterFiles(fs.OpenAPIDoc, serviceDir, modulePath, filtered, fs.DDLTables, usedNames); err != nil {
 		return fmt.Errorf("converters: %w", err)
+	}
+
+	// Phase005 pgx/v5 refit — emit the pgtype helper functions used by
+	// convert<Model> when a DDL column resolves to pgtype.UUID / pgtype.Numeric.
+	// The helpers are cheap and only referenced through generated convert code
+	// so their presence in a service that lacks UUID / NUMERIC columns is an
+	// inert extra file. Keeping emission unconditional avoids threading a
+	// "needs helpers?" flag through the convert emitter.
+	if err := emitPgtypeHelpers(serviceDir); err != nil {
+		return fmt.Errorf("pgtype helpers: %w", err)
 	}
 
 	// Remove a converters.go bundle left behind by older generations so

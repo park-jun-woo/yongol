@@ -1,6 +1,6 @@
 //ff:func feature=main type=command control=sequence
 //ff:what main — 애플리케이션 엔트리포인트 (DB/JWT/authz/queue/cache/session/file/router/gin 초기화)
-//ff:checked llm=yongol-gen hash=299155b2
+//ff:checked llm=yongol-gen hash=6dcf4568
 package main
 
 import (
@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/park-jun-woo/ssac/pkg/auth"
 	"github.com/park-jun-woo/zenflow/internal/api"
 	"github.com/park-jun-woo/zenflow/internal/db"
@@ -18,7 +20,6 @@ import (
 	"net/http"
 	"os"
 	"time"
-	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -30,17 +31,29 @@ func main() {
 	ctx, cancelBootstrap := context.WithCancel(context.Background())
 	defer cancelBootstrap()
 	slog.Info("connecting to database")
-	conn, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
+	poolCfg, err := pgxpool.ParseConfig(os.Getenv("DATABASE_URL"))
+	if err != nil {
+		slog.Error("db init: parse DATABASE_URL", "err", err)
+		os.Exit(1)
+	}
+	poolCfg.MaxConns = int32(envInt("DB_MAX_OPEN_CONNS", 25))
+	poolCfg.MinConns = int32(envInt("DB_MAX_IDLE_CONNS", 5))
+	poolCfg.MaxConnLifetime = envDuration("DB_CONN_MAX_LIFETIME", 5*time.Minute)
+	pool, err := pgxpool.NewWithConfig(ctx, poolCfg)
 	if err != nil {
 		slog.Error("db init", "err", err)
 		os.Exit(1)
 	}
-	defer conn.Close()
-	conn.SetMaxOpenConns(envInt("DB_MAX_OPEN_CONNS", 25))
-	conn.SetMaxIdleConns(envInt("DB_MAX_IDLE_CONNS", 5))
-	conn.SetConnMaxLifetime(envDuration("DB_CONN_MAX_LIFETIME", 5*time.Minute))
-	queries := db.New(conn)
-	slog.Info("database connected", "max_open", conn.Stats().MaxOpenConnections)
+	defer pool.Close()
+	// Bridge *pgxpool.Pool → *sql.DB so ssac packages (auth / queue /
+	// authz / cache / session) that still take database/sql handles work
+	// against the same underlying pool. stdlib.OpenDBFromPool shares the
+	// pool; no additional connection resources are allocated. Explicit
+	// *sql.DB annotation keeps the database/sql import marked as used.
+	var conn *sql.DB = stdlib.OpenDBFromPool(pool)
+	defer func() { _ = conn.Close() }()
+	queries := db.New(pool)
+	slog.Info("database connected", "max_conns", poolCfg.MaxConns)
 
 	if v := os.Getenv("JWT_SECRET"); v == "" {
 		slog.Error("JWT_SECRET is required")
@@ -53,7 +66,7 @@ func main() {
 	initAuthz(conn)
 
 	srv := &service.Server{
-		DB: conn,
+		DB: pool,
 		Queries: queries,
 	}
 

@@ -5,7 +5,7 @@
 
 //ff:func feature=db type=query control=sequence
 //ff:what Queries.WorkflowFindByID
-//ff:checked llm=yongol-gen hash=045dbdc0
+//ff:checked llm=yongol-gen hash=3cf948fd
 package db
 
 import (
@@ -13,7 +13,7 @@ import (
 )
 
 func (q *Queries) WorkflowFindByID(ctx context.Context, id int64) (Workflow, error) {
-	row := q.db.QueryRowContext(ctx, workflowFindByID, id)
+	row := q.db.QueryRow(ctx, workflowFindByID, id)
 	var i Workflow
 	err := row.Scan(
 		&i.ID,

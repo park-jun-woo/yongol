@@ -1,72 +1,64 @@
 //ff:func feature=gen-gogin type=generator control=sequence
-//ff:what blockDBInit — DB 접속 + 풀 설정 + sqlc Queries 초기화 (OTel 활성 시 otelsql 래핑)
+//ff:what blockDBInit — pgxpool 생성 + ssac용 sql.DB 브릿지 + sqlc Queries 초기화
 
 package boot
 
 import "github.com/park-jun-woo/yongol/pkg/yongol"
 
 // blockDBInit produces the db connection + pool tuning + sqlc Queries init
-// block. Pool parameters are controlled via DB_MAX_OPEN_CONNS (25),
-// DB_MAX_IDLE_CONNS (5), DB_CONN_MAX_LIFETIME (5m). envInt / envDuration
-// helpers are declared top-level by blockEnvHelpers.
+// block. Phase005 (pgx/v5 refit) — the primary connection is a
+// *pgxpool.Pool created via pgxpool.ParseConfig + New. Pool tuning is
+// configured on the pgxpool.Config before New() using the same env var
+// surface (DB_MAX_OPEN_CONNS, DB_MAX_IDLE_CONNS, DB_CONN_MAX_LIFETIME)
+// mapped onto pgxpool fields.
 //
-// When OpenTelemetry tracing is enabled (Phase009), the `database/sql`
-// driver is opened via `otelsql.Open` so every Query / Exec call becomes
-// a child span of the current request span automatically. The
-// DBStatsMetrics hook is also registered so connection-pool health shows
-// up as OTel metrics alongside Prometheus counters. Non-tracing builds
-// keep the plain `sql.Open` path to avoid any reflection / hook cost.
+// A secondary *sql.DB (`conn`) is derived from the pool via
+// stdlib.OpenDBFromPool. ssac packages (auth / queue / authz / cache /
+// session) still require *sql.DB, and migrating their signatures is out
+// of scope for this Phase. The bridge keeps the pool as the single source
+// of connections while preserving the existing ssac API surface.
+//
+// OpenTelemetry tracing (previous otelsql path) is temporarily removed;
+// reinstating otel via otelpgx is a follow-up (plans notes, obs01 /
+// sqlc02). Non-tracing fall-through is now the only path.
 func blockDBInit(fs *yongol.Fullstack, modulePath string) MainBlock {
+	_ = hasOtel // silence until otelpgx wiring returns
 	imports := []string{
 		`"context"`,
 		`"time"`,
-		`_ "github.com/lib/pq"`,
+		`"database/sql"`,
+		`"github.com/jackc/pgx/v5/pgxpool"`,
+		`"github.com/jackc/pgx/v5/stdlib"`,
 		`"` + modulePath + `/internal/db"`,
-	}
-	// database/sql is only referenced directly on the non-tracing branch
-	// (sql.Open). otelsql.Open returns *sql.DB but the identifier `sql.`
-	// does not appear in the generated db-init body under the OTel branch,
-	// and adding the import anyway would fail the unused-import check once
-	// substring filtering in shouldKeepImport is tightened. Other blocks
-	// (serverStruct, queue-init) that consume *sql.DB add their own
-	// database/sql import — dedupe merges them.
-	if !hasOtel(fs) {
-		imports = append(imports, `"database/sql"`)
 	}
 	lines := []string{
 		`ctx, cancelBootstrap := context.WithCancel(context.Background())`,
 		`defer cancelBootstrap()`,
 		`slog.Info("connecting to database")`,
-	}
-
-	if hasOtel(fs) {
-		imports = append(imports,
-			`"github.com/XSAM/otelsql"`,
-			`semconv "go.opentelemetry.io/otel/semconv/v1.26.0"`,
-		)
-		lines = append(lines,
-			`conn, err := otelsql.Open("postgres", os.Getenv("DATABASE_URL"),`,
-			`	otelsql.WithAttributes(semconv.DBSystemPostgreSQL),`,
-			`)`,
-		)
-	} else {
-		lines = append(lines,
-			`conn, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))`,
-		)
-	}
-
-	lines = append(lines,
+		`poolCfg, err := pgxpool.ParseConfig(os.Getenv("DATABASE_URL"))`,
+		`if err != nil {`,
+		`	slog.Error("db init: parse DATABASE_URL", "err", err)`,
+		`	os.Exit(1)`,
+		`}`,
+		`poolCfg.MaxConns = int32(envInt("DB_MAX_OPEN_CONNS", 25))`,
+		`poolCfg.MinConns = int32(envInt("DB_MAX_IDLE_CONNS", 5))`,
+		`poolCfg.MaxConnLifetime = envDuration("DB_CONN_MAX_LIFETIME", 5*time.Minute)`,
+		`pool, err := pgxpool.NewWithConfig(ctx, poolCfg)`,
 		`if err != nil {`,
 		`	slog.Error("db init", "err", err)`,
 		`	os.Exit(1)`,
 		`}`,
-		`defer conn.Close()`,
-		`conn.SetMaxOpenConns(envInt("DB_MAX_OPEN_CONNS", 25))`,
-		`conn.SetMaxIdleConns(envInt("DB_MAX_IDLE_CONNS", 5))`,
-		`conn.SetConnMaxLifetime(envDuration("DB_CONN_MAX_LIFETIME", 5*time.Minute))`,
-		`queries := db.New(conn)`,
-		`slog.Info("database connected", "max_open", conn.Stats().MaxOpenConnections)`,
-	)
+		`defer pool.Close()`,
+		`// Bridge *pgxpool.Pool → *sql.DB so ssac packages (auth / queue /`,
+		`// authz / cache / session) that still take database/sql handles work`,
+		`// against the same underlying pool. stdlib.OpenDBFromPool shares the`,
+		`// pool; no additional connection resources are allocated. Explicit`,
+		`// *sql.DB annotation keeps the database/sql import marked as used.`,
+		`var conn *sql.DB = stdlib.OpenDBFromPool(pool)`,
+		`defer func() { _ = conn.Close() }()`,
+		`queries := db.New(pool)`,
+		`slog.Info("database connected", "max_conns", poolCfg.MaxConns)`,
+	}
 
 	return MainBlock{
 		Name:    "db-init",

@@ -25,10 +25,14 @@ func generateServerGo(fs *yongol.Fullstack, artifactsDir, modulePath string) err
 	var sb strings.Builder
 	sb.WriteString(ffannot.EmitAnnotationBlock(ffannot.Block{
 		Type: ffannot.TypeAnnot{Feature: "service", Type: "model"},
-		What: "Server — StrictServerInterface 구조체 (DB/Queries 보관, auth 활성 시 RefreshStore 추가)",
+		What: "Server — StrictServerInterface 구조체 (pgxpool.Pool/Queries 보관, auth 활성 시 RefreshStore 추가)",
 	}))
 	sb.WriteString("package service\n\nimport (\n")
-	sb.WriteString("\t\"database/sql\"\n")
+	// Phase005 pgx/v5 refit — Server.DB is *pgxpool.Pool so sqlc Queries.WithTx
+	// can receive pgx.Tx from Pool.Begin. ssac packages (auth/queue/authz)
+	// continue to expect *sql.DB and are wired via a stdlib.OpenDBFromPool
+	// bridge in main.go (not on the Server struct).
+	sb.WriteString("\t\"github.com/jackc/pgx/v5/pgxpool\"\n")
 	sb.WriteString("\t\"" + modulePath + "/internal/db\"\n")
 	authActive := fs.Manifest != nil && fs.Manifest.Backend.Auth != nil && len(fs.Manifest.Backend.Auth.Claims) > 0
 	if authActive {
@@ -39,7 +43,7 @@ func generateServerGo(fs *yongol.Fullstack, artifactsDir, modulePath string) err
 	sb.WriteString(")\n\n")
 	sb.WriteString("// Server implements api.StrictServerInterface.\n")
 	sb.WriteString("type Server struct {\n")
-	sb.WriteString("\tDB      *sql.DB\n")
+	sb.WriteString("\tDB      *pgxpool.Pool\n")
 	sb.WriteString("\tQueries *db.Queries\n")
 	if authActive {
 		// Phase004 — RefreshStore is injected so SSaC handlers that emit a

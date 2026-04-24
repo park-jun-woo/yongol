@@ -1,6 +1,6 @@
 //ff:func feature=service type=util control=sequence topic=response-serialize
 //ff:what convertUser — db.User row → *api.User 변환
-//ff:checked llm=yongol-gen hash=b089b144
+//ff:checked llm=yongol-gen hash=8d5864fc
 package service
 
 import (
@@ -10,7 +10,7 @@ import (
 
 func convertUser(row db.User) (*api.User, error) {
 	return &api.User{
-		CreatedAt: ptrOf(row.CreatedAt),
+		CreatedAt: ptrOf(row.CreatedAt.Time),
 		Email: ptrOf(row.Email),
 		Id: ptrOf(row.ID),
 		Name: ptrOf(row.Name),

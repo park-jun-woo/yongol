@@ -5,7 +5,7 @@
 
 //ff:func feature=db type=query control=sequence
 //ff:what +allow-sensitive password_hash is required by auth login path
-//ff:checked llm=yongol-gen hash=290b6c95
+//ff:checked llm=yongol-gen hash=71bc04ee
 package db
 
 import (
@@ -14,7 +14,7 @@ import (
 
 // +allow-sensitive password_hash is required by auth login path
 func (q *Queries) UserFindByEmail(ctx context.Context, email string) (User, error) {
-	row := q.db.QueryRowContext(ctx, userFindByEmail, email)
+	row := q.db.QueryRow(ctx, userFindByEmail, email)
 	var i User
 	err := row.Scan(
 		&i.ID,

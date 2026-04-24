@@ -38,11 +38,15 @@ func generateHTTPMethod(sf ssacparser.ServiceFunc, fs *yongol.Fullstack, service
 	}
 
 	if useTx {
-		imports = append(imports, `"database/sql"`, `"errors"`)
-		body = append(body, "", "tx, err := server.DB.BeginTx(ctx, nil)")
+		// Phase005 pgx/v5 refit — server.DB is *pgxpool.Pool.
+		// Pool.Begin(ctx) returns a pgx.Tx; Rollback / Commit both accept
+		// ctx. pgx.ErrTxClosed is the counterpart of sql.ErrTxDone and is
+		// returned by Rollback after a successful Commit.
+		imports = append(imports, `"github.com/jackc/pgx/v5"`, `"errors"`)
+		body = append(body, "", "tx, err := server.DB.Begin(ctx)")
 		body = append(body, "if err != nil { return nil, err }")
 		body = append(body, "defer func() {")
-		body = append(body, fmt.Sprintf(`	if err := tx.Rollback(); err != nil && !errors.Is(err, sql.ErrTxDone) {`))
+		body = append(body, fmt.Sprintf(`	if err := tx.Rollback(ctx); err != nil && !errors.Is(err, pgx.ErrTxClosed) {`))
 		body = append(body, fmt.Sprintf(`		slog.Warn("rollback failed", "op", %q, "err", err)`, sf.Name))
 		body = append(body, "	}")
 		body = append(body, "}()")
@@ -79,7 +83,7 @@ func generateHTTPMethod(sf ssacparser.ServiceFunc, fs *yongol.Fullstack, service
 	}
 
 	if useTx {
-		body = append(body, "", "if err := tx.Commit(); err != nil { return nil, err }")
+		body = append(body, "", "if err := tx.Commit(ctx); err != nil { return nil, err }")
 	}
 	if len(postCommitLines) > 0 {
 		body = append(body, "")

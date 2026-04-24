@@ -5,7 +5,7 @@
 
 //ff:func feature=db type=query control=sequence
 //ff:what +allow-sensitive password_hash is required by auth middleware
-//ff:checked llm=yongol-gen hash=d63e11a6
+//ff:checked llm=yongol-gen hash=e2255b58
 package db
 
 import (
@@ -14,7 +14,7 @@ import (
 
 // +allow-sensitive password_hash is required by auth middleware
 func (q *Queries) UserFindByID(ctx context.Context, id int64) (User, error) {
-	row := q.db.QueryRowContext(ctx, userFindByID, id)
+	row := q.db.QueryRow(ctx, userFindByID, id)
 	var i User
 	err := row.Scan(
 		&i.ID,

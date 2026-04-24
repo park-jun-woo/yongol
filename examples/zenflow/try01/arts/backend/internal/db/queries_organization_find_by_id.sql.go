@@ -5,7 +5,7 @@
 
 //ff:func feature=db type=query control=sequence
 //ff:what Queries.OrganizationFindByID
-//ff:checked llm=yongol-gen hash=24e62c91
+//ff:checked llm=yongol-gen hash=5283218d
 package db
 
 import (
@@ -13,7 +13,7 @@ import (
 )
 
 func (q *Queries) OrganizationFindByID(ctx context.Context, id int64) (Organization, error) {
-	row := q.db.QueryRowContext(ctx, organizationFindByID, id)
+	row := q.db.QueryRow(ctx, organizationFindByID, id)
 	var i Organization
 	err := row.Scan(
 		&i.ID,

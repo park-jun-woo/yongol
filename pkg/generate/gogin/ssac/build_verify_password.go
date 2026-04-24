@@ -22,7 +22,7 @@ import (
 // The generated Go looks like:
 //
 //	user, err := server.Queries.UserFindByEmail(ctx, request.Body.Email)
-//	if err != nil && !errors.Is(err, sql.ErrNoRows) { return nil, err }
+//	if err != nil && !errors.Is(err, pgx.ErrNoRows) { return nil, err }
 //	if user.ID == 0 {
 //	    // timing equaliser: still pay bcrypt cost
 //	    _, _ = auth.VerifyPassword(auth.VerifyPasswordRequest{
@@ -69,7 +69,7 @@ func (g *methodGen) buildVerifyPassword(seq ssacparser.Sequence) ([]string, []st
 	assign := g.assignOp(true) // binds a new variable
 	lines := []string{
 		fmt.Sprintf("%s, err %s %s.%s(ctx, %s)", varName, assign, g.queryVar(), findMethod, emailArg),
-		"if err != nil && !errors.Is(err, sql.ErrNoRows) { return nil, err }",
+		"if err != nil && !errors.Is(err, pgx.ErrNoRows) { return nil, err }",
 		fmt.Sprintf("if %s.ID == 0 {", varName),
 		// Timing equaliser: still pay bcrypt cost on miss.
 		"\t_, _ = auth.VerifyPassword(auth.VerifyPasswordRequest{",
@@ -91,7 +91,7 @@ func (g *methodGen) buildVerifyPassword(seq ssacparser.Sequence) ([]string, []st
 	}
 
 	imports := []string{
-		`"database/sql"`,
+		`"github.com/jackc/pgx/v5"`,
 		`"errors"`,
 		`"log/slog"`,
 		// Phase001 UserClaimUnification — auth is back on ssac/pkg/auth

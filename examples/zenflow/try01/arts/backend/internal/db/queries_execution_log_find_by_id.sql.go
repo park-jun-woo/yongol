@@ -5,7 +5,7 @@
 
 //ff:func feature=db type=query control=sequence
 //ff:what Queries.ExecutionLogFindByID
-//ff:checked llm=yongol-gen hash=84e22e98
+//ff:checked llm=yongol-gen hash=c4e17bda
 package db
 
 import (
@@ -13,7 +13,7 @@ import (
 )
 
 func (q *Queries) ExecutionLogFindByID(ctx context.Context, id int64) (ExecutionLog, error) {
-	row := q.db.QueryRowContext(ctx, executionLogFindByID, id)
+	row := q.db.QueryRow(ctx, executionLogFindByID, id)
 	var i ExecutionLog
 	err := row.Scan(
 		&i.ID,

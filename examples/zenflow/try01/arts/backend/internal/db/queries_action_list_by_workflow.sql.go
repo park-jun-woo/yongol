@@ -5,7 +5,7 @@
 
 //ff:func feature=db type=query control=iteration dimension=1
 //ff:what +no-pagination actions per workflow are bounded by UI
-//ff:checked llm=yongol-gen hash=a0f236f1
+//ff:checked llm=yongol-gen hash=69b406d9
 package db
 
 import (
@@ -14,7 +14,7 @@ import (
 
 // +no-pagination actions per workflow are bounded by UI
 func (q *Queries) ActionListByWorkflow(ctx context.Context, workflowID int64) ([]Action, error) {
-	rows, err := q.db.QueryContext(ctx, actionListByWorkflow, workflowID)
+	rows, err := q.db.Query(ctx, actionListByWorkflow, workflowID)
 	if err != nil {
 		return nil, err
 	}
@@ -32,9 +32,6 @@ func (q *Queries) ActionListByWorkflow(ctx context.Context, workflowID int64) ([
 			return nil, err
 		}
 		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

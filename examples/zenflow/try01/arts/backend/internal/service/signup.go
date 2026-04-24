@@ -1,12 +1,12 @@
 //ff:func feature=service type=handler control=sequence
 //ff:what Signup — HTTP handler
-//ff:checked llm=yongol-gen hash=0635a050
+//ff:checked llm=yongol-gen hash=510339d7
 package service
 
 import (
 	"context"
-	"database/sql"
 	"errors"
+	"github.com/jackc/pgx/v5"
 	"github.com/park-jun-woo/ssac/pkg/auth"
 	"github.com/park-jun-woo/zenflow/internal/api"
 	"github.com/park-jun-woo/zenflow/internal/db"
@@ -17,17 +17,17 @@ import (
 func (server *Server) Signup(ctx context.Context, request api.SignupRequestObject) (api.SignupResponseObject, error) {
 	slog.DebugContext(ctx, "handler entry", "op", "Signup")
 
-	tx, err := server.DB.BeginTx(ctx, nil)
+	tx, err := server.DB.Begin(ctx)
 	if err != nil { return nil, err }
 	defer func() {
-		if err := tx.Rollback(); err != nil && !errors.Is(err, sql.ErrTxDone) {
+		if err := tx.Rollback(ctx); err != nil && !errors.Is(err, pgx.ErrTxClosed) {
 			slog.Warn("rollback failed", "op", "Signup", "err", err)
 		}
 	}()
 	qtx := server.Queries.WithTx(tx)
 
 	existing, err := qtx.UserFindByEmail(ctx, string(request.Body.Email))
-	if err != nil && !errors.Is(err, sql.ErrNoRows) { return nil, err }
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) { return nil, err }
 
 	if existing.ID != 0 {
 		slog.Warn("handler: 4xx", "op", "Signup", "status", 409)
@@ -52,7 +52,7 @@ func (server *Server) Signup(ctx context.Context, request api.SignupRequestObjec
 		return api.Signup500JSONResponse{Error: "Internal error", Code: strPtr("internal_error")}, nil
 	}
 
-	if err := tx.Commit(); err != nil { return nil, err }
+	if err := tx.Commit(ctx); err != nil { return nil, err }
 
 	organizationConverted, err := convertOrganization(org)
 	if err != nil { return nil, err }

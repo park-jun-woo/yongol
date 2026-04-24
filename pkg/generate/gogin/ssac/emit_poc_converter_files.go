@@ -7,6 +7,8 @@ import (
 	"sort"
 
 	"github.com/getkin/kin-openapi/openapi3"
+
+	"github.com/park-jun-woo/yongol/pkg/parser/ddl"
 )
 
 // emitAllConverterFiles writes one convert<Name>.go and one convert<Name>List.go
@@ -18,6 +20,7 @@ func emitAllConverterFiles(
 	doc *openapi3.T,
 	serviceDir, modulePath string,
 	needed map[string]bool,
+	ddlTables []ddl.Table,
 	used map[string]bool,
 ) error {
 	if doc == nil || doc.Components == nil || doc.Components.Schemas == nil {
@@ -38,7 +41,7 @@ func emitAllConverterFiles(
 		if ref == nil || ref.Value == nil {
 			continue
 		}
-		if err := emitConvertFuncFile(serviceDir, modulePath, name, ref.Value, used); err != nil {
+		if err := emitConvertFuncFile(serviceDir, modulePath, name, ref.Value, ddlTables, used); err != nil {
 			return err
 		}
 		if err := emitConvertListFile(serviceDir, modulePath, name, used); err != nil {

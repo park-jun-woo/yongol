@@ -1,13 +1,13 @@
 //ff:func feature=service type=handler control=sequence
 //ff:what GetCurrentUser — HTTP handler
-//ff:checked llm=yongol-gen hash=e15df4d5
+//ff:checked llm=yongol-gen hash=47dd05dc
 package service
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/jackc/pgx/v5"
 	"github.com/park-jun-woo/zenflow/internal/api"
 	"github.com/park-jun-woo/zenflow/internal/model"
 	"log/slog"
@@ -22,7 +22,7 @@ func (server *Server) GetCurrentUser(ctx context.Context, request api.GetCurrent
 	}
 
 	user, err := server.Queries.UserFindByID(ctx, currentUser.ID)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) { return nil, err }
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) { return nil, err }
 
 	if user.ID == 0 {
 		slog.Warn("handler: 4xx", "op", "GetCurrentUser", "status", 404)

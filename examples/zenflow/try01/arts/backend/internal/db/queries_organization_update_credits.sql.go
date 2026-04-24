@@ -5,7 +5,7 @@
 
 //ff:func feature=db type=query control=sequence
 //ff:what Queries.OrganizationUpdateCredits
-//ff:checked llm=yongol-gen hash=9555402f
+//ff:checked llm=yongol-gen hash=e40cf884
 package db
 
 import (
@@ -13,6 +13,6 @@ import (
 )
 
 func (q *Queries) OrganizationUpdateCredits(ctx context.Context, arg OrganizationUpdateCreditsParams) error {
-	_, err := q.db.ExecContext(ctx, organizationUpdateCredits, arg.CreditsBalance, arg.ID)
+	_, err := q.db.Exec(ctx, organizationUpdateCredits, arg.CreditsBalance, arg.ID)
 	return err
 }

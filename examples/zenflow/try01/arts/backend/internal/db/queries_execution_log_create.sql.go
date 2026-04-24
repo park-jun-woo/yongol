@@ -5,7 +5,7 @@
 
 //ff:func feature=db type=query control=sequence
 //ff:what Queries.ExecutionLogCreate
-//ff:checked llm=yongol-gen hash=6246d03b
+//ff:checked llm=yongol-gen hash=cab988ef
 package db
 
 import (
@@ -13,7 +13,7 @@ import (
 )
 
 func (q *Queries) ExecutionLogCreate(ctx context.Context, arg ExecutionLogCreateParams) (ExecutionLog, error) {
-	row := q.db.QueryRowContext(ctx, executionLogCreate,
+	row := q.db.QueryRow(ctx, executionLogCreate,
 		arg.WorkflowID,
 		arg.OrgID,
 		arg.Status,

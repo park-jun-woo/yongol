@@ -1,5 +1,5 @@
 //ff:func feature=gen-gogin type=test control=sequence topic=observability
-//ff:what TestBlockDBInit_OtelWrapsOpen — tracing 활성 시 otelsql.Open 분기 회귀 방지
+//ff:what TestBlockDBInit_TracingBranchRemoved — Phase005 pgx/v5 refit 로 otelsql 분기 제거
 
 package boot
 
@@ -11,11 +11,12 @@ import (
 	pmanifest "github.com/park-jun-woo/yongol/pkg/parser/manifest"
 )
 
-// TestBlockDBInit_OtelWrapsOpen asserts that when tracing is enabled the
-// db-init block swaps sql.Open for otelsql.Open so every DB call becomes a
-// child span automatically. The non-tracing branch (sql.Open) is covered
-// by TestDF_06_DBInit_HasDeferClose; this test guards the tracing branch.
-func TestBlockDBInit_OtelWrapsOpen(t *testing.T) {
+// TestBlockDBInit_TracingBranchRemoved — Phase005 pgx/v5 refit deleted the
+// otelsql-wrapped code path. Tracing over pgx is a follow-up (obs01 /
+// sqlc02) via otelpgx. This test makes sure the manifest "tracing=enabled"
+// shape no longer produces an otelsql import — otherwise we'd ship a
+// vestigial reference that breaks the Phase006 grep sweep.
+func TestBlockDBInit_TracingBranchRemoved(t *testing.T) {
 	fs := &yongol.Fullstack{
 		Manifest: &pmanifest.ProjectConfig{
 			Backend: pmanifest.Backend{
@@ -29,19 +30,13 @@ func TestBlockDBInit_OtelWrapsOpen(t *testing.T) {
 	body := strings.Join(block.Lines, "\n")
 	imports := strings.Join(block.Imports, "\n")
 
-	if !strings.Contains(body, `otelsql.Open("postgres"`) {
-		t.Fatalf("tracing-enabled db-init must use otelsql.Open, got:\n%s", body)
+	if strings.Contains(imports, "github.com/XSAM/otelsql") {
+		t.Fatalf("otelsql import must be gone after Phase005, got:\n%s", imports)
 	}
-	// The tracing branch must not emit a plain sql.Open — check for the
-	// exact non-otel prefix `"\nconn, err := sql.Open("` so we don't false-
-	// match otelsql.Open (which is a proper substring).
-	if strings.Contains(body, "err := sql.Open(") {
-		t.Fatalf("tracing-enabled db-init must NOT fall back to sql.Open, got:\n%s", body)
+	if strings.Contains(body, "otelsql.") {
+		t.Fatalf("otelsql reference must be gone after Phase005, got:\n%s", body)
 	}
-	if !strings.Contains(imports, "github.com/XSAM/otelsql") {
-		t.Fatalf("missing otelsql import, got:\n%s", imports)
-	}
-	if !strings.Contains(body, "defer conn.Close()") {
-		t.Fatalf("tracing branch must still defer conn.Close(), got:\n%s", body)
+	if !strings.Contains(body, "pgxpool.NewWithConfig") {
+		t.Fatalf("tracing-enabled db-init must still take the pgxpool path, got:\n%s", body)
 	}
 }

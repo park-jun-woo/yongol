@@ -7,7 +7,7 @@
 package db
 
 import (
-	"time"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type ExecutionLog struct {
@@ -16,5 +16,5 @@ type ExecutionLog struct {
 	OrgID        int64
 	Status       string
 	CreditsSpent int64
-	ExecutedAt   time.Time
+	ExecutedAt   pgtype.Timestamp
 }

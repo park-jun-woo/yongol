@@ -5,7 +5,7 @@
 
 //ff:func feature=db type=query control=sequence
 //ff:what Queries.WorkflowCreate
-//ff:checked llm=yongol-gen hash=6e5f559c
+//ff:checked llm=yongol-gen hash=835f1bb5
 package db
 
 import (
@@ -13,7 +13,7 @@ import (
 )
 
 func (q *Queries) WorkflowCreate(ctx context.Context, arg WorkflowCreateParams) (Workflow, error) {
-	row := q.db.QueryRowContext(ctx, workflowCreate,
+	row := q.db.QueryRow(ctx, workflowCreate,
 		arg.OrgID,
 		arg.Title,
 		arg.TriggerEvent,

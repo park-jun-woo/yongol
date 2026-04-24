@@ -8,6 +8,8 @@ import (
 	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
+
+	"github.com/park-jun-woo/yongol/pkg/parser/ddl"
 )
 
 // writeConvertFunc generates: func convertWorkflow(row db.Workflow) (*api.Workflow, error)
@@ -32,7 +34,7 @@ import (
 // The convert signature always returns an error — even for schemas with
 // no JSONB columns — so every caller uses a single pattern. The extra
 // nil return is a no-op at runtime.
-func writeConvertFunc(sb *strings.Builder, name string, schema *openapi3.Schema) {
+func writeConvertFunc(sb *strings.Builder, name string, schema *openapi3.Schema, ddlTables []ddl.Table) {
 	required := requiredSet(schema)
 
 	propNames := make([]string, 0, len(schema.Properties))
@@ -50,7 +52,11 @@ func writeConvertFunc(sb *strings.Builder, name string, schema *openapi3.Schema)
 		apiField := pascalCase(jsonName)
 		dbField := sqlcPascalCase(jsonName)
 		apiType := apiCastFor(name, jsonName, schema.Properties[jsonName])
-		rhs := pickConvertRHS(jsonName, apiField, dbField, required[jsonName], jsonbs, apiType)
+		// Resolve pgx/v5 row-field unwrap via DDL metadata. Unknown models
+		// (no DDL table by name) fall back to pgPrimitive — matches the
+		// pre-refit behaviour for schemas that are pure api wrappers.
+		rowKind := pgtypeRowFieldKindForColumn(ddlTables, name, jsonName)
+		rhs := pickConvertRHS(jsonName, apiField, dbField, required[jsonName], jsonbs, apiType, rowKind)
 		sb.WriteString("\t\t" + apiField + ": " + rhs + ",\n")
 	}
 	sb.WriteString("\t}, nil\n")

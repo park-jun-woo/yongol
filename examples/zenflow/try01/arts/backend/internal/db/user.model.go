@@ -7,7 +7,7 @@
 package db
 
 import (
-	"time"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type User struct {
@@ -17,5 +17,5 @@ type User struct {
 	PasswordHash string
 	Role         string
 	Name         string
-	CreatedAt    time.Time
+	CreatedAt    pgtype.Timestamp
 }

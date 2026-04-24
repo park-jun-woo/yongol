@@ -1,12 +1,12 @@
 //ff:func feature=service type=handler control=sequence
 //ff:what Login — HTTP handler
-//ff:checked llm=yongol-gen hash=7b497531
+//ff:checked llm=yongol-gen hash=89e602b6
 package service
 
 import (
 	"context"
-	"database/sql"
 	"errors"
+	"github.com/jackc/pgx/v5"
 	"github.com/park-jun-woo/ssac/pkg/auth"
 	"github.com/park-jun-woo/zenflow/internal/api"
 	"github.com/park-jun-woo/zenflow/internal/model"
@@ -17,7 +17,7 @@ func (server *Server) Login(ctx context.Context, request api.LoginRequestObject)
 	slog.DebugContext(ctx, "handler entry", "op", "Login")
 
 	user, err := server.Queries.UserFindByEmail(ctx, string(request.Body.Email))
-	if err != nil && !errors.Is(err, sql.ErrNoRows) { return nil, err }
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) { return nil, err }
 	if user.ID == 0 {
 		_, _ = auth.VerifyPassword(auth.VerifyPasswordRequest{
 			Password:     request.Body.Password,

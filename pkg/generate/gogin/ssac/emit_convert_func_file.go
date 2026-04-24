@@ -11,6 +11,7 @@ import (
 
 	"github.com/park-jun-woo/yongol/pkg/generate/gogin/ffannot"
 	"github.com/park-jun-woo/yongol/pkg/generate/gogin/fffile"
+	"github.com/park-jun-woo/yongol/pkg/parser/ddl"
 )
 
 // emitConvertFuncFile writes internal/service/convert_<name>.go containing a
@@ -24,6 +25,7 @@ import (
 func emitConvertFuncFile(
 	serviceDir, modulePath, name string,
 	schema *openapi3.Schema,
+	ddlTables []ddl.Table,
 	used map[string]bool,
 ) error {
 	var sb strings.Builder
@@ -61,7 +63,7 @@ func emitConvertFuncFile(
 		sb.WriteString("\n\topenapi_types \"github.com/oapi-codegen/runtime/types\"\n")
 	}
 	sb.WriteString(")\n\n")
-	writeConvertFunc(&sb, name, schema)
+	writeConvertFunc(&sb, name, schema, ddlTables)
 
 	fileName := fffile.EnsureUnique(fffile.FileNameForFunc("convert"+name), used)
 	return fffile.WriteIfNotPreserved(filepath.Join(serviceDir, fileName), []byte(sb.String()))

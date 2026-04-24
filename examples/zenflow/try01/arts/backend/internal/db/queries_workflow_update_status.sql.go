@@ -5,7 +5,7 @@
 
 //ff:func feature=db type=query control=sequence
 //ff:what Queries.WorkflowUpdateStatus
-//ff:checked llm=yongol-gen hash=9ac3bf00
+//ff:checked llm=yongol-gen hash=6e0617f5
 package db
 
 import (
@@ -13,6 +13,6 @@ import (
 )
 
 func (q *Queries) WorkflowUpdateStatus(ctx context.Context, arg WorkflowUpdateStatusParams) error {
-	_, err := q.db.ExecContext(ctx, workflowUpdateStatus, arg.Status, arg.ID)
+	_, err := q.db.Exec(ctx, workflowUpdateStatus, arg.Status, arg.ID)
 	return err
 }

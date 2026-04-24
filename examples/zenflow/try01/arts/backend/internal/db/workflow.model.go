@@ -7,7 +7,7 @@
 package db
 
 import (
-	"time"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Workflow struct {
@@ -16,5 +16,5 @@ type Workflow struct {
 	Title        string
 	TriggerEvent string
 	Status       string
-	CreatedAt    time.Time
+	CreatedAt    pgtype.Timestamp
 }
