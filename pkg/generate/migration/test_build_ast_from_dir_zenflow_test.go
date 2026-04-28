@@ -11,7 +11,7 @@ import (
 func TestBuildASTFromDir_Zenflow(t *testing.T) {
 	_, thisFile, _, _ := runtime.Caller(0)
 	root := filepath.Join(filepath.Dir(thisFile), "..", "..", "..")
-	ddlDir := filepath.Join(root, "dummys", "zenflow", "try-02", "specs", "db")
+	ddlDir := filepath.Join(root, "examples", "zenflow", "try02", "specs", "db")
 	s, err := BuildASTFromDir(ddlDir, nil)
 	if err != nil {
 		t.Fatalf("BuildASTFromDir: %v", err)
