@@ -15,9 +15,9 @@ import (
 func TestPopulateSSaCSymbols_StructTypes(t *testing.T) {
 	tab := ddl.Table{
 		Name: "users",
-		Columns: map[string]string{
-			"id":         "int64",
-			"created_at": "time.Time",
+		Columns: map[string]ddl.Column{
+			"id":         {Name: "id", RawType: "BIGINT"},
+			"created_at": {Name: "created_at", RawType: "TIMESTAMPTZ"},
 		},
 	}
 	fs := newMinimalFullstack(withDDLTables(tab))

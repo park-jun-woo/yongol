@@ -8,7 +8,11 @@ import (
 )
 
 func populateDDLCheck(g *rule.Ground, t ddl.Table) {
-	for col, vals := range t.CheckEnums {
+	for col, c := range t.Columns {
+		if len(c.CheckEnum) == 0 {
+			continue
+		}
+		vals := c.CheckEnum
 		checkSet := make(rule.StringSet, len(vals))
 		for _, v := range vals {
 			checkSet[v] = true

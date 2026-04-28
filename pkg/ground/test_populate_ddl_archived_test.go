@@ -13,10 +13,13 @@ import (
 // flag, per-column archived, and sensitive column flags.
 func TestPopulateDDLArchived_TableAndColumns(t *testing.T) {
 	tab := ddl.Table{
-		Name:             "users",
-		Archived:         true,
-		ArchivedColumns:  map[string]bool{"legacy_col": true},
-		SensitiveColumns: map[string]bool{"password_hash": true, "email": true},
+		Name:     "users",
+		Archived: true,
+		Columns: map[string]ddl.Column{
+			"legacy_col":    {Name: "legacy_col", RawType: "BIGINT", Archived: true},
+			"password_hash": {Name: "password_hash", RawType: "TEXT", Sensitive: true},
+			"email":         {Name: "email", RawType: "VARCHAR(255)", Sensitive: true},
+		},
 	}
 	fs := newMinimalFullstack(withDDLTables(tab))
 	g := newGround()

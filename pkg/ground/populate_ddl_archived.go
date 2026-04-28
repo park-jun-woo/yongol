@@ -1,10 +1,10 @@
 //ff:func feature=rule type=loader control=iteration dimension=1
-//ff:what populateDDLArchived — DDL Table.Archived/ArchivedColumns를 Flags로 투영
+//ff:what populateDDLArchived — DDL Table.Archived/컬럼 @archived/@sensitive 를 Flags로 투영
 package ground
 
 import (
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/rule"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // populateDDLArchived projects parsed `-- @archived` and `-- @sensitive`
@@ -20,11 +20,6 @@ func populateDDLArchived(g *rule.Ground, fs *yongol.Fullstack) {
 		if t.Archived {
 			g.Flags["archived."+t.Name] = true
 		}
-		for col := range t.ArchivedColumns {
-			g.Flags["archived."+t.Name+"."+col] = true
-		}
-		for col := range t.SensitiveColumns {
-			g.Flags["sensitive."+t.Name+"."+col] = true
-		}
+		populateDDLColumnFlags(g, t)
 	}
 }

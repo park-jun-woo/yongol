@@ -28,7 +28,13 @@ func d02NullableColumn(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	nullableByTable := make(map[string]map[string]bool, len(fs.DDLTables))
 	for i := range fs.DDLTables {
 		tbl := &fs.DDLTables[i]
-		nullableByTable[tbl.Name] = tbl.NullableAnnot
+		annot := make(map[string]bool, len(tbl.Columns))
+		for col, c := range tbl.Columns {
+			if c.NullableAnnot {
+				annot[col] = true
+			}
+		}
+		nullableByTable[tbl.Name] = annot
 	}
 
 	var diags []diagnostic.Diagnostic

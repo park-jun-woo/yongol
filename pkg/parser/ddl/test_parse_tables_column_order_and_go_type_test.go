@@ -45,8 +45,8 @@ func TestParseTables_ColumnOrderAndGoType(t *testing.T) {
 		"created_at": "time.Time",
 	}
 	for col, wt := range wantTypes {
-		if got := tb.Columns[col]; got != wt {
-			t.Errorf("Columns[%s] = %q, want %q", col, got, wt)
+		if got := GoTypeOf(tb.Columns[col]); got != wt {
+			t.Errorf("GoTypeOf(Columns[%s]) = %q, want %q", col, got, wt)
 		}
 	}
 }

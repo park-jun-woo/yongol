@@ -15,7 +15,7 @@ func dispatchConstraint(line, upper string, t *Table, tables map[string]*Table, 
 	case strings.HasPrefix(upper, "UNIQUE"):
 		appendUniqueIndex(line, t)
 	case strings.HasPrefix(upper, "CHECK"):
-		applyCheckEnum(line, "", t)
+		applyTableCheckEnum(line, t)
 	case line != "":
 		parseColumnDef(line, upper, t, pendingArchived)
 	}

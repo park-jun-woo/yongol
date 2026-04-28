@@ -14,12 +14,9 @@ import (
 func TestPopulateDDL_BasicColumnsAndDefaults(t *testing.T) {
 	tab := ddl.Table{
 		Name: "users",
-		Columns: map[string]string{
-			"id":    "int64",
-			"email": "string",
-		},
-		Defaults: map[string]string{
-			"email": "",
+		Columns: map[string]ddl.Column{
+			"id":    {Name: "id", RawType: "BIGINT"},
+			"email": {Name: "email", RawType: "VARCHAR(255)", HasDefault: true, DefaultLiteral: ""},
 		},
 	}
 	fs := newMinimalFullstack(withDDLTables(tab))
@@ -39,10 +36,6 @@ func TestPopulateDDL_BasicColumnsAndDefaults(t *testing.T) {
 
 	if !g.Flags["DDL.default.users.email"] {
 		t.Errorf("DDL.default.users.email flag missing")
-	}
-	if g.Types["DDL.default.value.users.email"] != "" {
-		// default was empty string, but key should still exist
-		// (checked via Types map presence)
 	}
 	if _, ok := g.Types["DDL.default.value.users.email"]; !ok {
 		t.Errorf("DDL.default.value.users.email missing")

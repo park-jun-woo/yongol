@@ -10,7 +10,7 @@ import (
 // isColumnNotNull reports whether col is NOT NULL in the given table (either
 // via an explicit NOT NULL constraint or because it is part of the primary key).
 func isColumnNotNull(tbl *ddl.Table, col string) bool {
-	if tbl.NotNullCols != nil && tbl.NotNullCols[col] {
+	if c, ok := tbl.Columns[col]; ok && c.NotNull {
 		return true
 	}
 	for _, pk := range tbl.PrimaryKey {

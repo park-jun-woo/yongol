@@ -10,7 +10,10 @@ import (
 )
 
 func populateDDLVarchar(g *rule.Ground, t ddl.Table) {
-	for col, n := range t.VarcharLen {
-		g.Types["DDL.varchar."+t.Name+"."+col] = strconv.Itoa(n)
+	for col, c := range t.Columns {
+		if c.VarcharLen <= 0 {
+			continue
+		}
+		g.Types["DDL.varchar."+t.Name+"."+col] = strconv.Itoa(c.VarcharLen)
 	}
 }

@@ -18,18 +18,15 @@ import (
 func TestRenderLogValueFile_PgtypeOnlyImportsSlog(t *testing.T) {
 	table := ddl.Table{
 		Name: "users",
-		Columns: map[string]string{
-			"id":            "pgtype.UUID",
-			"org_id":        "pgtype.UUID",
-			"email":         "string",
-			"password_hash": "string",
-			"role":          "string",
-			"created_at":    "pgtype.Timestamp",
+		Columns: map[string]ddl.Column{
+			"id":            {Name: "id", RawType: "UUID"},
+			"org_id":        {Name: "org_id", RawType: "UUID"},
+			"email":         {Name: "email", RawType: "VARCHAR(255)"},
+			"password_hash": {Name: "password_hash", RawType: "TEXT", Sensitive: true},
+			"role":          {Name: "role", RawType: "VARCHAR(20)"},
+			"created_at":    {Name: "created_at", RawType: "TIMESTAMPTZ"},
 		},
 		ColumnOrder: []string{"id", "org_id", "email", "password_hash", "role", "created_at"},
-		SensitiveColumns: map[string]bool{
-			"password_hash": true,
-		},
 	}
 	src, err := renderLogValueFile(table)
 	if err != nil {

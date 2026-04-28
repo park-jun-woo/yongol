@@ -25,9 +25,9 @@ func TestParseTables_CheckEnum(t *testing.T) {
 	if len(tables) != 1 {
 		t.Fatalf("tables count = %d", len(tables))
 	}
-	vals := tables[0].CheckEnums["status"]
+	vals := tables[0].Columns["status"].CheckEnum
 	if len(vals) != 3 {
-		t.Fatalf("CheckEnums[status] = %v, want 3 values", vals)
+		t.Fatalf("Columns[status].CheckEnum = %v, want 3 values", vals)
 	}
 	want := map[string]bool{"pending": true, "paid": true, "cancelled": true}
 	for _, v := range vals {

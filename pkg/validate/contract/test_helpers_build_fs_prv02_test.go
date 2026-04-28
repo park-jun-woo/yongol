@@ -20,10 +20,10 @@ func buildFSForPRV02() *yongol.Fullstack {
 			{Name: "UserFindByID", Method: "FindByID"},
 		},
 		DDLTables: []ddl.Table{
-			{Name: "users", Columns: map[string]string{
-				"id":         "int64",
-				"email":      "string",
-				"created_at": "time.Time",
+			{Name: "users", Columns: map[string]ddl.Column{
+				"id":         {Name: "id", RawType: "BIGINT"},
+				"email":      {Name: "email", RawType: "VARCHAR(255)"},
+				"created_at": {Name: "created_at", RawType: "TIMESTAMPTZ"},
 			}},
 		},
 	}

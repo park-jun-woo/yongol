@@ -36,7 +36,7 @@ func xdo76RequiredNullable(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			}
 
 			// Exempt columns annotated with -- @nullable.
-			if tbl.NullableAnnot != nil && tbl.NullableAnnot[col] {
+			if c, ok := tbl.Columns[col]; ok && c.NullableAnnot {
 				continue
 			}
 

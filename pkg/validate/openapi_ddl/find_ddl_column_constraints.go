@@ -9,20 +9,13 @@ import "github.com/park-jun-woo/yongol/pkg/yongol"
 // returns its VARCHAR length and CHECK enum values from the first match.
 func findDDLColumnConstraints(fs *yongol.Fullstack, col string) (varcharLen int, checkEnums []string, found bool) {
 	for _, t := range fs.DDLTables {
-		if _, ok := t.Columns[col]; !ok {
+		c, ok := t.Columns[col]
+		if !ok {
 			continue
 		}
 		found = true
-		if t.VarcharLen != nil {
-			if n, ok := t.VarcharLen[col]; ok {
-				varcharLen = n
-			}
-		}
-		if t.CheckEnums != nil {
-			if vals, ok := t.CheckEnums[col]; ok {
-				checkEnums = vals
-			}
-		}
+		varcharLen = c.VarcharLen
+		checkEnums = c.CheckEnum
 		return
 	}
 	return

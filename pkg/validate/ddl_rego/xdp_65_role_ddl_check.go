@@ -23,10 +23,12 @@ func xdp65RoleDDLCheck(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	// Collect allowed role values from any DDL table's CHECK on "role" column.
 	allowed := make(map[string]bool)
 	for _, t := range fs.DDLTables {
-		if vals, ok := t.CheckEnums["role"]; ok {
-			for _, v := range vals {
-				allowed[v] = true
-			}
+		c, ok := t.Columns["role"]
+		if !ok {
+			continue
+		}
+		for _, v := range c.CheckEnum {
+			allowed[v] = true
 		}
 	}
 	if len(allowed) == 0 {

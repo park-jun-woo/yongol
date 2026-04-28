@@ -23,7 +23,7 @@ func renderLogValueFile(t ddl.Table) (string, error) {
 	structName := structNameFor(t.Name)
 	cols := t.ColumnOrder
 	if len(cols) == 0 {
-		cols = sortedKeys(t.Columns)
+		cols = sortedColumnKeys(t.Columns)
 	}
 
 	var b strings.Builder

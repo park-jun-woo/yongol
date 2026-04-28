@@ -15,12 +15,14 @@ import (
 func buildSensitiveColumnIndex(tables []ddl.Table) map[string][]string {
 	idx := make(map[string][]string)
 	for _, t := range tables {
-		if len(t.SensitiveColumns) == 0 {
-			continue
-		}
 		var cols []string
-		for col := range t.SensitiveColumns {
-			cols = append(cols, col)
+		for col, c := range t.Columns {
+			if c.Sensitive {
+				cols = append(cols, col)
+			}
+		}
+		if len(cols) == 0 {
+			continue
 		}
 		sort.Strings(cols)
 		idx[strings.ToLower(t.Name)] = cols

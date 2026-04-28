@@ -14,8 +14,8 @@ import (
 func TestPopulateDDLCheck_EnumValues(t *testing.T) {
 	tab := ddl.Table{
 		Name: "orders",
-		CheckEnums: map[string][]string{
-			"status": {"pending", "paid", "cancelled"},
+		Columns: map[string]ddl.Column{
+			"status": {Name: "status", RawType: "VARCHAR(32)", CheckEnum: []string{"pending", "paid", "cancelled"}},
 		},
 	}
 	g := newGround()

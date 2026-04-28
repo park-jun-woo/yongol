@@ -3,8 +3,8 @@
 package ground
 
 import (
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/rule"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 func populateDDL(g *rule.Ground, fs *yongol.Fullstack) {
@@ -19,10 +19,7 @@ func populateDDL(g *rule.Ground, fs *yongol.Fullstack) {
 		populateDDLIndexes(g, t)
 		populateDDLCheck(g, t)
 		populateDDLVarchar(g, t)
-		for col, def := range t.Defaults {
-			g.Flags["DDL.default."+t.Name+"."+col] = true
-			g.Types["DDL.default.value."+t.Name+"."+col] = def
-		}
+		populateDDLDefaults(g, t)
 	}
 	g.Lookup["DDL.table"] = tables
 }

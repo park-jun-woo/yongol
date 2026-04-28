@@ -33,29 +33,32 @@ func TestParseTables_VarcharAndConstraints(t *testing.T) {
 	}
 	tb := tables[0]
 
-	if got := tb.VarcharLen["email"]; got != 255 {
-		t.Errorf("VarcharLen[email] = %d, want 255", got)
+	if got := tb.Columns["email"].VarcharLen; got != 255 {
+		t.Errorf("Columns[email].VarcharLen = %d, want 255", got)
 	}
-	if got := tb.VarcharLen["name"]; got != 100 {
-		t.Errorf("VarcharLen[name] = %d, want 100", got)
+	if got := tb.Columns["name"].VarcharLen; got != 100 {
+		t.Errorf("Columns[name].VarcharLen = %d, want 100", got)
 	}
-	if !tb.NotNullCols["email"] {
-		t.Errorf("NotNullCols[email] = false, want true")
+	if !tb.Columns["email"].NotNull {
+		t.Errorf("Columns[email].NotNull = false, want true")
 	}
-	if tb.NotNullCols["name"] {
-		t.Errorf("NotNullCols[name] = true, want false")
+	if tb.Columns["name"].NotNull {
+		t.Errorf("Columns[name].NotNull = true, want false")
 	}
-	if got := tb.Defaults["status"]; got != "draft" {
-		t.Errorf("Defaults[status] = %q, want 'draft'", got)
+	if got := tb.Columns["status"].DefaultLiteral; got != "draft" {
+		t.Errorf("Columns[status].DefaultLiteral = %q, want 'draft'", got)
 	}
-	if !tb.SensitiveColumns["password_hash"] {
-		t.Errorf("SensitiveColumns[password_hash] = false, want true")
+	if !tb.Columns["status"].HasDefault {
+		t.Errorf("Columns[status].HasDefault = false, want true")
 	}
-	if !tb.ArchivedColumns["old_ref"] {
-		t.Errorf("ArchivedColumns[old_ref] = false, want true")
+	if !tb.Columns["password_hash"].Sensitive {
+		t.Errorf("Columns[password_hash].Sensitive = false, want true")
 	}
-	if !tb.NullableAnnot["bio"] {
-		t.Errorf("NullableAnnot[bio] = false, want true")
+	if !tb.Columns["old_ref"].Archived {
+		t.Errorf("Columns[old_ref].Archived = false, want true")
+	}
+	if !tb.Columns["bio"].NullableAnnot {
+		t.Errorf("Columns[bio].NullableAnnot = false, want true")
 	}
 	if len(tb.PrimaryKey) != 1 || tb.PrimaryKey[0] != "id" {
 		t.Errorf("PrimaryKey = %v, want [id]", tb.PrimaryKey)

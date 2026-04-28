@@ -16,9 +16,10 @@ import (
 // (see slogAttrLine for rationale / BUG-024).
 func writeLogValueFields(b *strings.Builder, t ddl.Table, cols []string) {
 	for _, col := range cols {
-		goType := t.Columns[col]
+		c := t.Columns[col]
+		goType := ddl.GoTypeOf(c)
 		fieldName := sqlcFieldName(col)
-		if t.SensitiveColumns[col] {
+		if c.Sensitive {
 			b.WriteString(fmt.Sprintf("\t\tslog.String(%q, \"[REDACTED]\"),\n", col))
 			continue
 		}
