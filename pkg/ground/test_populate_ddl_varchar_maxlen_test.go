@@ -14,9 +14,9 @@ import (
 func TestPopulateDDLVarchar_MaxLen(t *testing.T) {
 	tab := ddl.Table{
 		Name: "users",
-		VarcharLen: map[string]int{
-			"email": 255,
-			"name":  50,
+		Columns: map[string]ddl.Column{
+			"email": {Name: "email", RawType: "VARCHAR(255)", VarcharLen: 255},
+			"name":  {Name: "name", RawType: "VARCHAR(50)", VarcharLen: 50},
 		},
 	}
 	g := newGround()

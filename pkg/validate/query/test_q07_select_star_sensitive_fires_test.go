@@ -18,8 +18,10 @@ func TestQ07SelectStarSensitiveFires(t *testing.T) {
 	fs := &yongol.Fullstack{
 		SQLcQueries: specs,
 		DDLTables: []ddl.Table{{
-			Name:             "users",
-			SensitiveColumns: map[string]bool{"password_hash": true},
+			Name: "users",
+			Columns: map[string]ddl.Column{
+				"password_hash": {Name: "password_hash", RawType: "TEXT", Sensitive: true},
+			},
 		}},
 	}
 	diags := q07SelectStarSensitive(fs)

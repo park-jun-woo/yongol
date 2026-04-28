@@ -22,7 +22,8 @@ PostgreSQL DDL (`*.sql`) 디렉토리를 파싱해 CREATE TABLE 메타 (컬럼 /
 
 | 타입 | 설명 |
 |---|---|
-| `Table` | DDL CREATE TABLE 에서 추출한 테이블 메타 (Name / Columns / ColumnOrder / ForeignKeys / Indexes / PrimaryKey / VarcharLen / CheckEnums / Sentinels / Archived / File / Line) |
+| `Table` | DDL CREATE TABLE 에서 추출한 테이블 메타 (Name / Columns / ColumnOrder / ForeignKeys / Indexes / PrimaryKey / Sentinels / Archived / File / Line) |
+| `Column` | 한 컬럼의 통합 메타 (Name / RawType / NotNull / NullableAnnot / HasDefault / DefaultLiteral / VarcharLen / CheckEnum / Archived / Sensitive) — Phase002 평행 맵 통합 |
 | `ForeignKey` | 외래키 관계 (`Column / RefTable / RefColumn`) |
 | `Index` | DDL 인덱스 (`Name / Columns / IsUnique`, USING method 보존) |
 | `SentinelInsert` | `-- @sentinel` 어노테이션 INSERT 블록 verbatim 보존 |

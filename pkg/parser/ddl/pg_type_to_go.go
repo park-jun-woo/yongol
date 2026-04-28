@@ -4,6 +4,10 @@ package ddl
 
 import "strings"
 
+// pgTypeToGo maps a raw, uppercased PostgreSQL type token to the Go type the
+// parser used to project columns to. Parser no longer calls this — it's
+// kept for the GoTypeOf wrapper and for compat consumers that want the
+// projection from a raw token.
 func pgTypeToGo(pgType string) string {
 	switch pgType {
 	case "BIGINT", "BIGSERIAL", "INTEGER", "SERIAL", "INT", "SMALLINT":

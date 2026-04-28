@@ -29,7 +29,7 @@ func Generate(fs *yongol.Fullstack, artifactsDir string) error {
 		return err
 	}
 	for _, t := range fs.DDLTables {
-		if len(t.SensitiveColumns) == 0 {
+		if !tableHasSensitiveColumn(t) {
 			continue
 		}
 		body, err := renderLogValueFile(t)

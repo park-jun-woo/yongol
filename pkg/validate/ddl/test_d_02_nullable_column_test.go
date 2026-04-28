@@ -63,8 +63,10 @@ func TestD02NullableColumn_RespectsNullableAnnotation(t *testing.T) {
     revoked_at  TIMESTAMPTZ -- @nullable
 );`
 	tables := []ddl.Table{{
-		Name:          "refresh_tokens",
-		NullableAnnot: map[string]bool{"revoked_at": true},
+		Name: "refresh_tokens",
+		Columns: map[string]ddl.Column{
+			"revoked_at": {Name: "revoked_at", RawType: "TIMESTAMPTZ", NullableAnnot: true},
+		},
 	}}
 	msgs := runD02InTmpDir(t, "refresh_tokens.sql", sql, tables)
 	if len(msgs) != 0 {

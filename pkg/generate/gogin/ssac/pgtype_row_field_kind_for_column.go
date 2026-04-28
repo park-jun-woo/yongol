@@ -13,22 +13,21 @@ import (
 // DDLTables as the source of truth. Falls back to pgPrimitive when the
 // table or column is not found — this matches the pre-refit behaviour where
 // convert emission assumes direct assignment.
+//
+// With Phase002 the parser preserves the raw PostgreSQL type token on
+// Column.RawType, so we no longer need to round-trip through the Go-type
+// projection (`classifyGoTypeProjection`). Direct dispatch on RawType +
+// NotNull yields the same kind classification with strictly more fidelity
+// (UUID vs VARCHAR, NUMERIC vs TEXT, etc).
 func pgtypeRowFieldKindForColumn(tables []ddl.Table, tableModelName, columnName string) pgtypeRowKind {
 	tbl := findDDLTableByModelName(tables, tableModelName)
 	if tbl == nil {
 		return pgPrimitive
 	}
 	lower := strings.ToLower(columnName)
-	goType, ok := tbl.Columns[lower]
+	c, ok := tbl.Columns[lower]
 	if !ok {
 		return pgPrimitive
 	}
-	notNull := tbl.NotNullCols[lower]
-	// ddl.Table.Columns values are Go types assigned by pg_type_to_go.go
-	// (pre-pgx/v5 mapping). For pgx/v5 the canonical decision is on the
-	// PostgreSQL type family, but the parser stores the Go-type projection
-	// rather than the raw SQL type. Recover the SQL family via the Go-type
-	// projection — it is lossless for the families we care about (time,
-	// uuid, numeric) thanks to the one-to-one mapping in pgTypeToGo.
-	return classifyGoTypeProjection(goType, notNull)
+	return classifyPgtypeRowField(c.RawType, c.NotNull)
 }

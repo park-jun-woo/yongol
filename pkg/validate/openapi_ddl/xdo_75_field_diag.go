@@ -27,10 +27,8 @@ func xdo75FieldDiag(fs *yongol.Fullstack, opID, fieldName string, fc oapiparser.
 	if !isColumnNotNull(tbl, col) {
 		return diagnostic.Diagnostic{}, false
 	}
-	if tbl.Defaults != nil {
-		if _, hasDefault := tbl.Defaults[col]; hasDefault {
-			return diagnostic.Diagnostic{}, false
-		}
+	if c, ok := tbl.Columns[col]; ok && c.HasDefault {
+		return diagnostic.Diagnostic{}, false
 	}
 	line := fs.OpenAPILines.RequestFieldLine(opID, fieldName)
 	if line == 0 {

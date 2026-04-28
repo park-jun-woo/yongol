@@ -35,41 +35,23 @@ func parseColumnDef(line, upper string, t *Table, pendingArchived bool) {
 	colType := strings.ToUpper(parts[1])
 	colType = strings.TrimSuffix(colType, ",")
 
-	t.Columns[colName] = pgTypeToGo(colType)
-	t.ColumnOrder = append(t.ColumnOrder, colName)
-	applyInlineConstraints(t, upper, colName, parts)
-	applyVarcharLen(t, colName, colType)
-	if strings.Contains(upper, "CHECK") {
-		applyCheckEnum(line, colName, t)
-	}
-	if colArchived {
-		if t.ArchivedColumns == nil {
-			t.ArchivedColumns = make(map[string]bool)
-		}
-		t.ArchivedColumns[colName] = true
-	}
-	if colSensitive {
-		if t.SensitiveColumns == nil {
-			t.SensitiveColumns = make(map[string]bool)
-		}
-		t.SensitiveColumns[colName] = true
+	col := Column{
+		Name:          colName,
+		RawType:       colType,
+		NotNull:       strings.Contains(upper, "NOT NULL") || strings.Contains(upper, "PRIMARY KEY"),
+		NullableAnnot: colNullable,
+		Archived:      colArchived,
+		Sensitive:     colSensitive,
 	}
 	if def := extractDefaultString(line); def != "" {
-		if t.Defaults == nil {
-			t.Defaults = make(map[string]string)
-		}
-		t.Defaults[colName] = def
+		col.HasDefault = true
+		col.DefaultLiteral = def
 	}
-	if strings.Contains(upper, "NOT NULL") || strings.Contains(upper, "PRIMARY KEY") {
-		if t.NotNullCols == nil {
-			t.NotNullCols = make(map[string]bool)
-		}
-		t.NotNullCols[colName] = true
+	applyVarcharLen(&col, colType)
+	if strings.Contains(upper, "CHECK") {
+		applyCheckEnum(line, &col)
 	}
-	if colNullable {
-		if t.NullableAnnot == nil {
-			t.NullableAnnot = make(map[string]bool)
-		}
-		t.NullableAnnot[colName] = true
-	}
+	t.Columns[colName] = col
+	t.ColumnOrder = append(t.ColumnOrder, colName)
+	applyInlineConstraints(t, upper, colName, parts)
 }

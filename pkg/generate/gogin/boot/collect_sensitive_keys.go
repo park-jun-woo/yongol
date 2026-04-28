@@ -16,9 +16,7 @@ import (
 func collectSensitiveKeys(fs *yongol.Fullstack) []string {
 	seen := make(map[string]bool)
 	for _, t := range fs.DDLTables {
-		for col := range t.SensitiveColumns {
-			seen[col] = true
-		}
+		collectSensitiveKeysFromTable(t.Columns, seen)
 	}
 	out := make([]string, 0, len(seen))
 	for k := range seen {

@@ -16,7 +16,7 @@ func extractTableName(line string, tables map[string]*Table, file string, lineNu
 			Name:    name,
 			File:    file,
 			Line:    lineNum,
-			Columns: make(map[string]string),
+			Columns: make(map[string]Column),
 		}
 	}
 	return name
