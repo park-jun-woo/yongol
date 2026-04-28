@@ -1,28 +1,29 @@
 # pkg/validate/rego_manifest
 
-Rego 정책의 `input.claims` / role 참조가 `manifest.yaml` 의 claims/roles 정의와 일치하는지, 역으로 Manifest 가 선언한 claims/roles 가 Rego 에서 사용되는지 확인.
+## 변경이력
+
+- 2026-04-28: 4 원칙 준수 형식으로 개정
+
+## 역할
+
+Rego 정책의 `input.claims` / role 참조와 `manifest.yaml` claims/roles 간 양방향 정합성 검증 (XNP-*, XPN-*).
 
 > 상위 문서: [`pkg/validate/README.md`](../README.md)
-> **구현 방식 범례**: `TOULMIN` = defeater 실 작동 또는 반례 확장 가능 / `IF-ELSE` = 단일 판정·Ground 조회
+> **구현 방식 범례**: `TOULMIN` = defeater 작동 또는 반례 확장 가능 / `IF-ELSE` = 단일 판정·Ground 조회
 
-## RefExists (IF-ELSE)
+## 검증 규칙
 
-| 규칙 ID | LookupKey | 설명 | 구현 방식 |
-|---------|-----------|------|----------|
-| XNP-53 | `Manifest.claims.values` | Rego input.claims → claims 값 | IF-ELSE |
-| XNP-63 | `Manifest.roles` | Rego role → Manifest roles | IF-ELSE |
-
-## CoverageCheck
-
-| 규칙 ID | LookupKey | 설명 | 구현 방식 | 예외 |
-|---------|-----------|------|----------|------|
-| XPN-54 | `Rego.claims` | Manifest claims → Rego 참조 여부 | TOULMIN | "middleware/response 참조도 인정 가능" 검토 중 — 반례 추가 가능성 |
-| XPN-64 | `Rego.roles` | Manifest roles → Rego 사용 여부 | TOULMIN | XPN-54와 대칭 — 동일 확장 후보군 |
+| 규칙 ID | 함수명 | 설명 | 구현 방식 | pkg 구현 |
+|---|---|---|---|---|
+| XNP-53 | `InputClaimsValues` | Rego `input.claims` 값 → manifest claims | IF-ELSE | ✓ |
+| XNP-63 | `RoleManifest` | Rego role → manifest roles | IF-ELSE | ✓ |
+| XPN-54 | `ClaimsToRego` | manifest claim → Rego/middleware/response 참조 (WARNING, coverage) | TOULMIN | ✓ |
+| XPN-64 | `RolesToRego` | manifest role → Rego allow 참조 (WARNING, coverage) | TOULMIN | ✓ |
 
 ## Defeater
 
-없음.
+없음 (XPN-54/64 는 middleware/response 참조도 인정 — 향후 반례 추가 가능).
 
-## internal 필수 예외
+## internal 일치성 메모
 
-- XPN-54: Rego 외 middleware/response 참조도 인정 가능 (검토 중) — `check_claims.go` forward+reverse
+- XPN-54: Rego 외 middleware/response 참조도 인정 — `xpn_54_claims_to_rego.go` forward+reverse 검사.

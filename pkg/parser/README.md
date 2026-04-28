@@ -1,86 +1,50 @@
 # pkg/parser
 
-> 모든 공개 파서는 **`(result, []diagnostic.Diagnostic)`** 시그니처를 따른다. 에러는 `error` 대신 `pkg/diagnostic` 의 Diagnostic 슬라이스로 누적 보고한다.
+## 변경이력
 
-## 자체 파서
+- 2026-04-28: 4 원칙 준수 형식으로 개정
 
-| 패키지 | 입력 | 출력 | entry | 설명 |
-|--------|------|------|-------|------|
-| `ssac/` | `.ssac` | `[]ServiceFunc` | `ParseDir(dir)`, `ParseFile(path)` | 서비스 함수 시퀀스 파싱 (Go AST 활용) |
-| `stml/` | `.html` | `[]PageSpec` | `ParseDir(dir)`, `ParseFile(path)`, `ParseReader(name, r)` | 프론트엔드 페이지 템플릿 파싱 (x/net/html 활용) |
-| `statemachine/` | Mermaid `.md` | `[]*StateDiagram` | `ParseDir(dir)`, `ParseFile(path)`, `Parse(id, content, file)` | 상태 전이 다이어그램 파싱 |
-| `funcspec/` | Go `.go` | `[]FuncSpec` | `ParseDir(dir)`, `ParseFile(path)` | 커스텀 함수 스펙 파싱 (Go AST 활용) |
-| `hurl/` | `.hurl` | `[]HurlEntry` | `ParseFile(path)` | 통합 테스트 시나리오 파싱. 파일 단위만 제공, 디렉토리 순회는 호출측 책임 |
-| `manifest/` | `manifest.yaml` | `*ProjectConfig` | `Load(specsDir)` | 프로젝트 설정 파싱 (yaml.v3 활용) |
-| `openapi/` | `*openapi3.T` | `map[op][field]FieldConstraint` | `ExtractRequestConstraints(doc)`, `ExtractResponseConstraints(doc)` | OpenAPI 요청/응답 필드의 type/format/length/enum/required 제약 추출. 에러 미발생 가정 (doc 이미 파싱됨) |
-| `toulmin/` | Go `.go` | `*Graph` | (예정) | **🚧 작업중** — Toulmin 규칙 그래프 파서. 상용 엔진 정립 전까지 보류. 현재 규칙 엔진은 OPA Rego 만 지원 |
+## 역할
 
-## 구조화 파서 + 외부 검증
+9 SSOT 의 텍스트 입력을 구조체로 변환하는 파서 모음. 모든 공개 파서는 `(result, []diagnostic.Diagnostic)` 시그니처를 따르며 에러는 `pkg/diagnostic` 슬라이스로 누적 보고.
 
-| 패키지 | 구조화 파서 | 출력 | 외부 검증 | 설명 |
-|--------|-----------|------|----------|------|
-| `ddl/` | `ParseTables(dir)` | `[]Table` | `ParseDir(dir)` → `[]*pg_query.ParseResult` | DDL 테이블/컬럼/FK/인덱스/CHECK |
-| `rego/` | `ParsePolicies(dir)` | `[]Policy` | `ParseDir(dir)` → `[]*ast.Module`, `ParsePolicyFile(path)` | allow 규칙, @ownership, claims 참조 |
+> 상위: [`pkg/yongol/README.md`](../yongol/README.md) (`Fullstack` 컨테이너 + `ParseAll` 호출자)
 
-## 외부 라이브러리 (래퍼 없이 직접 사용)
+## 자체 파서 (sub-package)
 
-| 라이브러리 | 대상 | 출력 | 설명 |
-|-----------|------|------|------|
-| `kin-openapi` | OpenAPI YAML | `*openapi3.T` | API 엔드포인트 스키마. `pkg/yongol.ParseAll` 에서 `openapi3.NewLoader().LoadFromFile()` 로 로드 |
+| 패키지 | 입력 → 출력 | entry |
+|---|---|---|
+| `ssac/` | `.ssac` → `[]ServiceFunc` | `ParseDir(dir)`, `ParseFile(path)` |
+| `tsx/` (구 stml) | `.html`/`.tsx` → `[]PageSpec` | `ParseDir(dir)`, `ParseFile(path)`, `ParseReader(name, r)` |
+| `statemachine/` | Mermaid `.md` → `[]*StateDiagram` | `ParseDir(dir)`, `ParseFile(path)`, `Parse(id, content, file)` |
+| `funcspec/` | Go `.go` → `[]FuncSpec` | `ParseDir(dir)`, `ParseFile(path)` |
+| `hurl/` | `.hurl` → `[]HurlEntry` | `ParseFile(path)` (디렉토리 순회는 호출측 책임) |
+| `manifest/` | `manifest.yaml` → `*ProjectConfig` | `Load(specsDir)` (yaml.v3) |
+| `openapi/` | `*openapi3.T` → `map[op][field]FieldConstraint` | `ExtractRequestConstraints(doc)`, `ExtractResponseConstraints(doc)` |
+| `ddl/` | DDL `.sql` → `[]Table` + `[]*pg_query.ParseResult` | `ParseTables(dir)`, `ParseDir(dir)` |
+| `rego/` | OPA `.rego` → `[]Policy` + `[]*ast.Module` | `ParsePolicies(dir)`, `ParseDir(dir)`, `ParsePolicyFile(path)` |
+| `sqlc/` | `sqlc.yaml` → 메타 | sqlc generate 보조 (`pkg/parser/sqlc/`) |
 
-## 관련 상위 패키지
+## 공개 구조체 (요약)
 
-| 패키지 | 역할 |
-|--------|------|
-| `pkg/yongol` | 모든 SSOT 파싱 결과를 담는 `Fullstack` 컨테이너 + `ParseAll(root, detected, skip)`. `pkg/parser/*` 를 조합 호출 |
-| `pkg/diagnostic` | 파서/검증기 공용 진단 타입 (`Diagnostic`, `Phase`, `Level`, `Loc`) |
+| 타입 | 위치 | 설명 |
+|---|---|---|
+| `Table` | `ddl/` | name, columns, FK, indexes, PK, varcharLen, checkEnums |
+| `Policy` | `rego/` | rules (`AllowRule`), ownerships (`OwnershipMapping`), claimsRefs |
+| `FieldConstraint` | `openapi/` | type, format, maxLength, minLength, enum, required |
+| `HurlEntry` | `hurl/` | method, path, statusCode + 추가 필드 |
+| `StateDiagram` / `Transition` | `statemachine/` | mermaid stateDiagram 구조 |
+| `ServiceFunc` | `ssac/` | SSaC 함수 시퀀스 |
+| `PageSpec` | `tsx/` | TSX/HTML 페이지 메타 |
+| `FuncSpec` | `funcspec/` | Go AST 함수 스펙 |
+| `ProjectConfig` | `manifest/` | manifest.yaml 루트 |
 
-## DDL 구조체
+## 외부 라이브러리 (직접 사용)
 
-```go
-type Table struct {
-    Name        string
-    Columns     map[string]string   // column → Go type
-    ColumnOrder []string            // DDL 정의 순서
-    ForeignKeys []ForeignKey        // {Column, RefTable, RefColumn}
-    Indexes     []Index             // {Name, Columns, IsUnique}
-    PrimaryKey  []string
-    VarcharLen  map[string]int      // column → VARCHAR(N)
-    CheckEnums  map[string][]string // column → CHECK IN values
-}
-```
-
-## Rego 구조체
-
-```go
-type Policy struct {
-    File       string
-    Rules      []AllowRule          // {Actions, Resource, UsesOwner, UsesRole, RoleValue}
-    Ownerships []OwnershipMapping   // {Resource, Table, Column, JoinTable, JoinFK}
-    ClaimsRefs []string             // input.claims.xxx 참조 (중복 제거)
-}
-```
-
-## OpenAPI 구조체
-
-```go
-type FieldConstraint struct {
-    Type      string
-    Format    string
-    MaxLength *int     // nil = 무제한
-    MinLength *int
-    Enum      []string
-    Required  bool
-}
-```
-
-## Hurl 구조체
-
-```go
-type HurlEntry struct {
-    Method     string
-    Path       string
-    StatusCode string
-    // + 추가 필드
-}
-```
+| 라이브러리 | 용도 |
+|---|---|
+| `kin-openapi` (`openapi3.T`) | OpenAPI YAML 로드 — `pkg/yongol.ParseAll` 에서 `openapi3.NewLoader().LoadFromFile()` |
+| `pganalyze/pg_query_go` | DDL AST |
+| `open-policy-agent/opa/ast` | Rego AST |
+| `gopkg.in/yaml.v3` | manifest |
+| `golang.org/x/net/html` | tsx/stml |

@@ -1,23 +1,51 @@
 # pkg/rule
 
-> **관계**: 본 패키지는 Toulmin defeater 그래프 기반 warrant 함수 라이브러리다.
-> - **규칙 wiring / 오케스트레이션** 은 [`pkg/validate/`](../validate) 참조.
-> - `pkg/rule` 이 제공하는 것은 **warrant 로직** (예: `VarDeclared`, `CoverageCheck`, `FieldRequired`) + **predicate** (`IsArchived` 등) + **Spec 타입**.
-> - 실제 "어떤 검증이 어떤 SSOT 에서 돌아가는가" 는 `pkg/validate/<domain>/run.go` 의 호출 순서에서 확인.
-> - **규칙 카탈로그** (rule ID → 설명): 저장소 루트 [`rulebook.md`](../../rulebook.md).
+## 변경이력
 
-Toulmin defeats graph 규칙 라이브러리. `pkg/validate` 하위 검증 규칙 중 **대략 1/4 수준** 이 본 패키지의 warrant/defeater를 사용한다. 나머지 규칙은 `*Ground`를 직접 조회하는 plain function으로 구현된다.
+- 2026-04-28: 4 원칙 준수 형식으로 개정
 
-> 관련 패키지: [`pkg/yongol`](../yongol) (Fullstack) · [`pkg/ground`](../ground) (Fullstack → Ground 어댑터) · [`pkg/validate`](../validate) (오케스트레이션 + 규칙 wiring) · [`pkg/diagnostic`](../diagnostic) (공용 진단 타입)
+## 역할
 
-## Toulmin이 정당화되는 조건
+Toulmin defeats graph 기반 warrant 함수 라이브러리. `pkg/validate` 하위 검증 규칙 중 약 1/4 (35 개) 가 본 패키지의 warrant + defeater 를 사용하며 나머지는 `*Ground` 직접 조회 plain function. **규칙 wiring 은 `pkg/validate/<domain>/run.go`**, **규칙 카탈로그는 [`rulebook.md`](../../rulebook.md)**.
 
-두 조건 중 하나 이상을 충족할 때만 Toulmin 그래프를 사용한다:
+> 관련: [`pkg/yongol`](../yongol) (Fullstack) · [`pkg/ground`](../ground) (Build adapter) · [`pkg/validate`](../validate) (wiring) · [`pkg/diagnostic`](../diagnostic).
 
-1. **defeater가 실제로 판정을 뒤집는다** — `IsImplicitVar`, `IsSubscribe`, `IsCustomTS`, `IsSensitiveCol`, `IsArchived`, `IsPkgModel`, `IsNoSensitive` 가 예외 케이스를 면제
-2. **스킵/예외 조건이 다수이며 추후 확장 가능성이 있다** — 예: `XSS-11`, `XDS-12` (4+ 스킵 체인)
+## 공개 함수 (warrant + defeater + util)
 
-위 조건에 해당하지 않고 "Ground.Lookup 집합 조회"로 끝나면 **plain `func(g *Ground, ...)` + if-else** 로 구현한다.
+| 함수 | 시그니처 | 설명 |
+|---|---|---|
+| `FieldRequired` | `(toulmin.Context, toulmin.Specs) (bool, any)` | S-1~S-24 (22 규칙). HTTP 전용 필드 요구 (claim: `map[string]bool`). `IsSubscribe` defeater |
+| `VarDeclared` | 동일 | S-27~S-30, XSS-47 (5 규칙). `Ground.Vars` 조회 (claim: `string`). `IsImplicitVar` defeater (예약어 `currentUser`/`request`/`query`/`message` 면제) |
+| `CoverageCheck` | 동일 | XOD-10, XSO-20, XSD-55, XPN-54, XPN-64 (5 규칙). `Ground.Lookup[LookupKey]` 조회. defeater 연계 (`IsSensitiveCol`, `IsArchived`+`IsPkgModel` 등) |
+| `IsPkgModel` | `(...) (bool, any)` | defeater. `Flags["pkgModel"]`. 면제: XSD-55, XDS-12 |
+| `IsArchived` | 동일 | `Flags["archived"]`. 면제: XSD-55 (DDL `@archived`) |
+| `IsSensitiveCol` | 동일 | `Flags["sensitive"]`. 면제: XOD-10 (DDL `-- @sensitive`) |
+| `IsNoSensitive` | 동일 | `Flags["nosensitive"]`. 면제: XDD-61 |
+| `IsSubscribe` | 동일 | `Flags["subscribe"]`. 면제: FieldRequired (S-1~24) — @subscribe 함수 |
+| `IsImplicitVar` | 동일 | `Flags["implicit.<name>"]`. 면제: VarDeclared (S-27~30, XSS-47) |
+| `IsCustomTS` | 동일 | `Flags["customTS.<name>"]`. 면제: TM-8 (`<page>.custom.ts` export) |
+| `GoInitialism` / `IsUpper` / `SplitPascal` / `StringSet` | (util) | 네이밍/문자열 헬퍼 |
+
+## 공개 타입
+
+| 타입 | 설명 |
+|---|---|
+| `Ground` | `{Lookup, Types, Pairs, Schemas map[string]...; Config map[string]bool; Vars, Flags StringSet}` — `pkg/ground.Build` 가 채움 |
+| `Evidence` | `{Rule, Level, Ref, Message string}` — 위반 결과 (Level: `ERROR`/`WARNING`) |
+| `BaseSpec` | `{Rule, Level, Message string}` — 모든 spec embed. `toulmin.Spec` 구현 (`SpecName()`, `Validate()`) |
+| `FieldRequiredSpec` | `BaseSpec + {SeqType, Field string; Required bool}` |
+| `VarDeclaredSpec` | `BaseSpec` (claim: 변수명 string) |
+| `CoverageCheckSpec` | `BaseSpec + {LookupKey string}` |
+| `StringSet` | `map[string]bool` 별칭 + helper |
+
+## Toulmin 정당화 조건 (warrant 추가 기준)
+
+다음 둘 중 하나 이상일 때만 Toulmin 그래프 사용:
+
+1. defeater 가 실제로 판정을 뒤집는다 (`IsImplicitVar`, `IsSubscribe`, `IsCustomTS`, `IsSensitiveCol`, `IsArchived`, `IsPkgModel`, `IsNoSensitive`).
+2. 스킵/예외 조건이 다수이며 확장 가능성 (예: XSS-11, XDS-12 — 4+ 스킵 체인).
+
+해당 안 되고 "Ground.Lookup 집합 조회"로 끝나면 plain `func(g *Ground, ...)` + if-else.
 
 ## 시그니처 규약
 
@@ -25,131 +53,27 @@ Toulmin defeats graph 규칙 라이브러리. `pkg/validate` 하위 검증 규�
 func RuleName(ctx toulmin.Context, specs toulmin.Specs) (bool, any)
 ```
 
-- `ctx.Get("claim")` — 검증 대상 (이름, 변수, 필드 집합 등)
-- `ctx.Get("ground")` — `*Ground` 공유 조회 컨텍스트
-- `specs[0].(*XxxSpec)` — 규칙별 판정 기준 struct
-- **반환**: `(true, *Evidence)` = 위반 발생, `(false, nil)` = 통과
-
-claim/ground 는 graph 구성 시 `pkg/validate` 호출자가 ctx에 주입한다.
-
-## 타입
-
-### Ground
-
-`pkg/ground.Build(fs *yongol.Fullstack)`가 구축. populator가 채우는 키 목록은 `pkg/ground/README.md` 참조.
-
-```go
-type Ground struct {
-    Lookup  map[string]StringSet // "target.kind" -> set of names
-    Types   map[string]string    // "target.kind.name" -> type string
-    Pairs   map[string]StringSet // "target.pairKind" -> set of "key:value"
-    Config  map[string]bool      // config key -> present
-    Vars    StringSet            // declared variable names
-    Flags   StringSet            // flags for defeaters
-    Schemas map[string][]string  // "target.schema" -> ordered field list
-}
-```
-
-### Evidence
-
-```go
-type Evidence struct {
-    Rule    string // "S-1", "XSS-11" 등
-    Level   string // "ERROR" 또는 "WARNING"
-    Ref     string
-    Message string
-}
-```
-
-### BaseSpec
-
-모든 `*XxxSpec` 타입이 embed 하는 공통 필드. toulmin.Spec 인터페이스를 만족 (`SpecName()`, `Validate()`).
-
-```go
-type BaseSpec struct {
-    Rule    string
-    Level   string
-    Message string
-}
-```
-
-## Warrant — 현재 Toulmin으로 wiring 된 3종
-
-### FieldRequired (22 규칙)
-
-`pkg/validate/ssac` S-1~S-24. `IsSubscribe` defeater가 HTTP 전용 필드 요구를 @subscribe 함수에서 면제.
-
-```go
-type FieldRequiredSpec struct {
-    BaseSpec
-    SeqType  string // "@get", "@post", "@put", "@delete", "@empty", "@state", "@auth", "@call", "@publish"
-    Field    string // "Model", "Result", "Inputs", "Target", "Message" 등
-    Required bool   // true = 있어야 함, false = 없어야 함
-}
-```
-
-claim: `map[string]bool` (필드명 → 존재 여부).
-
-### VarDeclared (5 규칙)
-
-`pkg/validate/ssac` S-27~S-30 + XSS-47. `IsImplicitVar` defeater가 예약어(`currentUser`/`request`/`query`/`message`) 면제.
-
-```go
-type VarDeclaredSpec struct {
-    BaseSpec
-}
-```
-
-claim: `string` (변수명). `Ground.Vars` 조회.
-
-### CoverageCheck (5 규칙)
-
-defeater 연계로 사용: XOD-10 (`IsSensitiveCol`), XSO-20 (Wrapper 스킵 — 향후 defeater 전환 가능성), XSD-55 (`IsArchived`+`IsPkgModel`), XPN-54/XPN-64 (middleware/response 참조 검토 중).
-
-```go
-type CoverageCheckSpec struct {
-    BaseSpec
-    LookupKey string
-}
-```
-
-claim: `string` (정의된 항목). `Ground.Lookup[LookupKey]` 조회.
-
-## Defeater
-
-모두 `Ground.Flags` 기반. 호출자가 평가 전에 해당 플래그를 설정.
-
-| 함수 | spec | Flags 키 | 면제 대상 규칙 |
-|---|---|---|---|
-| `IsPkgModel` | nil | `pkgModel` | XSD-55, XDS-12 — `pkg/<pkg>/` 내장 모델 |
-| `IsArchived` | nil | `archived` | XSD-55 — DDL `@archived` |
-| `IsSensitiveCol` | nil | `sensitive` | XOD-10 — DDL `-- @sensitive` |
-| `IsNoSensitive` | nil | `nosensitive` | XDD-61 — DDL `-- @nosensitive` |
-| `IsSubscribe` | nil | `subscribe` | FieldRequired (S-1~24 HTTP 전용) — @subscribe 함수 |
-| `IsImplicitVar` | nil | `implicit.<name>` | VarDeclared (S-27~30, XSS-47) — 예약어 |
-| `IsCustomTS` | nil | `customTS.<name>` | TM-8 — `<page>.custom.ts` export |
+`ctx.Get("claim")` (검증 대상), `ctx.Get("ground")` (`*Ground`), `specs[0].(*XxxSpec)`. 반환 `(true, *Evidence)` = 위반, `(false, nil)` = 통과. ctx 주입은 `pkg/validate` 호출자 책임.
 
 ## 커스텀 warrant (`pkg/rule` 공통 함수 미사용)
 
-아래 규칙은 `pkg/validate/{folder}` 내에 자체 warrant 함수를 두고 Toulmin graph에 defeater와 함께 등록한다. 공통 warrant로 표현하기엔 고유 로직이 많음:
+`pkg/validate/{folder}` 내 자체 warrant + Toulmin graph 등록. 공통화 어려움:
 
 - `XSS-11` PluralResultType — primitive/call/package 스킵 체인
-- `XDS-12` ResultNoDDLTable — `IsPkgModel`+sqlc row type+seq type 스킵
+- `XDS-12` ResultNoDDLTable — `IsPkgModel` + sqlc row type + seq type 스킵
 - `XDD-61` SensitiveNoAnnotation — `IsNoSensitive` 면제
 - `TM-8` BindNotFound — `IsCustomTS` 면제
 
 ## 제거된 공통 warrant (2026-04)
 
-과거 `pkg/rule`은 `RefExists`, `PairMatch`, `TypeMatch`, `SchemaMatch`, `ConfigRequired`, `ForbiddenRef`, `NameFormat` 7종 + `SchemaEvidence`/`TypeClaim` 보조 타입을 export 했다. 검토 결과 이들 모두 **defeater 없이 단순 Ground 조회**로 환원되어, `pkg/validate` 각 폴더에서 plain `g.Lookup[key][name]` 체크로 대체 가능함이 확인돼 **삭제**.
-
-향후 동일 패턴을 다시 필요로 하는 경우:
-1. 먼저 **진짜 defeater가 있는지** 검토 — 없으면 plain 함수 유지
-2. defeater가 있으면 `bak/pkg/rule/`에서 구현 참조해 재도입
-3. 신규 warrant 추가 시 해당 defeater가 **실제로 판정을 뒤집는지** PR 설명에 입증할 것
+과거 `RefExists`, `PairMatch`, `TypeMatch`, `SchemaMatch`, `ConfigRequired`, `ForbiddenRef`, `NameFormat` 7 종 + `SchemaEvidence`/`TypeClaim` 보조 타입 export 했음. 검토 결과 모두 defeater 없이 단순 Ground 조회로 환원 → `pkg/validate` 각 폴더 plain `g.Lookup[key][name]` 으로 대체 후 삭제. 재도입 시 (1) 진짜 defeater 존재 검토, (2) `bak/pkg/rule/` 참조, (3) PR 에 defeater 가 판정을 뒤집는지 입증.
 
 ## 네이밍 규약
 
-- warrant/defeater 함수: `PascalCase` — `FieldRequired`, `IsPkgModel`
-- spec 타입: `<RuleName>Spec` — `FieldRequiredSpec`, `CoverageCheckSpec`
-- 모든 Spec은 `BaseSpec` embed
-- LookupKey/ConfigKey 네임스페이스는 `pkg/ground` populator가 채우는 것과 일치해야 함 (silent-pass 방지)
+- warrant/defeater 함수: PascalCase (`FieldRequired`, `IsPkgModel`).
+- spec 타입: `<RuleName>Spec` (BaseSpec embed).
+- LookupKey/ConfigKey 는 `pkg/ground` populator 가 채우는 키와 정확히 일치 (silent-pass 방지).
+
+## catalog/
+
+`pkg/rule/catalog/` 에 규칙 카탈로그 보조 메타. 카탈로그 진실 원본은 저장소 루트 `rulebook.md`.

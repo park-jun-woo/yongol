@@ -1,40 +1,34 @@
 # pkg/validate/openapi_ddl
 
-OpenAPI ↔ DDL 교차 검증.
+## 변경이력
 
-> 규칙 전체 목록은 저장소 루트의 [`rulebook.md`](../../../rulebook.md) 참조.
+- 2026-04-28: 4 원칙 준수 형식으로 개정
+
+## 역할
+
+OpenAPI ↔ DDL 교차 검증. property/column 매칭, 길이·enum·CHECK 제약, 타입·Nullability 정합.
+
 > 상위 문서: [`pkg/validate/README.md`](../README.md)
-> **구현 방식 범례**: `TOULMIN` = defeater 실 작동 또는 반례 확장 가능 / `IF-ELSE` = 단일 판정·Ground 조회
+> **구현 방식 범례**: `TOULMIN` = pkg/rule + defeater / `IF-ELSE` = 단일 흐름 검사
 
-## RefExists (IF-ELSE)
+## 검증 규칙
 
-| 규칙 ID | LookupKey | 설명 | 구현 방식 |
-|---------|-----------|------|----------|
-| XDO-9 | `DDL.column.<table>` | OpenAPI property → DDL column (ghost) | IF-ELSE |
+| 규칙 ID | 함수명 | 설명 | 구현 방식 | pkg 구현 |
+|---|---|---|---|---|
+| XDO-9 | `xdo09GhostProperty` | OpenAPI property → 대응 DDL 컬럼 부재 (ERROR, ghost) | IF-ELSE | ✓ |
+| XOD-10 | `xod10DDLToResponse` | DDL 컬럼이 OpenAPI components.schemas 에 노출 안 됨 (WARNING) | TOULMIN | ✓ |
+| XDO-67 | `xdo67MaxLengthVarchar` | DDL VARCHAR(n) 컬럼의 OpenAPI 요청 필드에 `maxLength` 없음 (ERROR) | IF-ELSE | ✓ |
+| XDO-68 | `xdo68CheckInEnum` | DDL `CHECK IN(...)` 컬럼에 OpenAPI enum 없음 (ERROR) | IF-ELSE | ✓ |
+| XDO-69 | `xdo69CheckValuesEnum` | DDL CHECK IN 값 ↔ OpenAPI enum 값 셋 불일치 (ERROR) | IF-ELSE | ✓ |
+| XDO-70 | `xdo70MaxLengthExceedsVarchar` | OpenAPI `maxLength` > DDL `VARCHAR(n)` (WARNING) | IF-ELSE | ✓ |
+| XDO-75 | `xdo75OptionalNotNullNoDefault` | OpenAPI optional + DDL NOT NULL + DEFAULT 없음 (ERROR) | IF-ELSE | ✓ |
+| XDO-76 | `xdo76RequiredNullable` | OpenAPI required + DDL nullable (WARNING, `-- @nullable` 면제) | IF-ELSE | ✓ |
+| XDO-77 | `xdo77ColumnTypeMismatch` | DDL column 타입 ↔ OpenAPI field 타입 불일치 (ERROR) | IF-ELSE | ✓ |
+| XDO-78 | `xdo78EnumNoCheck` | OpenAPI enum 요청 필드에 대응 DDL CHECK IN 제약 없음 (ERROR) | IF-ELSE | ✓ |
 
-## CoverageCheck
+## XDO-77 타입 대조
 
-| 규칙 ID | LookupKey | 설명 | 구현 방식 | 예외 |
-|---------|-----------|------|----------|------|
-| XOD-10 | `OpenAPI.response.<op>` | DDL column → OpenAPI schema 포함 여부 | TOULMIN | `IsSensitiveCol` (`-- @sensitive`) defeater 실 작동 + `IsNoSensitive` 반례 |
-
-## TypeMatch (IF-ELSE)
-
-| 규칙 ID | LookupKey | 설명 | 구현 방식 |
-|---------|-----------|------|----------|
-| XDO-69 | `DDL.check.<table>` | DDL CHECK values ↔ OpenAPI enum | IF-ELSE |
-
-## SchemaMatch (IF-ELSE)
-
-| 규칙 ID | LookupKey | 설명 | 구현 방식 |
-|---------|-----------|------|----------|
-| XDO-67 | `DDL.varchar.<table>` | DDL VARCHAR(n) → OpenAPI maxLength | IF-ELSE |
-| XDO-68 | `DDL.check.<table>` | DDL CHECK IN → OpenAPI enum | IF-ELSE |
-| XDO-77 | `DDL.column.<table>` | DDL column 타입 ↔ OpenAPI field 타입 불일치 (ERROR) | IF-ELSE |
-
-### XDO-77 타입 대조 테이블
-
-| DDL 타입 | OpenAPI type | OpenAPI format |
+| DDL 타입 | OpenAPI type | format |
 |---|---|---|
 | `BIGINT`, `BIGSERIAL` | `integer` | `int64` |
 | `INTEGER`, `SERIAL`, `INT` | `integer` | (없거나 `int32`) |
@@ -44,42 +38,21 @@ OpenAPI ↔ DDL 교차 검증.
 | `TIMESTAMP`, `TIMESTAMPTZ` | `string` | `date-time` |
 | `NUMERIC`, `DECIMAL`, `REAL`, `DOUBLE PRECISION` | `number` | — |
 
-DDL `BIGINT`인데 OpenAPI `integer` (format 없음)이면 ERROR.
-권고: OpenAPI에 `format: int64`를 추가하세요.
-
-## 고유 함수 (IF-ELSE)
-
-| 규칙 ID | 함수명 | 설명 | 구현 방식 |
-|---------|--------|------|----------|
-| XDO-70 | `MaxLengthExceedsVarchar` | OpenAPI maxLength > DDL VARCHAR(n) (WARNING) | IF-ELSE |
-
-## NullabilityMatch (IF-ELSE)
-
-OpenAPI optional 필드와 DDL NOT NULL 제약의 정합성 검증.
-
-| 규칙 ID | 함수명 | 설명 | 구현 방식 | pkg 구현 |
-|---------|--------|------|----------|---------|
-| XDO-75 | `OptionalNotNullNoDefault` | OpenAPI optional + DDL NOT NULL + DEFAULT 없음 (ERROR) | IF-ELSE | **누락** |
-| XDO-76 | `RequiredNullable` | OpenAPI required + DDL nullable (WARNING) | IF-ELSE | **누락** |
-
-XDO-76 면제: DDL 컬럼에 `-- @nullable` 어노테이션이 있으면 의도적 설계로 간주하여 WARNING 면제.
-
-OpenAPI request field가 optional인데, 대응하는 DDL 컬럼이 NOT NULL이고,
-DDL DEFAULT도 없으면 INSERT 시 실패한다. SSaC에서 기본값 삽입 로직이 있으면 면제.
+## XDO-75 판정표
 
 | OpenAPI | DDL | DEFAULT / SSaC 기본값 | 판정 |
 |---|---|---|---|
 | optional | NOT NULL | DEFAULT 있음 | OK |
-| optional | NOT NULL | SSaC 기본값 삽입 | OK |
-| optional | NOT NULL | 둘 다 없음 | **ERROR** |
+| optional | NOT NULL | SSaC 리터럴 기본값 | OK |
+| optional | NOT NULL | 둘 다 없음 | ERROR |
 | optional | nullable | — | OK |
 | required | NOT NULL | — | OK |
-| required | nullable | — | **WARNING** — 의도적이지 않을 가능성 |
-
-SSaC 기본값 삽입 판정: `@post` Input에서 해당 필드가 리터럴(`"draft"`, `0` 등)으로 지정되면 면제.
+| required | nullable | — | WARNING (XDO-76) |
 
 ## Defeater
 
-- `IsSensitiveCol` — XOD-10 에서 `-- @sensitive` 컬럼 스킵
-- `IsNoSensitive` — sensitive 패턴 검사 면제용
-- `IsNullableIntentional` — `-- @nullable` 어노테이션 (XDO-76 면제)
+| 이름 | 면제 warrant | 설명 |
+|---|---|---|
+| `IsSensitiveCol` | XOD-10 | DDL `-- @sensitive` 컬럼 스킵 |
+| `IsNoSensitive` | XOD-10 (반례) | `-- @nosensitive` 으로 sensitive 패턴 면제 |
+| `IsNullableIntentional` | XDO-76 | DDL `-- @nullable` 어노테이션 |

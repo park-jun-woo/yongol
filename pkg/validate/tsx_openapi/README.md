@@ -1,23 +1,31 @@
-# pkg/validate/tsx_openapi — TSX ↔ OpenAPI 교차 검증 (XOT-*)
+# pkg/validate/tsx_openapi
 
-React `.tsx` SSOT 가 OpenAPI 계약과 일치하는지 단방향(TSX → OpenAPI) 검증.
+## 변경이력
 
-## 규칙
+- 2026-04-28: 4 원칙 준수 형식으로 개정
 
-| Rule ID | Level | 설명 |
+## 역할
+
+React `.tsx` SSOT 가 OpenAPI 계약과 일치하는지 단방향 (TSX → OpenAPI) 검증 (XOT-*). OpenAPI → TSX 미소비 경고는 다소비처 false positive 노이즈로 검사하지 않는다.
+
+> 상위 문서: [`pkg/validate/README.md`](../README.md)
+> **구현 방식 범례**: `TOULMIN` = defeater 작동 / `IF-ELSE` = 단일 판정·Ground 조회 — 본 폴더는 전부 IF-ELSE
+
+## 검증 규칙
+
+| 규칙 ID | 함수명 | 설명 | 구현 방식 | pkg 구현 |
+|---|---|---|---|---|
+| XOT-1 | `OperationId` | `apiClient.<op>()` 의 `<op>` → OpenAPI operationId 집합 (ERROR) | IF-ELSE | ✓ |
+| XOT-2 | `ParameterMatch` | apiClient 호출 path/query 인자 키 → OpenAPI parameters (ERROR) | IF-ELSE | ✓ |
+| XOT-3 | `FormField` | `useForm().register('x')` → 페이지 mutation 의 OpenAPI request body schema (WARNING) | IF-ELSE | ✓ |
+
+## Defeater
+
+| defeater | 면제 warrant | 조건 |
 |---|---|---|
-| `XOT-1` | ERROR | `apiClient.<op>()` 의 `<op>` 가 OpenAPI operationId 집합에 존재 |
-| `XOT-2` | ERROR | apiClient 호출의 path/query 인자 객체 키가 OpenAPI parameters 에 존재 |
-| `XOT-3` | WARNING | `useForm().register('x')` 필드가 해당 페이지 mutation 의 OpenAPI request body schema 에 존재 |
-
-## 방향성 — 단방향 검증
-
-```
-TSX (주장)  →  OpenAPI (정답)     : 검증 (XOT-*)
-OpenAPI (정답)  →  TSX (소비 여부)  : 검증 안 함
-```
-
-OpenAPI operationId 는 모바일 앱 / CLI / 파트너 / 배치 등 여러 소비처를 가질 수 있어 TSX 미소비 경고는 false positive 노이즈다.
+| `IsTransportKey` | XOT-2 | `body`/`data`/`payload`/`json` 등 transport wrapper key |
+| operationId 부재 | XOT-2 | XOT-1 이 이미 커버 — XOT-2 는 skip |
+| body 없음 | XOT-3 | mutation 호출에 body 없음 — skip |
 
 ## Ground Lookup 키
 

@@ -1,171 +1,62 @@
 # pkg/generate
 
-yongol 코드 생성 최상위 orchestrator. `yongol generate <specs> <arts>` 가 호출하는
-`Generate(fs, artifactsDir, backend, frontend)` 의 진입점.
+## 변경이력
 
-## 진입점
+- 2026-04-28: 4 원칙 준수 형식으로 개정
 
-```go
-// generate.go
-func Generate(fs *yongol.Fullstack, artifactsDir string, backend BackendType, frontend FrontendType) error
-```
+## 역할
 
-`cmd/yongol/generate_cmd.go` → `pkg/generate/generate.go` → backend/frontend/hurl/opa 순으로 위임.
+`yongol generate <specs> <arts>` 의 코드 생성 최상위 orchestrator. backend / frontend / hurl / OPA Rego 4 가지 산출 경로를 분기 호출. ERROR 또는 WARNING 이 하나라도 있으면 generate 호출 자체가 거절됨 (CLI 게이트).
 
-## 파이프라인 (전체)
+## 공개 함수
 
-```
-Generate(fs, artifactsDir, GoGin, React)
-  ├─ [A] runBackend    → gogin.Generate
-  │     [1]  oapi-codegen          → backend/internal/api/server.gen.go
-  │     [2]  postgresql.Generate   → specs/db/queries/*_generated.sql
-  │     [3]  sqlc generate         → backend/internal/db/*.go
-  │     [4]  auth.Generate         → backend/internal/auth/ + middleware/ + model/
-  │     [7]  state.Generate        → backend/internal/statemachine/*.go
-  │     [8]  copyFuncSpecs         → backend/internal/<pkg>/*.go
-  │     [9]  boot.Generate         → backend/cmd/main.go
-  │     [10] handler.Generate      → backend/internal/service/**/*.go
-  │     [11] generateGoMod         → backend/go.mod + go mod tidy
-  │
-  ├─ [B] runFrontend   → react.Generate (향후)
-  │     → frontend/
-  │
-  ├─ [C] hurl.Generate → tests/smoke.hurl
-  │
-  └─ [D] copyOPARego   → backend/policy/*.rego
-```
+| 함수 | 시그니처 | 설명 |
+|---|---|---|
+| `Generate` | `(fs *yongol.Fullstack, artifactsDir string, backend BackendType, frontend FrontendType, opts ...Option) error` | 진입점. runBackend → runFrontend → hurl_mirror → copy OPA Rego 순. |
+| `runBackend` | `(fs, artifactsDir, backend) error` | `BackendType == GoGin` → `gogin.Generate` |
+| `runFrontend` | `(fs, frontend) error` | `FrontendType == React` → `react.Generate` |
+| `copyOPARego` | `(fs, artifactsDir) error` | `specs/policy/*.rego` → `arts/backend/policy/*.rego` |
+| `runMigration` | `(fs, artifactsDir) error` | DDL diff → `arts/db/migrations/NNNN_*.up.sql` (+ down stub) |
 
-## 산출물 전체 맵
+## 공개 타입
+
+| 타입 | 설명 |
+|---|---|
+| `BackendType` | `string` — `GoGin = "go-gin"` (현재 1종) |
+| `FrontendType` | `string` — `React = "react"` (현재 1종) |
+| `Option` / `Config` | `apply_generate_options.go` — generate 옵션 (`--clean`, dry-run 등) |
+
+## 산출물 맵
 
 ```
 arts/
-├── backend/
-│   ├── cmd/
-│   │   └── main.go                         ← [9] boot/
-│   ├── internal/
-│   │   ├── api/
-│   │   │   └── server.gen.go               ← [1] oapi-codegen
-│   │   ├── db/
-│   │   │   ├── db.go                       ← [3] sqlc
-│   │   │   ├── models.go                   ← [3] sqlc
-│   │   │   └── *.sql.go                    ← [3] sqlc (정적 + [2] 동적)
-│   │   ├── auth/
-│   │   │   ├── issue_token.go              ← [4] auth/
-│   │   │   ├── verify_token.go             ← [4]
-│   │   │   ├── refresh_token.go            ← [4]
-│   │   │   └── reexport.go                ← [4] ssac/pkg/auth 재export
-│   │   ├── middleware/
-│   │   │   └── bearerauth.go              ← [4] auth/
-│   │   ├── model/
-│   │   │   └── current_user.go            ← [4] auth/
-│   │   ├── statemachine/
-│   │   │   └── workflow.go                ← [7] state/
-│   │   ├── <custom-func-pkg>/
-│   │   │   └── *.go                       ← [8] func copy
-│   │   └── service/
-│   │       ├── server.go                  ← [10] handler/
-│   │       └── <feature>/<func>.go        ← [10] handler/
-│   ├── policy/
-│   │   └── authz.rego                     ← [D] OPA rego copy
-│   └── go.mod                             ← [11] go.mod
-├── frontend/                               ← [B] react (향후)
-└── tests/
-    └── smoke.hurl                          ← [C] hurl/
+├── backend/   ← gogin.Generate (cmd/main.go, internal/{api,db,auth,middleware,model,statemachine,service,...}, policy/*.rego, go.mod)
+├── frontend/  ← react.Generate (향후)
+├── db/migrations/  ← migration.Generate (NNNN_<desc>.up.sql + down stub)
+└── tests/     ← hurl_mirror.Generate (smoke.hurl)
 ```
 
 ## 하위 패키지
 
-| 패키지 | 역할 | 상태 |
-|---|---|---|
-| `pkg/generate/gogin/` | Go+Gin 백엔드 orchestrator | ✅ 구현 + 📝 README |
-| `pkg/generate/gogin/boot/` | cmd/main.go Block Builder | ✅ 구현 |
-| `pkg/generate/gogin/handler/` | ServerInterface method body (SSaC 기반) | 📝 README |
-| `pkg/generate/gogin/auth/` | JWT + middleware + CurrentUser (통합) | 📝 README |
-| `pkg/generate/gogin/state/` | stateDiagram → CanTransition | 📝 README |
-| `pkg/generate/gogin/ssac/` | SSaC codegen 설계 배경 문서 | 📝 README |
-| `pkg/generate/postgresql/` | 동적 pagination/sort/filter SQL 생성 | 📝 README |
-| `pkg/generate/react/` | React 프론트엔드 (향후) | ⏳ 빈 껍질 |
-| `pkg/generate/hurl/` | Hurl 스모크 테스트 | 📝 README |
+| 패키지 | 역할 |
+|---|---|
+| `gogin/` | Go+Gin 백엔드 orchestrator (주력) |
+| `react/` | React 프론트엔드 (향후) |
+| `nestjs/` | NestJS (계획 단계) |
+| `migration/` | DDL diff 마이그레이션 emit |
+| `hurl_mirror/` | specs/tests → arts/tests 복사 |
+| `prepared/` | 사전 준비 산출물 |
+| `splitter/` | 큰 산출물 분할 |
+| `ffhash/`, `filefunc/` | filefunc 어노테이션 / 해시 메타 주입 |
 
-## 자체 담당 (이 패키지 직접 구현)
-
-### generate.go — orchestrator
-
-```go
-func Generate(fs, artifactsDir, backend, frontend) error {
-    runBackend(fs, artifactsDir, backend)   // [A]
-    runFrontend(fs, frontend)               // [B]
-    hurl.Generate(fs, artifactsDir)         // [C]
-    copyOPARego(fs, artifactsDir)           // [D]
-}
-```
-
-### run_backend.go — BackendType 분기
-
-```go
-func runBackend(fs, artifactsDir, backend) error {
-    switch backend {
-    case GoGin: return gogin.Generate(fs, artifactsDir)
-    }
-}
-```
-
-### run_frontend.go — FrontendType 분기
-
-```go
-func runFrontend(fs, frontend) error {
-    switch frontend {
-    case React: return react.Generate(fs)
-    }
-}
-```
-
-### copy_opa_rego.go — [D] OPA Rego 복사 (예정)
-
-`specs/policy/*.rego` → `arts/backend/policy/*.rego` 단순 복사.
-
-- 파일 내용 변경 없음 (사용자 작성 Rego 그대로)
-- main.go 의 `OPA_POLICY_PATH` 환경변수가 이 복사된 경로를 가리킴
-- `authz.Init(conn, ownerships)` 는 런타임에 이 .rego 를 로드
-- 복사 이유: arts/ 를 배포 단위로 패키징할 때 specs/ 의존 없이 자족 가능
-
-```go
-func copyOPARego(fs *yongol.Fullstack, artifactsDir string) error {
-    // specs/policy/*.rego → arts/backend/policy/*.rego
-}
-```
-
-## BackendType / FrontendType
-
-```go
-type BackendType string
-const GoGin BackendType = "go-gin"
-
-type FrontendType string
-const React FrontendType = "react"
-```
-
-CLI 플래그 `--backend go-gin` `--frontend react` 로 선택. 현재 각 1종만 지원.
-
-## generate 게이트
-
-`cmd/yongol/generate_cmd.go` 가 Generate 호출 전에:
-1. `ParseAll` → parser diagnostic 0 확인
-2. `validate.Validate` → ERROR 0 확인
-3. `printReport` 2번째 반환값(warnings) → WARNING 0 확인
-
-**ERROR 또는 WARNING 이 하나라도 있으면 Generate 호출 안 됨** (validate 보다 엄격).
-
-## 에러 처리
-
-각 하위 단계가 error 반환 시 즉시 중단. `generate_cmd.go` 가 에러를 출력하고 exit 1.
-부분 산출물은 남아있을 수 있음.
-
-## 외부 도구
+## 외부 도구 의존
 
 | 도구 | 호출 위치 | 용도 |
 |---|---|---|
-| `oapi-codegen` | gogin [1] | OpenAPI → Go types + gin-server |
-| `sqlc` | gogin [3] | DDL + queries → Go model + query methods |
-| `gofmt` | handler [10] | 생성된 Go 코드 포매팅 |
-| `go mod tidy` | gogin [11] | go.mod 의존성 정리 |
+| `oapi-codegen` v2.6+ | gogin [1] | OpenAPI → types + StrictServerInterface |
+| `sqlc` v1.30+ | gogin [3] | DDL + queries → Go model + query methods |
+| `gofmt`, `go mod tidy` | gogin [10][11] | 포매팅, 의존성 정리 |
+
+## generate 게이트 (`cmd/yongol/generate_cmd.go`)
+
+1. `ParseAll` → diagnostic 0 확인. 2. `validate.Validate` → ERROR 0 확인. 3. WARNING 0 확인. 셋 다 통과해야 `Generate` 호출. 부분 산출물은 남을 수 있음 (각 단계 error 시 즉시 중단 + `fmt.Errorf("<step>: %w", err)`).
