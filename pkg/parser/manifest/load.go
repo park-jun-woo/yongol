@@ -54,6 +54,9 @@ func Load(specsDir string) (*ProjectConfig, []diagnostic.Diagnostic) {
 	if cfg.Backend.Auth != nil && len(cfg.Backend.Auth.Roles) > 0 {
 		cfg.Backend.Auth.RolesLines = roleLines
 	}
+	if cfg.Backend.Auth != nil {
+		cfg.Backend.Auth.UserTableLine = extractUserTableLine(data)
+	}
 
 	return &cfg, nil
 }

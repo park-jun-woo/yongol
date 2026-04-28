@@ -1,0 +1,28 @@
+apiVersion: yongol/v1
+kind: Project
+metadata:
+  name: zenflow
+  description: "Multi-tenant workflow-automation SaaS"
+backend:
+  lang: go
+  framework: gin
+  module: github.com/park-jun-woo/zenflow
+  middleware:
+    - bearerAuth
+  auth:
+    type: jwt
+    mode: bearer
+    secret_env: JWT_SECRET
+    claims:
+      ID: user_id:int64
+      Email: email
+      Role: role
+      OrgID: org_id:int64
+    roles:
+      - admin
+      - member
+frontend:
+  lang: typescript
+  framework: react
+  bundler: vite
+  name: zenflow-web

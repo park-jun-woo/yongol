@@ -37,6 +37,6 @@ var goPrimitiveTypes = map[string]bool{
 var knownSeqTypes = map[string]bool{
 	"get": true, "post": true, "put": true, "delete": true,
 	"empty": true, "exists": true, "state": true, "auth": true,
-	"call": true, "publish": true, "response": true, "subscribe": true,
+	"call": true, "eval": true, "publish": true, "response": true, "subscribe": true,
 	"verify-password": true,
 }

@@ -13,6 +13,7 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/validate/hurl_openapi"
 	"github.com/park-jun-woo/yongol/pkg/validate/hurl_statemachine"
 	"github.com/park-jun-woo/yongol/pkg/validate/manifest"
+	"github.com/park-jun-woo/yongol/pkg/validate/manifest_ddl"
 	"github.com/park-jun-woo/yongol/pkg/validate/openapi"
 	"github.com/park-jun-woo/yongol/pkg/validate/openapi_ddl"
 	"github.com/park-jun-woo/yongol/pkg/validate/openapi_manifest"
@@ -47,6 +48,7 @@ func allSteps() []step {
 		{Name: "hurl", Kinds: []yongol.SSOTKind{yongol.KindScenario}, Run: hurl.Run},
 		{Name: "funcspec", Kinds: []yongol.SSOTKind{yongol.KindFunc}, Run: funcspec.Run},
 		{Name: "openapi_ddl", Kinds: []yongol.SSOTKind{yongol.KindOpenAPI, yongol.KindDDL}, Run: openapi_ddl.Run},
+		{Name: "manifest_ddl", Kinds: []yongol.SSOTKind{yongol.KindConfig, yongol.KindDDL}, Run: manifest_ddl.Run},
 		{Name: "openapi_ssac", Kinds: []yongol.SSOTKind{yongol.KindOpenAPI, yongol.KindSSaC}, Run: openapi_ssac.Run},
 		{Name: "hurl_openapi", Kinds: []yongol.SSOTKind{yongol.KindScenario, yongol.KindOpenAPI}, Run: hurl_openapi.Run},
 		{Name: "hurl_statemachine", Kinds: []yongol.SSOTKind{yongol.KindScenario, yongol.KindStates}, Run: hurl_statemachine.Run},

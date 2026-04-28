@@ -14,9 +14,6 @@ func processDecl(decl ast.Decl, fset *token.FileSet, spec *FuncSpec, expectedReq
 			processTypeSpecs(d, spec, expectedRequest, expectedResponse)
 		}
 	case *ast.FuncDecl:
-		funcName := ucFirst(spec.Name)
-		if d.Name.Name == funcName && d.Body != nil {
-			spec.HasBody = !isStubBody(fset, d.Body)
-		}
+		processFuncDecl(d, fset, spec)
 	}
 }

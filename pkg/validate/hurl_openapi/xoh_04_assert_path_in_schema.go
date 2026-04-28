@@ -21,32 +21,7 @@ func xoh04AssertPathInSchema(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	routes := collectOpenAPIRoutes(fs.OpenAPIDoc)
 	var diags []diagnostic.Diagnostic
 	for _, e := range fs.HurlEntries {
-		if len(e.Asserts) == 0 {
-			continue
-		}
-		segs := normalizeHurlPath(e.Path)
-		route := findExactRoute(segs, e.Method, routes)
-		if route == nil || route.Op == nil {
-			continue
-		}
-		schema := responseSchemaForStatus(route, e.StatusCode)
-		if schema == nil {
-			continue
-		}
-		for _, a := range e.Asserts {
-			if jsonPathReachable(a.JSONPath, schema) {
-				continue
-			}
-			diags = append(diags, diagnostic.Diagnostic{
-				File:  e.File,
-				Line:  a.Line,
-				Phase: diagnostic.PhaseValidate,
-				Level: diagnostic.LevelError,
-				Message: "[XOH-04] jsonpath \"" + a.JSONPath + "\" not reachable in " +
-					opLabel(route.Op) + " response schema",
-				Advice: "Check the field name in openapi.yaml responses, or update the hurl assertion",
-			})
-		}
+		diags = append(diags, xoh04CheckEntry(e, routes)...)
 	}
 	return diags
 }

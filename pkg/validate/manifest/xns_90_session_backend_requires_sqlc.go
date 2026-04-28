@@ -27,10 +27,3 @@ func xns90SessionBackendRequiresSQLC(fs *yongol.Fullstack) []diagnostic.Diagnost
 		RuleID: "XNS-90",
 	})
 }
-
-func sessionCfg(fs *yongol.Fullstack) builtinBackend {
-	if fs == nil || fs.Manifest == nil || fs.Manifest.Session == nil {
-		return builtinBackend{}
-	}
-	return builtinBackend{Present: true, Backend: fs.Manifest.Session.Backend}
-}

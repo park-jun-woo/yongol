@@ -59,6 +59,7 @@ backend:
   auth:
     type: jwt                     # only "jwt" is supported
     secret_env: JWT_SECRET
+    user_table: users             # DDL table that holds user rows (XDN-01~04)
     claims:                       # JWT claim → CurrentUser field mapping
       ID: user_id:int64           # format: claim_key:go_type (default string)
       Email: email
@@ -69,6 +70,13 @@ frontend: { lang: typescript, framework: react, bundler: vite, name: <app> }
 Claim types: `string` (default), `int64`, `bool`. The generated `@auth`
 middleware uses `currentUser.ID` and `currentUser.Role`; both field names must
 exist.
+
+`backend.auth.user_table` names the DDL table (e.g. `users`,
+`accounts`, `members`) backing the JWT claims. `yongol validate`
+enforces (`XDN-01~04`) that the field is present whenever auth is
+active, the named table exists in `db/*.sql`, and every
+`claims.<Field>: <col>[:<type>]` mapping points at a real column whose
+DDL-derived Go type matches the claim's declared Go type.
 
 Optional top-level blocks (see [`docs/manifest.md`](docs/manifest.md) for full
 schema + env-var overrides): `backend.cors`, `backend.http` (body limits),
@@ -108,6 +116,19 @@ Standard SQL DDL and sqlc. Details: [`docs/ddl.md`](docs/ddl.md).
 - **`sql_package: pgx/v5` is required** (Q-11). yongol's backend codegen
   is unified on pgx/v5; `database/sql` / `pgx/v4` / `lib/pq` / absent are
   rejected at `yongol validate`.
+- **PostgreSQL `UUID` requires explicit `pgtype` overrides** (Q-12). When
+  DDL declares a `UUID` column, `db/sqlc.yaml` must register two
+  `pgtype.UUID` entries — one for `nullable: false`, one for
+  `nullable: true`. sqlc's `pgx/v5` mode has no default mapping for `UUID`.
+  ```yaml
+  overrides:
+    - db_type: "uuid"
+      nullable: false
+      go_type: { import: "github.com/jackc/pgx/v5/pgtype", package: "pgtype", type: "UUID" }
+    - db_type: "uuid"
+      nullable: true
+      go_type: { import: "github.com/jackc/pgx/v5/pgtype", package: "pgtype", type: "UUID" }
+  ```
 - Recommended `gen.go.out`: `../../artifacts/<project>/backend/internal/db`.
 - Queries use a **global sqlc namespace** — prefix each `-- name:` with the
   Model (`UserCreate`, `GigFindByID`). In SSaC the prefix is auto-stripped:
@@ -123,6 +144,12 @@ Standard SQL DDL and sqlc. Details: [`docs/ddl.md`](docs/ddl.md).
 - Auto-increment primary keys must use `GENERATED ALWAYS AS IDENTITY`.
   `SERIAL` / `BIGSERIAL` / `SMALLSERIAL` are banned (D-8). Write
   `id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY`.
+- **All integer columns must be `BIGINT`** — yongol enforces a single
+  `int64` width across DDL → sqlc → OpenAPI (`format: int64`) → Go. `INTEGER`
+  / `SMALLINT` / `INT4` fails XDO-77 against the matching OpenAPI schema.
+  Rationale: SaaS counters (credits, prices in cents, sequence numbers, IDs)
+  overflow `int32` once tenants scale; one width = zero cast surface in
+  handlers and tests.
 
 ### DDL annotations
 
@@ -162,11 +189,12 @@ build). Full reference: [`docs/ssac.md`](docs/ssac.md).
 | `@post` | Create | `Type var = Model.Method(args...)` | Required |
 | `@put` | Update (no return) | `Model.Method(args...)` | Required |
 | `@delete` | Delete | `Model.Method(args...)` | 0 args → WARNING |
-| `@empty` | Guard: nil/zero → 404 | `target "message" [STATUS]` | default 404 |
-| `@exists` | Guard: not nil → 409 | `target "message" [STATUS]` | default 409 |
+| `@empty` | Guard: nil/zero → 404 | `target "message" [STATUS]` | default 404. Target must be a Model var (S-64); scalars rejected. |
+| `@exists` | Guard: not nil → 409 | `target "message" [STATUS]` | default 409. Target must be a Model var (S-64); scalars rejected. |
 | `@state` | State transition | `diagramID {inputs} "transition" "message" [STATUS]` | default 409 |
 | `@auth` | Permission check | `"action" "resource" {inputs} "message" [STATUS]` | default 403 |
 | `@call` | Function call | `[Type var =] package.Func(args...)` | — |
+| `@eval` | Predicate guard (true → STATUS) | `package.Func({k: v, ...}) "message" STATUS` | STATUS required (S-68); Func must return `bool` (S-67). |
 | `@publish` | Queue publish | `"topic" {payload} [{options}]` | — |
 | `@response` | JSON response | `varName` or `{ field: var, ... }` | — |
 | `@verify-password` | Timing-safe login check | `<Model>.<emailCol>=<emailExpr> <Model>.<hashCol> vs <pwExpr> -> <var> <status> "<message>"` | — |
@@ -193,6 +221,12 @@ quotes; numeric / boolean / `nil` as Go literals.
   property names (snake_case or camelCase, whichever OpenAPI uses).
 - Every other source uses Go PascalCase (`user.Email`, `course.InstructorID`).
 - `config.*` is forbidden; custom funcs read env vars directly.
+- Reserved sources (`currentUser`, `request`, `query`, `message`) must
+  always appear in **dotted** form inside `@post` / `@put` Inputs —
+  e.g. `currentUser.Email`, never `currentUser` alone (S-70). Standalone
+  reserved sources in DDL writes pack the whole object into one column
+  (blob anti-pattern). `@call` is exempt — user-authored Funcs may
+  legitimately receive a raw reserved object.
 
 ### @verify-password
 

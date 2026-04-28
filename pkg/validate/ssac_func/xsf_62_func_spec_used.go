@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=1 topic=func-check
-//ff:what XSF-62 — func spec is referenced by at least one @call
+//ff:what XSF-62 — func spec is referenced by at least one @call/@eval
 
 package ssac_func
 
@@ -9,8 +9,8 @@ import (
 )
 
 // xsf62FuncSpecUsed validates XSF-62: a project func spec that is never
-// referenced by any SSaC @call is dead code. WARNING — YongolPkgSpecs are
-// excluded from coverage.
+// referenced by any SSaC @call or @eval is dead code. WARNING — YongolPkgSpecs
+// are excluded from coverage.
 func xsf62FuncSpecUsed(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	if len(fs.ProjectFuncSpecs) == 0 {
 		return nil
@@ -34,8 +34,8 @@ func xsf62FuncSpecUsed(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			Line:    sp.Line,
 			Phase:   diagnostic.PhaseValidate,
 			Level:   diagnostic.LevelWarning,
-			Message: "[XSF-62] func spec " + sp.Package + "." + sp.Name + " is not referenced by any SSaC @call",
-			Advice:  "Remove unused func " + sp.Package + "." + sp.Name + ", or call it from a SSaC @call",
+			Message: "[XSF-62] func spec " + sp.Package + "." + sp.Name + " is not referenced by any SSaC @call/@eval",
+			Advice:  "Remove unused func " + sp.Package + "." + sp.Name + ", or call it from a SSaC @call/@eval",
 		})
 	}
 	return diags

@@ -11,6 +11,7 @@ Standard OpenAPI 3.x document. `operationId` is the keystone that links every SS
 - Every operation under `paths` has an `operationId` in **PascalCase**.
 - `securitySchemes` keys (e.g. `bearerAuth`) must match `manifest.backend.middleware`.
 - `x-*` extensions are not used — pagination/sort/filter are expressed as ordinary `parameters`.
+- **Integers are always `int64`.** `type: integer` requires `format: int64`. `format: int32` is rejected by XDO-77. See [docs/ddl.md](./ddl.md#numeric-types--int64-across-the-stack-xdo-77) for the rationale and the matching DDL `BIGINT` requirement.
 
 ## operationId Convention
 

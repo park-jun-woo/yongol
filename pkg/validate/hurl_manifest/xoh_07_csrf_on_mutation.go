@@ -4,10 +4,7 @@
 package hurl_manifest
 
 import (
-	"strings"
-
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
-	"github.com/park-jun-woo/yongol/pkg/parser/hurl"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
@@ -29,13 +26,7 @@ func xoh07CSRFOnMutation(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	}
 	var diags []diagnostic.Diagnostic
 	for _, e := range fs.HurlEntries {
-		if !isMutating(e.Method) {
-			continue
-		}
-		if isAuthPath(e.Path) {
-			continue
-		}
-		if hasCSRFHeader(e.Headers) {
+		if !shouldCheckCSRF(e) {
 			continue
 		}
 		diags = append(diags, diagnostic.Diagnostic{
@@ -48,25 +39,4 @@ func xoh07CSRFOnMutation(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		})
 	}
 	return diags
-}
-
-// isMutating reports whether an HTTP method causes server state to
-// change — these are the methods covered by the CSRF middleware.
-func isMutating(method string) bool {
-	switch strings.ToUpper(method) {
-	case "POST", "PUT", "PATCH", "DELETE":
-		return true
-	}
-	return false
-}
-
-// hasCSRFHeader returns true when any header is named X-CSRF-Token
-// (case-insensitive).
-func hasCSRFHeader(headers []hurl.HurlHeader) bool {
-	for _, h := range headers {
-		if strings.EqualFold(h.Name, "X-CSRF-Token") {
-			return true
-		}
-	}
-	return false
 }

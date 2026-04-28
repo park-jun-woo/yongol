@@ -1,0 +1,31 @@
+//ff:func feature=validate type=test control=sequence topic=hurl-openapi
+//ff:what TestXoh01_Negative_MethodMissing — path 존재하나 method 선언 없음 → [XOH-01]
+
+package hurl_openapi
+
+import (
+	"strings"
+	"testing"
+
+	"github.com/getkin/kin-openapi/openapi3"
+	"github.com/park-jun-woo/yongol/pkg/parser/hurl"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
+)
+
+func TestXoh01_Negative_MethodMissing(t *testing.T) {
+	fs := &yongol.Fullstack{
+		OpenAPIDoc: newDoc(map[string]map[string]*openapi3.Operation{
+			"/gigs": {"GET": {OperationID: "ListGigs"}},
+		}),
+		HurlEntries: []hurl.HurlEntry{
+			{Method: "POST", Path: "/gigs", File: "t.hurl", Line: 1},
+		},
+	}
+	diags := xoh01URLMethod(fs)
+	if len(diags) != 1 {
+		t.Fatalf("want 1 diag, got %d", len(diags))
+	}
+	if !strings.Contains(diags[0].Message, "method not declared") {
+		t.Fatalf("unexpected msg: %q", diags[0].Message)
+	}
+}

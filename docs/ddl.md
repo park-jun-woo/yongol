@@ -30,6 +30,36 @@ sql:
 
 Rules: D-4 (sqlc.yaml required), D-5 (`sql[].schema` must cover `db/*.sql`), D-6 (`sql[].queries` must cover `db/queries/`), Q-11 (`sql_package` must be `pgx/v5`).
 
+### sqlc Overrides for UUID (Q-12)
+
+PostgreSQL `UUID` has no default Go type in sqlc's `pgx/v5` mode. Without an explicit override the generated code may pick a non-`pgtype` import (for example `types.UUID`) and the yongol-generated handler will fail to compile against `github.com/jackc/pgx/v5/pgtype`.
+
+**Policy** — Go-native equivalents (`string` / `int64` / `bool` / `time.Time`) keep sqlc's default mapping. yongol does **not** require `pgtype` for every PG type; doing so would explode field access into `.String` / `.Int64` / `.Valid` boilerplate, break JSON serialisation against the OpenAPI string / integer schemas, and erase `NOT NULL` from the Go type system.
+
+UUID needs **two override entries** — one for `nullable: false`, one for `nullable: true`. sqlc treats the same `db_type` differently per nullability, so a single entry is not enough.
+
+**Q-12 — `UUID` → `pgtype.UUID`**:
+
+```yaml
+gen:
+  go:
+    overrides:
+      - db_type: "uuid"
+        nullable: false
+        go_type:
+          import: "github.com/jackc/pgx/v5/pgtype"
+          package: "pgtype"
+          type: "UUID"
+      - db_type: "uuid"
+        nullable: true
+        go_type:
+          import: "github.com/jackc/pgx/v5/pgtype"
+          package: "pgtype"
+          type: "UUID"
+```
+
+`yongol validate` runs Q-12 only when at least one DDL file declares a `UUID` column. Projects with no `UUID` columns skip the rule entirely. Both entries missing collapses into a single diagnostic — one rule, one message — with both YAML stanzas in the advice block so the fix is a single paste.
+
 ## sqlc Cardinality -> SSaC Type
 
 | Cardinality | SSaC Type | Go Return |
@@ -126,6 +156,24 @@ LIMIT sqlc.arg(per_page);
 ```
 
 ## DDL Authoring
+
+### Numeric Types — int64 Across the Stack (XDO-77)
+
+yongol enforces a single integer width — **`int64`** — across DDL, sqlc, OpenAPI, and Go. All numeric columns must be **`BIGINT`** (or `BIGSERIAL` / `BIGINT GENERATED ALWAYS AS IDENTITY` for PKs).
+
+| Layer | Required form |
+|---|---|
+| DDL | `BIGINT` |
+| sqlc | `int64` |
+| OpenAPI | `type: integer, format: int64` |
+| Go field | `int64` |
+
+Why no `INTEGER` / `int32`?
+- SaaS counters (credits, sequence numbers, prices in cents, IDs) routinely overflow 2³¹ once a tenant scales.
+- Mixed widths force per-column casts in handlers and `int32 ↔ int64` confusion in tests. One width = zero cast surface.
+- XDO-77 (ERROR) enforces this. `INTEGER` / `SMALLINT` / `INT4` in DDL fails validate against the OpenAPI `format: int64` requirement.
+
+Stick to `BIGINT` for every numeric column unless you have a hard constraint that demands otherwise — and even then, push back on the constraint first.
 
 ### Go Reserved Words
 

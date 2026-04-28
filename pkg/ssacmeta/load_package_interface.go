@@ -6,7 +6,6 @@ package ssacmeta
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"gopkg.in/yaml.v3"
 )
@@ -28,38 +27,4 @@ func LoadPackageInterface(path string) (*PackageInterface, error) {
 	}
 	iface.SourcePath = path
 	return &iface, nil
-}
-
-// LoadPackageInterfaces walks the given ssac repo root and loads every
-// interface.yaml under pkg/*/interface.yaml. Returns a map keyed by the
-// `package:` field.
-func LoadPackageInterfaces(ssacRoot string) (map[string]*PackageInterface, error) {
-	out := map[string]*PackageInterface{}
-	pkgRoot := filepath.Join(ssacRoot, "pkg")
-	entries, err := os.ReadDir(pkgRoot)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return out, nil
-		}
-		return nil, fmt.Errorf("ssacmeta: read pkg dir %s: %w", pkgRoot, err)
-	}
-	for _, e := range entries {
-		if !e.IsDir() {
-			continue
-		}
-		ifacePath := filepath.Join(pkgRoot, e.Name(), "interface.yaml")
-		iface, err := LoadPackageInterface(ifacePath)
-		if err != nil {
-			return nil, err
-		}
-		if iface == nil {
-			continue
-		}
-		key := iface.Package
-		if key == "" {
-			key = e.Name()
-		}
-		out[key] = iface
-	}
-	return out, nil
 }

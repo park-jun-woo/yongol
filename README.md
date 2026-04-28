@@ -127,6 +127,30 @@ Every layer uses `operationId` as a keystone — a single PascalCase identifier 
 
 Tell an agent "add a feature" and context collapses as the project grows. yongol sets up 8 SSOTs that reference each other, and `validate` surfaces every inconsistency on the spot. The AI writes freely; leaving the rails fails validation. Freedom on rails.
 
+## Why SSOT + validate
+
+**The drift you actually hit.** A typical source file mixes three things at once:
+
+- **User decisions** — this column is `BIGINT`, this endpoint is owner-only, pagination is cursor
+- **Business logic** — pricing, workflows, lifecycle rules
+- **Implementation details** — variable names, library call order, error wrapping
+
+When an AI reads that code, it cannot tell which line is a decision and which is a detail. So when it "refactors" or "cleans up," it quietly overwrites decisions thinking they were details — and the user does not notice until the behavior is already wrong. This is what makes vibe coding break around the 200-endpoint mark, and **a larger model does not fix it**: the medium (raw code) simply does not preserve decisions, so every model eventually loses them.
+
+**SSOT keeps decisions out of the code.** Each SSOT file holds *only* user decisions, with implementation explicitly excluded:
+
+- DDL → data-model decisions (tables, columns, types, constraints)
+- OpenAPI → API contract decisions
+- SSaC → service-flow decisions
+- Rego → authorization decisions
+- … 9 sources total
+
+The AI authors and edits SSOTs. Code is re-rendered from them on every `yongol generate`. Decisions live permanently in the SSOTs; the code is a disposable projection.
+
+**`validate` keeps the SSOTs themselves consistent.** Decisions are spread across 9 files, so the SSOTs can drift against each other (DDL says `BIGINT`, OpenAPI says `string`). A contradicted SSOT is a corrupted decision — the rendered code will drift even if the AI never touched the code directly. `yongol validate` runs ~150 cross-SSOT rules and refuses to compile until every contradiction is resolved.
+
+**Net effect.** SSOT preserves the decisions; `validate` preserves their integrity. Together they make decision survival independent of model size — a small LLM editing only SSOTs, with precise validate diagnostics on every miss, sustains the same decision integrity a much larger model would, and yongol re-renders the code deterministically from there.
+
 ## Can I edit the generated code?
 
 Yes. `yongol generate` **preserves** user edits on re-run:

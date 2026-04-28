@@ -29,10 +29,3 @@ func xnq90QueueBackendRequiresSQLC(fs *yongol.Fullstack) []diagnostic.Diagnostic
 		RuleID: "XNQ-90",
 	})
 }
-
-func queueCfg(fs *yongol.Fullstack) builtinBackend {
-	if fs == nil || fs.Manifest == nil || fs.Manifest.Queue == nil {
-		return builtinBackend{}
-	}
-	return builtinBackend{Present: true, Backend: fs.Manifest.Queue.Backend}
-}

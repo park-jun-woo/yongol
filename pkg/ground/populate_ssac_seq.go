@@ -13,7 +13,8 @@ func populateSSaCSeq(g *rule.Ground, funcName string, seq ssac.Sequence,
 	switch seq.Type {
 	case "auth":
 		authPairs[seq.Action+":"+seq.Resource] = true
-	case "call":
+	case "call", "eval":
+		// SSaC.callRef holds Func references from both @call and @eval.
 		registerSSaCCallRef(seq.Model, callRefs)
 	case "publish":
 		pubTopics[seq.Topic] = true

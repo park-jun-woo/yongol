@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util control=iteration dimension=1
+//ff:func feature=gen-hurl type=util control=sequence
 //ff:what pruneOrphans — arts/tests/ 에만 남은 이전 .hurl 산출물 삭제 (drift 방지)
 
 package hurl_mirror

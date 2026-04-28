@@ -4,11 +4,7 @@
 package hurl_openapi
 
 import (
-	"sort"
-	"strings"
-
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
-	"github.com/park-jun-woo/yongol/pkg/parser/hurl"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
@@ -42,30 +38,4 @@ func xoh01URLMethod(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		})
 	}
 	return diags
-}
-
-// xoh01Message picks the right diagnostic text based on whether the
-// path exists at all. Listing the available methods when the path
-// matches turns a drift report into a near copy-pasteable fix.
-func xoh01Message(e hurl.HurlEntry, segs []string, routes []apiRoute) (string, string) {
-	if findPathMatch(segs, routes) < 0 {
-		return "[XOH-01] " + e.Method + " " + e.Path + " — path not declared in OpenAPI",
-			"Add a matching operation to openapi.yaml, or fix the hurl request path"
-	}
-	methods := methodsForPath(segs, routes)
-	return "[XOH-01] " + e.Method + " " + e.Path + " — method not declared on this path (OpenAPI lists " + strings.Join(methods, ", ") + ")",
-		"Use one of the declared methods or add " + e.Method + " to the operation"
-}
-
-// methodsForPath returns the sorted list of HTTP methods declared for
-// the first route whose segments match.
-func methodsForPath(segs []string, routes []apiRoute) []string {
-	var out []string
-	for _, r := range routes {
-		if segmentsMatch(segs, r.Segments) {
-			out = append(out, r.Method)
-		}
-	}
-	sort.Strings(out)
-	return out
 }

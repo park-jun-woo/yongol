@@ -20,35 +20,7 @@ func xoh08CapturePathInSchema(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	routes := collectOpenAPIRoutes(fs.OpenAPIDoc)
 	var diags []diagnostic.Diagnostic
 	for _, e := range fs.HurlEntries {
-		if len(e.Captures) == 0 {
-			continue
-		}
-		segs := normalizeHurlPath(e.Path)
-		route := findExactRoute(segs, e.Method, routes)
-		if route == nil || route.Op == nil {
-			continue
-		}
-		schema := responseSchemaForStatus(route, e.StatusCode)
-		if schema == nil {
-			continue
-		}
-		for _, c := range e.Captures {
-			if c.Source != "jsonpath" || c.JSONPath == "" {
-				continue
-			}
-			if jsonPathReachable(c.JSONPath, schema) {
-				continue
-			}
-			diags = append(diags, diagnostic.Diagnostic{
-				File:  e.File,
-				Line:  c.Line,
-				Phase: diagnostic.PhaseValidate,
-				Level: diagnostic.LevelError,
-				Message: "[XOH-08] capture jsonpath \"" + c.JSONPath + "\" not in " +
-					opLabel(route.Op) + " response — won't match at runtime",
-				Advice: "Pick a field present in the OpenAPI response schema, or remove the capture",
-			})
-		}
+		diags = append(diags, xoh08CheckEntry(e, routes)...)
 	}
 	return diags
 }

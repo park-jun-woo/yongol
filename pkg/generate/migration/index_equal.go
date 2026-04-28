@@ -1,5 +1,6 @@
 //ff:func feature=migration type=util control=sequence
 //ff:what indexEqual — 두 Index 의 Unique/Where/Columns 전체 동등 비교
+
 package migration
 
 // indexEqual reports whether two indexes are structurally identical.
@@ -17,13 +18,4 @@ func indexEqual(a, b *Index) bool {
 		return false
 	}
 	return stringSliceEqual(a.Columns, b.Columns)
-}
-
-// normalizeIndexMethod canonicalises empty string and "btree" to the same
-// token so equality treats them interchangeably.
-func normalizeIndexMethod(m string) string {
-	if m == "" {
-		return "btree"
-	}
-	return m
 }

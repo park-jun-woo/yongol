@@ -30,6 +30,8 @@ func parseAnnotation(line string) (*Sequence, error) {
 		return &Sequence{Type: "subscribe", Topic: topic}, nil
 	case strings.HasPrefix(line, "@call "):
 		return parseCall(line[6:])
+	case strings.HasPrefix(line, "@eval "):
+		return parseEval(line[6:])
 	case strings.HasPrefix(line, "@verify-password "):
 		return parseVerifyPassword(line[len("@verify-password "):])
 	default:

@@ -1,13 +1,11 @@
 //ff:func feature=cli-init type=util control=sequence
-//ff:what detectModule — heuristics for inferring a Go module path when the user omits --module
+//ff:what DetectModule — infer the Go module path when the user omits --module
 
 package cliinit
 
 import (
 	"fmt"
 	"os"
-	"os/exec"
-	"regexp"
 	"strings"
 )
 
@@ -47,37 +45,4 @@ func DetectModule(projectID string) (module string, warning string) {
 			"detected user name contains no GitHub-safe characters — using placeholder; override with --module"
 	}
 	return fmt.Sprintf("github.com/%s/%s", normalized, projectID), ""
-}
-
-// gitUserName reads `git config --global user.name`. Any git failure (git not
-// installed, config unset, non-zero exit) is treated as "unknown".
-func gitUserName() (string, bool) {
-	cmd := exec.Command("git", "config", "--global", "user.name")
-	out, err := cmd.Output()
-	if err != nil {
-		return "", false
-	}
-	name := strings.TrimSpace(string(out))
-	if name == "" {
-		return "", false
-	}
-	return name, true
-}
-
-// githubUserAllowed matches characters that are valid in a GitHub username
-// slug — letters, digits, hyphens. Everything else is stripped.
-var githubUserAllowed = regexp.MustCompile(`[^A-Za-z0-9-]+`)
-
-// normalizeGitHubUser lowercases and strips disallowed characters so "Park Jun
-// Woo" becomes "parkjunwoo" and "Park-Jun Woo" becomes "park-junwoo". The
-// result is a best-effort guess — the user is expected to pass --module
-// explicitly when the inference is wrong.
-func normalizeGitHubUser(name string) string {
-	lower := strings.ToLower(name)
-	// Spaces and separators collapse into empty string (not hyphen) to avoid
-	// inventing a hyphen the user never actually uses as a GitHub handle.
-	lower = strings.ReplaceAll(lower, " ", "")
-	lower = githubUserAllowed.ReplaceAllString(lower, "")
-	lower = strings.Trim(lower, "-")
-	return lower
 }

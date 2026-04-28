@@ -113,6 +113,11 @@ SSaC self-consistency — required fields, variable flow, model references, @sub
 | S-61 | ERROR | Result variable names must not collide with codegen reserved names (`server`, `ctx`, `err`, etc.) | `pkg/validate/ssac/s_61_codegen_reserved_var.go` |
 | S-62 | ERROR | Result variable is unreferenced in subsequent sequences | `pkg/validate/ssac/s_62_unused_result_var.go` |
 | S-63 | WARNING | `@get []T` list endpoint has no pagination params and no `// @no-pagination` | `pkg/validate/ssac/s_63_list_no_pagination.go` |
+| S-64 | ERROR | `@empty` / `@exists` Target must reference a Model (struct), not a scalar field | `pkg/validate/ssac/s_64_empty_exists_model_only.go` |
+| S-67 | ERROR | `@eval` Func signature must be `func(req T) bool` | `pkg/validate/ssac/s_67_eval_func_signature.go` |
+| S-68 | ERROR | `@eval` requires an explicit STATUS code (no default) | `pkg/validate/ssac/s_68_eval_status_required.go` |
+| S-69 | ERROR | `@eval` Func must exist in Func Spec or built-in | `pkg/validate/ssac/s_69_eval_func_exists.go` |
+| S-70 | ERROR | `@post` / `@put` Inputs value must not be a standalone reserved source (`currentUser`, `request`, `query`, `message`); use dotted form. `@call` exempt | `pkg/validate/ssac/s_70_post_put_blob_input_forbidden.go` |
 | XSS-11 | WARNING | `@result` type is plural | `pkg/validate/ssac/xss_11_plural_result_type.go` |
 | XSS-38 | ERROR | `@call` function name starts with a lowercase letter (uppercase recommended) | `pkg/validate/ssac/xss_38_call_func_lowercase.go` |
 | XSS-47 | WARNING | `@call` argument source variable is undefined | `pkg/validate/ssac/xss_47_call_source_var_undefined.go` |
@@ -172,6 +177,7 @@ sqlc query file self-consistency.
 | Q-9 | ERROR | `:exec` query returns `SELECT` | `pkg/validate/query/q_09_select_on_exec.go` |
 | Q-10 | ERROR | `sql[].gen.go.out` in `sqlc.yaml` must resolve to `<artifacts>/backend/internal/db` (generate-time; requires `<artifacts>` CLI argument) | `pkg/generate/gogin/check_sqlc_out_path.go` |
 | Q-11 | ERROR | `sql[].gen.go.sql_package` in `sqlc.yaml` must be `pgx/v5` (yongol backend codegen is unified on pgx/v5) | `pkg/validate/query/q_11_sql_package_pgx_v5.go` |
+| Q-12 | ERROR | DDL has `UUID` column(s) but `sqlc.yaml` is missing the two `pgtype.UUID` overrides (`nullable: false` and `nullable: true`) | `pkg/validate/query/q_12_pgtype_uuid_override.go` |
 
 ## E. DDL
 
@@ -307,6 +313,17 @@ Cross-consistency between OpenAPI security schemes and manifest middleware confi
 | XON-51 | ERROR | manifest middleware must map to an existing OpenAPI securityScheme (coverage) | `pkg/validate/openapi_manifest/xon_51_middleware_security_scheme.go` |
 | SEC-04 | ERROR | The `<key>` of `backend.http.overrides.<key>` must exist as an OpenAPI operationId | `pkg/validate/openapi_manifest/sec_04_http_overrides_operation_id.go` |
 | SEC-101 | ERROR | generate-time: the generated main.go must register the request_id and error_envelope middleware immediately after the router, in that order | `pkg/generate/gogin/boot/collect_active_blocks.go` |
+
+## N2. Manifest auth claims ↔ DDL columns (XDN-*)
+
+Cross-consistency between `manifest.backend.auth` (user_table + claims mapping) and the DDL user table parsed from `db/*.sql`. JWT claims are a fixed, finite key set; they must map to typed columns on a named table — not to a generic JSONB blob.
+
+| Rule ID | Level | Description | Source |
+|---|---|---|---|
+| XDN-01 | ERROR | `backend.auth.user_table` is required when auth is active (`auth.type != "none"`) | `pkg/validate/manifest_ddl/xdn_01_user_table_required.go` |
+| XDN-02 | ERROR | `backend.auth.user_table` must reference a table parsed from `db/*.sql` | `pkg/validate/manifest_ddl/xdn_02_user_table_exists.go` |
+| XDN-03 | ERROR | Each `backend.auth.claims.<Field>: <col>[:<type>]` mapping's column must exist on the user_table | `pkg/validate/manifest_ddl/xdn_03_claim_column_exists.go` |
+| XDN-04 | ERROR | Each claim's Go type (`int64` / `string` / `bool`, default `string`) must match the user_table column's DDL-derived Go type | `pkg/validate/manifest_ddl/xdn_04_claim_column_type.go` |
 
 ## O. SSaC ↔ sqlc
 

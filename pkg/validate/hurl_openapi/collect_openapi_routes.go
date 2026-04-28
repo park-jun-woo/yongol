@@ -1,4 +1,4 @@
-//ff:func feature=validate type=util control=iteration dimension=1 topic=hurl-openapi
+//ff:func feature=validate type=util control=iteration dimension=2 topic=hurl-openapi
 //ff:what collectOpenAPIRoutes — OpenAPI Doc 의 전체 정규화 route 목록 생성
 
 package hurl_openapi
@@ -30,18 +30,4 @@ func collectOpenAPIRoutes(doc *openapi3.T) []apiRoute {
 		}
 	}
 	return routes
-}
-
-// collectResponseCodes collects the response-code keys declared on an
-// operation. Empty op / absent responses yield an empty map so callers
-// can use `codes[key]` guards without nil checks.
-func collectResponseCodes(op *openapi3.Operation) map[string]bool {
-	codes := map[string]bool{}
-	if op == nil || op.Responses == nil {
-		return codes
-	}
-	for code := range op.Responses.Map() {
-		codes[code] = true
-	}
-	return codes
 }

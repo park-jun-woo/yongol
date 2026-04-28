@@ -13,6 +13,7 @@ const (
 	SeqState    = "state"
 	SeqAuth     = "auth"
 	SeqCall           = "call"
+	SeqEval           = "eval"
 	SeqPublish        = "publish"
 	SeqResponse       = "response"
 	SeqVerifyPassword = "verify-password"
@@ -28,6 +29,7 @@ var ValidSequenceTypes = map[string]bool{
 	SeqState:    true,
 	SeqAuth:     true,
 	SeqCall:           true,
+	SeqEval:           true,
 	SeqPublish:        true,
 	SeqResponse:       true,
 	SeqVerifyPassword: true,

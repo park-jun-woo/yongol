@@ -13,4 +13,8 @@ type FuncSpec struct {
 	ResponseFields []Field  // FuncNameResponse struct fields
 	HasBody        bool     // true if function body is not just "// TODO: implement"
 	Imports        []string // import paths (e.g. "database/sql", "net/http")
+	// ReturnTypes captures the return types declared on the matching FuncDecl
+	// (e.g. ["bool"], ["FooResponse", "error"], ["error"]). Used by @eval
+	// validation (S-67) to detect predicate funcs whose sole return is `bool`.
+	ReturnTypes []string
 }

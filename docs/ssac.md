@@ -37,17 +37,73 @@ When using `@call pkg.Func`, the package must appear in the file's `import` bloc
 | `@post` | Create | `Type var = Model.Method(args...)` (args required) |
 | `@put` | Update | `Model.Method(args...)` (no return; args required) |
 | `@delete` | Delete | `Model.Method(args...)` (0 args -> WARNING) |
-| `@empty` | Guard nil/zero -> 404 | `target "message" [STATUS]` |
-| `@exists` | Guard not-nil -> 409 | `target "message" [STATUS]` |
+| `@empty` | Guard nil/zero -> 404 | `target "message" [STATUS]` (target must be a Model var, not a scalar) |
+| `@exists` | Guard not-nil -> 409 | `target "message" [STATUS]` (target must be a Model var, not a scalar) |
 | `@state` | State transition | `diagramID {inputs} "transition" "message" [STATUS]` (default 409) |
 | `@auth` | Authorization | `"action" "resource" {inputs} "message" [STATUS]` (default 403) |
 | `@call` | Function call | `[Type var =] package.Func(args...)` |
+| `@eval` | Predicate guard (true → STATUS) | `package.Func({k: v, ...}) "message" STATUS` (STATUS required) |
 | `@publish` | Queue publish | `"topic" {payload} [{options}]` |
 | `@response` | JSON response | `varName` or `{ field: var, ... }` |
 | `@verify-password` | Login timing defense | see below |
 | `@subscribe` | Queue trigger | see below |
 
 Suppress WARNINGs with `!` suffix: `@delete!`, `@response!`.
+
+### @empty / @exists target must be a Model (S-64)
+
+`@empty` and `@exists` are **model-level guards**: they ask "does this row
+exist?" — not "is this number zero?" or "is this string empty?". The target
+must be a variable bound by an earlier `@get` / `@post` / `@put` whose type is
+a DDL Model (e.g. `User`, `Workflow`).
+
+```ssac
+// ✅ correct — model presence check
+// @get Workflow wf = Workflow.FindByID({ID: request.id})
+// @empty wf "Workflow not found"
+
+// ❌ rejected by S-64 — scalar field, not a model
+// @get Organization org = Organization.FindByID({ID: currentUser.OrgID})
+// @empty org.CreditsBalance "Insufficient credits" 402
+```
+
+The right way to gate on a scalar value is a Func that returns `error`:
+
+```ssac
+// @get Organization org = Organization.FindByID({ID: currentUser.OrgID})
+// @call billing.CheckCredits({Balance: org.CreditsBalance}) 402
+```
+
+`billing.CheckCredits` returns `nil` when there are enough credits and a typed
+error otherwise; SSaC's `@call` early-return mechanism handles the response
+status.
+
+### @eval — predicate guard
+
+`@eval` is the dedicated **scalar predicate guard**. It calls a `bool`-returning
+Func and triggers an early HTTP error response when the Func returns `true`.
+Use it for the cases `@empty` / `@exists` cannot express — quota checks,
+rate limits, "is archived" flags, "is zero balance" — i.e. anything that
+needs a side-effect-free predicate.
+
+```ssac
+// @eval billing.IsZeroBalance({Balance: org.CreditsBalance}) "Insufficient credits" 402
+// @eval rate.IsLimited({UserID: currentUser.ID, Endpoint: "ExecuteWorkflow"}) "Rate limited" 429
+// @eval workflow.IsArchived({ID: wf.ID}) "Workflow archived" 410
+```
+
+Format: `package.Func({Field: source.value, ...}) "<message>" <STATUS>`
+
+- The Func must have signature `func(req T) bool` (S-67). Funcs that return
+  `error` belong to `@call`.
+- `<message>` and `<STATUS>` are both required (S-68). There is no default
+  status — the contract is visible at the call site.
+- Result capture (`Type var = ...`) is rejected at parse time; `@eval` is
+  guard-only. If the predicate computes a value you want to keep, use `@call`.
+
+Polarity: `true` triggers the guard. The author should align the Func's name
+and body with that meaning so the SSaC line reads naturally — e.g.
+`IsZeroBalance` returning `true` causing `402 Insufficient credits`.
 
 ### Function-level annotations
 
@@ -109,6 +165,42 @@ Re-read with `@get` to use the updated record:
 // @get Gig updated = Gig.FindByID({ID: gig.ID})
 // @response { gig: updated }
 ```
+
+### Reserved sources must be dotted in @post/@put (S-70)
+
+`@post` and `@put` write to DDL tables. Passing a reserved source
+(`currentUser`, `request`, `query`, `message`) **as a standalone Inputs
+value** — without a dotted field — packs the entire object into one
+column (typically a `JSONB` blob). This breaks per-claim typing,
+auditability, and migration. Yongol rejects it with `S-70`.
+
+Mandatory: each Inputs value must either be a literal, a declared
+variable, or a **dotted reference** to a reserved source.
+
+```go
+// ❌ S-70 — currentUser packed into a Claims column
+// @post User u = User.Create({Claims: currentUser})
+
+// ❌ S-70 — request body smeared into Meta
+// @put Workflow.UpdateMeta({ID: wf.ID, Meta: request})
+
+// ✅ Map each claim explicitly
+// @post User u = User.Create({Email: currentUser.Email, Name: currentUser.Name})
+
+// ✅ Pull the field you need from request
+// @put Workflow.UpdateMeta({ID: wf.ID, Title: request.title})
+```
+
+`@call` is exempt — user-authored Funcs may legitimately receive a raw
+reserved object as a single argument:
+
+```go
+// ✅ @call may take currentUser whole
+// @call audit.Log({Subject: currentUser, Action: "login"})
+```
+
+`@get` / `@delete` / `@auth` / `@state` / `@publish` are also unaffected
+by S-70 (no DDL write of a blob).
 
 ## Arg Format
 

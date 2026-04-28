@@ -43,6 +43,9 @@ func (g *methodGen) buildSequence(seq ssacparser.Sequence, next *ssacparser.Sequ
 	case "call":
 		l, imp := g.buildCall(seq)
 		return l, imp, false, nil
+	case "eval":
+		l, imp := g.buildEval(seq)
+		return l, imp, false, nil
 	case "verify-password":
 		l, imp := g.buildVerifyPassword(seq)
 		return l, imp, false, nil

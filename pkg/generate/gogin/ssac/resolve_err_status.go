@@ -18,6 +18,12 @@ func resolveErrStatus(seqType string, explicitStatus int) int {
 		return 403
 	case "call":
 		return 500
+	case "eval":
+		// SSaC enforces an explicit STATUS via S-68. The 500 fallback only
+		// fires when callers reach codegen with ErrStatus 0 (e.g. snapshot
+		// tests), keeping emission deterministic without papering over the
+		// SSaC error.
+		return 500
 	default:
 		return 500
 	}

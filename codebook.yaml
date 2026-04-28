@@ -54,6 +54,8 @@ required:
     openapi-parse: "OpenAPI 문서 파싱/해석 보조 (pkg/parser/openapi)"
     report: "검증 결과 직렬화 — JSON flat / SARIF 2.1.0 에미터 (pkg/report)"
     util: "범용 유틸 패키지 — case 변환 등 (pkg/util/*)"
+    cli-init: "yongol init 서브커맨드 (신규 프로젝트 스캐폴드 / 모듈 감지 / 프로젝트 ID 정규화)"
+    ssacmeta: "SSaC 패키지 interface.yaml 메타 로드 및 when 조건 평가"
   type:
     command: "CLI 명령 엔트리포인트"
     rule: "검증 규칙"
@@ -165,6 +167,21 @@ optional:
     migration-hints: "@rename / @backfill / @data_migration 힌트 파서 + MIG-001/003 규칙"
     migration-safety: "NOT NULL / DROP / CAST 등 파괴적 DDL 안전성 검사 (MIG-002/004/005)"
     migration-snapshot: ".generated_schema.sql 스냅샷 무결성 검증 (MIG-006)"
+    # --- gogin infra / runtime adapter topics ---
+    auth-refresh: "ssac/pkg/auth.RefreshStore adapter 생성 — pkg/generate/gogin/infra/wrap_auth.go"
+    cache: "ssac/pkg/cache.CacheModel adapter 생성 — pkg/generate/gogin/infra/wrap_cache.go"
+    queue: "ssac/pkg/queue.Backend adapter 생성 — pkg/generate/gogin/infra/wrap_queue.go"
+    session: "ssac/pkg/session.SessionModel adapter 생성 — pkg/generate/gogin/infra/wrap_session.go"
+    health: "/health / /ready 헬스체크 핸들러 — pkg/generate/gogin/boot/block_health*.go"
+    authz: "인가 검사 (owner lookup, resource id) — pkg/generate/gogin/ssac/build_auth*.go"
+    # --- hurl pair-check topics ---
+    hurl-manifest: "Hurl ↔ manifest 교차 검증 (XOH-06/07: 인증 선조건, CSRF)"
+    hurl-openapi: "Hurl ↔ OpenAPI 교차 검증 (XOH-01/02/03/04/08/09)"
+    hurl-statemachine: "Hurl ↔ stateDiagram 교차 검증 (XOH-05 상태 전이 순서)"
+    # --- manifest infra requires-sqlc topics ---
+    manifest-infra: "manifest backend.{auth,cache,queue,session} 구성 시 sqlc/DDL 요구 검증 (XNA/XNC/XNQ/XNS-90)"
+    # --- query ↔ rego pair topics ---
+    query-rego: "sqlc 쿼리 ↔ Rego 정책 교차 검증 (XQP-30 owner lookup)"
   ssot:
     openapi: ""
     ddl: ""

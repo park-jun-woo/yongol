@@ -22,6 +22,7 @@ backend:
   auth:
     type: jwt                       # Only "jwt" supported
     secret_env: JWT_SECRET
+    user_table: users               # DDL table holding user rows (XDN-01~04)
     claims:                         # JWT claim -> CurrentUser field
       ID: user_id:int64             # Format: claim_key:go_type (default string)
       Email: email
@@ -71,11 +72,46 @@ Auto-generated when `backend.middleware` includes `bearerAuth` and OpenAPI `secu
 - JWT functions (`IssueToken`, `VerifyToken`, `RefreshToken`) auto-generated under `internal/auth/`.
 - `internal/auth/reexport.go` re-exports `ssac/pkg/auth` utilities (`HashPassword`, `VerifyPassword`, ...).
 
+### auth.user_table + auth.claims ↔ DDL
+
+`backend.auth.user_table` is **required whenever auth is active**
+(`auth.type` not `none`). It names the DDL table — typically `users`,
+but free to be `accounts`, `members`, `freelancers`, etc. — that holds
+the user rows from which JWT claims derive. Inferring the table from
+filename conventions breaks under non-standard naming and multi-tenant
+auth schemes; making the field explicit costs one boilerplate line and
+removes the ambiguity entirely.
+
+Claim mapping format:
+
+```
+<FieldName>: <column_name>[:<go_type>]
+```
+
+`<go_type>` is one of `string` (default), `int64`, `bool`.
+
+The four XDN rules check the wiring at validate time:
+
+| Rule | Check |
+|---|---|
+| XDN-01 | `user_table` present when auth is active |
+| XDN-02 | `user_table` matches a table parsed from `db/*.sql` |
+| XDN-03 | Every `claims.<Field>: <col>` column exists on `user_table` |
+| XDN-04 | Each claim's Go type matches the user_table column's DDL-derived Go type |
+
+Fix path on a fresh failure: add `user_table: users` (or your real
+table name) to `backend.auth`, ensure `db/<table>.sql` defines the
+columns named in `claims`, and confirm the column types map to the
+declared Go types (`BIGINT`/`SERIAL` → `int64`, `VARCHAR`/`TEXT` →
+`string`, `BOOLEAN` → `bool`).
+
 ## Cross-SSOT Links
 
 | Link | Rule |
 |---|---|
 | `backend.middleware` -> OpenAPI `securitySchemes` keys | Middleware name must exist |
+| `backend.auth.user_table` -> DDL `db/<table>.sql` | Required when auth active; must match a parsed table (XDN-01/02) |
+| `backend.auth.claims` -> DDL columns on `user_table` | Each `claims.<F>: <col>[:<type>]` must hit a real column with matching Go type (XDN-03/04) |
 | `backend.auth.claims` -> Rego `input.claims.<field>` | Every claim used in Rego must be declared |
 | `backend.auth.roles` -> Rego role literals | Every role used in Rego must be declared |
 | `session/cache/file/queue.backend` -> SSaC `@call` / `@publish` | WARNING when SSaC uses an undeclared backend |

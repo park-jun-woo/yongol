@@ -31,6 +31,8 @@ CLAUDE.md
 
 # Generated artifacts from `yongol generate`
 artifacts/
+examples/*/try*/arts/
+examples/*/try*/package-lock.json
 
 # Frontend tooling deps (yongol spawns swc, openapi-typescript)
 node_modules/

@@ -23,5 +23,6 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	diags = append(diags, q08UnusedParam(fs)...)
 	diags = append(diags, q09SelectOnExec(fs)...)
 	diags = append(diags, q11SqlPackagePgxV5(fs)...)
+	diags = append(diags, q12PgtypeUuidOverride(fs)...)
 	return diags
 }

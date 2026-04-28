@@ -15,7 +15,7 @@ func directorySSOTs(abs string) []dirSSOT {
 		{KindSSaC, filepath.Join(abs, "service"), []string{"*.ssac", "*/*.ssac"}},
 		{KindStates, filepath.Join(abs, "states"), []string{"*.md"}},
 		{KindPolicy, filepath.Join(abs, "policy"), []string{"*.rego"}},
-		{KindScenario, filepath.Join(abs, "tests"), []string{"scenario-*.hurl", "invariant-*.hurl"}},
+		{KindScenario, filepath.Join(abs, "tests"), []string{"smoke.hurl", "scenario-*.hurl", "invariant-*.hurl"}},
 		{KindFunc, filepath.Join(abs, "func"), []string{"*/*.go"}},
 		{KindTSX, filepath.Join(abs, "frontend"), []string{"*.tsx", "*/*.tsx", "*/*/*.tsx", "*/*/*/*.tsx"}},
 	}
