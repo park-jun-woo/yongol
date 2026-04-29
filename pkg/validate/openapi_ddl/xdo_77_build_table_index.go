@@ -4,7 +4,7 @@
 package openapi_ddl
 
 import (
-	"github.com/park-jun-woo/yongol/pkg/parser/ddl"
+	"github.com/park-jun-woo/yongol/pkg/generate/gogin/types"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
@@ -15,7 +15,7 @@ func xdo77BuildTableIndex(fs *yongol.Fullstack) map[string]map[string]string {
 	for _, t := range fs.DDLTables {
 		cols := make(map[string]string, len(t.Columns))
 		for col, c := range t.Columns {
-			cols[col] = ddl.GoTypeOf(c)
+			cols[col] = types.GoTypeOf(c)
 		}
 		tableIndex[t.Name] = cols
 	}

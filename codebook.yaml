@@ -182,6 +182,10 @@ optional:
     manifest-infra: "manifest backend.{auth,cache,queue,session} 구성 시 sqlc/DDL 요구 검증 (XNA/XNC/XNQ/XNS-90)"
     # --- query ↔ rego pair topics ---
     query-rego: "sqlc 쿼리 ↔ Rego 정책 교차 검증 (XQP-30 owner lookup)"
+    # --- pgtype mapping topics (Phase001) ---
+    pgtype-matrix: "pkg/generate/gogin/types/ — DDL Column → GoTypeBinding 단일 출처 (17 PG family × 3 nullability × 4 emit). 3 emit 사이트 (convert/insert/response) 가 공유"
+    pgtype-override: "Q-12/Q-13/Q-14/Q-15/Q-16/Q-17/Q-18 — sqlc.yaml 의 pgtype.UUID/Numeric/Timestamptz/Timestamp/Date/Inet/Interval override 누락 검사 (NeedsOverride=true 기반)"
+    unsupported-pgtype: "D-11 — 다중 토큰 PG 타입 (DOUBLE PRECISION, TIMESTAMP WITH TIME ZONE) / CREATE TYPE 사용자 정의 ENUM 거절"
   ssot:
     openapi: ""
     ddl: ""

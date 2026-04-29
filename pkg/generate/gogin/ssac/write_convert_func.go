@@ -34,6 +34,11 @@ import (
 // The convert signature always returns an error — even for schemas with
 // no JSONB columns — so every caller uses a single pattern. The extra
 // nil return is a no-op at runtime.
+//
+// Phase001 — Row → Model expression resolution moves to
+// pkg/generate/gogin/types via the column lookup helper. The kind enum
+// is gone; pickConvertRHS receives the ddl.Column directly and uses
+// types.Expand on the binding template.
 func writeConvertFunc(sb *strings.Builder, name string, schema *openapi3.Schema, ddlTables []ddl.Table) {
 	required := requiredSet(schema)
 
@@ -52,11 +57,12 @@ func writeConvertFunc(sb *strings.Builder, name string, schema *openapi3.Schema,
 		apiField := pascalCase(jsonName)
 		dbField := sqlcPascalCase(jsonName)
 		apiType := apiCastFor(name, jsonName, schema.Properties[jsonName])
-		// Resolve pgx/v5 row-field unwrap via DDL metadata. Unknown models
-		// (no DDL table by name) fall back to pgPrimitive — matches the
-		// pre-refit behaviour for schemas that are pure api wrappers.
-		rowKind := pgtypeRowFieldKindForColumn(ddlTables, name, jsonName)
-		rhs := pickConvertRHS(jsonName, apiField, dbField, required[jsonName], jsonbs, apiType, rowKind)
+		// Resolve the parsed DDL column for this field so pickConvertRHS
+		// can route through types.MapPGType. Unknown models (api wrapper
+		// schemas without a backing table) get nil and the picker falls
+		// back to direct assignment.
+		col := lookupDDLColumn(ddlTables, name, jsonName)
+		rhs := pickConvertRHS(jsonName, apiField, dbField, required[jsonName], jsonbs, apiType, col)
 		sb.WriteString("\t\t" + apiField + ": " + rhs + ",\n")
 	}
 	sb.WriteString("\t}, nil\n")

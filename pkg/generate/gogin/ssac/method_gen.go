@@ -4,8 +4,10 @@
 package ssac
 
 import (
+	"github.com/park-jun-woo/yongol/pkg/parser/ddl"
 	"github.com/park-jun-woo/yongol/pkg/parser/funcspec"
 	"github.com/park-jun-woo/yongol/pkg/parser/rego"
+	sqlcparser "github.com/park-jun-woo/yongol/pkg/parser/sqlc"
 )
 
 // methodGen holds all context needed to generate one StrictServerInterface method.
@@ -75,4 +77,26 @@ type methodGen struct {
 	// populate authz.CheckRequest.Owners. Nil / empty when the project has
 	// no ownership annotations — buildAuth then emits an empty owners map.
 	Ownerships []rego.OwnershipMapping
+	// DDLTables is the parsed DDL cache shared with the convert / response
+	// emitters. Plumbed into methodGen so INSERT-side helpers (sqlcArgs,
+	// maybeMarshalJSONB) can resolve the target column's RawType via
+	// types.MapPGType — needed to wrap literal JSONB values as []byte
+	// (BUG-037 #1) and to feed the row → model rewiring of @post Model
+	// = Model.Create(...) (BUG-037 #2).
+	DDLTables []ddl.Table
+	// SQLcQueries is the parsed sqlc query catalogue (`-- name:` entries)
+	// shared with build_response so it can detect when a sqlc :one INSERT
+	// returns the synthesised <Method>Row (RETURNING ... selects a subset
+	// of columns) instead of the model row (RETURNING * or all columns).
+	// In the Row case build_response wires through convert<Method>Row
+	// which oapi-codegen emits with the right shape, instead of the
+	// model-typed convert<Model> that fails the assignment (BUG-037 #2).
+	SQLcQueries []sqlcparser.QuerySpec
+	// activeMethod is the sqlc query name currently being emitted by
+	// sqlcArgs / sqlcArgsSingle / sqlcArgsMulti. Set by the args helpers
+	// before they invoke wrapJSONBLiteral / lookupSQLCMethodColumn so
+	// per-column lookups can resolve the target DDL table from
+	// SQLcQueries. Cleared back to empty after each emission so leakage
+	// across sequences cannot misdirect a downstream literal wrap.
+	activeMethod string
 }

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/park-jun-woo/yongol/pkg/generate/gogin/types"
 	"github.com/park-jun-woo/yongol/pkg/parser/ddl"
 )
 
@@ -17,7 +18,7 @@ import (
 func writeLogValueFields(b *strings.Builder, t ddl.Table, cols []string) {
 	for _, col := range cols {
 		c := t.Columns[col]
-		goType := ddl.GoTypeOf(c)
+		goType := types.GoTypeOf(c)
 		fieldName := sqlcFieldName(col)
 		if c.Sensitive {
 			b.WriteString(fmt.Sprintf("\t\tslog.String(%q, \"[REDACTED]\"),\n", col))

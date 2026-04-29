@@ -14,6 +14,8 @@ package ssac
 // Keys are converted to sqlc PascalCase (e.g. "URL" → "Url",
 // "OrgID" → "OrgID") by the caller via the validate layer.
 func (g *methodGen) sqlcArgs(method string, inputs map[string]string) (preamble []string, args string, imports []string) {
+	g.activeMethod = method
+	defer func() { g.activeMethod = "" }()
 	switch len(inputs) {
 	case 0:
 		return nil, "ctx", nil

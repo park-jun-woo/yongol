@@ -1,11 +1,12 @@
 //ff:func feature=manifest type=test control=iteration dimension=1
-//ff:what ParseTables — ColumnOrder 선언 순서 보존 + Columns Go 타입 매핑
+//ff:what ParseTables — ColumnOrder 선언 순서 보존 + Columns RawType 보존
 
 package ddl
 
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -36,17 +37,20 @@ func TestParseTables_ColumnOrderAndGoType(t *testing.T) {
 			t.Errorf("ColumnOrder[%d] = %q, want %q", i, tb.ColumnOrder[i], c)
 		}
 	}
-	wantTypes := map[string]string{
-		"id":         "int64",
-		"name":       "string",
-		"amount":     "float64",
-		"active":     "bool",
-		"payload":    "json.RawMessage",
-		"created_at": "time.Time",
+	// Phase002 — parser preserves RawType verbatim. Phase001 ships GoTypeOf
+	// in pkg/generate/gogin/types; the parser-level test only asserts the
+	// raw token survives the round-trip.
+	wantRaw := map[string]string{
+		"id":         "BIGSERIAL",
+		"name":       "VARCHAR(100)",
+		"amount":     "NUMERIC",
+		"active":     "BOOLEAN",
+		"payload":    "JSONB",
+		"created_at": "TIMESTAMPTZ",
 	}
-	for col, wt := range wantTypes {
-		if got := GoTypeOf(tb.Columns[col]); got != wt {
-			t.Errorf("GoTypeOf(Columns[%s]) = %q, want %q", col, got, wt)
+	for col, wt := range wantRaw {
+		if got := strings.ToUpper(strings.TrimSpace(tb.Columns[col].RawType)); got != wt {
+			t.Errorf("Columns[%s].RawType = %q, want %q", col, got, wt)
 		}
 	}
 }

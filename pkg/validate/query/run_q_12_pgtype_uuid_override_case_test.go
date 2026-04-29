@@ -8,13 +8,15 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/park-jun-woo/yongol/pkg/parser/ddl"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // runQ12PgtypeUuidOverrideCase executes one row of the Q-12 table:
-// writes DDL + sqlc.yaml into a tempdir, runs the rule, then delegates
-// the assertion to assertQ12Diags. Extracted from TestQ12PgtypeUuidOverride
-// to keep the test loop body within the Q4 PURE line budget.
+// writes DDL + sqlc.yaml into a tempdir, parses the DDL into
+// fs.DDLTables (Phase001 routes Q-12 through DDLTables instead of
+// re-reading raw .sql), then runs the rule and delegates the assertion
+// to assertQ12Diags.
 func runQ12PgtypeUuidOverrideCase(t *testing.T, tc q12UuidTestCase) {
 	t.Helper()
 	dir := t.TempDir()
@@ -28,7 +30,8 @@ func runQ12PgtypeUuidOverrideCase(t *testing.T, tc q12UuidTestCase) {
 	if err := os.WriteFile(filepath.Join(dbDir, "sqlc.yaml"), []byte(tc.sqlc), 0o644); err != nil {
 		t.Fatalf("write sqlc.yaml: %v", err)
 	}
-	fs := &yongol.Fullstack{SpecsDir: dir}
+	tables, _ := ddl.ParseTables(dbDir)
+	fs := &yongol.Fullstack{SpecsDir: dir, DDLTables: tables}
 	diags := q12PgtypeUuidOverride(fs)
 	assertQ12Diags(t, tc, diags)
 }

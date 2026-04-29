@@ -1,5 +1,5 @@
 //ff:func feature=gen-gogin type=util control=iteration dimension=1
-//ff:what methodGen.sqlcArgsMulti — 입력이 2개 이상일 때 sqlc Params 구조체 리터럴 생성
+//ff:what methodGen.sqlcArgsMulti — 입력이 2개 이상일 때 sqlc Params 구조체 리터럴 생성 (JSONB 리터럴 wrap 포함)
 package ssac
 
 import (
@@ -18,7 +18,11 @@ func (g *methodGen) sqlcArgsMulti(method string, inputs map[string]string) (prea
 			fields = append(fields, k+": "+raw)
 			continue
 		}
-		fields = append(fields, k+": "+g.mapValue(v))
+		rendered := g.mapValue(v)
+		// BUG-037 #1 — string literal at a JSONB column requires
+		// []byte(...) wrap so sqlc params accept it.
+		rendered = g.wrapJSONBLiteral(k, rendered)
+		fields = append(fields, k+": "+rendered)
 	}
 	sort.Strings(fields)
 	return preamble, "ctx, db." + method + "Params{" + strings.Join(fields, ", ") + "}", imports

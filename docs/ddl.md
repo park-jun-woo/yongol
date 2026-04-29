@@ -30,13 +30,25 @@ sql:
 
 Rules: D-4 (sqlc.yaml required), D-5 (`sql[].schema` must cover `db/*.sql`), D-6 (`sql[].queries` must cover `db/queries/`), Q-11 (`sql_package` must be `pgx/v5`).
 
-### sqlc Overrides for UUID (Q-12)
+### sqlc Overrides for Non-Native PG Types (Q-12 ~ Q-18)
 
-PostgreSQL `UUID` has no default Go type in sqlc's `pgx/v5` mode. Without an explicit override the generated code may pick a non-`pgtype` import (for example `types.UUID`) and the yongol-generated handler will fail to compile against `github.com/jackc/pgx/v5/pgtype`.
+PostgreSQL types without a Go-native equivalent (`UUID`, `NUMERIC`, `TIMESTAMPTZ`, `TIMESTAMP`, `DATE`, `INET`, `INTERVAL`) have no default mapping in sqlc's `pgx/v5` mode. Without an explicit override the generated code may pick an inconsistent import — `types.UUID` instead of `pgtype.UUID`, raw `interface{}` for `NUMERIC`, etc. — and the yongol-generated handler will fail to compile against `github.com/jackc/pgx/v5/pgtype`.
 
-**Policy** — Go-native equivalents (`string` / `int64` / `bool` / `time.Time`) keep sqlc's default mapping. yongol does **not** require `pgtype` for every PG type; doing so would explode field access into `.String` / `.Int64` / `.Valid` boilerplate, break JSON serialisation against the OpenAPI string / integer schemas, and erase `NOT NULL` from the Go type system.
+**Policy** — Go-native equivalents (`string` / `int64` / `bool`) keep sqlc's default mapping. yongol does **not** require `pgtype` for every PG type; doing so would explode field access into `.String` / `.Int64` / `.Valid` boilerplate, break JSON serialisation against the OpenAPI string / integer schemas, and erase `NOT NULL` from the Go type system.
 
-UUID needs **two override entries** — one for `nullable: false`, one for `nullable: true`. sqlc treats the same `db_type` differently per nullability, so a single entry is not enough.
+Each non-native type needs **two override entries** — one for `nullable: false`, one for `nullable: true`. sqlc treats the same `db_type` differently per nullability, so a single entry is not enough. Each per-type rule fires only when at least one DDL file declares the corresponding column; both entries missing collapses into a single diagnostic with both YAML stanzas in the advice block so the fix is a single paste.
+
+The full table:
+
+| Rule | PG type | Go type |
+|---|---|---|
+| Q-12 | `UUID` | `pgtype.UUID` |
+| Q-13 | `NUMERIC` / `DECIMAL` | `pgtype.Numeric` |
+| Q-14 | `TIMESTAMPTZ` | `pgtype.Timestamptz` |
+| Q-15 | `TIMESTAMP` | `pgtype.Timestamp` |
+| Q-16 | `DATE` | `pgtype.Date` |
+| Q-17 | `INET` / `CIDR` | `pgtype.Inet` |
+| Q-18 | `INTERVAL` | `pgtype.Interval` |
 
 **Q-12 — `UUID` → `pgtype.UUID`**:
 
@@ -58,7 +70,87 @@ gen:
           type: "UUID"
 ```
 
-`yongol validate` runs Q-12 only when at least one DDL file declares a `UUID` column. Projects with no `UUID` columns skip the rule entirely. Both entries missing collapses into a single diagnostic — one rule, one message — with both YAML stanzas in the advice block so the fix is a single paste.
+**Q-13 — `NUMERIC` / `DECIMAL` → `pgtype.Numeric`**:
+
+```yaml
+overrides:
+  - db_type: "numeric"
+    nullable: false
+    go_type: { import: "github.com/jackc/pgx/v5/pgtype", package: "pgtype", type: "Numeric" }
+  - db_type: "numeric"
+    nullable: true
+    go_type: { import: "github.com/jackc/pgx/v5/pgtype", package: "pgtype", type: "Numeric" }
+```
+
+**Q-14 — `TIMESTAMPTZ` → `pgtype.Timestamptz`**:
+
+```yaml
+overrides:
+  - db_type: "timestamptz"
+    nullable: false
+    go_type: { import: "github.com/jackc/pgx/v5/pgtype", package: "pgtype", type: "Timestamptz" }
+  - db_type: "timestamptz"
+    nullable: true
+    go_type: { import: "github.com/jackc/pgx/v5/pgtype", package: "pgtype", type: "Timestamptz" }
+```
+
+**Q-15 — `TIMESTAMP` → `pgtype.Timestamp`**:
+
+```yaml
+overrides:
+  - db_type: "timestamp"
+    nullable: false
+    go_type: { import: "github.com/jackc/pgx/v5/pgtype", package: "pgtype", type: "Timestamp" }
+  - db_type: "timestamp"
+    nullable: true
+    go_type: { import: "github.com/jackc/pgx/v5/pgtype", package: "pgtype", type: "Timestamp" }
+```
+
+**Q-16 — `DATE` → `pgtype.Date`**:
+
+```yaml
+overrides:
+  - db_type: "date"
+    nullable: false
+    go_type: { import: "github.com/jackc/pgx/v5/pgtype", package: "pgtype", type: "Date" }
+  - db_type: "date"
+    nullable: true
+    go_type: { import: "github.com/jackc/pgx/v5/pgtype", package: "pgtype", type: "Date" }
+```
+
+**Q-17 — `INET` / `CIDR` → `pgtype.Inet`**:
+
+```yaml
+overrides:
+  - db_type: "inet"
+    nullable: false
+    go_type: { import: "github.com/jackc/pgx/v5/pgtype", package: "pgtype", type: "Inet" }
+  - db_type: "inet"
+    nullable: true
+    go_type: { import: "github.com/jackc/pgx/v5/pgtype", package: "pgtype", type: "Inet" }
+```
+
+**Q-18 — `INTERVAL` → `pgtype.Interval`**:
+
+```yaml
+overrides:
+  - db_type: "interval"
+    nullable: false
+    go_type: { import: "github.com/jackc/pgx/v5/pgtype", package: "pgtype", type: "Interval" }
+  - db_type: "interval"
+    nullable: true
+    go_type: { import: "github.com/jackc/pgx/v5/pgtype", package: "pgtype", type: "Interval" }
+```
+
+`yongol validate` shares one helper (`checkPgtypeOverride`) across Q-12 ~ Q-18 so the seven rules cannot drift apart on policy. The override matrix is sourced from `pkg/generate/gogin/types` — the same module that picks the convert / insert / response expressions on the codegen side, so a yongol-generated convert never refers to a Go type the user's sqlc.yaml does not declare.
+
+### Unsupported PG types (D-11)
+
+`yongol validate` rejects DDL columns whose PG type cannot be mapped to a Go-side binding (D-11). The rejected set today is **multi-word PG type tokens** (`DOUBLE PRECISION`, `TIMESTAMP WITH TIME ZONE` — once parser support lands) and **user-defined ENUMs declared via `CREATE TYPE`** (yongol does not parse `CREATE TYPE` definitions). Workarounds:
+
+- `DOUBLE PRECISION` → `FLOAT8`
+- `TIMESTAMP WITH TIME ZONE` → `TIMESTAMPTZ`
+- User ENUM → inline `VARCHAR(N)` plus `CHECK (col IN ('a','b','c'))`
 
 ## sqlc Cardinality -> SSaC Type
 

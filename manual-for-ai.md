@@ -116,10 +116,16 @@ Standard SQL DDL and sqlc. Details: [`docs/ddl.md`](docs/ddl.md).
 - **`sql_package: pgx/v5` is required** (Q-11). yongol's backend codegen
   is unified on pgx/v5; `database/sql` / `pgx/v4` / `lib/pq` / absent are
   rejected at `yongol validate`.
-- **PostgreSQL `UUID` requires explicit `pgtype` overrides** (Q-12). When
-  DDL declares a `UUID` column, `db/sqlc.yaml` must register two
-  `pgtype.UUID` entries — one for `nullable: false`, one for
-  `nullable: true`. sqlc's `pgx/v5` mode has no default mapping for `UUID`.
+- **Non-native PG types require explicit `pgtype` overrides** (Q-12 ~
+  Q-18). sqlc's `pgx/v5` mode has no default mapping for the seven
+  pgtype-only families: `UUID` (Q-12), `NUMERIC` / `DECIMAL` (Q-13),
+  `TIMESTAMPTZ` (Q-14), `TIMESTAMP` (Q-15), `DATE` (Q-16), `INET` /
+  `CIDR` (Q-17), `INTERVAL` (Q-18). For each declared column the
+  matching `db/sqlc.yaml` block must register two entries — one for
+  `nullable: false`, one for `nullable: true`. Each Q-NN rule fires
+  only when the corresponding column appears in DDL; the diagnostic
+  prints the exact YAML stanza (UUID example below — see
+  [`docs/ddl.md`](docs/ddl.md) for the full table).
   ```yaml
   overrides:
     - db_type: "uuid"
@@ -129,6 +135,10 @@ Standard SQL DDL and sqlc. Details: [`docs/ddl.md`](docs/ddl.md).
       nullable: true
       go_type: { import: "github.com/jackc/pgx/v5/pgtype", package: "pgtype", type: "UUID" }
   ```
+  Multi-word PG type tokens (`DOUBLE PRECISION`, `TIMESTAMP WITH TIME
+  ZONE`) and `CREATE TYPE` user-defined ENUMs are rejected by D-11 —
+  use the single-word alias (`FLOAT8`, `TIMESTAMPTZ`) or inline
+  `VARCHAR(N) + CHECK IN (...)` instead.
 - Recommended `gen.go.out`: `../../artifacts/<project>/backend/internal/db`.
 - Queries use a **global sqlc namespace** — prefix each `-- name:` with the
   Model (`UserCreate`, `GigFindByID`). In SSaC the prefix is auto-stripped:

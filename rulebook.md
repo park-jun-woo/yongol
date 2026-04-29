@@ -177,7 +177,13 @@ sqlc query file self-consistency.
 | Q-9 | ERROR | `:exec` query returns `SELECT` | `pkg/validate/query/q_09_select_on_exec.go` |
 | Q-10 | ERROR | `sql[].gen.go.out` in `sqlc.yaml` must resolve to `<artifacts>/backend/internal/db` (generate-time; requires `<artifacts>` CLI argument) | `pkg/generate/gogin/check_sqlc_out_path.go` |
 | Q-11 | ERROR | `sql[].gen.go.sql_package` in `sqlc.yaml` must be `pgx/v5` (yongol backend codegen is unified on pgx/v5) | `pkg/validate/query/q_11_sql_package_pgx_v5.go` |
-| Q-12 | ERROR | DDL has `UUID` column(s) but `sqlc.yaml` is missing the two `pgtype.UUID` overrides (`nullable: false` and `nullable: true`) | `pkg/validate/query/q_12_pgtype_uuid_override.go` |
+| Q-12 | ERROR | DDL has `UUID` column(s) but `sqlc.yaml` is missing the two `pgtype.UUID` overrides (NULL/NOT NULL). Implementation shares `checkPgtypeOverride` with the per-type Q-NN family below — the `NeedsOverride=true` flag on `types.GoTypeBinding` (`pkg/generate/gogin/types/`) is the single drift-free source. | `pkg/validate/query/q_12_pgtype_uuid_override.go` |
+| Q-13 | ERROR | DDL has `NUMERIC` / `DECIMAL` column(s) but `sqlc.yaml` is missing the two `pgtype.Numeric` overrides | `pkg/validate/query/q_13_pgtype_numeric_override.go` |
+| Q-14 | ERROR | DDL has `TIMESTAMPTZ` column(s) but `sqlc.yaml` is missing the two `pgtype.Timestamptz` overrides | `pkg/validate/query/q_14_pgtype_timestamptz_override.go` |
+| Q-15 | ERROR | DDL has `TIMESTAMP` (no TZ) column(s) but `sqlc.yaml` is missing the two `pgtype.Timestamp` overrides | `pkg/validate/query/q_15_pgtype_timestamp_override.go` |
+| Q-16 | ERROR | DDL has `DATE` column(s) but `sqlc.yaml` is missing the two `pgtype.Date` overrides | `pkg/validate/query/q_16_pgtype_date_override.go` |
+| Q-17 | ERROR | DDL has `INET` / `CIDR` column(s) but `sqlc.yaml` is missing the two `pgtype.Inet` overrides | `pkg/validate/query/q_17_pgtype_inet_override.go` |
+| Q-18 | ERROR | DDL has `INTERVAL` column(s) but `sqlc.yaml` is missing the two `pgtype.Interval` overrides | `pkg/validate/query/q_18_pgtype_interval_override.go` |
 
 ## E. DDL
 
@@ -195,6 +201,7 @@ DDL self-consistency (PostgreSQL + sqlc query definitions).
 | D-8 | ERROR | `SERIAL` / `BIGSERIAL` / `SMALLSERIAL` column types are banned. Use `GENERATED ALWAYS AS IDENTITY`. | `pkg/validate/ddl/d_08_serial_type_banned.go` |
 | D-9 | ERROR | Top-level `INSERT` in a DDL file must be preceded by `-- @sentinel` (otherwise migration would silently drop it) | `pkg/validate/ddl/d_09_top_level_insert_without_sentinel.go` |
 | D-10 | ERROR | `@sentinel` `INSERT` must include `ON CONFLICT DO NOTHING` so repeated application is idempotent | `pkg/validate/ddl/d_10_sentinel_without_on_conflict.go` |
+| D-11 | ERROR | Column uses an unsupported PG type — multi-word tokens (`DOUBLE PRECISION`, `TIMESTAMP WITH TIME ZONE`) or `CREATE TYPE` user-defined ENUMs. Use single-token aliases (`FLOAT8`, `TIMESTAMPTZ`) or inline `VARCHAR(N) + CHECK IN (...)`. | `pkg/validate/ddl/d_11_unsupported_pg_type.go` |
 | XDD-61 | WARNING | Columns matching sensitive patterns (`password` / `secret` / `hash` / `token`) are missing the `@sensitive` annotation | `pkg/validate/ddl/xdd_61_sensitive_no_annotation.go` |
 
 ## F. DDL ↔ OpenAPI

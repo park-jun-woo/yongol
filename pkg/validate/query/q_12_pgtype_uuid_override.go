@@ -4,11 +4,6 @@
 package query
 
 import (
-	"os"
-	"path/filepath"
-
-	"gopkg.in/yaml.v3"
-
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
@@ -20,27 +15,30 @@ import (
 // `types.UUID` (or pgtype.UUID inconsistently across nullability), breaking
 // the yongol-generated handler that imports `github.com/jackc/pgx/v5/pgtype`.
 //
-// Both entries missing collapse into a single diagnostic (one rule = one
-// message; the advice block carries both YAML stanzas so the user pastes
-// once). One missing entry produces one diagnostic that names which
-// nullable side is absent. Skipped entirely when DDL has no UUID columns
-// or when sqlc.yaml is unreadable (D-4 already reports the latter).
+// Implementation: thin wrapper over checkPgtypeOverride. The shared
+// helper is also used by per-type Q-NN rules (NUMERIC / INET / INTERVAL /
+// timestamp family) so all override-required pgtypes share one
+// diagnostic pipeline and one drift-free policy.
 func q12PgtypeUuidOverride(fs *yongol.Fullstack) []diagnostic.Diagnostic {
-	if fs == nil || fs.SpecsDir == "" {
-		return nil
-	}
-	if !ddlHasUUIDColumn(fs.SpecsDir) {
-		return nil
-	}
-	sqlcPath := filepath.Join(fs.SpecsDir, "db", "sqlc.yaml")
-	data, err := os.ReadFile(sqlcPath)
-	if err != nil {
-		return nil
-	}
-	var cfg sqlcOverridesConfig
-	if err := yaml.Unmarshal(data, &cfg); err != nil {
-		return nil
-	}
-	hasNotNull, hasNullable := scanUUIDOverrides(cfg)
-	return diagnoseUUIDOverrideGaps(hasNotNull, hasNullable)
+	return checkPgtypeOverride(fs, pgtypeOverrideRule{
+		RuleID:    "Q-12",
+		DBType:    "uuid",
+		PgPackage: "pgtype",
+		PgType:    "UUID",
+		Filter:    isUUIDColumn,
+		Advice: "Add to sql[].gen.go.overrides:\n" +
+			"  - db_type: \"uuid\"\n" +
+			"    nullable: false\n" +
+			"    go_type:\n" +
+			"      import: \"github.com/jackc/pgx/v5/pgtype\"\n" +
+			"      package: \"pgtype\"\n" +
+			"      type: \"UUID\"\n" +
+			"  - db_type: \"uuid\"\n" +
+			"    nullable: true\n" +
+			"    go_type:\n" +
+			"      import: \"github.com/jackc/pgx/v5/pgtype\"\n" +
+			"      package: \"pgtype\"\n" +
+			"      type: \"UUID\"\n" +
+			"PostgreSQL types without a Go native equivalent (UUID, NUMERIC, JSONB, INET, INTERVAL) require explicit pgtype overrides in sqlc.yaml.",
+	})
 }

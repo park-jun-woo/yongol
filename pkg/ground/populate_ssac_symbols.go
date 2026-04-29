@@ -8,7 +8,7 @@ import (
 	"github.com/ettle/strcase"
 	"github.com/jinzhu/inflection"
 
-	"github.com/park-jun-woo/yongol/pkg/parser/ddl"
+	"github.com/park-jun-woo/yongol/pkg/generate/gogin/types"
 	"github.com/park-jun-woo/yongol/pkg/rule"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
@@ -32,7 +32,7 @@ func populateSSaCSymbols(g *rule.Ground, fs *yongol.Fullstack) {
 		modelName := strcase.ToGoPascal(inflection.Singular(t.Name))
 		for col, c := range t.Columns {
 			fieldName := strcase.ToGoPascal(col)
-			g.Types["Struct."+modelName+"."+fieldName] = ddl.GoTypeOf(c)
+			g.Types["Struct."+modelName+"."+fieldName] = types.GoTypeOf(c)
 			ddlFields[t.Name] = append(ddlFields[t.Name], fieldName)
 		}
 	}

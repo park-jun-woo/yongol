@@ -5,6 +5,7 @@ package manifest_ddl
 
 import (
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
+	"github.com/park-jun-woo/yongol/pkg/generate/gogin/types"
 	"github.com/park-jun-woo/yongol/pkg/parser/ddl"
 	pmanifest "github.com/park-jun-woo/yongol/pkg/parser/manifest"
 )
@@ -17,7 +18,7 @@ func xdn04CheckClaim(field, userTable string, def pmanifest.ClaimDef, columns ma
 	if !ok {
 		return diagnostic.Diagnostic{}, false
 	}
-	ddlGoType := ddl.GoTypeOf(col)
+	ddlGoType := types.GoTypeOf(col)
 	claimGoType := def.GoType
 	if claimGoType == "" {
 		claimGoType = "string"
