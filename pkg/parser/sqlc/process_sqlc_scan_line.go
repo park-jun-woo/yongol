@@ -1,11 +1,17 @@
 //ff:func feature=orchestrator type=parser control=sequence
-//ff:what processSQLCScanLine — sqlc 파일 한 줄을 해석해 QuerySpec 전이 및 named param 수집을 처리
+//ff:what processSQLCScanLine — sqlc 파일 한 줄을 해석해 QuerySpec 전이 및 named param/Body 수집을 처리
 package sqlc
+
+import "strings"
 
 // processSQLCScanLine handles a single line of a sqlc source file during the
 // streaming scan. It may open a new QuerySpec (flushing the previous one into
-// specs) or collect named parameters into paramSet for the current spec.
+// specs) or accumulate the line into the current spec's Body and named params.
 // It returns the updated (current, paramSet).
+//
+// Body accumulation: every non-`-- name:` line that follows a `-- name:` marker
+// is appended to current.Body (joined with "\n"). The marker line itself is
+// not included. On flush, trailing whitespace is trimmed.
 func processSQLCScanLine(
 	line, model, path string,
 	lineNo int,
@@ -17,12 +23,14 @@ func processSQLCScanLine(
 		// Flush previous query
 		if current != nil {
 			current.Params = sortedKeys(paramSet)
+			current.Body = strings.TrimRight(current.Body, " \t\r\n")
 			*specs = append(*specs, *current)
 		}
 		newSpec := spec
 		return &newSpec, make(map[string]bool)
 	}
 	if current != nil {
+		appendBodyLine(current, line)
 		collectNamedParams(line, paramSet)
 	}
 	return current, paramSet

@@ -21,6 +21,7 @@ SSaC ↔ sqlc 입출력 계약 정합성 검증 (XQS-*). Input key 이름·대�
 | XQS-17 | `ParamKeyMissing` | sqlc Params 필드가 SSaC Input 에 없음 (ERROR) | IF-ELSE | ✓ |
 | XQS-18 | `ParamTypeMismatch` | OpenAPI param 타입 ↔ sqlc/DDL 타입 불일치 (ERROR) | IF-ELSE | ✓ |
 | XQS-19 | `SsacBuiltinQueryRequired` | DB-using ssac 빌트인 호출 → 대응 sqlc 쿼리 존재 (ERROR) | IF-ELSE | ✓ |
+| XQS-20 | `ReturnTypeMatch` | SSaC 선언 반환 타입 ↔ sqlc 쿼리 RETURNING shape (Model ↔ full / `<QueryName>Row` ↔ partial, ERROR) | IF-ELSE | ✓ |
 
 ## XQS-14 / XQS-15 역할 분담
 

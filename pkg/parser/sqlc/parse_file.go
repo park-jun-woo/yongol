@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
 )
@@ -51,6 +52,7 @@ func ParseFile(path string) ([]QuerySpec, []diagnostic.Diagnostic) {
 	// Flush last query
 	if current != nil {
 		current.Params = sortedKeys(paramSet)
+		current.Body = strings.TrimRight(current.Body, " \t\r\n")
 		specs = append(specs, *current)
 	}
 

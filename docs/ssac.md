@@ -224,6 +224,23 @@ properties:
 // user.Email uses Go PascalCase
 ```
 
+### Return type declaration must match sqlc RETURNING shape (XQS-20)
+
+`@get` / `@post` / `@put` declares the result type explicitly. sqlc emits two
+shapes depending on the query's RETURNING clause, and the declaration must
+match — otherwise `go build` fails on a type mismatch in the generated
+handler:
+
+| sqlc query RETURNING | sqlc-emitted Go type | SSaC declaration |
+|---|---|---|
+| `RETURNING *` or every column listed | the model itself (e.g. `User`) | `@post User user = User.Create({...})` |
+| partial RETURNING (e.g. `RETURNING id, email`) | `<QueryName>Row` (e.g. `UserCreateRow`) | `@post UserCreateRow row = User.Create({...})` |
+
+`yongol validate` enforces this with `XQS-20`. The diagnostic suggests both
+fixes (switch the SSaC type, or change the SQL RETURNING clause). SELECT
+queries without a RETURNING clause are out of scope — XDS-12 covers result
+type / DDL coverage there.
+
 ## Pagination
 
 Use standard OpenAPI `parameters` (see [docs/openapi.md](./openapi.md)). SSaC uses explicit `@get` + explicit `@response` field mapping.

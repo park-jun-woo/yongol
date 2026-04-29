@@ -186,6 +186,7 @@ optional:
     pgtype-matrix: "pkg/generate/gogin/types/ — DDL Column → GoTypeBinding 단일 출처 (17 PG family × 3 nullability × 4 emit). 3 emit 사이트 (convert/insert/response) 가 공유"
     pgtype-override: "Q-12/Q-13/Q-14/Q-15/Q-16/Q-17/Q-18 — sqlc.yaml 의 pgtype.UUID/Numeric/Timestamptz/Timestamp/Date/Inet/Interval override 누락 검사 (NeedsOverride=true 기반)"
     unsupported-pgtype: "D-11 — 다중 토큰 PG 타입 (DOUBLE PRECISION, TIMESTAMP WITH TIME ZONE) / CREATE TYPE 사용자 정의 ENUM 거절"
+    returning-shape: "XQS-20 — SSaC 선언 반환 타입 ↔ sqlc 쿼리 RETURNING 절 형태 (Model ↔ full RETURNING / `<QueryName>Row` ↔ partial RETURNING). pkg/validate/ssac_sqlc/xqs_20_return_type_match.go + extract/classify/expected/build_advice helpers"
   ssot:
     openapi: ""
     ddl: ""

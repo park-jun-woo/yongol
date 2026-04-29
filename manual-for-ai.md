@@ -221,6 +221,14 @@ corresponding transition, self-loop if there is no state change).
 `@put` returns nothing; re-query with `@get` if the response needs the updated
 row.
 
+**Return type ↔ RETURNING shape (XQS-20).** For `@get` / `@post` / `@put`,
+declare `<Model>` when the sqlc query uses `RETURNING *` (or lists every
+column), and `<QueryName>Row` when the query uses a partial RETURNING
+(e.g. `RETURNING id, email`). sqlc emits the model directly in the first
+case and an auto-generated row struct in the second; mismatches break
+`go build` of the generated handler. `yongol validate` enforces this with
+XQS-20 and suggests both directions of fix in the advice.
+
 ### Args format
 
 Sources: `request.*`, `currentUser.*`, `query.*`, `message.*` (subscribe only),

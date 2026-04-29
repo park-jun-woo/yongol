@@ -12,15 +12,22 @@ package sqlc
 // RowType     : sqlc-synthesized row struct name (e.g. "UserFindByEmailRow").
 //               Populated for ":one" / ":many"; empty for ":exec" / ":execresult"
 //               because those return no rows.
+// Params      : named params from SQL (@param_name → PascalCase "ParamName").
 // File        : absolute path to the .sql file.
 // Line        : 1-based line number of the `-- name:` comment.
+// Body        : raw SQL body for this query, lines joined with "\n", with the
+//               leading `-- name:` line excluded. Trailing whitespace trimmed.
+//               Comment lines are preserved as-is (the body is the raw text
+//               between `-- name:` markers). Consumers downstream extract the
+//               RETURNING clause from this string (see XQS-20).
 type QuerySpec struct {
 	Name        string
 	Model       string
 	Method      string
 	Cardinality string
 	RowType     string
-	Params      []string // named params from SQL (@param_name → PascalCase "ParamName")
+	Params      []string
 	File        string
 	Line        int
+	Body        string
 }
