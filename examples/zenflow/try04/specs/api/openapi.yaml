@@ -62,6 +62,19 @@ components:
         - status
         - created_at
 
+    Error:
+      type: object
+      required:
+        - error
+        - code
+      properties:
+        error:
+          type: string
+          description: Human-readable error message
+        code:
+          type: string
+          description: Machine-readable error code
+
     ExecutionLog:
       type: object
       properties:
@@ -129,8 +142,14 @@ paths:
                   - access_token
         "401":
           description: Invalid credentials
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
         "500":
           description: Internal server error
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
 
   /workflows:
     get:
@@ -169,6 +188,9 @@ paths:
                   - total
         "403":
           description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
 
     post:
       operationId: CreateWorkflow
@@ -203,6 +225,9 @@ paths:
                   - workflow
         "403":
           description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
 
   /workflows/{id}/activate:
     post:
@@ -231,12 +256,24 @@ paths:
                   - workflow
         "402":
           description: Payment Required - insufficient credits
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
         "403":
           description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
         "404":
           description: Workflow not found
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
         "409":
           description: Invalid state transition
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
 
   /workflows/{id}/pause:
     post:
@@ -265,10 +302,19 @@ paths:
                   - workflow
         "403":
           description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
         "404":
           description: Workflow not found
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
         "409":
           description: Invalid state transition
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
 
   /workflows/{id}/archive:
     post:
@@ -297,10 +343,19 @@ paths:
                   - workflow
         "403":
           description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
         "404":
           description: Workflow not found
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
         "409":
           description: Invalid state transition
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
 
   /workflows/{id}/execute:
     post:
@@ -329,9 +384,21 @@ paths:
                   - log
         "403":
           description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
         "404":
           description: Workflow not found
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
         "409":
           description: Workflow not active
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
         "500":
           description: Internal server error
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }

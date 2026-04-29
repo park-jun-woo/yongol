@@ -108,6 +108,8 @@ Standard OpenAPI 3.x. yongol-specific conventions: see
   response schema.
 - `securitySchemes` keys (e.g. `bearerAuth`) must appear in
   `backend.middleware`.
+- Every 4xx/5xx response requires `content: application/json` + schema (O-5).
+  204 / 304 are exempt. RFC 7807 recommended but not enforced.
 
 ## DDL + sqlc
 

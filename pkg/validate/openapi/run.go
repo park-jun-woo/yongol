@@ -14,6 +14,7 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	diags = append(diags, o02PathParamCaseConflict(fs)...)
 	diags = append(diags, o03PathTemplateParam(fs)...)
 	diags = append(diags, o04OpIdRequired(fs)...)
+	diags = append(diags, o05ResponseBodyRequired(fs)...)
 	diags = append(diags, xoo71PasswordNoMinLength(fs)...)
 	diags = append(diags, xoo72EmailNoFormat(fs)...)
 	return diags

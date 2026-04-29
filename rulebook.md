@@ -158,6 +158,7 @@ OpenAPI self-consistency (based on the document parsed by kin-openapi).
 | O-2 | ERROR | Path parameter case conflict | `pkg/validate/openapi/o_02_path_param_case_conflict.go` |
 | O-3 | ERROR | Path template parameter declaration missing | `pkg/validate/openapi/o_03_path_template_param.go` |
 | O-4 | ERROR | Operation is missing `operationId` | `pkg/validate/openapi/o_04_op_id_required.go` |
+| O-5 | ERROR | 4xx/5xx response is missing `content: application/json` + schema (204/304 exempt; 1xx-3xx out of scope) | `pkg/validate/openapi/o_05_response_body_required.go` |
 | XOO-71 | WARNING | Password-like fields have no `minLength` | `pkg/validate/openapi/xoo_71_password_no_min_length.go` |
 | XOO-72 | WARNING | Email-like fields have no `format` | `pkg/validate/openapi/xoo_72_email_no_format.go` |
 
