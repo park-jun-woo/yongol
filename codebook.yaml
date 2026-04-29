@@ -185,7 +185,8 @@ optional:
     # --- pgtype mapping topics (Phase001) ---
     pgtype-matrix: "pkg/generate/gogin/types/ — DDL Column → GoTypeBinding 단일 출처 (17 PG family × 3 nullability × 4 emit). 3 emit 사이트 (convert/insert/response) 가 공유"
     pgtype-override: "Q-12/Q-13/Q-14/Q-15/Q-16/Q-17/Q-18 — sqlc.yaml 의 pgtype.UUID/Numeric/Timestamptz/Timestamp/Date/Inet/Interval override 누락 검사 (NeedsOverride=true 기반)"
-    unsupported-pgtype: "D-11 — 다중 토큰 PG 타입 (DOUBLE PRECISION, TIMESTAMP WITH TIME ZONE) / CREATE TYPE 사용자 정의 ENUM 거절"
+    unsupported-pgtype: "D-11 — 매트릭스 미등재 다중 토큰 PG 타입 (TIME WITH/WITHOUT TIME ZONE, BIT VARYING) / CREATE TYPE 사용자 정의 ENUM 거절. DOUBLE PRECISION / TIMESTAMP WITH/WITHOUT TIME ZONE / CHARACTER VARYING 는 정규화 매트릭스 (ddl.NormalizePGTypeHead) 에서 단일 토큰 별칭으로 환산되어 정상 처리"
+    multi-token-pg-type: "pkg/parser/ddl/extract_raw_type.go + multi_token_heads.go — parts[1:] 토큰을 다중 단어 PG 타입 매트릭스로 greedy match 하여 RawType 보존. pkg/parser/ddl/normalize_pg_head.go + pg_head_aliases.go — 다중 단어 head 를 단일 토큰 별칭 (FLOAT8/TIMESTAMPTZ/TIMESTAMP/VARCHAR/CHAR/TIMETZ/TIME/VARBIT) 으로 환산 (gen/types + validate/query 공유)"
     returning-shape: "XQS-20 — SSaC 선언 반환 타입 ↔ sqlc 쿼리 RETURNING 절 형태 (Model ↔ full RETURNING / `<QueryName>Row` ↔ partial RETURNING). pkg/validate/ssac_sqlc/xqs_20_return_type_match.go + extract/classify/expected/build_advice helpers"
   ssot:
     openapi: ""

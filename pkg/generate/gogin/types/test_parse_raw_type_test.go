@@ -18,8 +18,12 @@ func TestParseRawType(t *testing.T) {
 		{"NUMERIC(10,2)", "NUMERIC", "10,2", false, false},
 		{"TEXT[]", "TEXT", "", true, false},
 		{"BIGINT[]", "BIGINT", "", true, false},
-		{"DOUBLE PRECISION", "DOUBLE PRECISION", "", false, true},
-		{"TIMESTAMP WITH TIME ZONE", "TIMESTAMP WITH TIME ZONE", "", false, true},
+		// Multi-word PG types: Head normalised to canonical alias, but
+		// the informational MultiToken flag stays true.
+		{"DOUBLE PRECISION", "FLOAT8", "", false, true},
+		{"TIMESTAMP WITH TIME ZONE", "TIMESTAMPTZ", "", false, true},
+		{"TIMESTAMP WITHOUT TIME ZONE", "TIMESTAMP", "", false, true},
+		{"CHARACTER VARYING(255)", "VARCHAR", "255", false, true},
 		{"TIMESTAMPTZ", "TIMESTAMPTZ", "", false, false},
 		{"  varchar (10) ", "VARCHAR", "10", false, false},
 	}

@@ -144,13 +144,40 @@ overrides:
 
 `yongol validate` shares one helper (`checkPgtypeOverride`) across Q-12 ~ Q-18 so the seven rules cannot drift apart on policy. The override matrix is sourced from `pkg/generate/gogin/types` — the same module that picks the convert / insert / response expressions on the codegen side, so a yongol-generated convert never refers to a Go type the user's sqlc.yaml does not declare.
 
+### Multi-word PG type names (both notations accepted)
+
+PostgreSQL has two equally idiomatic spellings for several types — the
+multi-word ANSI / SQL-standard form and the single-token alias. yongol
+accepts both. The DDL parser preserves the verbatim token in
+`Column.RawType` and `ddl.NormalizePGTypeHead` folds the head to the
+canonical alias for downstream matrix lookup, so `DOUBLE PRECISION`
+and `FLOAT8` produce identical Go bindings, identical sqlc overrides,
+and identical OpenAPI schema requirements. Mix-and-match is fine.
+
+| Multi-word form | Single-token alias | Resulting Go binding |
+|---|---|---|
+| `DOUBLE PRECISION` | `FLOAT8` | `float64` |
+| `TIMESTAMP WITH TIME ZONE` | `TIMESTAMPTZ` | `pgtype.Timestamptz` |
+| `TIMESTAMP WITHOUT TIME ZONE` | `TIMESTAMP` | `pgtype.Timestamp` |
+| `CHARACTER VARYING(N)` | `VARCHAR(N)` | `string` (length preserved) |
+| `CHARACTER(N)` | `CHAR(N)` | `string` |
+| `TIME WITH TIME ZONE` | `TIMETZ` | (no binding yet — D-11) |
+| `TIME WITHOUT TIME ZONE` | `TIME` | (no binding yet — D-11) |
+| `BIT VARYING(N)` | `VARBIT` | (no binding yet — D-11) |
+
+The same `head_token_equals` helper drives the Q-12 ~ Q-18 column
+filters in `pkg/validate/query`, so a column declared as
+`occurred_at TIMESTAMP WITH TIME ZONE NOT NULL` triggers Q-14
+(TIMESTAMPTZ override required) just as the single-token form does.
+
 ### Unsupported PG types (D-11)
 
-`yongol validate` rejects DDL columns whose PG type cannot be mapped to a Go-side binding (D-11). The rejected set today is **multi-word PG type tokens** (`DOUBLE PRECISION`, `TIMESTAMP WITH TIME ZONE` — once parser support lands) and **user-defined ENUMs declared via `CREATE TYPE`** (yongol does not parse `CREATE TYPE` definitions). Workarounds:
+`yongol validate` rejects DDL columns whose PG type cannot be mapped to a Go-side binding (D-11). The rejected set today covers:
 
-- `DOUBLE PRECISION` → `FLOAT8`
-- `TIMESTAMP WITH TIME ZONE` → `TIMESTAMPTZ`
-- User ENUM → inline `VARCHAR(N)` plus `CHECK (col IN ('a','b','c'))`
+- **Multi-word PG type forms whose alias has no Go binding yet** — `TIME WITH TIME ZONE` (TIMETZ), `TIME WITHOUT TIME ZONE` (TIME), `BIT VARYING(N)` (VARBIT). Use TIMESTAMPTZ / TIMESTAMP / VARCHAR instead until those bindings are added.
+- **User-defined ENUMs declared via `CREATE TYPE`** — yongol does not parse `CREATE TYPE` definitions today. Workaround: inline `VARCHAR(N)` + `CHECK (col IN ('a','b','c'))`.
+
+`DOUBLE PRECISION` and `TIMESTAMP WITH/WITHOUT TIME ZONE` were rejected by D-11 in earlier yongol revisions; they are now first-class via the alias matrix above.
 
 ## sqlc Cardinality -> SSaC Type
 

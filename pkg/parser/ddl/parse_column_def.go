@@ -32,7 +32,7 @@ func parseColumnDef(line, upper string, t *Table, pendingArchived bool) {
 		return
 	}
 	colName := parts[0]
-	colType := strings.ToUpper(parts[1])
+	colType, _ := extractRawType(parts[1:])
 	colType = strings.TrimSuffix(colType, ",")
 
 	col := Column{

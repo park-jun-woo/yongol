@@ -135,10 +135,17 @@ Standard SQL DDL and sqlc. Details: [`docs/ddl.md`](docs/ddl.md).
       nullable: true
       go_type: { import: "github.com/jackc/pgx/v5/pgtype", package: "pgtype", type: "UUID" }
   ```
-  Multi-word PG type tokens (`DOUBLE PRECISION`, `TIMESTAMP WITH TIME
-  ZONE`) and `CREATE TYPE` user-defined ENUMs are rejected by D-11 —
-  use the single-word alias (`FLOAT8`, `TIMESTAMPTZ`) or inline
-  `VARCHAR(N) + CHECK IN (...)` instead.
+  Multi-word PG type names are accepted as equivalents of their
+  single-token alias — `DOUBLE PRECISION` ≡ `FLOAT8`,
+  `TIMESTAMP WITH TIME ZONE` ≡ `TIMESTAMPTZ`,
+  `TIMESTAMP WITHOUT TIME ZONE` ≡ `TIMESTAMP`,
+  `CHARACTER VARYING(N)` ≡ `VARCHAR(N)`, `CHARACTER(N)` ≡ `CHAR(N)`.
+  The DDL parser preserves the verbatim spelling and
+  `ddl.NormalizePGTypeHead` folds it to the canonical alias for
+  downstream matrix lookup. `TIME WITH/WITHOUT TIME ZONE` (TIMETZ /
+  TIME) and `BIT VARYING` (VARBIT) are still rejected by D-11 — no Go
+  binding yet. `CREATE TYPE` user-defined ENUMs remain rejected; use
+  inline `VARCHAR(N) + CHECK IN (...)` instead.
 - Recommended `gen.go.out`: `../../artifacts/<project>/backend/internal/db`.
 - Queries use a **global sqlc namespace** — prefix each `-- name:` with the
   Model (`UserCreate`, `GigFindByID`). In SSaC the prefix is auto-stripped:

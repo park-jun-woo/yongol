@@ -9,11 +9,18 @@ import "github.com/park-jun-woo/yongol/pkg/parser/ddl"
 // constructor in priority order:
 //
 //  1. CheckEnum present → enum binding
-//  2. Multi-token raw type → unsupported (parser limit)
-//  3. Array marker → arrayBinding
-//  4. pgtype family → mapPgtypeFamily
-//  5. Native family → mapNativeFamily
-//  6. Otherwise → unsupported (likely CREATE TYPE user-defined ENUM)
+//  2. Array marker → arrayBinding
+//  3. pgtype family → mapPgtypeFamily
+//  4. Native family → mapNativeFamily
+//  5. Otherwise → unsupported (multi-word PG type not in the alias
+//     matrix, or a CREATE TYPE user-defined ENUM)
+//
+// Multi-word PostgreSQL type names are no longer rejected up-front —
+// parseRawType normalises recognised forms ("DOUBLE PRECISION" →
+// "FLOAT8", "TIMESTAMP WITH TIME ZONE" → "TIMESTAMPTZ") so they reach
+// the family matrices keyed by the single-token alias. Forms that do
+// not appear in pgHeadAliases fall through to the final
+// unsupportedBinding, which keeps D-11 firing on truly unknown heads.
 //
 // Extracted from MapPGType so each func stays inside the F1 line budget
 // and the priority ladder is testable independently.
@@ -21,8 +28,6 @@ func dispatchBinding(col ddl.Column, info rawTypeInfo, notNull bool, def string)
 	switch {
 	case len(col.CheckEnum) > 0:
 		return enumBinding(notNull, def)
-	case info.MultiToken:
-		return unsupportedBinding("multi-word PG type " + info.Head + " is not supported (use the single-token alias such as TIMESTAMPTZ instead of TIMESTAMP WITH TIME ZONE)")
 	case info.IsArray:
 		return arrayBinding(info.Head, def)
 	}
@@ -32,5 +37,5 @@ func dispatchBinding(col ddl.Column, info rawTypeInfo, notNull bool, def string)
 	if b, ok := mapNativeFamily(info.Head, notNull, def); ok {
 		return b
 	}
-	return unsupportedBinding("PG type " + info.Head + " is not recognised (likely a CREATE TYPE user-defined ENUM — not yet supported)")
+	return unsupportedBinding("PG type " + info.Head + " is not recognised (likely a CREATE TYPE user-defined ENUM, or a multi-word PG type without a registered single-token alias)")
 }

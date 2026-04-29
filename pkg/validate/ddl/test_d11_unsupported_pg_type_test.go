@@ -25,11 +25,19 @@ func TestD11UnsupportedPgType(t *testing.T) {
 			want: 0,
 		},
 		{
-			name: "double precision rejected",
+			// DOUBLE PRECISION and TIMESTAMP WITH TIME ZONE are now
+			// recognised via the alias matrix (FLOAT8 / TIMESTAMPTZ),
+			// so they no longer fire D-11. The remaining unsupported
+			// multi-word forms are TIME WITH/WITHOUT TIME ZONE and
+			// BIT VARYING — none yet have a registered Go binding.
+			name: "double precision now supported (zero diags)",
 			columns: map[string]ddl.Column{
-				"score": {Name: "score", RawType: "DOUBLE PRECISION", NotNull: true},
+				"score":     {Name: "score", RawType: "DOUBLE PRECISION", NotNull: true},
+				"occurred":  {Name: "occurred", RawType: "TIMESTAMP WITH TIME ZONE", NotNull: true},
+				"naive":     {Name: "naive", RawType: "TIMESTAMP WITHOUT TIME ZONE", NotNull: true},
+				"long_name": {Name: "long_name", RawType: "CHARACTER VARYING(255)", NotNull: true},
 			},
-			want: 1,
+			want: 0,
 		},
 		{
 			name: "user-defined enum rejected",
@@ -39,10 +47,10 @@ func TestD11UnsupportedPgType(t *testing.T) {
 			want: 1,
 		},
 		{
-			name: "two unsupported produce two diags",
+			name: "time with tz / bit varying remain unsupported (two diags)",
 			columns: map[string]ddl.Column{
-				"a": {Name: "a", RawType: "DOUBLE PRECISION", NotNull: true},
-				"b": {Name: "b", RawType: "TIMESTAMP WITH TIME ZONE", NotNull: true},
+				"clock": {Name: "clock", RawType: "TIME WITH TIME ZONE", NotNull: true},
+				"flags": {Name: "flags", RawType: "BIT VARYING(8)", NotNull: true},
 			},
 			want: 2,
 		},

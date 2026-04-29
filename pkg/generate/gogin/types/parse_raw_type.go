@@ -3,10 +3,22 @@
 
 package types
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/park-jun-woo/yongol/pkg/parser/ddl"
+)
 
 // parseRawType splits Column.RawType into family head, parameter list,
 // and array marker. The result is consumed by the dispatcher in types.go.
+//
+// Multi-word PostgreSQL type names (e.g. "DOUBLE PRECISION",
+// "TIMESTAMP WITH TIME ZONE") are normalised to their canonical
+// single-token alias ("FLOAT8", "TIMESTAMPTZ") via
+// ddl.NormalizePGTypeHead so the downstream family matrices
+// (floatHeads / pgtype_timestamp / stringHeads etc.) can stay keyed by
+// the single-token form. MultiToken is retained as an informational
+// flag for diagnostics; dispatch no longer routes on it.
 func parseRawType(raw string) rawTypeInfo {
 	t := strings.TrimSpace(raw)
 	info := rawTypeInfo{}
@@ -19,9 +31,9 @@ func parseRawType(raw string) rawTypeInfo {
 		t = strings.TrimSpace(t[:idx])
 	}
 	upper := strings.ToUpper(t)
-	info.Head = upper
 	if strings.Contains(upper, " ") {
 		info.MultiToken = true
 	}
+	info.Head = ddl.NormalizePGTypeHead(upper)
 	return info
 }

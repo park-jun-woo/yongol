@@ -24,10 +24,13 @@ import (
 // shape per family.
 func GoTypeOf(col ddl.Column) string {
 	t := col.RawType
+	if strings.HasSuffix(strings.TrimSpace(t), "[]") {
+		t = strings.TrimSpace(strings.TrimSuffix(strings.TrimSpace(t), "[]"))
+	}
 	if idx := strings.Index(t, "("); idx > 0 {
 		t = t[:idx]
 	}
-	t = strings.TrimSpace(strings.ToUpper(t))
+	t = ddl.NormalizePGTypeHead(t)
 	switch t {
 	case "BIGINT", "BIGSERIAL", "INTEGER", "SERIAL", "INT",
 		"INT2", "INT4", "INT8", "SMALLINT", "SMALLSERIAL":
@@ -38,7 +41,7 @@ func GoTypeOf(col ddl.Column) string {
 		return "bool"
 	case "TIMESTAMPTZ", "TIMESTAMP", "DATE":
 		return "time.Time"
-	case "NUMERIC", "DECIMAL", "REAL", "FLOAT", "DOUBLE",
+	case "NUMERIC", "DECIMAL", "REAL", "FLOAT",
 		"FLOAT4", "FLOAT8":
 		return "float64"
 	case "JSONB", "JSON":
