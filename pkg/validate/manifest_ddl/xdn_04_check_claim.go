@@ -1,4 +1,4 @@
-//ff:func feature=validate type=util control=selection topic=manifest-infra
+//ff:func feature=validate type=util control=sequence topic=manifest-infra
 //ff:what xdn04CheckClaim — 단일 claim 의 Go 타입↔컬럼 Go 타입 정합 검사 (mismatch 시 1건 diag)
 
 package manifest_ddl
