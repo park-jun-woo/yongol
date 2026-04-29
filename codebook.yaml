@@ -114,7 +114,7 @@ optional:
     authz-check: "SSaC @auth 입력 ↔ authz CheckRequest 필드"
     sensitive: "DDL 컬럼 민감 패턴 감지"
     # --- pkg/validate per-SSOT structural topics ---
-    manifest-structural: "manifest.yaml 로드 및 최소 스키마 검증 (C-*)"
+    manifest-structural: "manifest.yaml 로드 및 최소 스키마 검증 (C-*) — C-6 은 backend.auth 필수 강제 (yongol = backend = auth)"
     openapi-structural: "OpenAPI 문서 구조 + x-확장 의미 검증 (O-*, XOO-*)"
     ddl-structural: "DDL 구조 검증 + 민감 패턴 주석 (D-*, XDD-*)"
     ssac-structural: "SSaC 필수 필드/변수 흐름/@subscribe 제약/pub-sub 쌍 (S-*, XSS-*)"

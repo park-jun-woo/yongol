@@ -36,7 +36,9 @@ frontend:
 
 ## Required Fields
 
-`apiVersion` (`yongol/v1`), `kind` (`Project`), `metadata.name`, `backend.module`.
+`apiVersion` (`yongol/v1`), `kind` (`Project`), `metadata.name`, `backend.module`, `backend.auth`.
+
+`backend.auth` itself is required (**C-6**) — yongol targets SaaS / business backends and does not support auth-free dynamic backends. Public dynamic content belongs on a static site generator + CDN (Hugo / Jekyll / Next.js SSG) instead. When the field is missing or nil, `yongol validate` rejects the project before any code is generated.
 
 When `backend.auth` is declared: `type: jwt`, `claims` (at least one). `ID` and `Role` claims are required because `@auth` templates reference `currentUser.ID` / `currentUser.Role`.
 

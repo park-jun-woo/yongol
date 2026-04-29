@@ -135,6 +135,7 @@ SSaC self-consistency — required fields, variable flow, model references, @sub
 | C-3 | ERROR | `kind` must be `Project` | `pkg/validate/manifest/c_03_kind.go` |
 | C-4 | ERROR | `metadata.name` is required (empty value forbidden) | `pkg/validate/manifest/c_04_metadata_name.go` |
 | C-5 | ERROR | `backend.module` is required (empty value forbidden) | `pkg/validate/manifest/c_05_backend_module.go` |
+| C-6 | ERROR | `backend.auth` is required — yongol does not support auth-free backends (use a static site generator + CDN for public dynamic content) | `pkg/validate/manifest/c_06_backend_auth_required.go` |
 | CORS-01 | ERROR | `allow_origins=["*"]` combined with `allow_credentials=true` is forbidden | `pkg/validate/manifest/cors_01_wildcard_credentials.go` |
 | OBS-001 | ERROR | `backend.observability.metrics.path` must be an absolute path starting with `/` | `pkg/validate/manifest/obs_01_metrics_path.go` |
 | OBS-002 | ERROR | `backend.observability.metrics.path` must not collide with an OpenAPI path | `pkg/validate/manifest/obs_02_metrics_path_not_openapi.go` |

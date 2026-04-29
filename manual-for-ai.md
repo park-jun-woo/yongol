@@ -71,6 +71,11 @@ Claim types: `string` (default), `int64`, `bool`. The generated `@auth`
 middleware uses `currentUser.ID` and `currentUser.Role`; both field names must
 exist.
 
+`backend.auth` is **mandatory** in every yongol project (**C-6**) — yongol
+targets SaaS / business backends and does not support auth-free dynamic
+backends. Use a static site generator + CDN (Hugo / Jekyll / Next.js SSG)
+for public dynamic content instead.
+
 `backend.auth.user_table` names the DDL table (e.g. `users`,
 `accounts`, `members`) backing the JWT claims. `yongol validate`
 enforces (`XDN-01~04`) that the field is present whenever auth is
