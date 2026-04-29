@@ -24,13 +24,11 @@ func q18PgtypeIntervalOverride(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			"    nullable: false\n" +
 			"    go_type:\n" +
 			"      import: \"github.com/jackc/pgx/v5/pgtype\"\n" +
-			"      package: \"pgtype\"\n" +
 			"      type: \"Interval\"\n" +
 			"  - db_type: \"interval\"\n" +
 			"    nullable: true\n" +
 			"    go_type:\n" +
 			"      import: \"github.com/jackc/pgx/v5/pgtype\"\n" +
-			"      package: \"pgtype\"\n" +
 			"      type: \"Interval\"\n",
 	})
 }

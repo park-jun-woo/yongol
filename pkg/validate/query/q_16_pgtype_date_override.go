@@ -23,13 +23,11 @@ func q16PgtypeDateOverride(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			"    nullable: false\n" +
 			"    go_type:\n" +
 			"      import: \"github.com/jackc/pgx/v5/pgtype\"\n" +
-			"      package: \"pgtype\"\n" +
 			"      type: \"Date\"\n" +
 			"  - db_type: \"date\"\n" +
 			"    nullable: true\n" +
 			"    go_type:\n" +
 			"      import: \"github.com/jackc/pgx/v5/pgtype\"\n" +
-			"      package: \"pgtype\"\n" +
 			"      type: \"Date\"\n",
 	})
 }

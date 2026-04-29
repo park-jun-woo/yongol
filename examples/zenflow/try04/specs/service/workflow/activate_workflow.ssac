@@ -1,0 +1,15 @@
+package service
+
+import "github.com/park-jun-woo/ssac/pkg/auth"
+
+// @auth "ActivateWorkflow" "workflow" {ResourceID: request.id} "Forbidden"
+// @get Workflow workflow = Workflow.FindByID({ID: request.id})
+// @empty workflow "Workflow not found" 404
+// @get Organization org = Organization.FindByID({ID: workflow.OrgID})
+// @empty org "Organization not found" 404
+// @eval billing.IsZeroBalance({Balance: org.CreditsBalance}) "Insufficient credits" 402
+// @state workflow {Status: workflow.Status} "ActivateWorkflow" "Cannot activate workflow"
+// @put Workflow.UpdateStatus({ID: workflow.ID, Status: "active"})
+// @get Workflow updated = Workflow.FindByID({ID: workflow.ID})
+// @response { workflow: updated }
+func ActivateWorkflow() {}

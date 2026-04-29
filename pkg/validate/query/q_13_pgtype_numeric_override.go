@@ -25,13 +25,11 @@ func q13PgtypeNumericOverride(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			"    nullable: false\n" +
 			"    go_type:\n" +
 			"      import: \"github.com/jackc/pgx/v5/pgtype\"\n" +
-			"      package: \"pgtype\"\n" +
 			"      type: \"Numeric\"\n" +
 			"  - db_type: \"numeric\"\n" +
 			"    nullable: true\n" +
 			"    go_type:\n" +
 			"      import: \"github.com/jackc/pgx/v5/pgtype\"\n" +
-			"      package: \"pgtype\"\n" +
 			"      type: \"Numeric\"\n" +
 			"NUMERIC / DECIMAL have no Go native type — yongol routes them through pgNumericToString in the convert layer.",
 	})

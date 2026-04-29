@@ -1,0 +1,337 @@
+openapi: "3.0.3"
+info:
+  title: ZenFlow API
+  version: "1.0.0"
+  description: Multi-tenant workflow automation SaaS API
+
+servers:
+  - url: http://localhost:8080
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Organization:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        plan_type:
+          type: string
+          enum: [free, pro, enterprise]
+        credits_balance:
+          type: integer
+          format: int64
+      required:
+        - id
+        - name
+        - plan_type
+        - credits_balance
+
+    Workflow:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        org_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        trigger_event:
+          type: string
+        status:
+          type: string
+          enum: [draft, active, paused, archived]
+        created_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - org_id
+        - title
+        - trigger_event
+        - status
+        - created_at
+
+    ExecutionLog:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        workflow_id:
+          type: string
+          format: uuid
+        org_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+        credits_spent:
+          type: integer
+          format: int64
+        executed_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - workflow_id
+        - org_id
+        - status
+        - credits_spent
+        - executed_at
+
+security:
+  - bearerAuth: []
+
+paths:
+  /auth/login:
+    post:
+      operationId: Login
+      summary: Authenticate user and obtain JWT
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 8
+              required:
+                - email
+                - password
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                required:
+                  - access_token
+        "401":
+          description: Invalid credentials
+        "500":
+          description: Internal server error
+
+  /workflows:
+    get:
+      operationId: ListWorkflows
+      summary: List workflows for current organization
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            format: int64
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Workflow list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Workflow"
+                  total:
+                    type: integer
+                    format: int64
+                required:
+                  - items
+                  - total
+        "403":
+          description: Forbidden
+
+    post:
+      operationId: CreateWorkflow
+      summary: Create a new workflow
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                trigger_event:
+                  type: string
+              required:
+                - title
+                - trigger_event
+      responses:
+        "201":
+          description: Workflow created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workflow:
+                    $ref: "#/components/schemas/Workflow"
+                required:
+                  - workflow
+        "403":
+          description: Forbidden
+
+  /workflows/{id}/activate:
+    post:
+      operationId: ActivateWorkflow
+      summary: Activate a workflow (draft→active or paused→active)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Workflow activated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workflow:
+                    $ref: "#/components/schemas/Workflow"
+                required:
+                  - workflow
+        "402":
+          description: Payment Required - insufficient credits
+        "403":
+          description: Forbidden
+        "404":
+          description: Workflow not found
+        "409":
+          description: Invalid state transition
+
+  /workflows/{id}/pause:
+    post:
+      operationId: PauseWorkflow
+      summary: Pause an active workflow
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Workflow paused
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workflow:
+                    $ref: "#/components/schemas/Workflow"
+                required:
+                  - workflow
+        "403":
+          description: Forbidden
+        "404":
+          description: Workflow not found
+        "409":
+          description: Invalid state transition
+
+  /workflows/{id}/archive:
+    post:
+      operationId: ArchiveWorkflow
+      summary: Archive an active workflow
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Workflow archived
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workflow:
+                    $ref: "#/components/schemas/Workflow"
+                required:
+                  - workflow
+        "403":
+          description: Forbidden
+        "404":
+          description: Workflow not found
+        "409":
+          description: Invalid state transition
+
+  /workflows/{id}/execute:
+    post:
+      operationId: ExecuteWorkflow
+      summary: Execute a workflow
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Workflow executed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  log:
+                    $ref: "#/components/schemas/ExecutionLog"
+                required:
+                  - log
+        "403":
+          description: Forbidden
+        "404":
+          description: Workflow not found
+        "409":
+          description: Workflow not active
+        "500":
+          description: Internal server error

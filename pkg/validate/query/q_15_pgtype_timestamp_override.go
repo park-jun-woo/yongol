@@ -23,13 +23,11 @@ func q15PgtypeTimestampOverride(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			"    nullable: false\n" +
 			"    go_type:\n" +
 			"      import: \"github.com/jackc/pgx/v5/pgtype\"\n" +
-			"      package: \"pgtype\"\n" +
 			"      type: \"Timestamp\"\n" +
 			"  - db_type: \"timestamp\"\n" +
 			"    nullable: true\n" +
 			"    go_type:\n" +
 			"      import: \"github.com/jackc/pgx/v5/pgtype\"\n" +
-			"      package: \"pgtype\"\n" +
 			"      type: \"Timestamp\"\n",
 	})
 }

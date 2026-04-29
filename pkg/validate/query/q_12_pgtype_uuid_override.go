@@ -31,13 +31,11 @@ func q12PgtypeUuidOverride(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			"    nullable: false\n" +
 			"    go_type:\n" +
 			"      import: \"github.com/jackc/pgx/v5/pgtype\"\n" +
-			"      package: \"pgtype\"\n" +
 			"      type: \"UUID\"\n" +
 			"  - db_type: \"uuid\"\n" +
 			"    nullable: true\n" +
 			"    go_type:\n" +
 			"      import: \"github.com/jackc/pgx/v5/pgtype\"\n" +
-			"      package: \"pgtype\"\n" +
 			"      type: \"UUID\"\n" +
 			"PostgreSQL types without a Go native equivalent (UUID, NUMERIC, JSONB, INET, INTERVAL) require explicit pgtype overrides in sqlc.yaml.",
 	})

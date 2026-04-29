@@ -23,13 +23,11 @@ func q17PgtypeInetOverride(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			"    nullable: false\n" +
 			"    go_type:\n" +
 			"      import: \"github.com/jackc/pgx/v5/pgtype\"\n" +
-			"      package: \"pgtype\"\n" +
 			"      type: \"Inet\"\n" +
 			"  - db_type: \"inet\"\n" +
 			"    nullable: true\n" +
 			"    go_type:\n" +
 			"      import: \"github.com/jackc/pgx/v5/pgtype\"\n" +
-			"      package: \"pgtype\"\n" +
 			"      type: \"Inet\"\n" +
 			"yongol routes INET / CIDR through pgInetToString in the convert layer.",
 	})
