@@ -41,8 +41,19 @@ func generateUserClaim(artifactsDir string, fields []ClaimField) error {
 	}
 
 	var lines []string
+	hasUUID := false
 	for _, f := range fields {
-		lines = append(lines, fmt.Sprintf("\t%s %s `json:%q`", f.Name, f.GoType, f.Key))
+		goType := f.GoType
+		if goType == "uuid" {
+			goType = "pgtype.UUID"
+			hasUUID = true
+		}
+		lines = append(lines, fmt.Sprintf("\t%s %s `json:%q`", f.Name, goType, f.Key))
+	}
+
+	importBlock := ""
+	if hasUUID {
+		importBlock = "\nimport \"github.com/jackc/pgx/v5/pgtype\"\n"
 	}
 
 	header := ffannot.EmitAnnotationBlock(ffannot.Block{
@@ -50,7 +61,7 @@ func generateUserClaim(artifactsDir string, fields []ClaimField) error {
 		What: "UserClaim — JWT 인증 claim struct (manifest.backend.auth.claims 기반)",
 	})
 	src := header + fmt.Sprintf(`package model
-
+%s
 // UserClaim carries the typed JWT claim fields for this project. It is both
 // the payload passed to ssac/pkg/auth.IssueToken / RefreshToken via the
 // Claims any passthrough (the shared runtime JSON-marshals the struct into
@@ -60,7 +71,7 @@ func generateUserClaim(artifactsDir string, fields []ClaimField) error {
 type UserClaim struct {
 %s
 }
-`, strings.Join(lines, "\n"))
+`, importBlock, strings.Join(lines, "\n"))
 
 	return os.WriteFile(filepath.Join(dir, "user_claim.go"), []byte(src), 0o644)
 }
