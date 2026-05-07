@@ -14,7 +14,7 @@ import (
 
 // generateServerGo writes internal/service/server.go containing only the
 // Server struct (the StrictServerInterface receiver). Pointer and deref
-// helpers (strPtr, ptrOf, derefInt, derefStr, derefInt64, derefBool,
+// helpers (ptrOf, derefInt, derefStr, derefInt64, derefBool,
 // derefEnum) are emitted as sibling 1-file-1-func files via
 // generateServerHelpers so filefunc F1 passes on the service surface.
 //

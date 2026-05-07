@@ -18,11 +18,6 @@ type helperSpec struct {
 func helperSpecs() []helperSpec {
 	return []helperSpec{
 		{
-			file: "str_ptr.go",
-			what: "strPtr — wraps a string literal into *string",
-			code: "func strPtr(s string) *string { return &s }\n",
-		},
-		{
 			file: "ptr_of.go",
 			what: "ptrOf — wraps an arbitrary value T into *T (generic helper)",
 			code: "func ptrOf[T any](v T) *T { return &v }\n",

@@ -20,7 +20,16 @@ func (g *methodGen) buildAuth(seq ssacparser.Sequence) ([]string, []string) {
 	if msg == "" {
 		msg = neutralMessage(status)
 	}
-	extraFields := g.mapFields(seq.Inputs)
+
+	// Separate ResourceID from the rest of Inputs — it needs special
+	// stringification for authz.CheckRequest.ResourceID (string).
+	filtered := make(map[string]string, len(seq.Inputs))
+	for k, v := range seq.Inputs {
+		if k != "ResourceID" {
+			filtered[k] = v
+		}
+	}
+	extraFields := g.mapFields(filtered)
 
 	// `assign` selects := vs = for the final authz.Check call. When the
 	// ownership branch below runs it re-evaluates assignOp after emitting
@@ -48,6 +57,21 @@ func (g *methodGen) buildAuth(seq ssacparser.Sequence) ([]string, []string) {
 	if extraFields != "" {
 		checkFields = append(checkFields, extraFields)
 	}
+
+	// Emit ResourceID with explicit string conversion based on PK type.
+	rawRID, hasRID := seq.Inputs["ResourceID"]
+	if hasRID && !isResourceIDZero(rawRID) {
+		ridExpr := g.mapValue(rawRID)
+		pkCol := g.lookupResourcePKColumn(seq.Resource)
+		if pkCol != nil && isUUIDColumn(pkCol) {
+			checkFields = append(checkFields, "ResourceID: pgtypex.UUIDToString(pgtypex.ToPgUUID("+ridExpr+"))")
+			imports = append(imports, `"github.com/park-jun-woo/ssac/pkg/pgtypex"`)
+		} else {
+			checkFields = append(checkFields, "ResourceID: strconv.FormatInt("+ridExpr+", 10)")
+			imports = append(imports, `"strconv"`)
+		}
+	}
+
 	checkFields = append(checkFields, "Owners: "+ownersExpr)
 
 	lines := ownerLines
@@ -55,7 +79,7 @@ func (g *methodGen) buildAuth(seq ssacparser.Sequence) ([]string, []string) {
 		fmt.Sprintf("_, err %s authz.Check(authz.CheckRequest{%s})", assign, strings.Join(checkFields, ", ")),
 		"if err != nil {",
 		fmt.Sprintf("\t%s(\"handler: %s\", \"op\", %q, \"status\", %d, \"err\", err)", logLevelFuncForStatus(status), logTagForStatus(status), g.FuncName, status),
-		fmt.Sprintf("\treturn api.%s%dJSONResponse{Error: %q, Code: strPtr(%q)}, nil", g.FuncName, status, msg, neutralCode(status)),
+		fmt.Sprintf("\treturn api.%s%dJSONResponse{Error: %q, Code: %q}, nil", g.FuncName, status, msg, neutralCode(status)),
 		"}",
 	)
 	return lines, imports

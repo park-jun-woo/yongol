@@ -23,7 +23,7 @@ func (g *methodGen) buildExists(seq ssacparser.Sequence) ([]string, []string) {
 	lines := []string{
 		fmt.Sprintf("if %s {", guard),
 		fmt.Sprintf("\t%s(\"handler: %s\", \"op\", %q, \"status\", %d)", logLevelFuncForStatus(status), logTagForStatus(status), g.FuncName, status),
-		fmt.Sprintf("\treturn api.%s%dJSONResponse{Error: %q, Code: strPtr(%q)}, nil", g.FuncName, status, msg, neutralCode(status)),
+		fmt.Sprintf("\treturn api.%s%dJSONResponse{Error: %q, Code: %q}, nil", g.FuncName, status, msg, neutralCode(status)),
 		"}",
 	}
 	return lines, imports

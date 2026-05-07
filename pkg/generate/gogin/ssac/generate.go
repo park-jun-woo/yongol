@@ -13,7 +13,7 @@ import (
 
 // Generate produces all service-layer artifacts from SSaC:
 //   - internal/service/server.go (Server struct only)
-//   - internal/service/{str_ptr,ptr_of,deref_*}.go (pointer helpers, 1 file 1 func)
+//   - internal/service/{ptr_of,deref_*}.go (pointer helpers, 1 file 1 func)
 //   - internal/service/convert_<name>.go / convert_<name>_list.go per 200-response schema
 //   - internal/service/<func_name>.go per SSaC function (StrictServerInterface method)
 //   - Subscribe methods (not part of StrictServerInterface, registered via queue.Subscribe)

@@ -20,7 +20,8 @@ func (g *methodGen) sqlcArgsMulti(method string, inputs map[string]string) (prea
 		}
 		rendered := g.mapValue(v)
 		rendered = g.wrapJSONBLiteral(k, rendered)
-		rendered, extraImports := g.wrapInsertExpr(k, rendered)
+		alreadyPgtype := !strings.HasPrefix(v, "request.") && !strings.HasPrefix(v, `"`)
+		rendered, extraImports := g.wrapInsertExpr(k, rendered, alreadyPgtype)
 		imports = append(imports, extraImports...)
 		fields = append(fields, k+": "+rendered)
 	}

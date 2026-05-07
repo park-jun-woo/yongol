@@ -33,7 +33,7 @@ func (g *methodGen) buildState(seq ssacparser.Sequence) ([]string, []string) {
 	lines := []string{
 		fmt.Sprintf("if !statemachine.%sCanTransition(%s, %q) {", sym, inputField, seq.Transition),
 		fmt.Sprintf("\t%s(\"handler: %s\", \"op\", %q, \"status\", %d)", logLevelFuncForStatus(status), logTagForStatus(status), g.FuncName, status),
-		fmt.Sprintf("\treturn api.%s%dJSONResponse{Error: %q, Code: strPtr(%q)}, nil", g.FuncName, status, msg, neutralCode(status)),
+		fmt.Sprintf("\treturn api.%s%dJSONResponse{Error: %q, Code: %q}, nil", g.FuncName, status, msg, neutralCode(status)),
 		"}",
 	}
 	return lines, []string{fmt.Sprintf(`"%s/internal/statemachine"`, g.ModulePath), `"log/slog"`}

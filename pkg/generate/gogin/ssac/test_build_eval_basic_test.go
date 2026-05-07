@@ -26,7 +26,7 @@ func TestBuildEvalBasic(t *testing.T) {
 	if !strings.Contains(body, "if billing.IsZeroBalance(billing.IsZeroBalanceRequest{Balance: org.CreditsBalance})") {
 		t.Fatalf("expected predicate call header, got:\n%s", body)
 	}
-	if !strings.Contains(body, `return api.ChargeOrder402JSONResponse{Error: "Insufficient credits", Code: strPtr("payment_required")}, nil`) {
+	if !strings.Contains(body, `return api.ChargeOrder402JSONResponse{Error: "Insufficient credits", Code: "payment_required"}, nil`) {
 		t.Fatalf("expected 402 JSONResponse return with explicit message, got:\n%s", body)
 	}
 	if !strings.Contains(body, `slog.Warn("handler: 4xx", "op", "ChargeOrder", "status", 402)`) {

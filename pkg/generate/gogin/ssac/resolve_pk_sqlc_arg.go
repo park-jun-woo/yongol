@@ -11,10 +11,11 @@ import (
 )
 
 // resolvePKSqlcArg wraps ridExpr with InsertExpr from the PK column binding
-// and collects pgtypex-related imports. Returns the (possibly wrapped)
-// expression and any additional imports.
-func resolvePKSqlcArg(pkCol *ddl.Column, ridExpr string) (string, []string) {
-	if pkCol == nil {
+// and collects pgtypex-related imports. alreadyPgtype skips wrapping when the
+// expression is already a pgtype value (e.g. row field from a previous step).
+// Returns the (possibly wrapped) expression and any additional imports.
+func resolvePKSqlcArg(pkCol *ddl.Column, ridExpr string, alreadyPgtype bool) (string, []string) {
+	if pkCol == nil || alreadyPgtype {
 		return ridExpr, nil
 	}
 	binding := types.MapPGType(*pkCol)

@@ -5,6 +5,7 @@ package ssac
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/park-jun-woo/yongol/pkg/parser/rego"
 	ssacparser "github.com/park-jun-woo/yongol/pkg/parser/ssac"
@@ -35,20 +36,25 @@ func (g *methodGen) ownershipLookup(seq ssacparser.Sequence, mapping *rego.Owner
 	}
 
 	pkCol := g.lookupResourcePKColumn(mapping.Resource)
-	sqlcArg, imports := resolvePKSqlcArg(pkCol, ridExpr)
+	alreadyPgtype := !strings.HasPrefix(rawRID, "request.")
+	sqlcArg, imports := resolvePKSqlcArg(pkCol, ridExpr, alreadyPgtype)
 
 	ownerAssign := g.assignOp(true)
 	lines := []string{
 		fmt.Sprintf("%s, err %s %s.%s(ctx, %s)", ownerVar, ownerAssign, queriesRecv, queryName, sqlcArg),
 		"if err != nil {",
 		fmt.Sprintf("\t%s(\"handler: %s\", \"op\", %q, \"status\", %d, \"err\", err)", logLevelFuncForStatus(status), logTagForStatus(status), g.FuncName, status),
-		fmt.Sprintf("\treturn api.%s%dJSONResponse{Error: %q, Code: strPtr(%q)}, nil", g.FuncName, status, msg, neutralCode(status)),
+		fmt.Sprintf("\treturn api.%s%dJSONResponse{Error: %q, Code: %q}, nil", g.FuncName, status, msg, neutralCode(status)),
 		"}",
 	}
 
 	ownerKeyExpr := "fmt.Sprint(" + ridExpr + ")"
 	if pkCol != nil && isUUIDColumn(pkCol) {
-		ownerKeyExpr = "pgtypex.UUIDToString(" + ridExpr + ")"
+		if alreadyPgtype {
+			ownerKeyExpr = "pgtypex.UUIDToString(" + ridExpr + ")"
+		} else {
+			ownerKeyExpr = "pgtypex.UUIDToString(pgtypex.ToPgUUID(" + ridExpr + "))"
+		}
 		imports = append(imports, `"github.com/park-jun-woo/ssac/pkg/pgtypex"`)
 	} else {
 		imports = append(imports, `"fmt"`)

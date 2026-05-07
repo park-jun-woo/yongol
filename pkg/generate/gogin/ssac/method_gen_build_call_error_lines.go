@@ -12,7 +12,7 @@ func (g *methodGen) buildCallErrorLines(pkgName, callFunc, msg string, status in
 	} else {
 		lines = append(lines,
 			fmt.Sprintf("\t%s(\"handler: %s\", \"op\", %q, \"status\", %d, \"err\", err)", logLevelFuncForStatus(status), logTagForStatus(status), g.FuncName, status),
-			fmt.Sprintf("\treturn api.%s%dJSONResponse{Error: %q, Code: strPtr(%q)}, nil", g.FuncName, status, msg, neutralCode(status)),
+			fmt.Sprintf("\treturn api.%s%dJSONResponse{Error: %q, Code: %q}, nil", g.FuncName, status, msg, neutralCode(status)),
 		)
 	}
 	lines = append(lines, "}")

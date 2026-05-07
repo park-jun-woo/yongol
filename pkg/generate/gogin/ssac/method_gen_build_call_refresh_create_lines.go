@@ -22,7 +22,7 @@ func (g *methodGen) buildCallRefreshCreateLines(seq ssacparser.Sequence, varName
 	return []string{
 		fmt.Sprintf("if err := auth.CreateRefresh(ctx, %s.RefreshToken, %s, %s.ExpiresAt); err != nil {", varName, claimLit, varName),
 		fmt.Sprintf("\tslog.Error(\"handler: 5xx\", \"op\", %q, \"status\", 500, \"err\", err)", g.FuncName),
-		fmt.Sprintf("\treturn api.%s500JSONResponse{Error: %q, Code: strPtr(%q)}, nil", g.FuncName, neutralMessage(500), neutralCode(500)),
+		fmt.Sprintf("\treturn api.%s500JSONResponse{Error: %q, Code: %q}, nil", g.FuncName, neutralMessage(500), neutralCode(500)),
 		"}",
 	}
 }

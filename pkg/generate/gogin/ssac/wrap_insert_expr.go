@@ -14,9 +14,16 @@ import (
 // passthrough ("{var}"), returns rendered unchanged. When it contains a
 // bridge call (e.g. "pgtypex.ToPgUUID({var})"), expands the template.
 //
+// alreadyPgtype signals that the rendered value is already a pgtype struct
+// (e.g. a row field from a previous sqlc call). In that case InsertExpr is
+// skipped to avoid double-wrapping.
+//
 // Returns the wrapped expression and any additional imports needed
 // (quoted for writeMethodFile format).
-func (g *methodGen) wrapInsertExpr(inputKey, rendered string) (string, []string) {
+func (g *methodGen) wrapInsertExpr(inputKey, rendered string, alreadyPgtype bool) (string, []string) {
+	if alreadyPgtype {
+		return rendered, nil
+	}
 	col := g.lookupSQLCMethodColumn(inputKey)
 	if col == nil {
 		return rendered, nil

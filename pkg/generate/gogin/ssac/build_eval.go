@@ -14,7 +14,7 @@ import (
 //
 //	if pkg.Func(pkg.FuncRequest{Field: source}) {
 //	    slog.<lvl>("handler: <tag>", "op", "<funcName>", "status", <code>)
-//	    return api.<Op><Code>JSONResponse{Error: "<msg>", Code: strPtr("<code_name>")}, nil
+//	    return api.<Op><Code>JSONResponse{Error: "<msg>", Code: "<code_name>"}, nil
 //	}
 //
 // `true` triggers the guard (early-return) — the polarity contract documented
@@ -39,7 +39,7 @@ func (g *methodGen) buildEval(seq ssacparser.Sequence) ([]string, []string) {
 	lines := []string{
 		fmt.Sprintf("if %s.%s(%s.%sRequest{%s}) {", pkgName, callFunc, pkgName, callFunc, fields),
 		fmt.Sprintf("\t%s(\"handler: %s\", \"op\", %q, \"status\", %d)", logLevelFuncForStatus(status), logTagForStatus(status), g.FuncName, status),
-		fmt.Sprintf("\treturn api.%s%dJSONResponse{Error: %q, Code: strPtr(%q)}, nil", g.FuncName, status, msg, neutralCode(status)),
+		fmt.Sprintf("\treturn api.%s%dJSONResponse{Error: %q, Code: %q}, nil", g.FuncName, status, msg, neutralCode(status)),
 		"}",
 	}
 	imports := []string{`"log/slog"`}

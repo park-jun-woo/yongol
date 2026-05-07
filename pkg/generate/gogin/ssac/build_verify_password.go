@@ -29,14 +29,14 @@ import (
 //	        Password: request.Body.Password, PasswordHash: auth.DummyHash,
 //	    })
 //	    slog.Warn("handler: 4xx", "op", "Login", "status", 401, "reason", "user not found")
-//	    return api.Login401JSONResponse{Error: "Invalid credentials", Code: strPtr("unauthorized")}, nil
+//	    return api.Login401JSONResponse{Error: "Invalid credentials", Code: "unauthorized"}, nil
 //	}
 //	_, err = auth.VerifyPassword(auth.VerifyPasswordRequest{
 //	    Password: request.Body.Password, PasswordHash: user.PasswordHash,
 //	})
 //	if err != nil {
 //	    slog.Warn("handler: 4xx", "op", "Login", "status", 401, "err", err)
-//	    return api.Login401JSONResponse{Error: "Invalid credentials", Code: strPtr("unauthorized")}, nil
+//	    return api.Login401JSONResponse{Error: "Invalid credentials", Code: "unauthorized"}, nil
 //	}
 //
 // The caller marks subsequent sequences (`@call auth.IssueToken`, `@response ...`)
@@ -77,7 +77,7 @@ func (g *methodGen) buildVerifyPassword(seq ssacparser.Sequence) ([]string, []st
 		"\t\tPasswordHash: auth.DummyHash,",
 		"\t})",
 		fmt.Sprintf("\t%s(\"handler: %s\", \"op\", %q, \"status\", %d, \"reason\", \"user not found\")", logLevelFuncForStatus(status), logTagForStatus(status), g.FuncName, status),
-		fmt.Sprintf("\treturn api.%s%dJSONResponse{Error: %q, Code: strPtr(%q)}, nil", g.FuncName, status, msg, code),
+		fmt.Sprintf("\treturn api.%s%dJSONResponse{Error: %q, Code: %q}, nil", g.FuncName, status, msg, code),
 		"}",
 		// Real password check.
 		fmt.Sprintf("_, err = auth.VerifyPassword(auth.VerifyPasswordRequest{"),
@@ -86,7 +86,7 @@ func (g *methodGen) buildVerifyPassword(seq ssacparser.Sequence) ([]string, []st
 		"})",
 		"if err != nil {",
 		fmt.Sprintf("\t%s(\"handler: %s\", \"op\", %q, \"status\", %d, \"err\", err)", logLevelFuncForStatus(status), logTagForStatus(status), g.FuncName, status),
-		fmt.Sprintf("\treturn api.%s%dJSONResponse{Error: %q, Code: strPtr(%q)}, nil", g.FuncName, status, msg, code),
+		fmt.Sprintf("\treturn api.%s%dJSONResponse{Error: %q, Code: %q}, nil", g.FuncName, status, msg, code),
 		"}",
 	}
 

@@ -9,7 +9,7 @@ import (
 )
 
 // generateServerHelpers writes one file per pointer/deref helper used by
-// service methods: str_ptr.go, ptr_of.go, deref_int.go, deref_str.go,
+// service methods: ptr_of.go, deref_int.go, deref_str.go,
 // deref_int64.go, deref_bool.go, deref_enum.go. Each file carries a
 // complete //ff:func + //ff:what annotation so filefunc A1/A3/F1 pass
 // uniformly across the service package.
