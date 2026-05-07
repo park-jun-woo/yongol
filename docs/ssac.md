@@ -81,6 +81,15 @@ The right way to gate on a scalar value is a Func that returns `error`:
 error otherwise; SSaC's `@call` early-return mechanism handles the response
 status.
 
+### @call signature requirement (XFS-63)
+
+Every Func referenced by `@call` must have the canonical 2-value return
+signature `func FuncName(req T) (Response, error)`. A single `error` return
+(or any other shape) is rejected by XFS-63 — codegen unconditionally emits
+a 2-value assignment (`resp, err := ...`), so non-conforming signatures fail
+to compile. Side-effect-only funcs must still declare a (possibly empty)
+Response struct.
+
 ### @eval — predicate guard
 
 `@eval` is the dedicated **scalar predicate guard**. It calls a `bool`-returning

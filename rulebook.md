@@ -253,6 +253,7 @@ Cross-consistency between SSaC `@call` and Func spec (Request/Response).
 | XFS-44 | ERROR | `@call` Input type must be compatible with FuncRequest field type | `pkg/validate/ssac_func/xfs_44_call_input_type.go` |
 | XFS-45 | ERROR | `@result` is declared but Func has no Response | `pkg/validate/ssac_func/xfs_45_call_result_missing.go` |
 | XSF-46 | WARNING | Func has a Response but no `@result` is declared | `pkg/validate/ssac_func/xsf_46_call_result_ignored.go` |
+| XFS-63 | ERROR | `@call` Func signature must return `(Response, error)` | `pkg/validate/ssac_func/xfs_63_call_func_signature.go` |
 | XSF-62 | WARNING | Func spec must be used in SSaC (coverage) | `pkg/validate/ssac_func/xsf_62_func_spec_used.go` |
 
 ## I. SSaC ↔ StateMachine

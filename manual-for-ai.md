@@ -434,6 +434,8 @@ Custom `@call` implementations in `func/<pkg>/*.go`. Details:
 [`docs/func.md`](docs/func.md).
 
 - Fixed signature: `func FuncName(req FuncNameRequest) (FuncNameResponse, error)`.
+  `@call` targets must return exactly 2 values `(Response, error)` (XFS-63).
+  Single `error` return is rejected — use a Response struct even for side-effect-only funcs.
 - One `@func` per file. Annotations above the function:
   - `// @func camelCaseName` — must match the SSaC `@call` reference.
   - `// @error NNN` — default HTTP status on error. Priority: `.ssac`
