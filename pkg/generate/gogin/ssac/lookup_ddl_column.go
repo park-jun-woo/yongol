@@ -4,8 +4,6 @@
 package ssac
 
 import (
-	"strings"
-
 	"github.com/park-jun-woo/yongol/pkg/parser/ddl"
 )
 
@@ -25,7 +23,7 @@ func lookupDDLColumn(tables []ddl.Table, tableModelName, columnName string) *ddl
 	if tbl == nil {
 		return nil
 	}
-	lower := strings.ToLower(columnName)
+	lower := pascalToSnake(columnName)
 	c, ok := tbl.Columns[lower]
 	if !ok {
 		return nil
