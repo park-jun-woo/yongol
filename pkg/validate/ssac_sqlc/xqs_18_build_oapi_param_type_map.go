@@ -8,6 +8,8 @@ import (
 )
 
 // buildXqs18OAPIParamTypeMap returns param name → OpenAPI type string for an operation.
+// When format is present, it returns a more specific type (e.g. "int64", "float32", "uuid").
+// When format is absent, it returns the base type (e.g. "integer", "number", "string").
 func buildXqs18OAPIParamTypeMap(op *openapi3.Operation) map[string]string {
 	result := make(map[string]string)
 	for _, pRef := range op.Parameters {
@@ -22,7 +24,7 @@ func buildXqs18OAPIParamTypeMap(op *openapi3.Operation) map[string]string {
 		if types == nil || len(*types) == 0 {
 			continue
 		}
-		result[p.Name] = (*types)[0]
+		result[p.Name] = resolveOAPITypeWithFormat((*types)[0], p.Schema.Value.Format)
 	}
 	return result
 }
