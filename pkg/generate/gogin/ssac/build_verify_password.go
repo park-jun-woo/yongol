@@ -66,11 +66,14 @@ func (g *methodGen) buildVerifyPassword(seq ssacparser.Sequence) ([]string, []st
 	emailArg := g.mapValue(seq.EmailExpr)
 	passwordArg := g.mapValue(seq.PasswordExpr)
 
+	col := lookupDDLColumn(g.DDLTables, seq.Model, "id")
+	guard := zeroValueCheckWithCol(varName+".ID", col)
+
 	assign := g.assignOp(true) // binds a new variable
 	lines := []string{
 		fmt.Sprintf("%s, err %s %s.%s(ctx, %s)", varName, assign, g.queryVar(), findMethod, emailArg),
 		"if err != nil && !errors.Is(err, pgx.ErrNoRows) { return nil, err }",
-		fmt.Sprintf("if %s.ID == 0 {", varName),
+		fmt.Sprintf("if %s {", guard),
 		// Timing equaliser: still pay bcrypt cost on miss.
 		"\t_, _ = auth.VerifyPassword(auth.VerifyPasswordRequest{",
 		fmt.Sprintf("\t\tPassword:     %s,", passwordArg),
@@ -94,9 +97,8 @@ func (g *methodGen) buildVerifyPassword(seq ssacparser.Sequence) ([]string, []st
 		`"github.com/jackc/pgx/v5"`,
 		`"errors"`,
 		`"log/slog"`,
-		// Phase001 UserClaimUnification — auth is back on ssac/pkg/auth
-		// for all emission paths (the project-local reexport is gone).
 		`"github.com/park-jun-woo/ssac/pkg/auth"`,
 	}
+	imports = append(imports, pgtypexImportIfNeeded(col)...)
 	return lines, imports
 }
