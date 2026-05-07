@@ -25,7 +25,7 @@ backend:
     secret_env: JWT_SECRET
     user_table: users
     claims:
-      Email: email
+      Email: email:string
 frontend:
   lang: typescript
   framework: react

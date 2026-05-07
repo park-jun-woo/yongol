@@ -14,6 +14,7 @@ func parseRawClaims(rawClaims map[string]string, claimLines map[string]int) map[
 		def := ClaimDef{Key: parts[0], GoType: "string"}
 		if len(parts) == 2 && parts[1] != "" {
 			def.GoType = parts[1]
+			def.Typed = true
 		}
 		if claimLines != nil {
 			def.SourceLine = claimLines[field]

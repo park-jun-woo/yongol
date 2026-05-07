@@ -1,5 +1,5 @@
 //ff:func feature=validate type=test control=sequence topic=manifest-infra
-//ff:what TestIntegration_XDN04_Trip — claims.IsAdmin: is_admin:int64 인데 컬럼이 BOOLEAN → XDN-04
+//ff:what TestIntegration_XDN06_Trip — claims.IsAdmin: is_admin:int64 인데 컬럼이 BOOLEAN → XDN-06
 
 package manifest_ddl
 
@@ -13,7 +13,7 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
-func TestIntegration_XDN04_Trip(t *testing.T) {
+func TestIntegration_XDN06_Trip(t *testing.T) {
 	manifestBody := `apiVersion: yongol/v1
 kind: Project
 metadata:
@@ -45,9 +45,9 @@ frontend:
 	fs := &yongol.Fullstack{Manifest: cfg, DDLTables: tables, SpecsDir: root}
 	d := Run(fs)
 	if len(d) != 1 {
-		t.Fatalf("expected 1 diagnostic (XDN-04), got %d (%+v)", len(d), d)
+		t.Fatalf("expected 1 diagnostic (XDN-06), got %d (%+v)", len(d), d)
 	}
-	if !strings.Contains(d[0].Message, "[XDN-04]") {
-		t.Fatalf("expected XDN-04, got %s", d[0].Message)
+	if !strings.Contains(d[0].Message, "[XDN-06]") {
+		t.Fatalf("expected XDN-06, got %s", d[0].Message)
 	}
 }

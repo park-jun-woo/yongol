@@ -6,5 +6,6 @@ package manifest
 type ClaimDef struct {
 	Key        string // JWT claim key (e.g. "org_id")
 	GoType     string // Go type (e.g. "int64"), default "string"
+	Typed      bool   // true when user explicitly declared type via "col:type" syntax
 	SourceLine int    // 1-based line number of the claim entry in manifest.yaml (0 = unknown)
 }

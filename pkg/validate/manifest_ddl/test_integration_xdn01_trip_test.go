@@ -24,7 +24,7 @@ backend:
     type: jwt
     secret_env: JWT_SECRET
     claims:
-      Email: email
+      Email: email:string
 frontend:
   lang: typescript
   framework: react

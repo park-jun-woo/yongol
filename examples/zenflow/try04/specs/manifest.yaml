@@ -17,10 +17,10 @@ backend:
       - admin
       - member
     claims:
-      ID: id:string
-      Email: email
-      Role: role
-      OrgID: org_id
+      ID: id:uuid
+      Email: email:string
+      Role: role:string
+      OrgID: org_id:uuid
 frontend:
   lang: typescript
   framework: react

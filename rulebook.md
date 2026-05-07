@@ -332,7 +332,9 @@ Cross-consistency between `manifest.backend.auth` (user_table + claims mapping) 
 | XDN-01 | ERROR | `backend.auth.user_table` is required when auth is active (`auth.type != "none"`) | `pkg/validate/manifest_ddl/xdn_01_user_table_required.go` |
 | XDN-02 | ERROR | `backend.auth.user_table` must reference a table parsed from `db/*.sql` | `pkg/validate/manifest_ddl/xdn_02_user_table_exists.go` |
 | XDN-03 | ERROR | Each `backend.auth.claims.<Field>: <col>[:<type>]` mapping's column must exist on the user_table | `pkg/validate/manifest_ddl/xdn_03_claim_column_exists.go` |
-| XDN-04 | ERROR | Each claim's Go type (`int64` / `string` / `bool`, default `string`) must match the user_table column's DDL-derived Go type | `pkg/validate/manifest_ddl/xdn_04_claim_column_type.go` |
+| ~~XDN-04~~ | ~~ERROR~~ | ~~Each claim's Go type must match the user_table column's DDL-derived Go type~~ **(deprecated — superseded by XDN-06)** | `pkg/validate/manifest_ddl/xdn_04_claim_column_type.go` |
+| XDN-05 | ERROR | Each `backend.auth.claims.<Field>` value must use `<col>:<type>` format (type declaration required). Allowed types: `string`, `int64`, `int32`, `bool`, `uuid` | `pkg/validate/manifest_ddl/xdn_05_claim_type_required.go` |
+| XDN-06 | ERROR | Each claim's declared type must match the user_table column's DDL type per the compatibility matrix (uuid↔UUID, string↔TEXT/VARCHAR, int64↔BIGINT/INT8, int32↔INTEGER/INT/INT4, bool↔BOOLEAN/BOOL) | `pkg/validate/manifest_ddl/xdn_06_claim_ddl_type.go` |
 
 ## O. SSaC ↔ sqlc
 

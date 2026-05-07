@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=1 topic=manifest-infra
-//ff:what XDN-04 — claim Go 타입과 user_table 컬럼 DDL Go 타입 정합 검증
+//ff:what XDN-04 — [DEPRECATED: superseded by XDN-06] claim Go 타입과 user_table 컬럼 DDL Go 타입 정합 검증
 
 package manifest_ddl
 

@@ -1,5 +1,5 @@
 //ff:func feature=validate type=test control=sequence topic=manifest-infra
-//ff:what TestIntegration_Happy_ZeroDiags — manifest+users.sql 정합 시 4 규칙 모두 진단 0
+//ff:what TestIntegration_Happy_ZeroDiags — manifest+users.sql 정합 시 모든 규칙 진단 0
 
 package manifest_ddl
 
@@ -27,8 +27,8 @@ backend:
     user_table: users
     claims:
       ID: user_id:int64
-      Email: email
-      Role: role
+      Email: email:string
+      Role: role:string
 frontend:
   lang: typescript
   framework: react
