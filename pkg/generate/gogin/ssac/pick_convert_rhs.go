@@ -17,11 +17,11 @@ import (
 //
 // Phase001 (types/ unification) — when col != nil the row → model
 // expression is sourced from types.MapPGType(col).ConvertExpr expanded
-// with {row}=row, {field}=dbField. Pgtype unwrap (pgUUIDToString,
-// pgNumericToString, .Time) is encoded in the ConvertExpr template so
-// callers no longer maintain a parallel kind ladder. col == nil falls
-// back to the historic `row.<dbField>` direct-assign path used by api
-// wrappers without a backing DDL column.
+// with {row}=row, {field}=dbField. Pgtype unwrap (pgtypex.FromPg*)
+// is encoded in the ConvertExpr template so callers no longer maintain
+// a parallel kind ladder. col == nil falls back to the historic
+// `row.<dbField>` direct-assign path used by api wrappers without a
+// backing DDL column.
 func pickConvertRHS(jsonName, apiField, dbField string, isRequired bool, jsonbs []jsonbFieldAlias, apiCast string, col *ddl.Column) string {
 	if rhs, ok := jsonbConvertRHS(jsonName, isRequired, jsonbs); ok {
 		return rhs

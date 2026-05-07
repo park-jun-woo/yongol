@@ -48,6 +48,7 @@ func emitConvertFuncFile(
 	// response direction).
 	needsJSON := hasJSONBProperty(schema)
 	needsTypes := hasOpenAPITypesCast(schema)
+	needsPgtypex := hasPgtypexColumn(schema, ddlTables, name)
 	sb.WriteString("package service\n\nimport (\n")
 	if needsJSON {
 		sb.WriteString("\t\"encoding/json\"\n\n")
@@ -61,6 +62,9 @@ func emitConvertFuncFile(
 		// expressions compile against the same named types the api
 		// struct fields declare.
 		sb.WriteString("\n\topenapi_types \"github.com/oapi-codegen/runtime/types\"\n")
+	}
+	if needsPgtypex {
+		sb.WriteString("\t\"github.com/park-jun-woo/ssac/pkg/pgtypex\"\n")
 	}
 	sb.WriteString(")\n\n")
 	writeConvertFunc(&sb, name, schema, ddlTables)

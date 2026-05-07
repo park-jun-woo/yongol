@@ -19,9 +19,9 @@ func (g *methodGen) sqlcArgsMulti(method string, inputs map[string]string) (prea
 			continue
 		}
 		rendered := g.mapValue(v)
-		// BUG-037 #1 — string literal at a JSONB column requires
-		// []byte(...) wrap so sqlc params accept it.
 		rendered = g.wrapJSONBLiteral(k, rendered)
+		rendered, extraImports := g.wrapInsertExpr(k, rendered)
+		imports = append(imports, extraImports...)
 		fields = append(fields, k+": "+rendered)
 	}
 	sort.Strings(fields)

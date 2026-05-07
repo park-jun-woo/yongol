@@ -4,15 +4,15 @@
 package types
 
 // mapNativeFamily routes Integer / Float / String / Boolean head tokens
-// to their native bindings (or pointer variants for nullable). Returns
-// ok=false when head matches no native family — caller treats it as
-// unsupported.
+// to their native bindings (NOT NULL) or pgtype variants (nullable).
+// Returns ok=false when head matches no native family — caller treats it
+// as unsupported.
 func mapNativeFamily(head string, notNull bool, defaultLiteral string) (GoTypeBinding, bool) {
 	switch {
 	case isIntegerHead(head):
 		return nativeInteger(notNull, defaultLiteral), true
 	case isFloatHead(head):
-		return nativeFloat(notNull, defaultLiteral), true
+		return nativeFloatWithHead(head, notNull, defaultLiteral), true
 	case isStringHead(head):
 		return nativeString(notNull, defaultLiteral), true
 	case isBooleanHead(head):

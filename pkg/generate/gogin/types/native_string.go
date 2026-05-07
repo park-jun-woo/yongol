@@ -1,16 +1,14 @@
 //ff:func feature=gen-gogin type=util control=selection
-//ff:what nativeString — VARCHAR/TEXT/CHAR/BPCHAR 매핑 (NOT NULL → string, NULL → *string)
+//ff:what nativeString — VARCHAR/TEXT/CHAR/BPCHAR 매핑 (NOT NULL → string, NULL → pgtype.Text)
 
 package types
 
 // nativeString returns the binding for a string-family column. The
 // parameter list (e.g. "255" for VARCHAR(255)) is not encoded into the
 // binding itself; length validation lives in the OpenAPI / DDL layer.
+// sqlc pgx/v5 emits pgtype.Text for nullable text columns — pgtypex bridge.
 func nativeString(notNull bool, defaultLiteral string) GoTypeBinding {
-	switch notNull {
-	case false:
-		return pointerString(defaultLiteral)
-	default:
+	if notNull {
 		return GoTypeBinding{
 			SqlcGoType:     "string",
 			ApiField:       "string",
@@ -22,4 +20,5 @@ func nativeString(notNull bool, defaultLiteral string) GoTypeBinding {
 			Supported:      true,
 		}
 	}
+	return pgtypeText(defaultLiteral)
 }

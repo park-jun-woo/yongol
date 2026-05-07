@@ -52,6 +52,12 @@ type GoTypeBinding struct {
 	// primitive payload from any pgtype wrapper.
 	ResponseExpr string
 
+	// NilCheckExpr is the predicate template for nil/empty guards. The
+	// SSaC emit calls Expand(NilCheckExpr, "", "", varName) at @empty /
+	// @get-result-empty sites. Empty string means "use the language-native
+	// zero comparison" (string == "" / numeric == 0).
+	NilCheckExpr string
+
 	// DefaultLiteral is the emit-time literal used for NOT NULL DEFAULT
 	// columns when no caller value is supplied. Empty string means the
 	// caller must always provide a value.
