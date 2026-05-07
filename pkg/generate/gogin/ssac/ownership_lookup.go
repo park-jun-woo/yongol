@@ -5,10 +5,7 @@ package ssac
 
 import (
 	"fmt"
-	"strings"
 
-	"github.com/park-jun-woo/yongol/pkg/generate/gogin/types"
-	"github.com/park-jun-woo/yongol/pkg/parser/ddl"
 	"github.com/park-jun-woo/yongol/pkg/parser/rego"
 	ssacparser "github.com/park-jun-woo/yongol/pkg/parser/ssac"
 )
@@ -37,21 +34,8 @@ func (g *methodGen) ownershipLookup(seq ssacparser.Sequence, mapping *rego.Owner
 		queriesRecv = "server.Queries"
 	}
 
-	// Resolve PK column to apply InsertExpr wrap (UUID → pgtypex.ToPgUUID)
 	pkCol := g.lookupResourcePKColumn(mapping.Resource)
-	sqlcArg := ridExpr
-	var imports []string
-	if pkCol != nil {
-		binding := types.MapPGType(*pkCol)
-		if binding.InsertExpr != "" && binding.InsertExpr != "{var}" {
-			sqlcArg = types.Expand(binding.InsertExpr, "", "", ridExpr)
-			for _, imp := range binding.Imports {
-				if strings.Contains(imp, "pgtypex") {
-					imports = append(imports, `"`+imp+`"`)
-				}
-			}
-		}
-	}
+	sqlcArg, imports := resolvePKSqlcArg(pkCol, ridExpr)
 
 	ownerAssign := g.assignOp(true)
 	lines := []string{
@@ -62,7 +46,6 @@ func (g *methodGen) ownershipLookup(seq ssacparser.Sequence, mapping *rego.Owner
 		"}",
 	}
 
-	// Owners map key: UUID → pgtypex.UUIDToString, others → fmt.Sprint
 	ownerKeyExpr := "fmt.Sprint(" + ridExpr + ")"
 	if pkCol != nil && isUUIDColumn(pkCol) {
 		ownerKeyExpr = "pgtypex.UUIDToString(" + ridExpr + ")"
@@ -74,15 +57,4 @@ func (g *methodGen) ownershipLookup(seq ssacparser.Sequence, mapping *rego.Owner
 		"map[string]map[string]any{%q: {%s: %s}}",
 		mapping.Resource, ownerKeyExpr, ownerVar)
 	return lines, ownersExpr, imports
-}
-
-// lookupResourcePKColumn resolves the PK (id) column for a resource name.
-func (g *methodGen) lookupResourcePKColumn(resource string) *ddl.Column {
-	return lookupDDLColumn(g.DDLTables, pascalCase(resource), "id")
-}
-
-// isUUIDColumn returns true when the column resolves to a UUID binding.
-func isUUIDColumn(col *ddl.Column) bool {
-	binding := types.MapPGType(*col)
-	return binding.SqlcGoType == "pgtype.UUID"
 }

@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=selection
+//ff:func feature=gen-gogin type=util control=sequence
 //ff:what nativeString — VARCHAR/TEXT/CHAR/BPCHAR 매핑 (NOT NULL → string, NULL → pgtype.Text)
 
 package types

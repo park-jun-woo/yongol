@@ -20,14 +20,3 @@ func zeroValueCheckWithCol(target string, col *ddl.Column) string {
 	}
 	return target + " == 0"
 }
-
-// nonZeroCheckWithCol returns the non-zero predicate (negated nil-check).
-func nonZeroCheckWithCol(target string, col *ddl.Column) string {
-	if col != nil {
-		binding := types.MapPGType(*col)
-		if binding.NilCheckExpr != "" {
-			return "!" + types.Expand(binding.NilCheckExpr, "", "", target)
-		}
-	}
-	return target + " != 0"
-}

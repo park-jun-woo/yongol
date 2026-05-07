@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=selection
+//ff:func feature=gen-gogin type=util control=sequence
 //ff:what nativeBoolean — BOOLEAN/BOOL 매핑 (NOT NULL → bool, NULL → pgtype.Bool)
 
 package types

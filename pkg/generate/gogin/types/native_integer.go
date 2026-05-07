@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=selection
+//ff:func feature=gen-gogin type=util control=sequence
 //ff:what nativeInteger — BIGINT/INT/SMALLINT 계열 매핑 (NOT NULL → int64, NULL → pgtype.Int8)
 
 package types
