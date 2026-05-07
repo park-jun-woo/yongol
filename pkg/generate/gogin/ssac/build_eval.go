@@ -42,5 +42,7 @@ func (g *methodGen) buildEval(seq ssacparser.Sequence) ([]string, []string) {
 		fmt.Sprintf("\treturn api.%s%dJSONResponse{Error: %q, Code: strPtr(%q)}, nil", g.FuncName, status, msg, neutralCode(status)),
 		"}",
 	}
-	return lines, []string{`"log/slog"`}
+	imports := []string{`"log/slog"`}
+	imports = append(imports, g.buildEvalImports(seq)...)
+	return lines, imports
 }
