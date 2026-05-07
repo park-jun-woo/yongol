@@ -1,3 +1,8 @@
+-- name: UserFindByEmail :one
+-- +allow-sensitive
+SELECT * FROM users
+WHERE email = @email;
+
 -- name: LoginLookup :one
 SELECT id, password_hash, org_id, role FROM users WHERE email = @email;
 
