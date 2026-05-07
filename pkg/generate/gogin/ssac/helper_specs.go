@@ -28,6 +28,11 @@ func helperSpecs() []helperSpec {
 			code: "func derefInt(p *int) int32 { if p != nil { return int32(*p) }; return 0 }\n",
 		},
 		{
+			file: "deref_int32.go",
+			what: "derefInt32 — dereferences *int32 to int32 (nil→0)",
+			code: "func derefInt32(p *int32) int32 { if p != nil { return *p }; return 0 }\n",
+		},
+		{
 			file: "deref_str.go",
 			what: "derefStr — dereferences *string to string (nil→\"\")",
 			code: "func derefStr(p *string) string { if p != nil { return *p }; return \"\" }\n",

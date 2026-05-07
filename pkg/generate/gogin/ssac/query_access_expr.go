@@ -4,8 +4,9 @@
 package ssac
 
 // queryAccessExpr emits Go code that reads a query parameter from
-// request.Params, accounting for enum alias types (string(*p)), int64 format,
-// required vs optional. Enum accessors go through derefEnum to stay nil-safe.
+// request.Params, accounting for enum alias types (string(*p)), int32/int64
+// format, required vs optional. Enum accessors go through derefEnum to stay
+// nil-safe.
 func queryAccessExpr(qp queryParam, accessor string) string {
 	if qp.IsEnum {
 		if qp.IsRequired {
@@ -18,6 +19,8 @@ func queryAccessExpr(qp queryParam, accessor string) string {
 	switch qp.GoType {
 	case "integer":
 		return primitiveQueryAccess(qp.IsRequired, accessor, "derefInt")
+	case "integer32":
+		return primitiveQueryAccess(qp.IsRequired, accessor, "derefInt32")
 	case "integer64":
 		return primitiveQueryAccess(qp.IsRequired, accessor, "derefInt64")
 	case "string":

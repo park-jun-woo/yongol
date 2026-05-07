@@ -23,10 +23,9 @@ func buildQueryParam(p *openapi3.ParameterRef, operationId string) queryParam {
 	qp.IsNullable = schema.Nullable
 	if types := schema.Type; types != nil && len(*types) > 0 {
 		t := (*types)[0]
-		if t == "integer" && schema.Format == "int64" {
-			qp.GoType = "integer64"
-		} else {
-			qp.GoType = t
+		qp.GoType = t
+		if t == "integer" {
+			qp.GoType = integerGoType(schema.Format)
 		}
 	}
 	if len(schema.Enum) > 0 {

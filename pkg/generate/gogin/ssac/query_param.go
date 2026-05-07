@@ -8,7 +8,7 @@ package ssac
 // nullable markers). GoType is the normalized primitive name yongol uses
 // internally: "integer", "integer64", "string", "bool", etc.
 type queryParam struct {
-	GoType       string // "integer" | "integer64" | "string" | "bool"
+	GoType       string // "integer" | "integer32" | "integer64" | "string" | "bool"
 	IsEnum       bool
 	EnumTypeName string // oapi-codegen alias type name, e.g. "ListAuditLogsParamsSortBy"
 	IsRequired   bool
