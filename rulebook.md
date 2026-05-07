@@ -349,6 +349,7 @@ Validates that the names, case, and count of SSaC Input keys match sqlc Params e
 | XQS-18 | ERROR | OpenAPI param type must be compatible with the sqlc param Go type | `pkg/validate/ssac_sqlc/xqs_18_param_type_mismatch.go` |
 | XQS-19 | ERROR | SSaC call to a DB-using ssac built-in requires the corresponding sqlc query (per ssac `interface.yaml`) | `pkg/validate/ssac_sqlc/xqs_19_ssac_builtin_query_required.go` |
 | XQS-20 | ERROR | SSaC declared return type must match sqlc query RETURNING shape (Model ↔ full RETURNING, `<QueryName>Row` ↔ partial RETURNING) | `pkg/validate/ssac_sqlc/xqs_20_return_type_match.go` |
+| XQS-21 | ERROR | `@verify-password` requires the sqlc query `<Model>FindBy<Col>` to exist | `pkg/validate/ssac_sqlc/xqs_21_verify_password_query.go` |
 
 ## P. SSaC ↔ DDL
 
