@@ -59,17 +59,17 @@ backend:
   auth:
     type: jwt                     # only "jwt" is supported
     secret_env: JWT_SECRET
-    user_table: users             # DDL table that holds user rows (XDN-01~04)
+    user_table: users             # DDL table that holds user rows (XDN-01~03, XDN-05~06)
     claims:                       # JWT claim → CurrentUser field mapping
-      ID: user_id:int64           # format: claim_key:go_type (default string)
-      Email: email
-      Role: role
+      ID: user_id:int64           # format: <col>:<type> (type required — XDN-05)
+      Email: email:string
+      Role: role:string
 frontend: { lang: typescript, framework: react, bundler: vite, name: <app> }
 ```
 
-Claim types: `string` (default), `int64`, `bool`. The generated `@auth`
-middleware uses `currentUser.ID` and `currentUser.Role`; both field names must
-exist.
+Claim type declaration is **required** (XDN-05). Allowed types: `string`,
+`int64`, `int32`, `bool`, `uuid`. The generated `@auth` middleware uses
+`currentUser.ID` and `currentUser.Role`; both field names must exist.
 
 `backend.auth` is **mandatory** in every yongol project (**C-6**) — yongol
 targets SaaS / business backends and does not support auth-free dynamic
@@ -78,10 +78,11 @@ for public dynamic content instead.
 
 `backend.auth.user_table` names the DDL table (e.g. `users`,
 `accounts`, `members`) backing the JWT claims. `yongol validate`
-enforces (`XDN-01~04`) that the field is present whenever auth is
-active, the named table exists in `db/*.sql`, and every
-`claims.<Field>: <col>[:<type>]` mapping points at a real column whose
-DDL-derived Go type matches the claim's declared Go type.
+enforces (`XDN-01~03, XDN-05~06`) that the field is present whenever
+auth is active, the named table exists in `db/*.sql`, every
+`claims.<Field>: <col>:<type>` mapping points at a real column, the
+type declaration is present and allowed (XDN-05), and the declared type
+matches the DDL column type per the compatibility matrix (XDN-06).
 
 Optional top-level blocks (see [`docs/manifest.md`](docs/manifest.md) for full
 schema + env-var overrides): `backend.cors`, `backend.http` (body limits),

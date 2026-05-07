@@ -22,11 +22,11 @@ backend:
   auth:
     type: jwt                       # Only "jwt" supported
     secret_env: JWT_SECRET
-    user_table: users               # DDL table holding user rows (XDN-01~04)
+    user_table: users               # DDL table holding user rows (XDN-01~03, XDN-05~06)
     claims:                         # JWT claim -> CurrentUser field
-      ID: user_id:int64             # Format: claim_key:go_type (default string)
-      Email: email
-      Role: role
+      ID: user_id:int64             # Format: <col>:<type> (type required — XDN-05)
+      Email: email:string
+      Role: role:string
 frontend:
   lang: typescript
   framework: react
@@ -42,7 +42,7 @@ frontend:
 
 When `backend.auth` is declared: `type: jwt`, `claims` (at least one). `ID` and `Role` claims are required because `@auth` templates reference `currentUser.ID` / `currentUser.Role`.
 
-Claim format: `FieldName: claim_key:go_type`. Types: `string` (default), `int64`, `bool`.
+Claim format: `FieldName: <col>:<type>` (type declaration is **required** — XDN-05). Allowed types: `string`, `int64`, `int32`, `bool`, `uuid`.
 
 ## Optional Backend Blocks
 
@@ -87,25 +87,29 @@ removes the ambiguity entirely.
 Claim mapping format:
 
 ```
-<FieldName>: <column_name>[:<go_type>]
+<FieldName>: <column_name>:<type>
 ```
 
-`<go_type>` is one of `string` (default), `int64`, `bool`.
+`<type>` is **required** (XDN-05). Allowed values: `string`, `int64`,
+`int32`, `bool`, `uuid`.
 
-The four XDN rules check the wiring at validate time:
+The XDN rules check the wiring at validate time:
 
 | Rule | Check |
 |---|---|
 | XDN-01 | `user_table` present when auth is active |
 | XDN-02 | `user_table` matches a table parsed from `db/*.sql` |
 | XDN-03 | Every `claims.<Field>: <col>` column exists on `user_table` |
-| XDN-04 | Each claim's Go type matches the user_table column's DDL-derived Go type |
+| ~~XDN-04~~ | ~~Each claim's Go type matches the DDL-derived Go type~~ **(deprecated — superseded by XDN-06)** |
+| XDN-05 | Each claim value must use `<col>:<type>` format (type declaration required) |
+| XDN-06 | Declared type must match DDL column type per the compatibility matrix |
 
 Fix path on a fresh failure: add `user_table: users` (or your real
 table name) to `backend.auth`, ensure `db/<table>.sql` defines the
 columns named in `claims`, and confirm the column types map to the
-declared Go types (`BIGINT`/`SERIAL` → `int64`, `VARCHAR`/`TEXT` →
-`string`, `BOOLEAN` → `bool`).
+declared types (`BIGINT`/`INT8` → `int64`, `INTEGER`/`INT`/`INT4` →
+`int32`, `VARCHAR`/`TEXT` → `string`, `BOOLEAN`/`BOOL` → `bool`,
+`UUID` → `uuid`).
 
 ## Cross-SSOT Links
 
@@ -113,7 +117,7 @@ declared Go types (`BIGINT`/`SERIAL` → `int64`, `VARCHAR`/`TEXT` →
 |---|---|
 | `backend.middleware` -> OpenAPI `securitySchemes` keys | Middleware name must exist |
 | `backend.auth.user_table` -> DDL `db/<table>.sql` | Required when auth active; must match a parsed table (XDN-01/02) |
-| `backend.auth.claims` -> DDL columns on `user_table` | Each `claims.<F>: <col>[:<type>]` must hit a real column with matching Go type (XDN-03/04) |
+| `backend.auth.claims` -> DDL columns on `user_table` | Each `claims.<F>: <col>:<type>` must hit a real column with matching type (XDN-03/05/06) |
 | `backend.auth.claims` -> Rego `input.claims.<field>` | Every claim used in Rego must be declared |
 | `backend.auth.roles` -> Rego role literals | Every role used in Rego must be declared |
 | `session/cache/file/queue.backend` -> SSaC `@call` / `@publish` | WARNING when SSaC uses an undeclared backend |

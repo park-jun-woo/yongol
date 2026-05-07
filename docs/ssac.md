@@ -135,7 +135,7 @@ transition — a self-loop if there is no state change) in the diagram.
 
 ### @verify-password
 
-Single-line bundle of `FindByEmail` + bcrypt compare + dummy-hash fallback. Prevents response-time oracle on user existence.
+Single-line bundle of `FindBy<Col>` + bcrypt compare + dummy-hash fallback. Prevents response-time oracle on user existence. The sqlc query `<Model>FindBy<Col>` must exist (XQS-21).
 
 ```
 // @verify-password User.email=request.email User.password_hash vs request.password -> user 401 "Invalid credentials"
