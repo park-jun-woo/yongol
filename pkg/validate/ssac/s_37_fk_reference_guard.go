@@ -23,7 +23,8 @@ func s37FKReferenceGuard(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		}
 		for i, seq := range fn.Sequences {
 			if seq.Type == "get" && seq.Result != nil &&
-				!strings.HasPrefix(seq.Result.Type, "[]") && seq.Result.Wrapper == "" {
+				!strings.HasPrefix(seq.Result.Type, "[]") && seq.Result.Wrapper == "" &&
+				!goPrimitiveTypes[seq.Result.Type] {
 				model := extractModel(seq)
 				if hasFKRef(seq, declared, types, model) && !hasEmptyGuardAfter(fn.Sequences[i+1:], seq.Result.Var) {
 					diags = append(diags, diagnostic.Diagnostic{

@@ -222,7 +222,7 @@ build). Full reference: [`docs/ssac.md`](docs/ssac.md).
 | `@post` | Create | `Type var = Model.Method(args...)` | Required |
 | `@put` | Update (no return) | `Model.Method(args...)` | Required |
 | `@delete` | Delete | `Model.Method(args...)` | 0 args → WARNING |
-| `@empty` | Guard: nil/zero → 404 | `target "message" [STATUS]` | default 404. Target must be a Model var (S-64); scalars rejected. |
+| `@empty` | Guard: nil/zero → 404 | `target "message" [STATUS]` | default 404. Target must be a Model var (S-64); scalars rejected. S-37 은 단일 Model 조회만 적용 — scalar 결과에는 `@empty` 불필요. |
 | `@exists` | Guard: not nil → 409 | `target "message" [STATUS]` | default 409. Target must be a Model var (S-64); scalars rejected. |
 | `@state` | State transition | `diagramID {inputs} "transition" "message" [STATUS]` | default 409 |
 | `@auth` | Permission check | `"action" "resource" {inputs} "message" [STATUS]` | default 403 |

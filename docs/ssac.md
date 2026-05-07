@@ -57,6 +57,9 @@ exist?" — not "is this number zero?" or "is this string empty?". The target
 must be a variable bound by an earlier `@get` / `@post` / `@put` whose type is
 a DDL Model (e.g. `User`, `Workflow`).
 
+S-37 (FK reference guard) 역시 단일 Model 조회에만 적용된다. scalar 결과
+(`int64`, `string` 등)는 DB 가 항상 값을 반환하므로 `@empty` 가드 대상이 아니다.
+
 ```ssac
 // ✅ correct — model presence check
 // @get Workflow wf = Workflow.FindByID({ID: request.id})

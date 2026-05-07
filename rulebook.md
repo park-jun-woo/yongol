@@ -92,7 +92,7 @@ SSaC self-consistency — required fields, variable flow, model references, @sub
 | S-34 | ERROR | Go reserved words must not be used as variable names | `pkg/validate/ssac/s_34_go_reserved_word.go` |
 | S-35 | ERROR | Go reserved words must not be used as Model names | `pkg/validate/ssac/s_35_go_reserved_word_model.go` |
 | S-36 | WARNING | `@response` used after `@put`/`@delete` without refresh (stale) | `pkg/validate/ssac/s_36_check_response_stale.go` |
-| S-37 | WARNING | FK-referencing `@get` should be followed by an `@empty` guard | `pkg/validate/ssac/s_37_fk_reference_guard.go` |
+| S-37 | WARNING | FK-referencing `@get` should be followed by an `@empty` guard (단일 Model 조회만 적용; scalar/배열 제외) | `pkg/validate/ssac/s_37_fk_reference_guard.go` |
 | S-38 | ERROR | HTTP-only Inputs are forbidden in `@subscribe` | `pkg/validate/ssac/s_38_subscribe_no_http_inputs.go` |
 | S-39 | ERROR | `@subscribe` Message is required | `pkg/validate/ssac/s_39_subscribe_message_required.go` |
 | S-40 | ERROR | `@subscribe` handler must take a single parameter | `pkg/validate/ssac/s_40_subscribe_single_param.go` |
