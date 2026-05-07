@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/park-jun-woo/yongol/pkg/parser/ddl"
+	"github.com/park-jun-woo/yongol/pkg/util/caseconv"
 )
 
 // findDDLTableByModelName looks up a DDL table by its sqlc model name. The
@@ -14,7 +15,7 @@ import (
 // receives the PascalCase sqlc model name ("Workflow"). We normalise both
 // sides to the same lower-snake singular form ("workflow") for comparison.
 func findDDLTableByModelName(tables []ddl.Table, modelName string) *ddl.Table {
-	target := ddlTableSingular(pascalToSnake(modelName))
+	target := ddlTableSingular(caseconv.PascalToSnake(modelName))
 	for i := range tables {
 		t := &tables[i]
 		lower := strings.ToLower(t.Name)
