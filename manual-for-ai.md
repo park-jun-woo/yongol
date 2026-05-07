@@ -142,6 +142,14 @@ Standard SQL DDL and sqlc. Details: [`docs/ddl.md`](docs/ddl.md).
       nullable: true
       go_type: { import: "github.com/jackc/pgx/v5/pgtype", package: "pgtype", type: "UUID" }
   ```
+  At codegen time, nullable columns mapped to `pgtype.*` use
+  `ssac/pkg/pgtypex` bridge functions (e.g. `pgtypex.ToPgUUID`,
+  `pgtypex.FromPgUUID`, `pgtypex.IsNilPgUUID`). The SSaC emit imports
+  `pgtypex` automatically; nil-check guards, sqlc arg wrapping, and
+  Owners-map UUID serialisation all route through `GoTypeBinding`
+  templates (`NilCheckExpr`, `InsertExpr`, `ConvertExpr`,
+  `ResponseExpr`) resolved from the types matrix.
+
   Multi-word PG type names are accepted as equivalents of their
   single-token alias — `DOUBLE PRECISION` ≡ `FLOAT8`,
   `TIMESTAMP WITH TIME ZONE` ≡ `TIMESTAMPTZ`,
@@ -297,6 +305,7 @@ Runtime implementations live in the sibling repo
 | `storage` | S3 low-level (presigned URLs, direct client) | S3 only |
 | `crypto` | AES-256-GCM, TOTP | — |
 | `mail` | SMTP sendEmail / template email | env-based |
+| `pgtypex` | OpenAPI ↔ pgtype bridge (ToPg*/FromPg*/IsNilPg*) | — |
 | `text` | `generateSlug`, `sanitizeHTML`, `truncateText` | — |
 | `image` | `ogImage` (1200×630), `thumbnail` (200×200) | — |
 
