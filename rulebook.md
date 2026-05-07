@@ -118,6 +118,7 @@ SSaC self-consistency — required fields, variable flow, model references, @sub
 | S-68 | ERROR | `@eval` requires an explicit STATUS code (no default) | `pkg/validate/ssac/s_68_eval_status_required.go` |
 | S-69 | ERROR | `@eval` Func must exist in Func Spec or built-in | `pkg/validate/ssac/s_69_eval_func_exists.go` |
 | S-70 | ERROR | `@post` / `@put` Inputs value must not be a standalone reserved source (`currentUser`, `request`, `query`, `message`); use dotted form. `@call` exempt | `pkg/validate/ssac/s_70_post_put_blob_input_forbidden.go` |
+| S-71 | ERROR | SSaC Input 값의 변수 prefix 가 해당 시퀀스 지점에서 유효한 scope 에 없으면 ERROR | `pkg/validate/ssac/s_71_unknown_variable.go` |
 | XSS-11 | WARNING | `@result` type is plural | `pkg/validate/ssac/xss_11_plural_result_type.go` |
 | XSS-38 | ERROR | `@call` function name starts with a lowercase letter (uppercase recommended) | `pkg/validate/ssac/xss_38_call_func_lowercase.go` |
 | XSS-47 | WARNING | `@call` argument source variable is undefined | `pkg/validate/ssac/xss_47_call_source_var_undefined.go` |

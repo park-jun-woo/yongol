@@ -72,6 +72,7 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	diags = append(diags, s68EvalStatusRequired(fs)...)
 	diags = append(diags, s69EvalFuncExists(fs)...)
 	diags = append(diags, s70PostPutBlobInputForbidden(fs)...)
+	diags = append(diags, s71UnknownVariable(fs)...)
 	diags = append(diags, xss11PluralResultType(fs)...)
 	diags = append(diags, xss38CallFuncLowercase(fs)...)
 	diags = append(diags, xss47CallSourceVarUndefined(fs)...)
