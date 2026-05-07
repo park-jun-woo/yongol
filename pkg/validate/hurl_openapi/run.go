@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=hurl-openapi
-//ff:what Run — Hurl↔OpenAPI 교차 검증 실행 (XOH-01/02/03/04/08/09)
+//ff:what Run — Hurl↔OpenAPI 교차 검증 실행 (XOH-01/02/03/04/08/09/10/11)
 package hurl_openapi
 
 import (
@@ -19,5 +19,10 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	diags = append(diags, xoh04AssertPathInSchema(fs)...)
 	diags = append(diags, xoh08CapturePathInSchema(fs)...)
 	diags = append(diags, xoh09UnusedCapture(fs)...)
+	xoh10 := xoh10SmokeRequired(fs)
+	diags = append(diags, xoh10...)
+	if len(xoh10) == 0 {
+		diags = append(diags, xoh11SmokeCoverage(fs)...)
+	}
 	return diags
 }

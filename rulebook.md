@@ -407,6 +407,8 @@ All Hurl files under `specs/tests/` are user-authored. yongol does not emit any 
 | XOH-04 | ERROR | Hurl assert jsonpath reachable in OpenAPI response schema | `pkg/validate/hurl_openapi/xoh_04_assert_path_in_schema.go` |
 | XOH-08 | ERROR | Hurl capture jsonpath reachable in OpenAPI response schema | `pkg/validate/hurl_openapi/xoh_08_capture_path_in_schema.go` |
 | XOH-09 | WARNING | Hurl captured variable is referenced later in the file | `pkg/validate/hurl_openapi/xoh_09_unused_capture.go` |
+| XOH-10 | ERROR | smoke.hurl is required in specs/tests/ | `pkg/validate/hurl_openapi/xoh_10_smoke_required.go` |
+| XOH-11 | ERROR | smoke.hurl must cover all OpenAPI operationIds | `pkg/validate/hurl_openapi/xoh_11_smoke_coverage.go` |
 
 ## R3. Hurl ↔ State Machine
 
