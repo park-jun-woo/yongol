@@ -28,14 +28,21 @@ func (g *methodGen) buildFieldResponse(fields map[string]string) []string {
 	// Pre-pass: hoist any $ref convert<Type>/convert<Type>List call into
 	// a local variable so the per-call error is reachable. scalarLocal
 	// keyed by jsonName → local var name; same for listLocal.
+	// Skip converter for @call result variables — Func Response structs
+	// are user-authored OpenAPI-compatible types (BUG-050).
 	scalarLocal := make(map[string]string)
 	listLocal := make(map[string]string)
+	directAssign := make(map[string]bool)
 	for _, jsonName := range keys {
 		rf, ok := g.RespFields[jsonName]
 		if !ok || rf.RefType == "" {
 			continue
 		}
 		varExpr := fields[jsonName]
+		if g.CallResultVars[varExpr] {
+			directAssign[jsonName] = true
+			continue
+		}
 		local := lowerFirst(pascalCase(jsonName)) + "Converted"
 		if rf.IsArray {
 			listLocal[jsonName] = local
@@ -58,7 +65,11 @@ func (g *methodGen) buildFieldResponse(fields map[string]string) []string {
 		g.FuncName, g.SuccessStatus))
 
 	for _, jsonName := range keys {
-		lines = append(lines, g.renderResponseFieldHoisted(jsonName, fields[jsonName], scalarLocal, listLocal))
+		if directAssign[jsonName] {
+			lines = append(lines, g.renderDirectAssignField(jsonName, fields[jsonName]))
+		} else {
+			lines = append(lines, g.renderResponseFieldHoisted(jsonName, fields[jsonName], scalarLocal, listLocal))
+		}
 	}
 	lines = append(lines, "}, nil")
 	return lines

@@ -37,14 +37,19 @@ func newMethodGen(doc *openapi3.T, sf ssacparser.ServiceFunc, modulePath string,
 	// later @response can look up the model even when the assignment
 	// appeared earlier in the sequence list.
 	varTypes := make(map[string]string)
+	callResultVars := make(map[string]bool)
 	for _, seq := range sf.Sequences {
 		if seq.Result != nil && seq.Result.Var != "" && seq.Result.Type != "" {
 			varTypes[seq.Result.Var] = seq.Result.Type
+		}
+		if seq.Type == "call" && seq.Result != nil && seq.Result.Var != "" {
+			callResultVars[seq.Result.Var] = true
 		}
 	}
 	g := &methodGen{
 		SuccessStatus: 200, // overwritten by extractFromOpenAPI for real ops
 		VarTypes:        varTypes,
+		CallResultVars:  callResultVars,
 		BodyJSONBFields: make(map[string]bool),
 		FuncName:        sf.Name,
 		FileName:      sf.FileName,

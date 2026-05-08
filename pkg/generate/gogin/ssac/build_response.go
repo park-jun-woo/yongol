@@ -23,6 +23,12 @@ func (g *methodGen) buildResponse(seq ssacparser.Sequence) []string {
 	}
 	// @response target — direct variable (scalar or list).
 	if seq.Target != "" {
+		// @call result variables are Func Response types (user-authored,
+		// OpenAPI-compatible) — emit direct cast without converter (BUG-050).
+		if g.CallResultVars[seq.Target] {
+			return []string{fmt.Sprintf("return api.%s%dJSONResponse(%s), nil",
+				g.FuncName, g.SuccessStatus, seq.Target)}
+		}
 		if model := g.VarTypes[seq.Target]; model != "" {
 			return []string{
 				fmt.Sprintf("converted, err := convert%s(%s)", model, seq.Target),
