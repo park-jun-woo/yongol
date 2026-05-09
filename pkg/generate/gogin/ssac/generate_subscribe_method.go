@@ -27,7 +27,7 @@ func generateSubscribeMethod(sf ssacparser.ServiceFunc, fs *yongol.Fullstack, se
 	var imports []string
 	var body []string
 
-	imports = append(imports, `"context"`, `"encoding/json"`, `"fmt"`, `"log/slog"`)
+	imports = append(imports, `"context"`, `"encoding/json"`, `"log/slog"`)
 
 	// Handler entry DEBUG log (Phase012 AutoLogInsert 1단계) — topic tag
 	topic := ""
@@ -51,6 +51,7 @@ func generateSubscribeMethod(sf ssacparser.ServiceFunc, fs *yongol.Fullstack, se
 	}
 
 	if useTx {
+		imports = append(imports, `"fmt"`)
 		imports, body = appendSubscribeTxBeginLines(imports, body, sf.Name)
 	}
 
