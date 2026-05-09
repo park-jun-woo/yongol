@@ -16,7 +16,6 @@ package ssac
 // assigned implicitly to the plain-string sqlc param (BUG-020).
 var openAPIFormatToPrimitive = map[string]string{
 	"email": "string",
-	"uuid":  "string",
 	"enum":  "string",
 }
 

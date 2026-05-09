@@ -10,20 +10,6 @@ import (
 	ssacparser "github.com/park-jun-woo/yongol/pkg/parser/ssac"
 )
 
-// ssacBuiltinPkgs are packages provided by github.com/park-jun-woo/ssac/pkg/.
-//
-// `auth` is in this set as of Phase001 UserClaimUnification — the project no
-// longer emits `internal/auth/` (the reexport alias surface was deleted),
-// so `@call auth.*` imports ssac/pkg/auth directly like every other builtin.
-// The JWT claim payload type is the project-local `model.UserClaim`, generated
-// from `manifest.backend.auth.claims` by gen-gogin-auth; buildCall emits
-// `Claims: model.UserClaim{...}` for IssueToken / RefreshToken.
-var ssacBuiltinPkgs = map[string]bool{
-	"auth": true, "authz": true, "cache": true, "config": true,
-	"crypto": true, "file": true, "image": true, "mail": true,
-	"pagination": true, "queue": true, "session": true, "storage": true, "text": true,
-}
-
 // ssacCtxFirstPkgs lists ssac/pkg packages whose public functions accept
 // context.Context as the first argument (Phase004b migration). buildCall
 // injects `ctx, ` before the Request literal when the target package is in

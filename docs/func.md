@@ -76,7 +76,7 @@ Uniform — no per-package exceptions.
 
 ## Import-Path Convention
 
-SSaC imports `internal/<pkg>`. Specs live under `specs/<project>/func/<pkg>/`; `yongol generate` copies them to `artifacts/<project>/backend/internal/<pkg>/`.
+SSaC imports use full Go import paths (e.g. `import "github.com/user/project/internal/dashboard"`). Bare names are rejected (S-73). Specs live under `specs/<project>/func/<pkg>/`; `yongol generate` copies them to `artifacts/<project>/backend/internal/<pkg>/`.
 
 ## Fallback Chain
 

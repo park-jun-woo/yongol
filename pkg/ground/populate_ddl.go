@@ -3,7 +3,9 @@
 package ground
 
 import (
+	"github.com/park-jun-woo/yongol/pkg/generate/gogin/types"
 	"github.com/park-jun-woo/yongol/pkg/rule"
+	"github.com/park-jun-woo/yongol/pkg/util/caseconv"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
@@ -22,4 +24,15 @@ func populateDDL(g *rule.Ground, fs *yongol.Fullstack) {
 		populateDDLDefaults(g, t)
 	}
 	g.Lookup["DDL.table"] = tables
+
+	// Register DDL column Go types for var.Field resolution (Phase009).
+	for _, t := range fs.DDLTables {
+		modelName := sqlcModelName(t.Name)
+		for _, colName := range t.ColumnOrder {
+			col := t.Columns[colName]
+			binding := types.MapPGType(col)
+			fieldName := caseconv.SnakeToPascalSqlc(colName)
+			g.Types["DDL.field."+modelName+"."+fieldName] = binding.SqlcGoType
+		}
+	}
 }

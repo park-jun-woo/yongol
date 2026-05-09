@@ -23,6 +23,11 @@ func populateManifest(g *rule.Ground, fs *yongol.Fullstack) {
 		for field, def := range fs.Manifest.Backend.Auth.Claims {
 			claims[field] = true
 			claimKeys[def.Key] = true
+			goType := def.GoType
+			if goType == "uuid" {
+				goType = "pgtype.UUID"
+			}
+			g.Types["Manifest.claim."+field] = goType
 		}
 		g.Lookup["Manifest.claims"] = claims
 		g.Lookup["Manifest.claims.keys"] = claimKeys

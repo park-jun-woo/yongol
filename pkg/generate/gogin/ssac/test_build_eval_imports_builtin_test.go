@@ -1,5 +1,5 @@
 //ff:func feature=gen-gogin type=test control=sequence topic=import-collect
-//ff:what TestBuildEvalImports_Builtin — ssac 빌트인 패키지 → ssac/pkg/ 경로
+//ff:what TestBuildEvalImports_Builtin — ssac 빌트인 패키지 → ImportMap lookup
 
 package ssac
 
@@ -10,7 +10,12 @@ import (
 )
 
 func TestBuildEvalImports_Builtin(t *testing.T) {
-	g := &methodGen{ModulePath: "example.com/zenflow"}
+	g := &methodGen{
+		ModulePath: "example.com/zenflow",
+		ImportMap: map[string]string{
+			"auth": "github.com/park-jun-woo/ssac/pkg/auth",
+		},
+	}
 	seq := ssacparser.Sequence{Model: "auth.VerifyPassword"}
 	got := g.buildEvalImports(seq)
 	if len(got) != 1 {

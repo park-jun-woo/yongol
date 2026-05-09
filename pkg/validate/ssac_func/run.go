@@ -18,5 +18,7 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	diags = append(diags, xsf46CallResultIgnored(fs)...)
 	diags = append(diags, xfs63CallFuncSignature(fs)...)
 	diags = append(diags, xsf62FuncSpecUsed(fs)...)
+	diags = append(diags, xfs70AuthInputType(fs)...)
+	diags = append(diags, xfs73CallRequestParamType(fs)...)
 	return diags
 }

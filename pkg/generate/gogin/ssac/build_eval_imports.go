@@ -16,8 +16,8 @@ func (g *methodGen) buildEvalImports(seq ssacparser.Sequence) []string {
 	if pkgName == "" {
 		return nil
 	}
-	if ssacBuiltinPkgs[pkgName] {
-		return []string{fmt.Sprintf(`"github.com/park-jun-woo/ssac/pkg/%s"`, pkgName)}
+	if fullPath, ok := g.ImportMap[pkgName]; ok {
+		return []string{fmt.Sprintf(`"%s"`, fullPath)}
 	}
-	return []string{fmt.Sprintf(`"%s/internal/%s"`, g.ModulePath, pkgName)}
+	return nil
 }

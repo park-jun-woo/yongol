@@ -29,7 +29,7 @@ func (g *methodGen) buildPublish(seq ssacparser.Sequence) ([]string, []string) {
 	sort.Strings(keys)
 	var fields []string
 	for _, k := range keys {
-		fields = append(fields, fmt.Sprintf("\t%q: %s,", k, seq.Inputs[k]))
+		fields = append(fields, fmt.Sprintf("\t%q: %s,", k, g.mapValue(seq.Inputs[k])))
 	}
 
 	imports := []string{`"github.com/park-jun-woo/ssac/pkg/queue"`}

@@ -11,8 +11,10 @@ package cache
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/park-jun-woo/ssac/pkg/cache"
 
@@ -46,10 +48,14 @@ func (c *postgresCache) Set(ctx context.Context, key string, value any, ttl time
 }
 
 // Get forwards to the sqlc query and returns the raw bytes as a string.
+// Cache miss (key not found or expired) returns ("", nil) per cache.CacheModel contract.
 // interface.yaml port: %[3]s.
 func (c *postgresCache) Get(ctx context.Context, key string) (string, error) {
 	raw, err := c.q.%[3]s(ctx, key)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return "", nil
+		}
 		return "", err
 	}
 	return string(raw), nil

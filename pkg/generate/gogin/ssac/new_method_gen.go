@@ -4,6 +4,8 @@
 package ssac
 
 import (
+	"path"
+
 	"github.com/getkin/kin-openapi/openapi3"
 
 	"github.com/park-jun-woo/yongol/pkg/parser/ddl"
@@ -37,23 +39,23 @@ func newMethodGen(doc *openapi3.T, sf ssacparser.ServiceFunc, modulePath string,
 	// later @response can look up the model even when the assignment
 	// appeared earlier in the sequence list.
 	varTypes := make(map[string]string)
-	callResultVars := make(map[string]bool)
 	for _, seq := range sf.Sequences {
 		if seq.Result != nil && seq.Result.Var != "" && seq.Result.Type != "" {
 			varTypes[seq.Result.Var] = seq.Result.Type
 		}
-		if seq.Type == "call" && seq.Result != nil && seq.Result.Var != "" {
-			callResultVars[seq.Result.Var] = true
-		}
+	}
+	importMap := make(map[string]string, len(sf.Imports))
+	for _, imp := range sf.Imports {
+		importMap[path.Base(imp)] = imp
 	}
 	g := &methodGen{
 		SuccessStatus: 200, // overwritten by extractFromOpenAPI for real ops
 		VarTypes:        varTypes,
-		CallResultVars:  callResultVars,
 		BodyJSONBFields: make(map[string]bool),
 		FuncName:        sf.Name,
 		FileName:      sf.FileName,
 		ModulePath:    modulePath,
+		ImportMap:     importMap,
 		PathParams:    make(map[string]bool),
 		QueryParams:   make(map[string]queryParam),
 		BodyFormats:   make(map[string]string),

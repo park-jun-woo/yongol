@@ -63,6 +63,21 @@ func Generate(fs *yongol.Fullstack, artifactsDir string) error {
 		return fmt.Errorf("converters: %w", err)
 	}
 
+	// Func Response converters — same pattern as DB model converters but
+	// for @call result types that have no sqlc backing row. Intersect
+	// needed with funcRespNames (excluding sqlcModelNames) so we only
+	// emit convert<X> for schemas produced by Func Response types.
+	funcRespNames := collectFuncResponseNames(fs.ServiceFuncs)
+	funcFiltered := make(map[string]funcRespInfo)
+	for name := range needed {
+		if info, ok := funcRespNames[name]; ok && !sqlcModelNames[name] {
+			funcFiltered[name] = info
+		}
+	}
+	if err := emitFuncResponseConverterFiles(fs.OpenAPIDoc, serviceDir, modulePath, funcFiltered, fs.ProjectFuncSpecs, usedNames); err != nil {
+		return fmt.Errorf("func response converters: %w", err)
+	}
+
 	// pgtype bridge calls now route through ssac/pkg/pgtypex — no
 	// internal/service helper emit needed.
 

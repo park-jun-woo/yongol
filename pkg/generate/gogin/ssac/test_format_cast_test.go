@@ -7,7 +7,7 @@ import "testing"
 func TestFormatPrimitiveCast(t *testing.T) {
 	cases := map[string]string{
 		"email":     "string",
-		"uuid":      "string",
+		"uuid":      "",
 		"":          "",
 		"int64":     "",
 		"date-time": "",

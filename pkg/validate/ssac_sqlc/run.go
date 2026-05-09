@@ -18,5 +18,6 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	diags = append(diags, xqs19SsacBuiltinQueryRequired(fs)...)
 	diags = append(diags, xqs20ReturnTypeMatch(fs)...)
 	diags = append(diags, xqs21VerifyPasswordQuery(fs)...)
+	diags = append(diags, xqs72QueryParamIntWidth(fs)...)
 	return diags
 }

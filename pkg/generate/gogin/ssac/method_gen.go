@@ -15,6 +15,11 @@ type methodGen struct {
 	FuncName     string
 	FileName     string // 원본 SSaC 파일명 (진단 메시지용)
 	ModulePath   string
+	// ImportMap maps a package alias (path.Base of the import) to the full
+	// Go import path declared in the SSaC file. Populated at newMethodGen
+	// from sf.Imports so buildCallImports / buildEvalImports can look up
+	// the correct import path without synthesising it (Phase006).
+	ImportMap map[string]string
 	PathParams   map[string]bool          // OpenAPI path param names (lowercase)
 	QueryParams  map[string]queryParam    // OpenAPI query param name → rich metadata
 	BodyFormats  map[string]string        // OpenAPI body field name → format ("email", "uuid", ...)
@@ -99,10 +104,4 @@ type methodGen struct {
 	// SQLcQueries. Cleared back to empty after each emission so leakage
 	// across sequences cannot misdirect a downstream literal wrap.
 	activeMethod string
-	// CallResultVars tracks variable names produced by @call sequences.
-	// Func Response structs are user-authored (OpenAPI-compatible) so
-	// they must NOT be routed through convert<Model>() which targets
-	// sqlc DB row types. buildFieldResponse / buildResponse consult this
-	// map to emit direct assignment instead of converter calls (BUG-050).
-	CallResultVars map[string]bool
 }

@@ -1,5 +1,5 @@
 //ff:func feature=gen-gogin type=test control=sequence topic=import-collect
-//ff:what TestBuildEvalImports_UserDefined — 사용자 정의 패키지 → internal/<pkg> 경로
+//ff:what TestBuildEvalImports_UserDefined — 사용자 정의 패키지 → ImportMap lookup
 
 package ssac
 
@@ -10,7 +10,12 @@ import (
 )
 
 func TestBuildEvalImports_UserDefined(t *testing.T) {
-	g := &methodGen{ModulePath: "github.com/park-jun-woo/zenflow"}
+	g := &methodGen{
+		ModulePath: "github.com/park-jun-woo/zenflow",
+		ImportMap: map[string]string{
+			"billing": "github.com/park-jun-woo/zenflow/internal/billing",
+		},
+	}
 	seq := ssacparser.Sequence{Model: "billing.IsZeroBalance"}
 	got := g.buildEvalImports(seq)
 	if len(got) != 1 {

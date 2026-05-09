@@ -27,7 +27,7 @@ import "github.com/park-jun-woo/ssac/pkg/auth"
 func Register() {}
 ```
 
-When using `@call pkg.Func`, the package must appear in the file's `import` block.
+When using `@call pkg.Func` or `@eval pkg.Func`, the package must appear in the file's `import` block with a full Go import path (S-72, S-73).
 
 ## Sequence Types
 
@@ -144,6 +144,30 @@ func LikeWorkflow() {}
 only when the operation truly does not depend on the resource's state. For
 state-dependent operations, add a `@state` guard (and the corresponding
 transition — a self-loop if there is no state change) in the diagram.
+
+> **타입 제약 (XFS-70):** `@auth` Inputs 의 값은 `authz.CheckRequest` 필드
+> 타입과 호환되어야 한다. `ResourceID` 는 `string` — `request.id` (path
+> param) 를 사용하라. DB row 의 UUID 필드 (`wf.ID`) 는 `pgtype.UUID` 이므로
+> 직접 전달하면 validate 에러.
+>
+> ```ssac
+> // ✅ correct — request.id is string (OpenAPI path param)
+> // @auth "GetWorkflow" "workflow" {ResourceID: request.id} "Forbidden"
+>
+> // ❌ rejected by XFS-70 — wf.ID is pgtype.UUID, not string
+> // @auth "GetWorkflow" "workflow" {ResourceID: wf.ID} "Forbidden"
+> ```
+
+> **타입 제약 (XSM-71):** `@state` Inputs 값은 `string` 호환이어야 한다.
+> statemachine 함수는 status 를 `string` 으로 받는다.
+>
+> ```ssac
+> // ✅ correct — status is TEXT column = string
+> // @state workflow {status: wf.Status} "ActivateWorkflow" "Cannot activate" 409
+>
+> // ❌ rejected by XSM-71 — wf.ID is pgtype.UUID
+> // @state workflow {ID: wf.ID, Status: wf.Status} "ActivateWorkflow" "..." 409
+> ```
 
 ### @verify-password
 
@@ -320,7 +344,7 @@ Call with `@call <pkg>.<Func>({...})`. Exact Request/Response field names are in
 
 Notes:
 - `auth.IssueToken` / `VerifyToken` / `RefreshToken` are generated from `manifest.backend.auth.claims`; Request/Response fields mirror the claim fields.
-- `auth` is re-exported via `internal/auth/reexport.go` so SSaC imports `auth` once.
+- SSaC imports `auth` via full path: `import "github.com/park-jun-woo/ssac/pkg/auth"`.
 
 ## Built-in Models
 

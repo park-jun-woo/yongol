@@ -7,10 +7,8 @@ import "fmt"
 
 func (g *methodGen) buildCallImports(pkgName, callFunc, varName string) []string {
 	var imps []string
-	if ssacBuiltinPkgs[pkgName] {
-		imps = append(imps, fmt.Sprintf(`"github.com/park-jun-woo/ssac/pkg/%s"`, pkgName))
-	} else {
-		imps = append(imps, fmt.Sprintf(`"%s/internal/%s"`, g.ModulePath, pkgName))
+	if fullPath, ok := g.ImportMap[pkgName]; ok {
+		imps = append(imps, fmt.Sprintf(`"%s"`, fullPath))
 	}
 	// Phase001 UserClaimUnification — auth.IssueToken / RefreshToken emit a
 	// `Claims: model.UserClaim{...}` literal, so the enclosing handler needs

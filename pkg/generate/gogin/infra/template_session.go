@@ -9,8 +9,10 @@ package session
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/park-jun-woo/ssac/pkg/session"
 
@@ -49,6 +51,9 @@ func (s *postgresSession) Set(ctx context.Context, key string, value any, ttl ti
 func (s *postgresSession) Get(ctx context.Context, key string) (string, error) {
 	raw, err := s.q.%[3]s(ctx, key)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return "", nil
+		}
 		return "", err
 	}
 	return string(raw), nil

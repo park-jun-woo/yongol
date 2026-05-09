@@ -19,7 +19,6 @@ func TestBuildResponse_DBModelUnchanged(t *testing.T) {
 		SuccessStatus:  200,
 		RespFields:     make(map[string]responseField),
 		VarTypes:       map[string]string{"workflow": "Workflow"},
-		CallResultVars: map[string]bool{},
 	}
 	seq := ssacparser.Sequence{
 		Type:   "response",

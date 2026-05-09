@@ -119,6 +119,8 @@ SSaC self-consistency — required fields, variable flow, model references, @sub
 | S-69 | ERROR | `@eval` Func must exist in Func Spec or built-in | `pkg/validate/ssac/s_69_eval_func_exists.go` |
 | S-70 | ERROR | `@post` / `@put` Inputs value must not be a standalone reserved source (`currentUser`, `request`, `query`, `message`); use dotted form. `@call` exempt | `pkg/validate/ssac/s_70_post_put_blob_input_forbidden.go` |
 | S-71 | ERROR | SSaC Input 값의 변수 prefix 가 해당 시퀀스 지점에서 유효한 scope 에 없으면 ERROR | `pkg/validate/ssac/s_71_unknown_variable.go` |
+| S-72 | ERROR | `@call`/`@eval` 참조 패키지에 대한 SSaC import 선언 필수 | `pkg/validate/ssac/s_72_call_eval_import_required.go` |
+| S-73 | ERROR | SSaC import는 full Go import path 필수 (bare name 거부) | `pkg/validate/ssac/s_73_import_must_be_full_path.go` |
 | XSS-11 | WARNING | `@result` type is plural | `pkg/validate/ssac/xss_11_plural_result_type.go` |
 | XSS-38 | ERROR | `@call` function name starts with a lowercase letter (uppercase recommended) | `pkg/validate/ssac/xss_38_call_func_lowercase.go` |
 | XSS-47 | WARNING | `@call` argument source variable is undefined | `pkg/validate/ssac/xss_47_call_source_var_undefined.go` |
@@ -255,6 +257,8 @@ Cross-consistency between SSaC `@call` and Func spec (Request/Response).
 | XSF-46 | WARNING | Func has a Response but no `@result` is declared | `pkg/validate/ssac_func/xsf_46_call_result_ignored.go` |
 | XFS-63 | ERROR | `@call` Func signature must return `(Response, error)` | `pkg/validate/ssac_func/xfs_63_call_func_signature.go` |
 | XSF-62 | WARNING | Func spec must be used in SSaC (coverage) | `pkg/validate/ssac_func/xsf_62_func_spec_used.go` |
+| XFS-70 | ERROR | `@auth` input value type must be string-compatible | `pkg/validate/ssac_func/xfs_70_auth_input_type.go` |
+| XFS-73 | ERROR | `@call` input `request.*` OpenAPI param type must match Func Request field type | `pkg/validate/ssac_func/xfs_73_call_request_param_type.go` |
 
 ## I. SSaC ↔ StateMachine
 
@@ -267,6 +271,7 @@ Cross-consistency between SSaC `@state` and Mermaid stateDiagram.
 | XSM-23 | ERROR | stateDiagram transition event must exist as a SSaC function | `pkg/validate/ssac_statemachine/xsm_23_transition_to_func.go` |
 | XSM-26 | WARNING | Function participating in a state transition has no `@state` declaration | `pkg/validate/ssac_statemachine/xsm_26_missing_state_guard.go` |
 | XSM-27 | WARNING | POST/PUT/DELETE on a stateful resource must declare either `@state` or `// @state-neutral` | `pkg/validate/ssac_statemachine/xsm_27_state_intent_declaration.go` |
+| XSM-71 | ERROR | `@state` input value type must be string-compatible | `pkg/validate/ssac_statemachine/xsm_71_state_input_type.go` |
 
 ## J. SSaC ↔ Rego
 
@@ -352,6 +357,7 @@ Validates that the names, case, and count of SSaC Input keys match sqlc Params e
 | XQS-19 | ERROR | SSaC call to a DB-using ssac built-in requires the corresponding sqlc query (per ssac `interface.yaml`) | `pkg/validate/ssac_sqlc/xqs_19_ssac_builtin_query_required.go` |
 | XQS-20 | ERROR | SSaC declared return type must match sqlc query RETURNING shape (Model ↔ full RETURNING, `<QueryName>Row` ↔ partial RETURNING) | `pkg/validate/ssac_sqlc/xqs_20_return_type_match.go` |
 | XQS-21 | ERROR | `@verify-password` requires the sqlc query `<Model>FindBy<Col>` to exist | `pkg/validate/ssac_sqlc/xqs_21_verify_password_query.go` |
+| XQS-72 | ERROR | OpenAPI query param int width must match sqlc param int width | `pkg/validate/ssac_sqlc/xqs_72_query_param_int_width.go` |
 
 ## P. SSaC ↔ DDL
 

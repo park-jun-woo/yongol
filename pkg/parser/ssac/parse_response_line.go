@@ -34,5 +34,6 @@ func parseResponseLine(line string) (*Sequence, bool, error) {
 			SuppressWarn: suppressWarn,
 		}, false, nil
 	}
-	return nil, false, nil
+	// @response 또는 @response! — 빈 응답 (204 등)
+	return &Sequence{Type: SeqResponse, SuppressWarn: suppressWarn}, false, nil
 }

@@ -170,6 +170,9 @@ Standard SQL DDL and sqlc. Details: [`docs/ddl.md`](docs/ddl.md).
 - Cardinality maps: `:one` → `*T`, `:many` → `[]T`, `:exec` → no return.
 - Positional `$N` is forbidden (D-7). Use `@name` for WHERE/SET/VALUES,
   `sqlc.arg(name)` inside LIMIT/OFFSET or arithmetic.
+- `page`/`per_page` query param 의 `format` 은 sqlc LIMIT/OFFSET 타입과
+  일치해야 한다 (XQS-72). sqlc 기본은 `int32`. `format: int64` 사용 시
+  sqlc 쿼리에 `::bigint` 캐스트 필요, 또는 `format: int32` 로 통일.
 - Avoid Go-reserved column names (`type`, `range`, `select`, `map`, …) — rename
   to `tx_type`, `date_range`, etc.
 - `NOT NULL DEFAULT 0` FK sentinel pattern avoids nullable FKs; the referenced
@@ -209,7 +212,7 @@ build). Full reference: [`docs/ssac.md`](docs/ssac.md).
 - One `func` per file. Files live under `service/<domain>/`, never directly
   under `service/`.
 - Function name = OpenAPI `operationId`.
-- Imports at the top of the file are required whenever `@call pkg.Func` is used.
+- Full Go import paths at the top of the file are required for every package referenced by `@call` or `@eval` (S-72, S-73).
 - External API calls use flat names: `@call stripe.CreateCharge(...)`, never
   `stripe.Charge.Create` (S-47). Package-prefix model calls
   (`@get session.Session.Get`) are deprecated — use the built-in `@call`.
@@ -262,6 +265,15 @@ quotes; numeric / boolean / `nil` as Go literals.
   property names (snake_case or camelCase, whichever OpenAPI uses).
 - Every other source uses Go PascalCase (`user.Email`, `course.InstructorID`).
 - `config.*` is forbidden; custom funcs read env vars directly.
+- `@auth` Inputs 의 `ResourceID` 값은 `string` 호환 타입이어야 한다
+  (XFS-70). `request.id` (OpenAPI path param = string) 사용을 권장.
+  DB row 의 UUID 필드 (`wf.ID` 등) 는 `pgtype.UUID` 이므로 직접 전달 불가.
+- `@call` 에 `request.*` 를 전달할 때 OpenAPI param 타입과 Func Request
+  필드 타입이 일치해야 한다 (XFS-73). path param `format: uuid` 는
+  `openapi_types.UUID` — Func 필드도 `openapi_types.UUID` 로 선언할 것.
+- `@state` Inputs 값도 `string` 호환이어야 한다 (XSM-71).
+  `{status: wf.Status}` (TEXT 컬럼 = string) 는 OK.
+  `{ID: wf.ID}` (UUID 컬럼 = pgtype.UUID) 는 불필요하며 타입 에러.
 - Reserved sources (`currentUser`, `request`, `query`, `message`) must
   always appear in **dotted** form inside `@post` / `@put` Inputs —
   e.g. `currentUser.Email`, never `currentUser` alone (S-70). Standalone
@@ -312,7 +324,7 @@ Runtime implementations live in the sibling repo
 
 `auth.IssueToken` / `VerifyToken` / `RefreshToken` are generated from
 `backend.auth.claims` — their request/response field names mirror claim names.
-SSaC imports a single `auth` package (generated re-export).
+SSaC imports `auth` via full path: `import "github.com/park-jun-woo/ssac/pkg/auth"`.
 
 ### Built-in models
 
