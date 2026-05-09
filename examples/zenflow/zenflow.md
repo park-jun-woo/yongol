@@ -34,7 +34,7 @@ CREATE TABLE actions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     workflow_id UUID REFERENCES workflows(id) ON DELETE CASCADE,
     type TEXT NOT NULL,
-    payload_template JSONB,
+    config TEXT NOT NULL DEFAULT '',
     sequence_order INTEGER NOT NULL
 );
 

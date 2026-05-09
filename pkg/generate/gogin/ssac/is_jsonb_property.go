@@ -30,5 +30,10 @@ func isJSONBProperty(ref *openapi3.SchemaRef) bool {
 	if s.AdditionalProperties.Schema != nil {
 		return true
 	}
+	// additionalProperties 미지정 — OpenAPI 3.0 기본값은 허용.
+	// oapi-codegen은 map[string]interface{}를 생성하므로 JSONB 취급.
+	if s.AdditionalProperties.Has == nil && s.AdditionalProperties.Schema == nil {
+		return true
+	}
 	return false
 }
