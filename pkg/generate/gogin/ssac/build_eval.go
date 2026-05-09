@@ -39,10 +39,13 @@ func (g *methodGen) buildEval(seq ssacparser.Sequence) ([]string, []string) {
 	lines := []string{
 		fmt.Sprintf("if %s.%s(%s.%sRequest{%s}) {", pkgName, callFunc, pkgName, callFunc, fields),
 		fmt.Sprintf("\t%s(\"handler: %s\", \"op\", %q, \"status\", %d)", logLevelFuncForStatus(status), logTagForStatus(status), g.FuncName, status),
-		fmt.Sprintf("\treturn api.%s%dJSONResponse{Error: %q, Code: %q}, nil", g.FuncName, status, msg, neutralCode(status)),
+		"\t" + g.guardReturn(msg, status),
 		"}",
 	}
 	imports := []string{`"log/slog"`}
 	imports = append(imports, g.buildEvalImports(seq)...)
+	if g.IsSubscribe {
+		imports = append(imports, `"fmt"`)
+	}
 	return lines, imports
 }

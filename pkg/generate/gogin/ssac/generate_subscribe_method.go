@@ -69,6 +69,10 @@ func generateSubscribeMethod(sf ssacparser.ServiceFunc, fs *yongol.Fullstack, se
 			return fmt.Errorf("generateSubscribeMethod %s: %w", sf.Name, err)
 		}
 		imports = append(imports, imp...)
+		// db import needed when sqlcArgs generates db.XXXParams (2+ inputs)
+		if isCRUD(seq.Type) && len(seq.Inputs) > 1 {
+			imports = append(imports, fmt.Sprintf(`"%s/internal/db"`, modulePath))
+		}
 		if isPost {
 			postCommit = append(postCommit, lines...)
 		} else {

@@ -23,8 +23,11 @@ func (g *methodGen) buildEmpty(seq ssacparser.Sequence) ([]string, []string) {
 	lines := []string{
 		fmt.Sprintf("if %s {", guard),
 		fmt.Sprintf("\t%s(\"handler: %s\", \"op\", %q, \"status\", %d)", logLevelFuncForStatus(status), logTagForStatus(status), g.FuncName, status),
-		fmt.Sprintf("\treturn api.%s%dJSONResponse{Error: %q, Code: %q}, nil", g.FuncName, status, msg, neutralCode(status)),
+		"\t" + g.guardReturn(msg, status),
 		"}",
+	}
+	if g.IsSubscribe {
+		imports = append(imports, `"fmt"`)
 	}
 	return lines, imports
 }

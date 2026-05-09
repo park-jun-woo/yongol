@@ -35,7 +35,7 @@ func (g *methodGen) buildPublish(seq ssacparser.Sequence) ([]string, []string) {
 	imports := []string{`"github.com/park-jun-woo/ssac/pkg/queue"`}
 
 	if g.UseTx {
-		return buildPublishTx(seq, fields, imports), imports
+		return buildPublishTx(seq, fields, imports, g.IsSubscribe), imports
 	}
 	return g.buildPublishBestEffort(seq, fields, &imports), imports
 }

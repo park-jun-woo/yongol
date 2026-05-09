@@ -26,9 +26,9 @@ func (g *methodGen) buildGet(seq ssacparser.Sequence, next *ssacparser.Sequence)
 	preamble, argStr, argImports := g.sqlcArgs(method, seq.Inputs)
 
 	imports := append([]string(nil), argImports...)
-	errHandler := "if err != nil { return nil, err }"
+	errHandler := "if err != nil { " + g.returnErr() + " }"
 	if varName != "_" && next != nil && (next.Type == "empty" || next.Type == "exists") && next.Target == varName {
-		errHandler = "if err != nil && !errors.Is(err, pgx.ErrNoRows) { return nil, err }"
+		errHandler = "if err != nil && !errors.Is(err, pgx.ErrNoRows) { " + g.returnErr() + " }"
 		imports = append(imports, `"github.com/jackc/pgx/v5"`, `"errors"`)
 	}
 

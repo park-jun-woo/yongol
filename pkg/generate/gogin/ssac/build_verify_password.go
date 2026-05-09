@@ -50,8 +50,6 @@ func (g *methodGen) buildVerifyPassword(seq ssacparser.Sequence) ([]string, []st
 	if msg == "" {
 		msg = neutralMessage(status)
 	}
-	code := neutralCode(status)
-
 	varName := "user"
 	if seq.Result != nil && seq.Result.Var != "" {
 		varName = seq.Result.Var
@@ -72,7 +70,7 @@ func (g *methodGen) buildVerifyPassword(seq ssacparser.Sequence) ([]string, []st
 	assign := g.assignOp(true) // binds a new variable
 	lines := []string{
 		fmt.Sprintf("%s, err %s %s.%s(ctx, %s)", varName, assign, g.queryVar(), findMethod, emailArg),
-		"if err != nil && !errors.Is(err, pgx.ErrNoRows) { return nil, err }",
+		"if err != nil && !errors.Is(err, pgx.ErrNoRows) { " + g.returnErr() + " }",
 		fmt.Sprintf("if %s {", guard),
 		// Timing equaliser: still pay bcrypt cost on miss.
 		"\t_, _ = auth.VerifyPassword(auth.VerifyPasswordRequest{",
@@ -80,7 +78,7 @@ func (g *methodGen) buildVerifyPassword(seq ssacparser.Sequence) ([]string, []st
 		"\t\tPasswordHash: auth.DummyHash,",
 		"\t})",
 		fmt.Sprintf("\t%s(\"handler: %s\", \"op\", %q, \"status\", %d, \"reason\", \"user not found\")", logLevelFuncForStatus(status), logTagForStatus(status), g.FuncName, status),
-		fmt.Sprintf("\treturn api.%s%dJSONResponse{Error: %q, Code: %q}, nil", g.FuncName, status, msg, code),
+		"\t" + g.guardReturn(msg, status),
 		"}",
 		// Real password check.
 		fmt.Sprintf("_, err = auth.VerifyPassword(auth.VerifyPasswordRequest{"),
@@ -89,7 +87,7 @@ func (g *methodGen) buildVerifyPassword(seq ssacparser.Sequence) ([]string, []st
 		"})",
 		"if err != nil {",
 		fmt.Sprintf("\t%s(\"handler: %s\", \"op\", %q, \"status\", %d, \"err\", err)", logLevelFuncForStatus(status), logTagForStatus(status), g.FuncName, status),
-		fmt.Sprintf("\treturn api.%s%dJSONResponse{Error: %q, Code: %q}, nil", g.FuncName, status, msg, code),
+		"\t" + g.guardReturn(msg, status),
 		"}",
 	}
 
@@ -100,5 +98,8 @@ func (g *methodGen) buildVerifyPassword(seq ssacparser.Sequence) ([]string, []st
 		`"github.com/park-jun-woo/ssac/pkg/auth"`,
 	}
 	imports = append(imports, pgtypexImportIfNeeded(col)...)
+	if g.IsSubscribe {
+		imports = append(imports, `"fmt"`)
+	}
 	return lines, imports
 }
