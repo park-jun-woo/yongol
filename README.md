@@ -110,7 +110,7 @@ specs/
 ├── manifest.yaml              → project configuration (required)
 ├── api/openapi.yaml           → OpenAPI 3.x
 ├── db/*.sql                   → SQL DDL + sqlc queries
-├── service/**/*.ssac          → SSaC — service sequence DSL
+├── service/**/*.ssac          → SSaC — service flow decisions (yongol's keystone DSL)
 ├── func/<pkg>/*.go            → custom function implementations (optional)
 ├── states/*.md                → Mermaid stateDiagram (state transitions)
 ├── policy/*.rego              → OPA Rego (authorization)
@@ -150,6 +150,77 @@ The AI authors and edits SSOTs. Code is re-rendered from them on every `yongol g
 **`validate` keeps the SSOTs themselves consistent.** Decisions are spread across 9 files, so the SSOTs can drift against each other (DDL says `BIGINT`, OpenAPI says `string`). A contradicted SSOT is a corrupted decision — the rendered code will drift even if the AI never touched the code directly. `yongol validate` runs ~150 cross-SSOT rules and refuses to compile until every contradiction is resolved.
 
 **Net effect.** SSOT preserves the decisions; `validate` preserves their integrity. Together they make decision survival independent of model size — a small LLM editing only SSOTs, with precise validate diagnostics on every miss, sustains the same decision integrity a much larger model would, and yongol re-renders the code deterministically from there.
+
+## Why SSaC is a custom DSL
+
+Of yongol's 9 SSOT sources, 8 are industry standards (OpenAPI, SQL DDL, sqlc, Rego, Mermaid, Hurl, TSX, manifest YAML). SSaC — Service Sequence as Code — is the one yongol invented. This is intentional.
+
+**The gap SSaC fills.** Consider the spectrum of declarative tools. On one end sit contract standards (OpenAPI, SQL, Rego) that declare *what* but not *in what order*. On the other end sit workflow runtimes (Temporal, Inngest, Restate) that are *code* — decisions and implementation details remix in the same file. SSaC occupies the empty seat between them: "what happens inside one endpoint, in what order, and with what guards."
+
+That seat is empty for a reason. No existing standard fits it:
+
+- **Business-process standards (BPMN, DMN)** target business analysts, not developers. Their surface area explodes to serve that audience, and their graphics-first tooling is incompatible with text-based SSOT.
+- **Workflow runtimes (Temporal, Inngest, Restate)** are code. Decisions and implementation details re-merge in the same file, and runtime concerns (determinism, replay) leak into the SSOT layer.
+- **API standards (OpenAPI)** describe the contract — request shape, response shape, status codes — but not the flow between receiving the request and sending the response.
+- **Policy standards (Rego, Cedar)** describe authorization rules but cannot express *why* a particular sequence of steps is ordered the way it is.
+
+The industry did not overlook this gap; the gap had no economic pressure to fill. Before AI codegen, there was no reason to freeze service flow as a decision artifact — you just wrote the code, and nobody needed to distinguish decisions from details. That distinction became expensive only when LLMs started refactoring large codebases and silently overwriting decisions they mistook for implementation details. **A new problem demands a new medium.**
+
+**Why custom is an advantage, not a compromise.**
+
+1. **Controlled vocabulary.** SSaC's full annotation set is under 20 keywords. No borrowed standard achieves this economy. LLM-friendliness is not about pre-training familiarity; it is about in-context learnability — and a sub-20-keyword vocabulary with a one-page manual is the ceiling of that metric.
+2. **Validation precision.** Because SSaC is small and purpose-built, cross-SSOT rules (SSaC ↔ DDL, SSaC ↔ Rego, SSaC ↔ OpenAPI, SSaC ↔ FuncSpec) resolve cleanly without static analysis. Borrowing a standard would immediately lose this precision.
+3. **Evolvability.** When SSaC lacks an annotation, adding one is a single PR. Standards do not allow that — you cannot inject `@yongol_auth` into the Temporal SDK.
+
+**The cost of custom.** SSaC is not free. The manual must be maintained, and every agent encountering SSaC for the first time pays an in-context learning cost. [`manual-for-ai.md`](manual-for-ai.md) exists to minimize that cost, and the cheatsheet below is designed so that an LLM absorbs the full vocabulary in a single pass.
+
+### SSaC Cheatsheet
+
+**Annotations** — the complete vocabulary:
+
+| Annotation | Purpose | Format |
+|---|---|---|
+| `@get` | Read from DB | `Type var = Model.Method({args})` |
+| `@post` | Create row | `Type var = Model.Method({args})` |
+| `@put` | Update row (no return) | `Model.Method({args})` |
+| `@delete` | Delete row | `Model.Method({args})` |
+| `@empty` | Guard nil → 404 | `var "message" [STATUS]` |
+| `@exists` | Guard not-nil → 409 | `var "message" [STATUS]` |
+| `@auth` | Authorization check | `"action" "resource" {inputs} "message" [STATUS]` |
+| `@state` | State-machine transition | `diagram {inputs} "transition" "message" [STATUS]` |
+| `@call` | Call a function | `[Type var =] pkg.Func({args})` |
+| `@eval` | Predicate guard (true → error) | `pkg.Func({args}) "message" STATUS` |
+| `@publish` | Publish to queue | `"topic" {payload}` |
+| `@subscribe` | Queue-triggered function | `"topic"` |
+| `@verify-password` | Login with timing defense | `Model.col=source Model.hash vs source -> var STATUS "msg"` |
+| `@response` | Return JSON | `{ field: var, ... }` or `var` |
+| `@no-pagination` | Exempt from pagination rule | *(function-level)* |
+| `@state-neutral` | Exempt from state-machine rule | *(function-level)* |
+
+**Complete example** — AcceptProposal (auth + dual state machine + escrow + queue):
+
+```go
+package service
+
+import "github.com/org/project/internal/billing"
+
+// @get Proposal p = Proposal.FindByID({ID: request.id})
+// @empty p "Proposal not found" 404
+// @get Gig gig = Gig.FindByID({ID: p.GigID})
+// @empty gig "Gig not found" 404
+// @auth "AcceptProposal" "gig" {ResourceID: request.id} "Forbidden" 403
+// @state proposal {status: p.Status} "AcceptProposal" "Cannot accept" 409
+// @state gig {status: gig.Status} "AcceptProposal" "Cannot accept on gig" 409
+// @put Proposal.UpdateStatus({ID: p.ID, Status: "accepted"})
+// @put Gig.AssignFreelancer({ID: gig.ID, FreelancerID: p.FreelancerID, Status: "in_progress"})
+// @call billing.HoldEscrowResponse escrow = billing.HoldEscrow({GigID: gig.ID, Amount: gig.Budget})
+// @publish "proposal.accepted" {GigID: gig.ID, FreelancerID: p.FreelancerID}
+// @get Proposal updated = Proposal.FindByID({ID: p.ID})
+// @response { proposal: updated }
+func AcceptProposal() {}
+```
+
+16 lines. 10 annotations. Two state machines, authorization, escrow, queue event, and a response — every decision visible, every detail absent. Full syntax reference: [`docs/ssac.md`](docs/ssac.md).
 
 ## Can I edit the generated code?
 
@@ -370,6 +441,8 @@ All SSOTs are parsed exactly once per CLI invocation via `ParseAll()` and shared
 ## Prior Art
 
 yongol applies multi-model consistency checking — mature research in Model-Driven Engineering for 20+ years — to the modern web SaaS stack, using industry-standard declarative formats (OpenAPI, SQL, Rego, Mermaid, Hurl, TSX) instead of custom metamodels (UML/SysML). The moat is not the idea; it is packaging the idea as a developer-facing OSS CLI that works with tools teams already use.
+
+**Why not an existing standard for the service layer?** BPMN/DMN model business processes for analyst audiences — their surface area is too large and their graphics-first tooling is incompatible with text SSOT. Temporal/Inngest/Restate are workflow *runtimes* — they couple decisions to implementation and import runtime constraints (determinism, replay) into the specification layer. OpenAPI stops at the contract boundary; Rego/Cedar stop at the policy boundary. None of these express the narrow concern SSaC targets: the ordered sequence of decisions inside a single endpoint. See [Why SSaC is a custom DSL](#why-ssac-is-a-custom-dsl) for the full rationale.
 
 ## Acknowledgments
 
