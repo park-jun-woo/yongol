@@ -121,6 +121,7 @@ SSaC self-consistency — required fields, variable flow, model references, @sub
 | S-71 | ERROR | SSaC Input 값의 변수 prefix 가 해당 시퀀스 지점에서 유효한 scope 에 없으면 ERROR | `pkg/validate/ssac/s_71_unknown_variable.go` |
 | S-72 | ERROR | `@call`/`@eval` 참조 패키지에 대한 SSaC import 선언 필수 | `pkg/validate/ssac/s_72_call_eval_import_required.go` |
 | S-73 | ERROR | SSaC import는 full Go import path 필수 (bare name 거부) | `pkg/validate/ssac/s_73_import_must_be_full_path.go` |
+| S-74 | ERROR | SSaC 함수에 어노테이션이 하나도 없으면 ERROR (빈 함수 차단) | `pkg/parser/ssac/parse_func_decl.go` |
 | XSS-11 | WARNING | `@result` type is plural | `pkg/validate/ssac/xss_11_plural_result_type.go` |
 | XSS-38 | ERROR | `@call` function name starts with a lowercase letter (uppercase recommended) | `pkg/validate/ssac/xss_38_call_func_lowercase.go` |
 | XSS-47 | WARNING | `@call` argument source variable is undefined | `pkg/validate/ssac/xss_47_call_source_var_undefined.go` |

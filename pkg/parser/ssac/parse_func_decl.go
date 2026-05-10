@@ -26,7 +26,15 @@ func parseFuncDecl(fset *token.FileSet, fn *ast.FuncDecl, f *ast.File, path stri
 		}}
 	}
 	if len(sequences) == 0 {
-		return nil, nil
+		line := fset.Position(fn.Pos()).Line
+		return nil, []diagnostic.Diagnostic{{
+			File:    path,
+			Line:    line,
+			Phase:   diagnostic.PhaseParse,
+			Level:   diagnostic.LevelError,
+			Message: "[S-74] " + filepath.Base(path) + ":" + fn.Name.Name + " — SSaC function has no annotations. Add at least one sequence (@get, @post, @call, @response, etc.)",
+			Advice:  "An SSaC function without annotations is a no-op. Either add sequence annotations or remove the file.",
+		}}
 	}
 
 	noPagination := hasNoPaginationComment(comments)

@@ -147,7 +147,7 @@ When an AI reads that code, it cannot tell which line is a decision and which is
 
 The AI authors and edits SSOTs. Code is re-rendered from them on every `yongol generate`. Decisions live permanently in the SSOTs; the code is a disposable projection.
 
-**`validate` keeps the SSOTs themselves consistent.** Decisions are spread across 9 files, so the SSOTs can drift against each other (DDL says `BIGINT`, OpenAPI says `string`). A contradicted SSOT is a corrupted decision — the rendered code will drift even if the AI never touched the code directly. `yongol validate` runs ~150 cross-SSOT rules and refuses to compile until every contradiction is resolved.
+**`validate` keeps the SSOTs themselves consistent.** Decisions are spread across 9 files, so the SSOTs can drift against each other (DDL says `BIGINT`, OpenAPI says `string`). A contradicted SSOT is a corrupted decision — the rendered code will drift even if the AI never touched the code directly. `yongol validate` runs ~270 cross-SSOT rules and refuses to compile until every contradiction is resolved.
 
 **Net effect.** SSOT preserves the decisions; `validate` preserves their integrity. Together they make decision survival independent of model size — a small LLM editing only SSOTs, with precise validate diagnostics on every miss, sustains the same decision integrity a much larger model would, and yongol re-renders the code deterministically from there.
 
