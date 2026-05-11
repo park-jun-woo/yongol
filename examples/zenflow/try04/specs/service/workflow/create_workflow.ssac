@@ -1,6 +1,0 @@
-package service
-
-// @auth "CreateWorkflow" "workflow" {} "Forbidden"
-// @post Workflow workflow = Workflow.Create({OrgID: currentUser.OrgID, Title: request.title, TriggerEvent: request.trigger_event})
-// @response { workflow: workflow }
-func CreateWorkflow() {}

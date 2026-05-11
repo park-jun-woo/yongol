@@ -1,0 +1,12 @@
+package service
+
+// @auth "CloneTemplate" "template" {} "Forbidden"
+// @get Template tmpl = Template.FindByID({ID: request.id})
+// @empty tmpl "Template not found"
+// @get Workflow sourceWf = Workflow.FindByID({ID: tmpl.SourceWorkflowID})
+// @empty sourceWf "Source workflow not found"
+// @post Workflow newWf = Workflow.Create({OrgID: currentUser.OrgID, Title: tmpl.Title, TriggerEvent: sourceWf.TriggerEvent})
+// @put Action.CopyToWorkflow({TargetWorkflowID: newWf.ID, SourceWorkflowID: sourceWf.ID})
+// @put Template.IncrementCloneCount({ID: tmpl.ID})
+// @response { workflow: newWf }
+func CloneTemplate() {}

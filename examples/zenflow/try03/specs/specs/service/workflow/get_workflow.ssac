@@ -1,8 +1,0 @@
-package service
-
-// @state-neutral
-// @auth "GetWorkflow" "workflow" {ResourceID: request.id} "Forbidden"
-// @get Workflow workflow = Workflow.FindByID({ID: request.id})
-// @empty workflow "Workflow not found"
-// @response { workflow: workflow }
-func GetWorkflow() {}

@@ -1,0 +1,10 @@
+package service
+
+// @auth "ArchiveWorkflow" "workflow" {ResourceID: request.id} "Forbidden"
+// @get Workflow wf = Workflow.FindByID({ID: request.id})
+// @empty wf "Workflow not found"
+// @state workflow {status: wf.Status} "ArchiveWorkflow" "Cannot archive workflow" 409
+// @put Workflow.UpdateStatus({ID: wf.ID, Status: "archived"})
+// @get Workflow updated = Workflow.FindByID({ID: wf.ID})
+// @response { workflow: updated }
+func ArchiveWorkflow() {}

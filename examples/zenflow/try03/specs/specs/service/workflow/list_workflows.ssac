@@ -1,7 +1,0 @@
-package service
-
-// @no-pagination
-// @auth "ListWorkflows" "workflow" {} "Forbidden"
-// @get []Workflow items = Workflow.ListByOrgID({OrgID: currentUser.OrgID})
-// @response { items: items }
-func ListWorkflows() {}

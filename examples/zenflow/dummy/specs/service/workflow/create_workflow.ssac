@@ -1,0 +1,7 @@
+package service
+
+// @auth "CreateWorkflow" "workflow" {} "Forbidden"
+// @post Workflow wf = Workflow.Create({OrgID: currentUser.OrgID, Title: request.title, TriggerEvent: request.trigger_event})
+// @put AuditLog.Create({OrgID: currentUser.OrgID, ActorID: currentUser.ID, Action: "CreateWorkflow", ResourceType: "workflow", ResourceID: wf.ID, Detail: wf.Title})
+// @response { workflow: wf }
+func CreateWorkflow() {}

@@ -1,0 +1,22 @@
+<main>
+  <section data-fetch="ListWebhooks">
+    <h2>Webhooks</h2>
+    <ul data-each="webhooks">
+      <li>
+        <span data-bind="url"></span>
+        <span data-bind="event_type"></span>
+      </li>
+    </ul>
+  </section>
+
+  <div data-action="CreateWebhook">
+    <h3>Add Webhook</h3>
+    <input data-field="url" type="text" placeholder="Webhook URL" />
+    <input data-field="event_type" type="text" placeholder="Event Type" />
+    <button type="submit">Create</button>
+  </div>
+
+  <div data-action="DeleteWebhook" data-param-id="route.id">
+    <button type="submit">Delete Webhook</button>
+  </div>
+</main>

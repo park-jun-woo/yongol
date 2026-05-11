@@ -1,0 +1,7 @@
+package service
+
+// @no-pagination
+// @auth "ListExecutionLogs" "workflow" {ResourceID: request.id} "Forbidden"
+// @get []ExecutionLog logs = ExecutionLog.ListByWorkflowID({WorkflowID: request.id})
+// @response { execution_logs: logs }
+func ListExecutionLogs() {}
