@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=stml-openapi
-//ff:what Run — STML↔OpenAPI 교차 검증 실행 (TM-01 ~ TM-10, XMO-10)
+//ff:what Run — STML↔OpenAPI 교차 검증 실행 (TM-01 ~ TM-13, XMO-10)
 package stml_openapi
 
 import (
@@ -31,5 +31,23 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	// XMO-10: OpenAPI operationId not consumed by any STML page
 	diags = append(diags, xmo10Unconsumed(fs.STMLPages, fs.OpenAPIDoc)...)
 
+	// TM-11 ~ TM-13: layout cross-validation (skip if no layouts defined)
+	if len(fs.Layouts) > 0 || (fs.Manifest != nil && fs.Manifest.Frontend.DefaultLayout != "") {
+		diags = append(diags, tm11LayoutNotFound(fs.STMLPages, fs.Layouts)...)
+		if fs.Manifest != nil {
+			diags = append(diags, tm12DefaultLayoutNotFound(fs.Manifest.Frontend.DefaultLayout, fs.Layouts)...)
+		}
+		diags = append(diags, tm13UnusedLayout(fs.STMLPages, fs.Layouts, defaultLayoutFromManifest(fs))...)
+	}
+
 	return diags
+}
+
+// defaultLayoutFromManifest extracts the defaultLayout value from the manifest,
+// returning empty string if the manifest is nil.
+func defaultLayoutFromManifest(fs *yongol.Fullstack) string {
+	if fs.Manifest == nil {
+		return ""
+	}
+	return fs.Manifest.Frontend.DefaultLayout
 }

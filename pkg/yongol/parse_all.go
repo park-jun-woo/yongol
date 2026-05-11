@@ -20,6 +20,7 @@ func ParseAll(root string, detected []DetectedSSOT) *Fullstack {
 	parseFuncIfPresent(fs, has)
 	parseScenarioIfPresent(fs, has)
 	parseSTMLIfPresent(fs, has)
+	parseLayoutIfPresent(fs, has)
 	parseDesignIfPresent(fs, root)
 	parseYongolPkgSpecs(fs)
 	parseSsacInterfaces(fs)

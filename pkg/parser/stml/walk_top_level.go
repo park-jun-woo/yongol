@@ -13,6 +13,12 @@ func walkTopLevel(n *html.Node, page *PageSpec) {
 		return
 	}
 	if n.Type == html.ElementNode {
+		// Extract data-layout from the first non-implicit element.
+		if page.Layout == "" {
+			if v := getAttr(n, "data-layout"); v != "" {
+				page.Layout = v
+			}
+		}
 		if dispatchTopLevelElement(n, page) {
 			return
 		}

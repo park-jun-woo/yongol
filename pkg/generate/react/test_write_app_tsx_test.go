@@ -14,7 +14,7 @@ import (
 
 func TestWriteAppTSX_NoPages_Placeholder(t *testing.T) {
 	dir := t.TempDir()
-	if err := writeAppTSX(dir, nil); err != nil {
+	if err := writeAppTSX(dir, nil, nil, ""); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))
@@ -34,7 +34,7 @@ func TestWriteAppTSX_BasicPages(t *testing.T) {
 		{Name: "register", FileName: "register.html"},
 		{Name: "dashboard", FileName: "dashboard.html"},
 	}
-	if err := writeAppTSX(dir, pages); err != nil {
+	if err := writeAppTSX(dir, pages, nil, ""); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))
@@ -69,7 +69,7 @@ func TestWriteAppTSX_DetailPage(t *testing.T) {
 			}},
 		},
 	}
-	if err := writeAppTSX(dir, pages); err != nil {
+	if err := writeAppTSX(dir, pages, nil, ""); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))
@@ -103,7 +103,7 @@ func TestWriteAppTSX_FullZenflow(t *testing.T) {
 		{Name: "webhooks", FileName: "webhooks.html"},
 		{Name: "audit-logs", FileName: "audit-logs.html"},
 	}
-	if err := writeAppTSX(dir, pages); err != nil {
+	if err := writeAppTSX(dir, pages, nil, ""); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))
@@ -226,7 +226,7 @@ func TestWriteAppTSX_NonDetailPageWithRouteParam(t *testing.T) {
 			},
 		},
 	}
-	if err := writeAppTSX(dir, pages); err != nil {
+	if err := writeAppTSX(dir, pages, nil, ""); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))
@@ -260,7 +260,7 @@ func TestBuildRoutes_Sorted(t *testing.T) {
 		{Name: "alpha", FileName: "alpha.html"},
 		{Name: "mid", FileName: "mid.html"},
 	}
-	routes := buildRoutes(pages)
+	routes := buildRoutes(pages, "")
 	if len(routes) != 3 {
 		t.Fatalf("got %d routes, want 3", len(routes))
 	}

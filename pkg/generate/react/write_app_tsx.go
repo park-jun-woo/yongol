@@ -18,17 +18,24 @@ type stmlRoute struct {
 	Path          string // e.g. "/workflows/:id"
 	ComponentName string // e.g. "WorkflowDetail"
 	ImportPath    string // e.g. "./pages/workflow-detail"
+	Layout        string // layout name (e.g. "app", "auth"); empty = no layout
 }
 
 // writeAppTSX emits App.tsx with routes derived from STML pages.
 // If no STML pages are provided, a placeholder scaffold is emitted.
-func writeAppTSX(srcDir string, pages []stml.PageSpec) error {
+//
+// When layouts are provided, routes are grouped under layout wrapper routes:
+//   - page.Layout != "" → grouped under that layout
+//   - page.Layout == "" → grouped under defaultLayout (if non-empty)
+//   - defaultLayout == "" and page.Layout == "" → flat route (no wrapper)
+func writeAppTSX(srcDir string, pages []stml.PageSpec, layouts []stml.LayoutSpec, defaultLayout string) error {
 	if len(pages) == 0 {
 		return writeAppTSXPlaceholder(srcDir)
 	}
 
-	routes := buildRoutes(pages)
-	src := renderAppTSX(routes)
+	routes := buildRoutes(pages, defaultLayout)
+	layoutSet := buildLayoutSet(layouts)
+	src := renderAppTSX(routes, layoutSet)
 	return os.WriteFile(filepath.Join(srcDir, "App.tsx"), []byte(src), 0644)
 }
 
@@ -51,16 +58,34 @@ export default function App() {
 }
 
 // buildRoutes converts STML PageSpecs into sorted route definitions.
-func buildRoutes(pages []stml.PageSpec) []stmlRoute {
+// defaultLayout is applied to pages that have no explicit Layout set.
+func buildRoutes(pages []stml.PageSpec, defaultLayout string) []stmlRoute {
 	routes := make([]stmlRoute, 0, len(pages))
 	for _, p := range pages {
 		rs := pageToRoutes(p)
+		// Resolve layout: explicit page.Layout > defaultLayout > ""
+		resolvedLayout := p.Layout
+		if resolvedLayout == "" {
+			resolvedLayout = defaultLayout
+		}
+		for i := range rs {
+			rs[i].Layout = resolvedLayout
+		}
 		routes = append(routes, rs...)
 	}
 	sort.Slice(routes, func(i, j int) bool {
 		return routes[i].Path < routes[j].Path
 	})
 	return routes
+}
+
+// buildLayoutSet returns a set of layout names that have corresponding LayoutSpecs.
+func buildLayoutSet(layouts []stml.LayoutSpec) map[string]bool {
+	s := make(map[string]bool, len(layouts))
+	for _, l := range layouts {
+		s[l.Name] = true
+	}
+	return s
 }
 
 // pageToRoutes converts a single STML PageSpec into route definitions.
@@ -152,10 +177,16 @@ func naivePluralize(s string) string {
 }
 
 // renderAppTSX generates the full App.tsx source from a list of routes.
-func renderAppTSX(routes []stmlRoute) string {
+// layoutSet contains layout names that have LayoutSpec definitions.
+// Routes with a non-empty Layout field are grouped under a layout wrapper route.
+func renderAppTSX(routes []stmlRoute, layoutSet map[string]bool) string {
+	// Partition routes by layout
+	grouped := groupRoutesByLayout(routes)
+
 	var sb strings.Builder
 	sb.WriteString("import { Routes, Route } from 'react-router-dom'\n")
 
+	// Import page components
 	seen := make(map[string]bool)
 	for _, r := range routes {
 		if seen[r.ComponentName] {
@@ -165,11 +196,65 @@ func renderAppTSX(routes []stmlRoute) string {
 		fmt.Fprintf(&sb, "import %s from '%s'\n", r.ComponentName, r.ImportPath)
 	}
 
-	sb.WriteString("\nexport default function App() {\n  return (\n    <Routes>\n")
-	for _, r := range routes {
-		fmt.Fprintf(&sb, "      <Route path=\"%s\" element={<%s />} />\n", r.Path, r.ComponentName)
+	// Import layout components (sorted for deterministic output)
+	layoutNames := sortedLayoutNames(grouped)
+	for _, name := range layoutNames {
+		if name == "" {
+			continue
+		}
+		compName := layoutComponentName(name)
+		fmt.Fprintf(&sb, "import %s from './layouts/%s'\n", compName, compName)
 	}
+
+	sb.WriteString("\nexport default function App() {\n  return (\n    <Routes>\n")
+
+	// Emit layout-grouped routes first, then flat routes
+	for _, name := range layoutNames {
+		rs := grouped[name]
+		if name == "" {
+			// Flat routes (no layout)
+			for _, r := range rs {
+				fmt.Fprintf(&sb, "      <Route path=\"%s\" element={<%s />} />\n", r.Path, r.ComponentName)
+			}
+			continue
+		}
+		compName := layoutComponentName(name)
+		fmt.Fprintf(&sb, "      <Route element={<%s />}>\n", compName)
+		for _, r := range rs {
+			fmt.Fprintf(&sb, "        <Route path=\"%s\" element={<%s />} />\n", r.Path, r.ComponentName)
+		}
+		sb.WriteString("      </Route>\n")
+	}
+
 	sb.WriteString("    </Routes>\n  )\n}\n")
 
 	return sb.String()
+}
+
+// groupRoutesByLayout partitions routes by their Layout field.
+// Routes with empty Layout are keyed under "".
+func groupRoutesByLayout(routes []stmlRoute) map[string][]stmlRoute {
+	m := make(map[string][]stmlRoute)
+	for _, r := range routes {
+		m[r.Layout] = append(m[r.Layout], r)
+	}
+	return m
+}
+
+// sortedLayoutNames returns layout names in sorted order, with "" (flat) last.
+func sortedLayoutNames(grouped map[string][]stmlRoute) []string {
+	names := make([]string, 0, len(grouped))
+	hasFlat := false
+	for name := range grouped {
+		if name == "" {
+			hasFlat = true
+			continue
+		}
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	if hasFlat {
+		names = append(names, "")
+	}
+	return names
 }

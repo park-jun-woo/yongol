@@ -53,10 +53,19 @@ func generateFrontendSetup(fs *yongol.Fullstack, artifactsDir string) error {
 		return err
 	}
 	var stmlPages []stml.PageSpec
+	var stmlLayouts []stml.LayoutSpec
+	var defaultLayout string
 	if fs != nil {
 		stmlPages = fs.STMLPages
+		stmlLayouts = fs.Layouts
+		if fs.Manifest != nil {
+			defaultLayout = fs.Manifest.Frontend.DefaultLayout
+		}
 	}
-	if err := writeAppTSX(srcDir, stmlPages); err != nil {
+	if err := writeLayoutsTSX(srcDir, stmlLayouts); err != nil {
+		return err
+	}
+	if err := writeAppTSX(srcDir, stmlPages, stmlLayouts, defaultLayout); err != nil {
 		return err
 	}
 	if err := writeLibUtils(srcDir); err != nil {

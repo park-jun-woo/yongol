@@ -27,3 +27,4 @@ frontend:
   bundler: vite
   name: zenflow-web
   design: frontend/DESIGN.md
+  defaultLayout: app
