@@ -27,5 +27,10 @@ type TypographyToken struct {
 
 // ComponentToken represents a component-level design token.
 type ComponentToken struct {
-	Props map[string]string `yaml:"props"`
+	Base           string            `yaml:"base"`
+	Variants       map[string]string `yaml:"variants"`
+	Sizes          map[string]string `yaml:"sizes"`
+	DefaultVariant string            `yaml:"defaultVariant"`
+	DefaultSize    string            `yaml:"defaultSize"`
+	Props          map[string]string `yaml:"props"`
 }

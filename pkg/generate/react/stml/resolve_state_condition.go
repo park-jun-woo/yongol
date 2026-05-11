@@ -17,6 +17,9 @@ func resolveStateCondition(condition, dataVar string) string {
 	case strings.HasSuffix(condition, ".error"):
 		return dataVar + "Error"
 	default:
+		if parts := strings.SplitN(condition, "=", 2); len(parts) == 2 {
+			return fmt.Sprintf("%s.%s === '%s'", dataVar, parts[0], parts[1])
+		}
 		return fmt.Sprintf("%s.%s", dataVar, condition)
 	}
 }

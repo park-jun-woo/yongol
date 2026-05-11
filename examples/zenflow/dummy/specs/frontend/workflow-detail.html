@@ -3,23 +3,21 @@
     <h2 data-bind="workflow.title"></h2>
     <p data-bind="workflow.status"></p>
     <p data-bind="workflow.trigger_event"></p>
+
+    <footer data-state="workflow.status=draft">
+      <button data-action="ActivateWorkflow" data-param-id="route.id">Activate</button>
+    </footer>
+
+    <footer data-state="workflow.status=active">
+      <button data-action="PauseWorkflow" data-param-id="route.id">Pause</button>
+      <button data-action="ArchiveWorkflow" data-param-id="route.id">Archive</button>
+      <button data-action="ExecuteWorkflow" data-param-id="route.id">Execute</button>
+    </footer>
+
+    <footer data-state="workflow.status=paused">
+      <button data-action="ActivateWorkflow" data-param-id="route.id">Resume</button>
+    </footer>
   </article>
-
-  <div data-action="ActivateWorkflow" data-param-id="route.id">
-    <button type="submit">Activate</button>
-  </div>
-
-  <div data-action="PauseWorkflow" data-param-id="route.id">
-    <button type="submit">Pause</button>
-  </div>
-
-  <div data-action="ArchiveWorkflow" data-param-id="route.id">
-    <button type="submit">Archive</button>
-  </div>
-
-  <div data-action="ExecuteWorkflow" data-param-id="route.id">
-    <button type="submit">Execute</button>
-  </div>
 
   <section data-fetch="ListActions" data-param-id="route.id">
     <h3>Actions</h3>

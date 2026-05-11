@@ -13,7 +13,7 @@ import (
 //	index.html, package.json, tsconfig.json, vite.config.ts
 //	tailwind.config.js, postcss.config.js
 //	src/main.tsx, src/App.tsx, src/index.css
-//	src/api.ts  — operationId-keyed apiClient (openapi-fetch + typed paths)
+//	src/lib/api.ts — operationId-keyed api (openapi-fetch + typed paths)
 //	src/types/api.d.ts — openapi-typescript output (spawn)
 //	src/lib/utils.ts — shadcn cn() helper
 //	src/components/ui/*.tsx — 10 shadcn-like primitives

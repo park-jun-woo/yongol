@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/park-jun-woo/yongol/pkg/parser/design"
+	"github.com/park-jun-woo/yongol/pkg/parser/stml"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
@@ -27,6 +29,11 @@ func generateFrontendSetup(fs *yongol.Fullstack, artifactsDir string) error {
 		theme = resolveTheme(fs)
 	}
 
+	var dspec *design.DesignSpec
+	if fs != nil {
+		dspec = fs.DesignSpec
+	}
+
 	if err := writePackageJSON(frontendDir); err != nil {
 		return err
 	}
@@ -39,27 +46,31 @@ func generateFrontendSetup(fs *yongol.Fullstack, artifactsDir string) error {
 	if err := writeIndexHTML(frontendDir); err != nil {
 		return err
 	}
-	if err := writeTailwindConfig(frontendDir, theme); err != nil {
+	if err := writeTailwindConfig(frontendDir, theme, dspec); err != nil {
 		return err
 	}
 	if err := writeMainTSX(srcDir); err != nil {
 		return err
 	}
-	if err := writeAppTSX(srcDir); err != nil {
+	var stmlPages []stml.PageSpec
+	if fs != nil {
+		stmlPages = fs.STMLPages
+	}
+	if err := writeAppTSX(srcDir, stmlPages); err != nil {
 		return err
 	}
 	if err := writeLibUtils(srcDir); err != nil {
 		return err
 	}
-	if err := writeComponentsUI(srcDir); err != nil {
+	if err := writeComponentsUI(srcDir, dspec); err != nil {
 		return err
 	}
 
-	// types/api.d.ts must exist before api.ts is written (same directory
-	// graph, import resolution). Best-effort: if openapi-typescript fails,
-	// a stub is written and the error is propagated so the caller knows.
+	// types/api.d.ts must exist before api.ts is written (import resolution).
+	// Best-effort: if openapi-typescript fails, a stub is written and the
+	// error is propagated so the caller knows.
 	// openapi-typescript must run before api.ts emission because api.ts
-	// imports `./types/api` at the type level. If the tool is missing, a
+	// imports `../types/api` at the type level. If the tool is missing, a
 	// stub is still written (inside runOpenAPITypescript's error path) so
 	// the TypeScript compiler has something to resolve against. The
 	// stub-then-error contract means api.ts is always emitted, and the

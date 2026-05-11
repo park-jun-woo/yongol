@@ -1,24 +1,43 @@
 //ff:func feature=gen-react type=generator control=iteration dimension=1
-//ff:what writeComponentsUI — src/components/ui/ 아래 shadcn-like 프리미티브 10종 방출
+//ff:what writeComponentsUI — DESIGN.md components 기반 또는 하드코딩 fallback 으로 src/components/ui/ 방출
 
 package react
 
 import (
 	"os"
 	"path/filepath"
+
+	"github.com/park-jun-woo/yongol/pkg/parser/design"
 )
 
-// writeComponentsUI materializes 10 shadcn/ui-inspired primitives under
-// src/components/ui/. Each file is self-contained and only depends on
-// React + @/lib/utils (cn). Variants follow shadcn conventions so AI can
-// iterate without extra lookup cost.
-func writeComponentsUI(srcDir string) error {
+// writeComponentsUI materializes UI component files under src/components/ui/.
+// When a DesignSpec with components is provided, each component is rendered
+// from its base/variants/sizes definition. Otherwise, the 10 hardcoded
+// shadcn-like primitives are emitted as a fallback.
+func writeComponentsUI(srcDir string, spec *design.DesignSpec) error {
 	uiDir := filepath.Join(srcDir, "components", "ui")
 	if err := os.MkdirAll(uiDir, 0o755); err != nil {
 		return err
 	}
+
+	if spec != nil && len(spec.Components) > 0 {
+		return writeDesignComponents(uiDir, spec.Components)
+	}
+
 	for name, source := range uiPrimitives() {
 		if err := os.WriteFile(filepath.Join(uiDir, name), []byte(source), 0o644); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// writeDesignComponents emits one TSX file per DESIGN.md component definition.
+func writeDesignComponents(uiDir string, comps map[string]design.ComponentToken) error {
+	for name, tok := range comps {
+		src := renderComponentTSX(name, tok)
+		fileName := name + ".tsx"
+		if err := os.WriteFile(filepath.Join(uiDir, fileName), []byte(src), 0o644); err != nil {
 			return err
 		}
 	}

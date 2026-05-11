@@ -13,5 +13,5 @@ func TestGenerateOptionsDefaults(t *testing.T) {
 </main>`))
 	code := GeneratePage(page, "")
 	assertContains(t, code, `import { api } from '@/lib/api'`)
-	assertContains(t, code, "'use client'")
+	assertNotContains(t, code, "'use client'")
 }

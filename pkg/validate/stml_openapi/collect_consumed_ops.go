@@ -20,11 +20,28 @@ func collectConsumedOps(pages []stml.PageSpec) map[string]struct{} {
 	return out
 }
 
-// collectFetchOps recursively collects operationIds from a FetchBlock
-// and its nested fetches.
+// collectFetchOps recursively collects operationIds from a FetchBlock,
+// its nested fetches, and actions inside data-state children.
 func collectFetchOps(f stml.FetchBlock, out map[string]struct{}) {
 	out[f.OperationID] = struct{}{}
 	for _, child := range f.NestedFetches {
 		collectFetchOps(child, out)
+	}
+	for _, child := range f.Children {
+		collectChildOps(child, out)
+	}
+}
+
+func collectChildOps(ch stml.ChildNode, out map[string]struct{}) {
+	if ch.Action != nil {
+		out[ch.Action.OperationID] = struct{}{}
+	}
+	if ch.Fetch != nil {
+		collectFetchOps(*ch.Fetch, out)
+	}
+	if ch.State != nil {
+		for _, sc := range ch.State.Children {
+			collectChildOps(sc, out)
+		}
 	}
 }

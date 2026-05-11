@@ -5,5 +5,5 @@ package stml
 // GenerateOptions configures code generation behavior.
 type GenerateOptions struct {
 	APIImportPath string // import path for api module (default: "@/lib/api")
-	UseClient     bool   // emit 'use client' directive (default: true)
+	UseClient     bool   // emit 'use client' directive (default: false)
 }

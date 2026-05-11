@@ -8,24 +8,32 @@ import (
 )
 
 // knownComponentProps lists the well-known component property names.
+// base, variants, sizes, defaultVariant, defaultSize are ComponentToken
+// struct fields (YAML-deserialized outside Props), but are listed here
+// defensively in case a user accidentally nests them under props:.
 var knownComponentProps = map[string]bool{
-	"variant":   true,
-	"size":      true,
-	"color":     true,
-	"disabled":  true,
-	"fullWidth": true,
-	"icon":      true,
-	"label":     true,
-	"children":  true,
-	"onClick":   true,
-	"onChange":   true,
-	"value":     true,
-	"placeholder": true,
-	"type":      true,
-	"name":      true,
-	"required":  true,
-	"className": true,
-	"style":     true,
+	"variant":        true,
+	"size":           true,
+	"color":          true,
+	"disabled":       true,
+	"fullWidth":      true,
+	"icon":           true,
+	"label":          true,
+	"children":       true,
+	"onClick":        true,
+	"onChange":        true,
+	"value":          true,
+	"placeholder":    true,
+	"type":           true,
+	"name":           true,
+	"required":       true,
+	"className":      true,
+	"style":          true,
+	"base":           true,
+	"variants":       true,
+	"sizes":          true,
+	"defaultVariant": true,
+	"defaultSize":    true,
 }
 
 // v07UnknownProp warns about component properties not in the known set.

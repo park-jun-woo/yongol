@@ -12,11 +12,14 @@ import (
 func (r *ReactTarget) GeneratePage(page stmlparser.PageSpec, specsDir string, opt GenerateOptions) string {
 	is := collectImports(page, specsDir)
 
-	// Collect fetch operationIds for mutation onSuccess
+	// Collect fetch operationIds for mutation onSuccess (all page-level fetches)
 	var fetchOps []string
 	for _, f := range page.Fetches {
 		fetchOps = collectFetchOps(f, fetchOps)
 	}
+
+	// Build per-action fetch map for scoped invalidation
+	actionFetchMap := buildActionFetchMap(page)
 
 	// Collect ALL actions including nested ones
 	allActions := append([]stmlparser.ActionBlock{}, page.Actions...)
@@ -46,7 +49,7 @@ func (r *ReactTarget) GeneratePage(page stmlparser.PageSpec, specsDir string, op
 	sb.WriteString(fmt.Sprintf("export default function %s() {\n", componentName))
 
 	renderPageHooks(page, is, &sb)
-	renderPageMutations(allActions, fetchOps, &sb)
+	renderPageMutations(allActions, fetchOps, actionFetchMap, &sb)
 	renderPageJSX(page, &sb)
 
 	sb.WriteString("}\n")

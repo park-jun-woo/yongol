@@ -14,7 +14,7 @@ import (
 //   - react/react-dom 19, react-router-dom 7 (current majors as of 2026-04)
 //   - @tanstack/react-query 5 for server state
 //   - react-hook-form 7 for form state (XOT-3 depends on its register())
-//   - openapi-fetch 0.x — typed fetch client consumed by src/api.ts
+//   - openapi-fetch 0.x — typed fetch client consumed by src/lib/api.ts
 //   - openapi-typescript 7.x (devDep) — `postinstall` runs on install; yongol
 //     also re-runs it from `yongol generate` so generated docs are fresh.
 //   - tailwindcss 3.x + clsx + tailwind-merge — shadcn/ui primitives rely on

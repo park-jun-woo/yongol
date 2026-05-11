@@ -1,5 +1,5 @@
 //ff:func feature=gen-react type=generator control=sequence
-//ff:what writeApiClientEntry — apiClient.<OperationID>(args) 엔트리 1건 방출 (path/query/body 분기)
+//ff:what writeApiClientEntry — api.<OperationID>(args) 엔트리 1건 방출 (path/query/body 분기)
 
 package react
 
@@ -8,14 +8,14 @@ import (
 	"strings"
 )
 
-// writeApiClientEntry emits a single apiClient.<OperationID>(args) entry.
+// writeApiClientEntry emits a single api.<OperationID>(args) entry.
 // Path params are lifted out of `args` into the openapi-fetch `path` option;
 // remaining properties flow as query (GET) or body (mutation).
 func writeApiClientEntry(b *strings.Builder, ep endpoint) {
 	method := strings.ToUpper(ep.method)
 	pathLit := ep.path
 
-	// args parameter signature — always optional so AI can call apiClient.X().
+	// args parameter signature — always optional so AI can call api.X().
 	b.WriteString("  ")
 	b.WriteString(ep.opID)
 	b.WriteString(": (args?: Record<string, any>) => {\n")

@@ -1,5 +1,3 @@
-'use client'
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
@@ -24,6 +22,11 @@ export default function WorkflowDetail() {
     queryFn: () => api.ListExecutionLogs({ id: id }),
   })
 
+  const { data: listWorkflowVersionsData, isLoading: listWorkflowVersionsDataLoading, error: listWorkflowVersionsDataError } = useQuery({
+    queryKey: ['ListWorkflowVersions', id],
+    queryFn: () => api.ListWorkflowVersions({ id: id }),
+  })
+
   const createActionForm = useForm()
   const createActionMutation = useMutation({
     mutationFn: (data: any) => api.CreateAction({ ...data, id: id }),
@@ -31,6 +34,17 @@ export default function WorkflowDetail() {
       queryClient.invalidateQueries({ queryKey: ['GetWorkflow'] })
       queryClient.invalidateQueries({ queryKey: ['ListActions'] })
       queryClient.invalidateQueries({ queryKey: ['ListExecutionLogs'] })
+      queryClient.invalidateQueries({ queryKey: ['ListWorkflowVersions'] })
+    },
+  })
+
+  const createWorkflowVersionMutation = useMutation({
+    mutationFn: (data: any) => api.CreateWorkflowVersion({ ...data, id: id }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['GetWorkflow'] })
+      queryClient.invalidateQueries({ queryKey: ['ListActions'] })
+      queryClient.invalidateQueries({ queryKey: ['ListExecutionLogs'] })
+      queryClient.invalidateQueries({ queryKey: ['ListWorkflowVersions'] })
     },
   })
 
@@ -38,8 +52,6 @@ export default function WorkflowDetail() {
     mutationFn: (data: any) => api.ActivateWorkflow({ ...data, id: id }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['GetWorkflow'] })
-      queryClient.invalidateQueries({ queryKey: ['ListActions'] })
-      queryClient.invalidateQueries({ queryKey: ['ListExecutionLogs'] })
     },
   })
 
@@ -47,8 +59,6 @@ export default function WorkflowDetail() {
     mutationFn: (data: any) => api.PauseWorkflow({ ...data, id: id }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['GetWorkflow'] })
-      queryClient.invalidateQueries({ queryKey: ['ListActions'] })
-      queryClient.invalidateQueries({ queryKey: ['ListExecutionLogs'] })
     },
   })
 
@@ -56,8 +66,6 @@ export default function WorkflowDetail() {
     mutationFn: (data: any) => api.ArchiveWorkflow({ ...data, id: id }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['GetWorkflow'] })
-      queryClient.invalidateQueries({ queryKey: ['ListActions'] })
-      queryClient.invalidateQueries({ queryKey: ['ListExecutionLogs'] })
     },
   })
 
@@ -65,8 +73,6 @@ export default function WorkflowDetail() {
     mutationFn: (data: any) => api.ExecuteWorkflow({ ...data, id: id }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['GetWorkflow'] })
-      queryClient.invalidateQueries({ queryKey: ['ListActions'] })
-      queryClient.invalidateQueries({ queryKey: ['ListExecutionLogs'] })
     },
   })
 
@@ -136,6 +142,23 @@ export default function WorkflowDetail() {
           </ul>
         </section>
       )}
+      {listWorkflowVersionsDataLoading && <div>로딩 중...</div>}
+      {listWorkflowVersionsDataError && <div>오류가 발생했습니다</div>}
+      {listWorkflowVersionsData && (
+        <section>
+          <h3>Versions</h3>
+          <ul>
+            {listWorkflowVersionsData.workflows?.map((item: any, index: number) => (
+              <li key={index}>
+                <span>{item.version}</span>
+                <span>{item.status}</span>
+                <span>{item.created_at}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      <div><button onClick={() => createWorkflowVersionMutation.mutate({})}>New Version</button></div>
     </main>
   )
 }

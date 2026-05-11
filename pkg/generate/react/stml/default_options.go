@@ -6,6 +6,6 @@ package stml
 func DefaultOptions() GenerateOptions {
 	return GenerateOptions{
 		APIImportPath: "@/lib/api",
-		UseClient:     true,
+		UseClient:     false,
 	}
 }
