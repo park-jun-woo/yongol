@@ -1,10 +1,11 @@
 //ff:func feature=validate type=util control=iteration dimension=1 topic=stml-design
-//ff:what collectOverrides — STML 파일에서 <!-- @override --> 주석 직후 요소의 class를 수집
+//ff:what collectOverrides — STML 파일에서 <!-- @override class="..." --> 주석의 class 값을 수집
 package stml_design
 
 import (
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -15,8 +16,12 @@ import (
 // overrideSet maps filename → set of class attribute values that are overridden.
 type overrideSet map[string]map[string]bool
 
-// collectOverrides scans raw STML HTML files for <!-- @override --> comments and
-// returns the set of class attribute values on elements immediately following such comments.
+// overrideClassRe extracts the class value from @override comment text.
+// Matches: @override class="..." or @override class='...'
+var overrideClassRe = regexp.MustCompile(`@override\s+class=["']([^"']+)["']`)
+
+// collectOverrides scans raw STML HTML files for <!-- @override class="..." --> comments
+// and returns the set of class attribute values extracted from those comments.
 func collectOverrides(fs *yongol.Fullstack) overrideSet {
 	result := make(overrideSet)
 	frontendDir := filepath.Join(fs.SpecsDir, "frontend")
@@ -31,8 +36,8 @@ func collectOverrides(fs *yongol.Fullstack) overrideSet {
 	return result
 }
 
-// parseOverridesFromFile reads an HTML file and finds class values on elements
-// immediately preceded by <!-- @override --> comments.
+// parseOverridesFromFile reads an HTML file and extracts class values from
+// <!-- @override class="..." --> comments.
 func parseOverridesFromFile(path string) map[string]bool {
 	f, err := os.Open(path)
 	if err != nil {
@@ -50,33 +55,34 @@ func parseOverridesFromFile(path string) map[string]bool {
 	return classes
 }
 
-// walkForOverrides recursively walks the DOM and finds elements preceded by
-// an @override comment sibling.
+// walkForOverrides recursively walks the DOM and extracts class values from
+// @override comment nodes.
 func walkForOverrides(n *html.Node, classes map[string]bool) {
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		if c.Type == html.CommentNode && isOverrideComment(c.Data) {
-			// Find next element sibling
-			for next := c.NextSibling; next != nil; next = next.NextSibling {
-				if next.Type == html.ElementNode {
-					cls := getNodeAttr(next, "class")
-					if cls != "" {
-						classes[cls] = true
-					}
-					break
-				}
-				// Skip text nodes (whitespace)
-				if next.Type == html.TextNode && strings.TrimSpace(next.Data) != "" {
-					break
-				}
+			cls := extractOverrideClass(c.Data)
+			if cls != "" {
+				classes[cls] = true
 			}
 		}
 		walkForOverrides(c, classes)
 	}
 }
 
-// isOverrideComment checks if a comment node's data matches " @override ".
+// isOverrideComment checks if a comment node's data starts with "@override".
+// Matches both <!-- @override --> and <!-- @override class="..." -->.
 func isOverrideComment(data string) bool {
-	return strings.TrimSpace(data) == "@override"
+	return strings.HasPrefix(strings.TrimSpace(data), "@override")
+}
+
+// extractOverrideClass extracts the class value from an @override comment.
+// Returns "" if no class attribute is present (structure-only override).
+func extractOverrideClass(data string) string {
+	m := overrideClassRe.FindStringSubmatch(data)
+	if m == nil {
+		return ""
+	}
+	return m[1]
 }
 
 // getNodeAttr returns the value of the named attribute on an html.Node.

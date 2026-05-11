@@ -65,8 +65,7 @@ func walkInlineStyles(n *html.Node, filename string, hexToToken map[string]strin
 	if n.Type == html.ElementNode {
 		style := getNodeAttr(n, "style")
 		if style != "" {
-			cls := getNodeAttr(n, "class")
-			if !isOverridden(ovr, filename, cls) {
+			if !isPrecededByOverride(n) {
 				checkStyleColors(style, filename, hexToToken, diags)
 			}
 		}
@@ -74,6 +73,22 @@ func walkInlineStyles(n *html.Node, filename string, hexToToken map[string]strin
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		walkInlineStyles(c, filename, hexToToken, ovr, diags)
 	}
+}
+
+// isPrecededByOverride checks if the given element node has a preceding
+// sibling that is an @override comment (skipping whitespace text nodes).
+func isPrecededByOverride(n *html.Node) bool {
+	for prev := n.PrevSibling; prev != nil; prev = prev.PrevSibling {
+		if prev.Type == html.CommentNode && isOverrideComment(prev.Data) {
+			return true
+		}
+		// Skip whitespace text nodes
+		if prev.Type == html.TextNode && strings.TrimSpace(prev.Data) == "" {
+			continue
+		}
+		break
+	}
+	return false
 }
 
 // checkStyleColors checks a style attribute value for hardcoded hex colors that
