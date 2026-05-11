@@ -1,0 +1,5 @@
+package service
+
+// @get []Template items = Template.ListCursor({Cursor: request.cursor, PerPage: request.per_page, FilterCategory: request.category})
+// @response { items: items }
+func ListTemplates() {}

@@ -123,11 +123,11 @@ allow {
 ## 8. Development Guidelines
 
 1. Read `manual-for-ai.md` at repo root as the sole source of yongol conventions.
-2. Author SSOT files in `examples/zenflow/specs/`.
-3. Generate code with `yongol generate examples/zenflow/specs examples/zenflow/arts`.
+2. Author SSOT files in `examples/zenflow/tryNN/specs/`.
+3. Generate code with `yongol generate examples/zenflow/tryNN/specs examples/zenflow/tryNN/arts`.
 4. Record a start timestamp when you write the first `manifest.yaml` line and measure wall-clock time through the full green chain, in this order:
-   1. `yongol validate examples/zenflow/specs` — all SSOTs consistent.
-   2. `yongol generate examples/zenflow/specs examples/zenflow/arts` — no ERROR/WARNING.
+   1. `yongol validate examples/zenflow/tryNN/specs` — all SSOTs consistent.
+   2. `yongol generate examples/zenflow/tryNN/specs examples/zenflow/tryNN/arts` — no ERROR/WARNING.
    3. `go build ./...` inside the generated backend — compiles clean.
    4. Start the backend and run `hurl --test --variable host=http://localhost:8080 examples/zenflow/arts/<project>/tests/smoke.hurl` — every smoke assertion green.
 
@@ -138,5 +138,5 @@ allow {
    - Hurl CLI (`hurl`) on PATH for the smoke step above.
 6. Build only from `manual-for-ai.md`. Do not consult other full-stack scaffolds, generated code from prior attempts, or unrelated implementations.
 7. If `yongol` itself errors, do **not** monkey-patch. Report at `~/.clari/repos/fullend/bugs/BUG-NNN.md` and stop only if blocked outright.
-8. On completion, record the timing breakdown (initial build, each incremental add) for benchmarking. and report in `examples/zenflow/REPORT.md`
+8. On completion, record the timing breakdown (initial build, each incremental add) for benchmarking. and report in `examples/zenflow/tryNN/REPORT.md`
 9. Shell caveat: in a PTY, `!` is history-expanded — avoid it in passwords.

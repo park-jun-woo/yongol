@@ -1,0 +1,17 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    schema: "."
+    queries: "queries/"
+    gen:
+      go:
+        package: "db"
+        out: "../../arts/backend/internal/db"
+        sql_package: "pgx/v5"
+        overrides:
+          - db_type: "timestamptz"
+            nullable: false
+            go_type: "github.com/jackc/pgx/v5/pgtype.Timestamptz"
+          - db_type: "timestamptz"
+            nullable: true
+            go_type: "github.com/jackc/pgx/v5/pgtype.Timestamptz"
