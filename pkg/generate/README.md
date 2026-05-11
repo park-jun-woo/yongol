@@ -41,7 +41,7 @@ arts/
 | 패키지 | 역할 |
 |---|---|
 | `gogin/` | Go+Gin 백엔드 orchestrator (주력) |
-| `react/` | React 프론트엔드 (향후) |
+| `react/` | React 프론트엔드 스캐폴드 + `react/stml/` STML→TSX 코드젠 |
 | `nestjs/` | NestJS (계획 단계) |
 | `migration/` | DDL diff 마이그레이션 emit |
 | `hurl_mirror/` | specs/tests → arts/tests 복사 |

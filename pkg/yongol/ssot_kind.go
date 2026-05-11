@@ -14,5 +14,5 @@ const (
 	KindScenario SSOTKind = "Scenario"
 	KindFunc     SSOTKind = "Func"
 	KindConfig   SSOTKind = "Config"
-	KindTSX      SSOTKind = "TSX"
+	KindSTML     SSOTKind = "STML"
 )

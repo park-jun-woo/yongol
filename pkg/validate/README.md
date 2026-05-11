@@ -24,7 +24,6 @@ yongol 의 단일·교차 SSOT 정합성 검증 통합 패키지. 도메인별 �
 | [`rego/`](rego/) | `P-`, `XPP-` |
 | [`funcspec/`](funcspec/) | `F-`, `XFF-` |
 | [`hurl/`](hurl/) | `H-` |
-| [`tsx/`](tsx/) | `TX-` |
 | [`migration/`](migration/) | `MG-` |
 | [`contract/`](contract/) | `CT-`, `PRV-` |
 
@@ -50,13 +49,13 @@ yongol 의 단일·교차 SSOT 정합성 검증 통합 패키지. 도메인별 �
 | [`hurl_openapi/`](hurl_openapi/) | `XOH-` |
 | [`hurl_statemachine/`](hurl_statemachine/) | `XMH-` |
 | [`hurl_manifest/`](hurl_manifest/) | `XNH-` |
-| [`tsx_openapi/`](tsx_openapi/) | `XOT-` |
+| [`stml_openapi/`](stml_openapi/) | `TM-` |
 
 ## 규칙 ID 표기 규약
 
 - **단일 SSOT**: `<prefix>-<N>` — 접두사 SSOT 고유 (S/D/O/TM/ST/P/F/H/C/M).
 - **교차 SSOT**: `X<target><source>-<N>` — `<target>` = LookupKey 의 SSOT (grounded-against), `<source>` = 주장 SSOT (claimant).
-- SSOT 코드: `O`=OpenAPI, `S`=SSaC, `D`=DDL, `T`=STML/TSX, `M`=StateMachine, `P`=Rego, `H`=Hurl, `F`=Func, `N`=Manifest, `A`=Authz, `Q`=sqlc.
+- SSOT 코드: `O`=OpenAPI, `S`=SSaC, `D`=DDL, `T`=STML, `M`=StateMachine, `P`=Rego, `H`=Hurl, `F`=Func, `N`=Manifest, `A`=Authz, `Q`=sqlc.
 
 ## Defeater 전역 카탈로그
 
@@ -76,8 +75,8 @@ yongol 의 단일·교차 SSOT 정합성 검증 통합 패키지. 도메인별 �
 ```
 ParseAll() → Fullstack
   → pkg/ground.Build(fs) → *rule.Ground
-  → per-SSOT validator (manifest/ddl/query/openapi/ssac/statemachine/rego/funcspec/hurl/tsx/migration/contract)
-  → per-pair validator (openapi_*, ssac_*, ddl_*, rego_*, query_*, hurl_*, tsx_*)
+  → per-SSOT validator (manifest/ddl/query/openapi/ssac/statemachine/rego/funcspec/hurl/migration/contract)
+  → per-pair validator (openapi_*, ssac_*, ddl_*, rego_*, query_*, hurl_*, stml_openapi)
   → 각 validator: rule.Ground + Toulmin Graph (warrant + defeater) → diagnostic
 ```
 

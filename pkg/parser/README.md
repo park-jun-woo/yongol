@@ -15,7 +15,7 @@
 | 패키지 | 입력 → 출력 | entry |
 |---|---|---|
 | `ssac/` | `.ssac` → `[]ServiceFunc` | `ParseDir(dir)`, `ParseFile(path)` |
-| `tsx/` (구 stml) | `.html`/`.tsx` → `[]PageSpec` | `ParseDir(dir)`, `ParseFile(path)`, `ParseReader(name, r)` |
+| `stml/` | `.html` → `[]PageSpec` | `ParseDir(dir)`, `ParseFile(path)`, `ParseReader(name, r)` |
 | `statemachine/` | Mermaid `.md` → `[]*StateDiagram` | `ParseDir(dir)`, `ParseFile(path)`, `Parse(id, content, file)` |
 | `funcspec/` | Go `.go` → `[]FuncSpec` | `ParseDir(dir)`, `ParseFile(path)` |
 | `hurl/` | `.hurl` → `[]HurlEntry` | `ParseFile(path)` (디렉토리 순회는 호출측 책임) |
@@ -35,7 +35,7 @@
 | `HurlEntry` | `hurl/` | method, path, statusCode + 추가 필드 |
 | `StateDiagram` / `Transition` | `statemachine/` | mermaid stateDiagram 구조 |
 | `ServiceFunc` | `ssac/` | SSaC 함수 시퀀스 |
-| `PageSpec` | `tsx/` | TSX/HTML 페이지 메타 |
+| `PageSpec` | `stml/` | STML 페이지 메타 |
 | `FuncSpec` | `funcspec/` | Go AST 함수 스펙 |
 | `ProjectConfig` | `manifest/` | manifest.yaml 루트 |
 
@@ -47,4 +47,4 @@
 | `pganalyze/pg_query_go` | DDL AST |
 | `open-policy-agent/opa/ast` | Rego AST |
 | `gopkg.in/yaml.v3` | manifest |
-| `golang.org/x/net/html` | tsx/stml |
+| `golang.org/x/net/html` | stml |

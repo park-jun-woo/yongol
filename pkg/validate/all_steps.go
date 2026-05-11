@@ -31,8 +31,7 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/validate/ssac_sqlc"
 	"github.com/park-jun-woo/yongol/pkg/validate/ssac_statemachine"
 	"github.com/park-jun-woo/yongol/pkg/validate/statemachine"
-	"github.com/park-jun-woo/yongol/pkg/validate/tsx"
-	"github.com/park-jun-woo/yongol/pkg/validate/tsx_openapi"
+	"github.com/park-jun-woo/yongol/pkg/validate/stml_openapi"
 )
 
 // allSteps returns the validation steps in fixed execution order.
@@ -65,7 +64,6 @@ func allSteps() []step {
 		{Name: "ddl_rego", Kinds: []yongol.SSOTKind{yongol.KindDDL, yongol.KindPolicy}, Run: ddl_rego.Run},
 		{Name: "query_rego", Kinds: []yongol.SSOTKind{yongol.KindDDL, yongol.KindPolicy}, Run: query_rego.Run},
 		{Name: "rego_manifest", Kinds: []yongol.SSOTKind{yongol.KindPolicy, yongol.KindConfig}, Run: rego_manifest.Run},
-		{Name: "tsx", Kinds: []yongol.SSOTKind{yongol.KindTSX}, Run: tsx.Run},
-		{Name: "tsx_openapi", Kinds: []yongol.SSOTKind{yongol.KindTSX, yongol.KindOpenAPI}, Run: tsx_openapi.Run},
+		{Name: "stml_openapi", Kinds: []yongol.SSOTKind{yongol.KindSTML, yongol.KindOpenAPI}, Run: stml_openapi.Run},
 	}
 }

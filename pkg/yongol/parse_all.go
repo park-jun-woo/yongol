@@ -19,7 +19,7 @@ func ParseAll(root string, detected []DetectedSSOT) *Fullstack {
 	parsePolicyIfPresent(fs, has)
 	parseFuncIfPresent(fs, has)
 	parseScenarioIfPresent(fs, has)
-	parseTSXIfPresent(fs, has)
+	parseSTMLIfPresent(fs, has)
 	parseYongolPkgSpecs(fs)
 	parseSsacInterfaces(fs)
 

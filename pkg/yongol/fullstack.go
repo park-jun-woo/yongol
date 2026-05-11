@@ -15,10 +15,10 @@ import (
 	oapiparser "github.com/park-jun-woo/yongol/pkg/parser/openapi"
 	"github.com/park-jun-woo/yongol/pkg/parser/ssac"
 	"github.com/park-jun-woo/yongol/pkg/parser/statemachine"
+	"github.com/park-jun-woo/yongol/pkg/parser/stml"
 	"github.com/park-jun-woo/yongol/pkg/parser/ddl"
 	"github.com/park-jun-woo/yongol/pkg/parser/rego"
 	sqlcparser "github.com/park-jun-woo/yongol/pkg/parser/sqlc"
-	"github.com/park-jun-woo/yongol/pkg/parser/tsx"
 	"github.com/park-jun-woo/yongol/pkg/rule"
 	"github.com/park-jun-woo/yongol/pkg/ssacmeta"
 )
@@ -45,9 +45,9 @@ type Fullstack struct {
 	DDLTables        []ddl.Table
 	SQLcQueries      []sqlcparser.QuerySpec
 	ParsedPolicies   []rego.Policy
-	TSXPages         []tsx.PageSpec
 	RequestConstraints  map[string]map[string]oapiparser.FieldConstraint
 	ResponseConstraints map[string]map[string]oapiparser.FieldConstraint
+	STMLPages           []stml.PageSpec
 	ParseDiagnostics    []diagnostic.Diagnostic // All errors collected during the parser phase. Gated at the CLI level.
 	Presences           map[SSOTKind]SSOTPresence // Presence state (Absent/Declared/Populated) per SSOT kind.
 	// SsacInterfaces holds parsed ssac/pkg/*/interface.yaml documents keyed

@@ -23,8 +23,8 @@ func kindPresent(fs *yongol.Fullstack, k yongol.SSOTKind) bool {
 		return fs.HurlEntries != nil || fs.HurlFiles != nil || fs.PresenceOf(yongol.KindScenario) != yongol.SSOTAbsent
 	case yongol.KindFunc:
 		return fs.ProjectFuncSpecs != nil
-	case yongol.KindTSX:
-		return fs.TSXPages != nil
+	case yongol.KindSTML:
+		return fs.STMLPages != nil
 	}
 	return false
 }

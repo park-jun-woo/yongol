@@ -65,8 +65,7 @@ yongol validate examples/zenflow
 ✓ ddl_statemachine
 ✓ ddl_rego
 ✓ rego_manifest
-✓ tsx
-✓ tsx_openapi
+✓ stml_openapi
 
 0 errors, 0 warnings
 ```
@@ -117,8 +116,8 @@ specs/
 ├── tests/smoke.hurl           → user-owned smoke (write it yourself)
 ├── tests/scenario-*.hurl      → user-owned business scenarios
 ├── tests/invariant-*.hurl     → user-owned cross-endpoint invariants
-├── frontend/pages/*.tsx       → React TSX — apiClient calls, forms
-└── frontend/components/*.tsx  → shared React components
+├── frontend/*.html            → STML — declarative page specs (data-* attributes)
+└── frontend/components/*.tsx  → custom React components (optional)
 ```
 
 Every layer uses `operationId` as a keystone — a single PascalCase identifier chains every layer together. `yongol chain <operationId>` walks the whole chain in one command.
@@ -153,7 +152,7 @@ The AI authors and edits SSOTs. Code is re-rendered from them on every `yongol g
 
 ## Why SSaC is a custom DSL
 
-Of yongol's 9 SSOT sources, 8 are industry standards (OpenAPI, SQL DDL, sqlc, Rego, Mermaid, Hurl, TSX, manifest YAML). SSaC — Service Sequence as Code — is the one yongol invented. This is intentional.
+Of yongol's 9 SSOT sources, 7 are industry standards (OpenAPI, SQL DDL, sqlc, Rego, Mermaid, Hurl, manifest YAML). SSaC and STML are yongol inventions. SSaC — Service Sequence as Code — captures service flow decisions. STML — Semantic Template Markup Language — captures frontend page structure as HTML with `data-*` attributes.
 
 **The gap SSaC fills.** Consider the spectrum of declarative tools. On one end sit contract standards (OpenAPI, SQL, Rego) that declare *what* but not *in what order*. On the other end sit workflow runtimes (Temporal, Inngest, Restate) that are *code* — decisions and implementation details remix in the same file. SSaC occupies the empty seat between them: "what happens inside one endpoint, in what order, and with what guards."
 
@@ -283,8 +282,7 @@ Individual SSOT validation followed by cross-layer consistency checks.
 ✓ ddl_statemachine
 ✓ ddl_rego
 ✓ rego_manifest
-✓ tsx
-✓ tsx_openapi
+✓ stml_openapi
 
 0 errors, 0 warnings
 ```
@@ -329,7 +327,7 @@ Call the generated functions from SSaC as `@call <pkg>.<Func>({...})`.
 
 ## Cross-Validation
 
-Individual tools (SSaC, TypeScript/TSX) validate their own layer. yongol catches inconsistencies **between** layers:
+Individual tools (SSaC, STML) validate their own layer. yongol catches inconsistencies **between** layers:
 
 - **manifest.yaml ↔ OpenAPI** — middleware names match securitySchemes keys
 - **OpenAPI parameters ↔ DDL** — referenced columns exist in tables
@@ -346,7 +344,7 @@ Individual tools (SSaC, TypeScript/TSX) validate their own layer. yongol catches
 - **Hurl ↔ Manifest** — auth precondition + CSRF headers (XOH-06~07)
 - **Queue** — `@publish` topics match `@subscribe` functions, payload fields agree
 - **Func ↔ SSaC** — `@call` references have implementations, arg count/types match
-- **TSX ↔ OpenAPI** — `apiClient.<op>()` ↔ operationId (XOT-1), call args ↔ parameters (XOT-2), `register('x')` ↔ request body schema (XOT-3, WARNING)
+- **STML ↔ OpenAPI** — `data-fetch`/`data-action` ↔ operationId (TM-01/02), `data-param-*` ↔ parameters (TM-04), `data-field` ↔ request body (TM-05), `data-bind` ↔ response schema (TM-06)
 
 ## Default Functions (pkg/)
 
@@ -434,13 +432,13 @@ hurl --test --variable host=http://localhost:8080 artifacts/my-project/tests/*.h
 
 ## Architecture
 
-SSaC is integrated into `pkg/parser/ssac/` + `pkg/validate/ssac*/`. React TSX is the 9th SSOT — `.tsx` files are parsed with swc (`pkg/parser/tsx`) and cross-validated against OpenAPI (`pkg/validate/tsx_openapi`).
+SSaC is integrated into `pkg/parser/ssac/` + `pkg/validate/ssac*/`. STML is the 9th SSOT — `.html` files with `data-*` attributes are parsed by `pkg/parser/stml/` and cross-validated against OpenAPI (`pkg/validate/stml_openapi/`). STML pages are compiled to React TSX by `pkg/generate/react/stml/`.
 
 All SSOTs are parsed exactly once per CLI invocation via `ParseAll()` and shared across the validate, generate, and chain pipelines.
 
 ## Prior Art
 
-yongol applies multi-model consistency checking — mature research in Model-Driven Engineering for 20+ years — to the modern web SaaS stack, using industry-standard declarative formats (OpenAPI, SQL, Rego, Mermaid, Hurl, TSX) instead of custom metamodels (UML/SysML). The moat is not the idea; it is packaging the idea as a developer-facing OSS CLI that works with tools teams already use.
+yongol applies multi-model consistency checking — mature research in Model-Driven Engineering for 20+ years — to the modern web SaaS stack, using industry-standard declarative formats (OpenAPI, SQL, Rego, Mermaid, Hurl) plus STML instead of custom metamodels (UML/SysML). The moat is not the idea; it is packaging the idea as a developer-facing OSS CLI that works with tools teams already use.
 
 **Why not an existing standard for the service layer?** BPMN/DMN model business processes for analyst audiences — their surface area is too large and their graphics-first tooling is incompatible with text SSOT. Temporal/Inngest/Restate are workflow *runtimes* — they couple decisions to implementation and import runtime constraints (determinism, replay) into the specification layer. OpenAPI stops at the contract boundary; Rego/Cedar stop at the policy boundary. None of these express the narrow concern SSaC targets: the ordered sequence of decisions inside a single endpoint. See [Why SSaC is a custom DSL](#why-ssac-is-a-custom-dsl) for the full rationale.
 

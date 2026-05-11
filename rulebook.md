@@ -14,13 +14,13 @@ Complete catalog of rules executed by `yongol validate`. The manual (`manual-for
 | `D-`, `XDD-` | DDL (PostgreSQL CREATE TABLE + sqlc queries) |
 | `O-`, `XOO-` | OpenAPI |
 | `S-`, `XSS-` | SSaC (Service-Sequence as Code) |
-| `T-` | React TSX (frontend/**/*.tsx) |
 | `ST-` | Mermaid stateDiagram |
 | `P-`, `XPP-` | OPA Rego |
 | `F-`, `XFF-` | Func spec (Go AST) |
 | `H-` | Hurl scenarios |
 | `Q-` | sqlc queries |
 | `CORS-` | manifest CORS block |
+| `TM-` | STML ↔ OpenAPI cross-validation |
 
 ### Cross SSOT — `X<target><source>-<N>`
 
@@ -33,11 +33,9 @@ Complete catalog of rules executed by `yongol validate`. The manual (`manual-for
 | Rego | `P` | Manifest | `N` |
 | Hurl | `H` | Func | `F` |
 | Authz | `A` | sqlc | `Q` |
-| TSX | `T` | | |
+| STML | `T` | | |
 
 Example: SSaC → OpenAPI (SSaC is the claim, OpenAPI is the ground truth) → `XOS-`.
-Example: TSX → OpenAPI (TSX is the claim, OpenAPI is the ground truth) → `XOT-`.
-
 ## Level
 
 | Level | Behavior | Meaning |
@@ -444,26 +442,6 @@ All Hurl files under `specs/tests/` are user-authored. yongol does not emit any 
 | XDM-27 | ERROR | `@state` field must exist as a DDL column | `pkg/validate/ddl_statemachine/xdm_27_state_field_column.go` |
 | XDM-28 | ERROR | stateDiagram `[*] → X` initial transition must match DDL `DEFAULT 'X'` | `pkg/validate/ddl_statemachine/xdm_28_default_initial_state.go` |
 
-## Q. TSX (React frontend)
-
-Self-consistency for React `.tsx` files (frontend/**/*.tsx).
-
-| Rule ID | Level | Description | Source |
-|---|---|---|---|
-| T-1 | WARNING | Import target file for `@/components/` or relative paths must exist | `pkg/validate/tsx/t_01_component_file.go` |
-
-## Q2. TSX ↔ OpenAPI
-
-Validates that `apiClient.<op>()` calls in TSX match the OpenAPI contract. One-directional (TSX → OpenAPI). operationIds not consumed by OpenAPI are intentionally not reported, since there are many other possible consumers (mobile, CLI, partners, etc.).
-
-| Rule ID | Level | Description | Source |
-|---|---|---|---|
-| XOT-1 | ERROR | `<op>` in `apiClient.<op>()` must exist in the OpenAPI operationId set | `pkg/validate/tsx_openapi/xot_01_operation_id.go` |
-| XOT-2 | ERROR | Path/query argument object keys of apiClient calls must exist in OpenAPI parameters | `pkg/validate/tsx_openapi/xot_02_parameter_match.go` |
-| XOT-3 | WARNING | `useForm().register('x')` field must exist in the OpenAPI request body schema of that page's mutation | `pkg/validate/tsx_openapi/xot_03_form_field.go` |
-
----
-
 ## S. Preserve (`PRV-*`) — Preserved file contract / runtime safety guards
 
 Applies only to `.go` files whose `//ff:checked hash` no longer matches (i.e., the user has edited them). Runs only when the arts directory is provided, as in `yongol validate <specs> <arts>`.
@@ -507,6 +485,22 @@ Rules collected during the DDL migration phase of `yongol generate` (`pkg/genera
 | MIG-004 | WARNING | DROP TABLE / DROP COLUMN occurs but the target table has no `@allow_destructive` (intent reconfirmation recommended) | `pkg/validate/migration/mig_004_destructive_without_allow.go` |
 | MIG-005 | WARNING | Risky type change (`INTEGER↔TEXT`, narrowing `VARCHAR(N)`, etc.) has no `@cast using=<expr>` hint | `pkg/validate/migration/mig_005_cast_missing.go` |
 | MIG-006 | ERROR | The `-- YONGOL_SCHEMA_HASH:` header in `specs/db/.generated_schema.sql` does not match the sha256 of the body (user-edited = drift) | `pkg/validate/migration/mig_006_snapshot_drift.go` |
+
+## U. STML ↔ OpenAPI (`TM-*`)
+
+Cross-validation between STML template attributes (`data-fetch`, `data-action`, `data-param`, `data-field`, `data-bind`, `data-each`, `data-component`) and the OpenAPI spec. Ensures that STML references resolve to valid OpenAPI operations, parameters, request/response fields, and component files.
+
+| Rule ID | Level | Description | Source |
+|---|---|---|---|
+| TM-01 | ERROR | `data-fetch` operationId is not defined in OpenAPI | `pkg/validate/stml_openapi/tm_01_fetch_op_not_found.go` |
+| TM-02 | ERROR | `data-action` operationId is not defined in OpenAPI | `pkg/validate/stml_openapi/tm_02_action_op_not_found.go` |
+| TM-03 | ERROR | `data-action` references a GET method endpoint (actions require POST/PUT/DELETE) | `pkg/validate/stml_openapi/tm_03_action_get_method.go` |
+| TM-04 | ERROR | `data-param` name is not declared in the OpenAPI operation's parameters | `pkg/validate/stml_openapi/tm_04_param_not_found.go` |
+| TM-05 | ERROR | `data-field` name is not in the OpenAPI operation's request body schema | `pkg/validate/stml_openapi/tm_05_field_not_found.go` |
+| TM-06 | ERROR | `data-bind` field is not in the OpenAPI operation's response schema | `pkg/validate/stml_openapi/tm_06_bind_not_found.go` |
+| TM-07 | ERROR | `data-each` field is not in the OpenAPI operation's response schema | `pkg/validate/stml_openapi/tm_0708_each.go` |
+| TM-08 | ERROR | `data-each` field exists in the response schema but is not an array type | `pkg/validate/stml_openapi/tm_0708_each.go` |
+| TM-09 | ERROR | `data-component` references a `.tsx` file that does not exist | `pkg/validate/stml_openapi/tm_09_component_not_found.go` |
 
 ---
 
