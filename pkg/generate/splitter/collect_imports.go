@@ -16,10 +16,17 @@ func collectImportsForDecl(decls []ast.Decl, allImports []*ast.ImportSpec) []*as
 		gatherSelectorNames(d, used)
 	}
 	var out []*ast.ImportSpec
+	seen := map[string]bool{} // import path 기준 중복 방지
 	for _, imp := range allImports {
-		if keepImport(imp, used) {
-			out = append(out, imp)
+		if !keepImport(imp, used) {
+			continue
 		}
+		path := imp.Path.Value
+		if seen[path] {
+			continue
+		}
+		seen[path] = true
+		out = append(out, imp)
 	}
 	return out
 }

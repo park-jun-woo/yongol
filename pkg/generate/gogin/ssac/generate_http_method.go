@@ -82,6 +82,16 @@ func generateHTTPMethod(sf ssacparser.ServiceFunc, fs *yongol.Fullstack, service
 	if len(responseLines) > 0 {
 		body = append(body, "")
 		body = append(body, responseLines...)
+	} else {
+		// SSaC에 @response 시퀀스가 없는 경우 (e.g. DELETE 204 No Content).
+		// SuccessStatus 기반으로 기본 return을 emit한다.
+		suffix := "JSONResponse"
+		if g.SuccessStatus == 204 {
+			suffix = "Response"
+		}
+		body = append(body, "")
+		body = append(body, fmt.Sprintf("return api.%s%d%s{}, nil",
+			sf.Name, g.SuccessStatus, suffix))
 	}
 
 	sig := fmt.Sprintf("func (server *Server) %s(ctx context.Context, request api.%sRequestObject) (api.%sResponseObject, error)", sf.Name, sf.Name, sf.Name)
