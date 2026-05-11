@@ -9,6 +9,7 @@ import (
 	"github.com/open-policy-agent/opa/ast"
 
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
+	"github.com/park-jun-woo/yongol/pkg/parser/design"
 	"github.com/park-jun-woo/yongol/pkg/parser/funcspec"
 	"github.com/park-jun-woo/yongol/pkg/parser/hurl"
 	"github.com/park-jun-woo/yongol/pkg/parser/manifest"
@@ -48,6 +49,7 @@ type Fullstack struct {
 	RequestConstraints  map[string]map[string]oapiparser.FieldConstraint
 	ResponseConstraints map[string]map[string]oapiparser.FieldConstraint
 	STMLPages           []stml.PageSpec
+	DesignSpec          *design.DesignSpec
 	ParseDiagnostics    []diagnostic.Diagnostic // All errors collected during the parser phase. Gated at the CLI level.
 	Presences           map[SSOTKind]SSOTPresence // Presence state (Absent/Declared/Populated) per SSOT kind.
 	// SsacInterfaces holds parsed ssac/pkg/*/interface.yaml documents keyed

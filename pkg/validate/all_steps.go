@@ -7,6 +7,9 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/validate/ddl"
 	"github.com/park-jun-woo/yongol/pkg/validate/ddl_rego"
 	"github.com/park-jun-woo/yongol/pkg/validate/ddl_statemachine"
+	designvalidate "github.com/park-jun-woo/yongol/pkg/validate/design"
+	"github.com/park-jun-woo/yongol/pkg/validate/design_manifest"
+	"github.com/park-jun-woo/yongol/pkg/validate/domain_security"
 	"github.com/park-jun-woo/yongol/pkg/validate/funcspec"
 	"github.com/park-jun-woo/yongol/pkg/validate/hurl"
 	"github.com/park-jun-woo/yongol/pkg/validate/hurl_manifest"
@@ -31,6 +34,7 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/validate/ssac_sqlc"
 	"github.com/park-jun-woo/yongol/pkg/validate/ssac_statemachine"
 	"github.com/park-jun-woo/yongol/pkg/validate/statemachine"
+	"github.com/park-jun-woo/yongol/pkg/validate/stml_design"
 	"github.com/park-jun-woo/yongol/pkg/validate/stml_openapi"
 )
 
@@ -46,6 +50,7 @@ func allSteps() []step {
 		{Name: "rego", Kinds: []yongol.SSOTKind{yongol.KindPolicy}, Run: rego.Run},
 		{Name: "hurl", Kinds: []yongol.SSOTKind{yongol.KindScenario}, Run: hurl.Run},
 		{Name: "funcspec", Kinds: []yongol.SSOTKind{yongol.KindFunc}, Run: funcspec.Run},
+		{Name: "design", Kinds: []yongol.SSOTKind{yongol.KindDesign}, Run: designvalidate.Run},
 		{Name: "openapi_ddl", Kinds: []yongol.SSOTKind{yongol.KindOpenAPI, yongol.KindDDL}, Run: openapi_ddl.Run},
 		{Name: "manifest_ddl", Kinds: []yongol.SSOTKind{yongol.KindConfig, yongol.KindDDL}, Run: manifest_ddl.Run},
 		{Name: "openapi_ssac", Kinds: []yongol.SSOTKind{yongol.KindOpenAPI, yongol.KindSSaC}, Run: openapi_ssac.Run},
@@ -65,5 +70,8 @@ func allSteps() []step {
 		{Name: "query_rego", Kinds: []yongol.SSOTKind{yongol.KindDDL, yongol.KindPolicy}, Run: query_rego.Run},
 		{Name: "rego_manifest", Kinds: []yongol.SSOTKind{yongol.KindPolicy, yongol.KindConfig}, Run: rego_manifest.Run},
 		{Name: "stml_openapi", Kinds: []yongol.SSOTKind{yongol.KindSTML, yongol.KindOpenAPI}, Run: stml_openapi.Run},
+		{Name: "stml_design", Kinds: []yongol.SSOTKind{yongol.KindSTML, yongol.KindDesign}, Run: stml_design.Run},
+		{Name: "domain_security", Kinds: []yongol.SSOTKind{yongol.KindConfig, yongol.KindOpenAPI}, Run: domain_security.Run},
+		{Name: "design_manifest", Kinds: []yongol.SSOTKind{yongol.KindConfig}, Run: design_manifest.Run},
 	}
 }

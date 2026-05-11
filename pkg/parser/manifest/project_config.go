@@ -15,4 +15,5 @@ type ProjectConfig struct {
 	File       *FileBackend    `yaml:"file"`
 	Queue      *QueueBackend   `yaml:"queue"`
 	Authz      *AuthzConfig    `yaml:"authz"`
+	Domains    map[string]DomainConfig `yaml:"domains,omitempty"`
 }

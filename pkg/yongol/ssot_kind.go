@@ -15,4 +15,5 @@ const (
 	KindFunc     SSOTKind = "Func"
 	KindConfig   SSOTKind = "Config"
 	KindSTML     SSOTKind = "STML"
+	KindDesign   SSOTKind = "Design"
 )

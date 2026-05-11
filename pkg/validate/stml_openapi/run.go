@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=stml-openapi
-//ff:what Run — STML↔OpenAPI 교차 검증 실행 (TM-01 ~ TM-09)
+//ff:what Run — STML↔OpenAPI 교차 검증 실행 (TM-01 ~ TM-09, XMO-10)
 package stml_openapi
 
 import (
@@ -24,5 +24,9 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			diags = append(diags, validateActionBlock(a, page.FileName, opMap, fs)...)
 		}
 	}
+
+	// XMO-10: OpenAPI operationId not consumed by any STML page
+	diags = append(diags, xmo10Unconsumed(fs.STMLPages, fs.OpenAPIDoc)...)
+
 	return diags
 }
