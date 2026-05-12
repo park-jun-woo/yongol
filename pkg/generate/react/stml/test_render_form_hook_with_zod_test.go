@@ -24,5 +24,5 @@ func TestRenderFormHookWithZod(t *testing.T) {
 	code := renderFormHook(a, constraints)
 	assertContains(t, code, "const createWorkflowSchema = z.object(")
 	assertContains(t, code, "resolver: zodResolver(createWorkflowSchema)")
-	assertContains(t, code, "const createWorkflowForm = useForm(")
+	assertContains(t, code, "const createWorkflowForm = useForm<z.infer<typeof createWorkflowSchema>>(")
 }

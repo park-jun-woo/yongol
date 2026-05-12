@@ -10,9 +10,9 @@ import (
 )
 
 // renderFetchHooks writes useQuery hook declarations.
-func renderFetchHooks(f stmlparser.FetchBlock, sb *strings.Builder) {
-	sb.WriteString(fmt.Sprintf("  %s\n\n", renderUseQuery(f)))
+func renderFetchHooks(f stmlparser.FetchBlock, pathParamTypes map[string]map[string]string, sb *strings.Builder) {
+	sb.WriteString(fmt.Sprintf("  %s\n\n", renderUseQuery(f, pathParamTypes)))
 	for _, child := range f.NestedFetches {
-		renderFetchHooks(child, sb)
+		renderFetchHooks(child, pathParamTypes, sb)
 	}
 }

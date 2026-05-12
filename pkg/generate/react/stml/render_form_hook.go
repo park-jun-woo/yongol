@@ -22,5 +22,5 @@ func renderFormHook(a stmlparser.ActionBlock, constraints map[string]map[string]
 
 	schemaCode := generateZodSchema(a.OperationID, fields)
 	schemaName := toLowerFirst(a.OperationID) + "Schema"
-	return fmt.Sprintf("%s\n  const %s = useForm({\n    resolver: zodResolver(%s),\n  })", schemaCode, formName, schemaName)
+	return fmt.Sprintf("%s\n  const %s = useForm<z.infer<typeof %s>>({\n    resolver: zodResolver(%s),\n  })", schemaCode, formName, schemaName, schemaName)
 }

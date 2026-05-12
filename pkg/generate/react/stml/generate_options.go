@@ -20,4 +20,9 @@ type GenerateOptions struct {
 	// NoBodyOps is the set of operationIds whose OpenAPI definition has no
 	// requestBody. Void mutations use mutate() instead of mutate({}).
 	NoBodyOps map[string]bool
+	// PathParamTypes maps operationId → paramName → OpenAPI type (e.g.
+	// "integer"). When a path parameter is "integer", the generated code
+	// wraps the useParams() value with Number() to satisfy TypeScript.
+	PathParamTypes map[string]map[string]string
 }
+

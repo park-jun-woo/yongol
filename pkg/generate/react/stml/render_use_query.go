@@ -9,10 +9,10 @@ import (
 )
 
 // renderUseQuery generates a useQuery hook call.
-func renderUseQuery(f stmlparser.FetchBlock) string {
+func renderUseQuery(f stmlparser.FetchBlock, pathParamTypes map[string]map[string]string) string {
 	alias := toLowerFirst(f.OperationID) + "Data"
 	paramValues := renderParamValues(f.Params)
-	paramArgs := renderParamArgs(f.Params)
+	paramArgs := renderParamArgs(f.Params, f.OperationID, pathParamTypes)
 
 	// queryKey parts
 	queryKey := fmt.Sprintf("'%s'", f.OperationID)

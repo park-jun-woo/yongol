@@ -57,8 +57,8 @@ func (r *ReactTarget) GeneratePage(page stmlparser.PageSpec, specsDir string, op
 	componentName := toComponentName(page.Name)
 	sb.WriteString(fmt.Sprintf("export default function %s() {\n", componentName))
 
-	renderPageHooks(page, is, &sb)
-	renderPageMutations(allActions, fetchOps, actionFetchMap, opt.RequestConstraints, opt.HasAuthz, &sb)
+	renderPageHooks(page, is, opt.PathParamTypes, &sb)
+	renderPageMutations(allActions, fetchOps, actionFetchMap, opt.RequestConstraints, opt.HasAuthz, opt.NoBodyOps, opt.PathParamTypes, &sb)
 	renderPageJSX(page, &sb, opt.NoBodyOps)
 
 	sb.WriteString("}\n")

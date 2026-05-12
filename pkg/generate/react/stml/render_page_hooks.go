@@ -9,7 +9,7 @@ import (
 	stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
 )
 
-func renderPageHooks(page stmlparser.PageSpec, is importSet, sb *strings.Builder) {
+func renderPageHooks(page stmlparser.PageSpec, is importSet, pathParamTypes map[string]map[string]string, sb *strings.Builder) {
 	allParams := collectAllParams(page)
 	if up := renderUseParamsWithRoute(allParams, page.Route); up != "" {
 		sb.WriteString(fmt.Sprintf("  %s\n", up))
@@ -26,6 +26,6 @@ func renderPageHooks(page stmlparser.PageSpec, is importSet, sb *strings.Builder
 	sb.WriteString("\n")
 
 	for _, f := range page.Fetches {
-		renderFetchHooks(f, sb)
+		renderFetchHooks(f, pathParamTypes, sb)
 	}
 }

@@ -10,21 +10,33 @@ import (
 )
 
 // renderUseMutation generates a useMutation hook call.
-func renderUseMutation(a stmlparser.ActionBlock, fetchOps []string, hasAuthz bool) string {
+func renderUseMutation(a stmlparser.ActionBlock, fetchOps []string, hasAuthz bool, noBodyOps map[string]bool, pathParamTypes map[string]map[string]string) string {
 	mutName := toLowerFirst(a.OperationID) + "Mutation"
-	paramArgs := renderParamArgs(a.Params)
+	paramArgs := renderParamArgs(a.Params, a.OperationID, pathParamTypes)
+	isVoid := noBodyOps[a.OperationID]
 
-	apiArgs := "data"
-	if paramArgs != "" {
-		inner := strings.TrimPrefix(paramArgs, "{ ")
-		inner = strings.TrimSuffix(inner, " }")
-		apiArgs = "{ ...data, " + inner + " }"
+	var fnParam, apiArgs string
+	if isVoid {
+		fnParam = "()"
+		if paramArgs != "" {
+			apiArgs = paramArgs
+		} else {
+			apiArgs = ""
+		}
+	} else {
+		fnParam = "(data)"
+		apiArgs = "data"
+		if paramArgs != "" {
+			inner := strings.TrimPrefix(paramArgs, "{ ")
+			inner = strings.TrimSuffix(inner, " }")
+			apiArgs = "{ ...data, " + inner + " }"
+		}
 	}
 
 	// Login + authz: store tokens and navigate to '/'
 	if hasAuthz && isLoginAction(a.OperationID) {
 		return fmt.Sprintf(`const %s = useMutation({
-    mutationFn: (data) => api.%s(%s),
+    mutationFn: %s => api.%s(%s),
     onSuccess: (data) => {
       localStorage.setItem('access_token', data.access_token)
       if (data.refresh_token) {
@@ -32,7 +44,7 @@ func renderUseMutation(a stmlparser.ActionBlock, fetchOps []string, hasAuthz boo
       }
       navigate('/')
     },
-  })`, mutName, a.OperationID, apiArgs)
+  })`, mutName, fnParam, a.OperationID, apiArgs)
 	}
 
 	// onSuccess: invalidate related queries
@@ -46,9 +58,9 @@ func renderUseMutation(a stmlparser.ActionBlock, fetchOps []string, hasAuthz boo
 	}
 
 	return fmt.Sprintf(`const %s = useMutation({
-    mutationFn: (data) => api.%s(%s),
+    mutationFn: %s => api.%s(%s),
     onSuccess: () => {
       %s
     },
-  })`, mutName, a.OperationID, apiArgs, invalidate)
+  })`, mutName, fnParam, a.OperationID, apiArgs, invalidate)
 }

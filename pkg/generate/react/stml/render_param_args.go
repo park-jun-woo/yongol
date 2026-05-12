@@ -9,13 +9,17 @@ import (
 	stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
 )
 
-func renderParamArgs(params []stmlparser.ParamBind) string {
+func renderParamArgs(params []stmlparser.ParamBind, opID string, pathParamTypes map[string]map[string]string) string {
 	if len(params) == 0 {
 		return ""
 	}
 	var parts []string
 	for _, p := range params {
-		parts = append(parts, fmt.Sprintf("%s: %s", p.Name, paramSourceExpr(p)))
+		expr := paramSourceExpr(p)
+		if isIntegerParam(opID, p.Name, pathParamTypes) {
+			expr = "Number(" + expr + ")"
+		}
+		parts = append(parts, fmt.Sprintf("%s: %s", p.Name, expr))
 	}
 	return "{ " + strings.Join(parts, ", ") + " }"
 }

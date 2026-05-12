@@ -17,5 +17,8 @@ func mergeOpt(base, override GenerateOptions) GenerateOptions {
 	if override.NoBodyOps != nil {
 		base.NoBodyOps = override.NoBodyOps
 	}
+	if override.PathParamTypes != nil {
+		base.PathParamTypes = override.PathParamTypes
+	}
 	return base
 }
