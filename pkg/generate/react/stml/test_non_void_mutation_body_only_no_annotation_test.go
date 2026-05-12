@@ -1,5 +1,5 @@
 //ff:func feature=stml-gen type=test control=sequence
-//ff:what body-only(path param 없음) 분기에서 constraints 있어도 z.infer 타입이 붙지 않는지 검증
+//ff:what body-only(path param 없음) 분기에서 api 함수 직접 참조 형태인지 검증
 package stml
 
 import (
@@ -24,6 +24,7 @@ func TestNonVoidMutationBodyOnlyNoAnnotation(t *testing.T) {
 			},
 		},
 	})
-	assertContains(t, code, `mutationFn: (data) => api.CreateRoom(data)`)
+	assertContains(t, code, `mutationFn: api.CreateRoom`)
+	assertNotContains(t, code, `(data) => api.CreateRoom(data)`)
 	assertNotContains(t, code, `z.infer<typeof createRoomSchema>)`)
 }

@@ -17,11 +17,14 @@ func resolveMutationArgs(operationID, paramArgs string, isVoid bool, constraints
 		apiArgs = paramArgs // empty when no params
 		return fnParam, apiArgs
 	}
-	fnParam = "(data)"
-	apiArgs = "data"
 	if paramArgs == "" {
+		// body only: signal caller to emit `mutationFn: api.X` directly
+		fnParam = ""
+		apiArgs = ""
 		return fnParam, apiArgs
 	}
+	fnParam = "(data)"
+	apiArgs = "data"
 	inner := strings.TrimPrefix(paramArgs, "{ ")
 	inner = strings.TrimSuffix(inner, " }")
 	apiArgs = "{ ...data, " + inner + " }"

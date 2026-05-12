@@ -16,7 +16,9 @@ func writeReqResTypes(b *strings.Builder) {
 	b.WriteString("  operations[K] extends { parameters: { query?: infer Q } } ? (Q extends undefined ? {} : Q) : {}\n\n")
 
 	b.WriteString("type BodyOf<K extends keyof operations> =\n")
-	b.WriteString("  operations[K] extends { requestBody: { content: { 'application/json': infer B } } } ? B : {}\n\n")
+	b.WriteString("  operations[K] extends { requestBody: { content: { 'application/json': infer B } } }\n")
+	b.WriteString("    ? keyof B extends never ? {} : B\n")
+	b.WriteString("    : {}\n\n")
 
 	b.WriteString("type Req<K extends keyof operations> =\n")
 	b.WriteString("  PathOf<K> & QueryOf<K> & BodyOf<K> extends infer R\n")

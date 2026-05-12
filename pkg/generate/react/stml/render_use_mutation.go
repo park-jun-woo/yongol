@@ -17,10 +17,12 @@ func renderUseMutation(a stmlparser.ActionBlock, fetchOps []string, hasAuthz boo
 
 	fnParam, apiArgs := resolveMutationArgs(a.OperationID, paramArgs, isVoid, constraints)
 
+	mutationFn := renderMutationFnExpr(fnParam, a.OperationID, apiArgs)
+
 	// Login + authz: store tokens and navigate to '/'
 	if hasAuthz && isLoginAction(a.OperationID) {
 		return fmt.Sprintf(`const %s = useMutation({
-    mutationFn: %s => api.%s(%s),
+    mutationFn: %s,
     onSuccess: (data) => {
       localStorage.setItem('access_token', data.access_token)
       if (data.refresh_token) {
@@ -28,15 +30,15 @@ func renderUseMutation(a stmlparser.ActionBlock, fetchOps []string, hasAuthz boo
       }
       navigate('/')
     },
-  })`, mutName, fnParam, a.OperationID, apiArgs)
+  })`, mutName, mutationFn)
 	}
 
 	invalidate := renderInvalidateExpr(fetchOps)
 
 	return fmt.Sprintf(`const %s = useMutation({
-    mutationFn: %s => api.%s(%s),
+    mutationFn: %s,
     onSuccess: () => {
       %s
     },
-  })`, mutName, fnParam, a.OperationID, apiArgs, invalidate)
+  })`, mutName, mutationFn, invalidate)
 }

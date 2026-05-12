@@ -1,5 +1,5 @@
 //ff:func feature=stml-gen type=test control=sequence
-//ff:what Login + HasAuthz 시 토큰 저장 + navigate('/') 방출 검증
+//ff:what Login + HasAuthz 시 토큰 저장 + navigate('/') + body only 직접 참조 방출 검증
 package stml
 
 import (
@@ -21,6 +21,10 @@ func TestGenerateLoginPage_Authz_TokenStore(t *testing.T) {
 		APIImportPath: "@/lib/api",
 		HasAuthz:      true,
 	})
+
+	// body only: api function passed directly
+	assertContains(t, code, "mutationFn: api.Login")
+	assertNotContains(t, code, "(data) => api.Login(data)")
 
 	// Token storage in onSuccess
 	assertContains(t, code, "localStorage.setItem('access_token', data.access_token)")
