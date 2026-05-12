@@ -29,6 +29,10 @@ func TestWriteAPIClient_TypedSig_ReqResHelpers(t *testing.T) {
 	}
 	content := string(data)
 
+	assertContains(t, content, "type PathOf<K extends keyof operations>")
+	assertContains(t, content, "type QueryOf<K extends keyof operations>")
+	assertContains(t, content, "type BodyOf<K extends keyof operations>")
 	assertContains(t, content, "type Req<K extends keyof operations>")
+	assertContains(t, content, "PathOf<K> & QueryOf<K> & BodyOf<K> extends infer R")
 	assertContains(t, content, "type Res<K extends keyof operations>")
 }

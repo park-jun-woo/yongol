@@ -4,34 +4,18 @@ package stml
 
 import (
 	"fmt"
-	"strings"
 
+	oapiparser "github.com/park-jun-woo/yongol/pkg/parser/openapi"
 	stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
 )
 
 // renderUseMutation generates a useMutation hook call.
-func renderUseMutation(a stmlparser.ActionBlock, fetchOps []string, hasAuthz bool, noBodyOps map[string]bool, pathParamTypes map[string]map[string]string) string {
+func renderUseMutation(a stmlparser.ActionBlock, fetchOps []string, hasAuthz bool, noBodyOps map[string]bool, pathParamTypes map[string]map[string]string, constraints map[string]map[string]oapiparser.FieldConstraint) string {
 	mutName := toLowerFirst(a.OperationID) + "Mutation"
 	paramArgs := renderParamArgs(a.Params, a.OperationID, pathParamTypes)
 	isVoid := noBodyOps[a.OperationID]
 
-	var fnParam, apiArgs string
-	if isVoid {
-		fnParam = "()"
-		if paramArgs != "" {
-			apiArgs = paramArgs
-		} else {
-			apiArgs = ""
-		}
-	} else {
-		fnParam = "(data)"
-		apiArgs = "data"
-		if paramArgs != "" {
-			inner := strings.TrimPrefix(paramArgs, "{ ")
-			inner = strings.TrimSuffix(inner, " }")
-			apiArgs = "{ ...data, " + inner + " }"
-		}
-	}
+	fnParam, apiArgs := resolveMutationArgs(a.OperationID, paramArgs, isVoid, constraints)
 
 	// Login + authz: store tokens and navigate to '/'
 	if hasAuthz && isLoginAction(a.OperationID) {
@@ -47,15 +31,7 @@ func renderUseMutation(a stmlparser.ActionBlock, fetchOps []string, hasAuthz boo
   })`, mutName, fnParam, a.OperationID, apiArgs)
 	}
 
-	// onSuccess: invalidate related queries
-	invalidate := "queryClient.invalidateQueries()"
-	if len(fetchOps) > 0 {
-		var parts []string
-		for _, op := range fetchOps {
-			parts = append(parts, fmt.Sprintf("queryClient.invalidateQueries({ queryKey: ['%s'] })", op))
-		}
-		invalidate = strings.Join(parts, "\n      ")
-	}
+	invalidate := renderInvalidateExpr(fetchOps)
 
 	return fmt.Sprintf(`const %s = useMutation({
     mutationFn: %s => api.%s(%s),

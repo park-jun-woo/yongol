@@ -22,9 +22,10 @@ func runSTMLCodegen(fs *yongol.Fullstack, artifactsDir string) error {
 	if fs.Manifest != nil {
 		hasAuthz = fs.Manifest.Authz != nil
 	}
+	constraints := fillDefaultRequestConstraints(fs.STMLPages, fs.OpenAPIDoc, fs.RequestConstraints)
 	opt := stmlgen.GenerateOptions{
 		HasAuthz:                hasAuthz,
-		RequestConstraints:      fs.RequestConstraints,
+		RequestConstraints:      constraints,
 		ResponseArrayItemFields: oapiparser.ExtractResponseArrayItemFields(fs.OpenAPIDoc),
 		NoBodyOps:               oapiparser.ExtractNoBodyOps(fs.OpenAPIDoc),
 		PathParamTypes:          oapiparser.ExtractPathParamTypes(fs.OpenAPIDoc),
