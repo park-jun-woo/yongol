@@ -18,7 +18,12 @@ func runSTMLCodegen(fs *yongol.Fullstack, artifactsDir string) error {
 		return nil
 	}
 	pagesDir := filepath.Join(artifactsDir, "frontend", "src", "pages")
+	var hasAuthz bool
+	if fs.Manifest != nil {
+		hasAuthz = fs.Manifest.Authz != nil
+	}
 	opt := stmlgen.GenerateOptions{
+		HasAuthz:                hasAuthz,
 		RequestConstraints:      fs.RequestConstraints,
 		ResponseArrayItemFields: oapiparser.ExtractResponseArrayItemFields(fs.OpenAPIDoc),
 	}

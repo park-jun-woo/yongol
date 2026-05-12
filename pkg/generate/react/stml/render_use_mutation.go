@@ -10,7 +10,7 @@ import (
 )
 
 // renderUseMutation generates a useMutation hook call.
-func renderUseMutation(a stmlparser.ActionBlock, fetchOps []string) string {
+func renderUseMutation(a stmlparser.ActionBlock, fetchOps []string, hasAuthz bool) string {
 	mutName := toLowerFirst(a.OperationID) + "Mutation"
 	paramArgs := renderParamArgs(a.Params)
 
@@ -19,6 +19,20 @@ func renderUseMutation(a stmlparser.ActionBlock, fetchOps []string) string {
 		inner := strings.TrimPrefix(paramArgs, "{ ")
 		inner = strings.TrimSuffix(inner, " }")
 		apiArgs = "{ ...data, " + inner + " }"
+	}
+
+	// Login + authz: store tokens and navigate to '/'
+	if hasAuthz && isLoginAction(a.OperationID) {
+		return fmt.Sprintf(`const %s = useMutation({
+    mutationFn: (data) => api.%s(%s),
+    onSuccess: (data) => {
+      localStorage.setItem('access_token', data.access_token)
+      if (data.refresh_token) {
+        localStorage.setItem('refresh_token', data.refresh_token)
+      }
+      navigate('/')
+    },
+  })`, mutName, a.OperationID, apiArgs)
 	}
 
 	// onSuccess: invalidate related queries

@@ -7,6 +7,7 @@ func mergeOpt(base, override GenerateOptions) GenerateOptions {
 		base.APIImportPath = override.APIImportPath
 	}
 	base.UseClient = override.UseClient
+	base.HasAuthz = override.HasAuthz
 	if override.RequestConstraints != nil {
 		base.RequestConstraints = override.RequestConstraints
 	}

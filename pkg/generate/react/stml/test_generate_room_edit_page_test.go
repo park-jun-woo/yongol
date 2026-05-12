@@ -20,6 +20,8 @@ func TestGenerateRoomEditPage(t *testing.T) {
 </main>`))
 	code := GeneratePage(page, "")
 	assertContains(t, code, "export default function RoomEditPage()")
+	assertContains(t, code, `<main className="mx-auto max-w-4xl px-4 py-8 space-y-6">`)
+	assertContains(t, code, `<h1 className="text-2xl font-bold">Room Edit</h1>`)
 	assertContains(t, code, "useParams")
 	assertContains(t, code, "RoomID")
 	assertContains(t, code, "api.UpdateRoom")

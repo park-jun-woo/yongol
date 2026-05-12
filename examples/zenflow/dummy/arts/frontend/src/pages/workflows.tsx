@@ -1,5 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { api } from '@/lib/api'
 
 export default function Workflows() {
@@ -10,9 +12,15 @@ export default function Workflows() {
     queryFn: () => api.ListWorkflows(),
   })
 
-  const createWorkflowForm = useForm()
+  const createWorkflowSchema = z.object({
+  title: z.string().min(1),
+  trigger_event: z.string().min(1),
+})
+  const createWorkflowForm = useForm({
+    resolver: zodResolver(createWorkflowSchema),
+  })
   const createWorkflowMutation = useMutation({
-    mutationFn: (data: any) => api.CreateWorkflow(data),
+    mutationFn: (data) => api.CreateWorkflow(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ListWorkflows'] })
     },
@@ -26,8 +34,8 @@ export default function Workflows() {
         <section>
           <h2>Workflows</h2>
           <ul>
-            {listWorkflowsData.workflows?.map((item: any, index: number) => (
-              <li key={index}>
+            {listWorkflowsData.workflows?.map((item) => (
+              <li key={item.id}>
                 <span>{item.title}</span>
                 <span>{item.status}</span>
               </li>
@@ -37,9 +45,15 @@ export default function Workflows() {
       )}
       <form onSubmit={createWorkflowForm.handleSubmit((data) => createWorkflowMutation.mutate(data))}>
         <h3>New Workflow</h3>
-        <input type="text" placeholder="Title" {...createWorkflowForm.register('title')} />
-        <input type="text" placeholder="Trigger Event" {...createWorkflowForm.register('trigger_event')} />
-        <button type="submit">Create</button>
+        <div>
+          <label htmlFor="title">Title</label>
+          <input id="title" type="text" placeholder="Title" {...createWorkflowForm.register('title')} />
+        </div>
+        <div>
+          <label htmlFor="trigger_event">Trigger Event</label>
+          <input id="trigger_event" type="text" placeholder="Trigger Event" {...createWorkflowForm.register('trigger_event')} />
+        </div>
+        <button type="submit" disabled={createWorkflowMutation.isPending}>{createWorkflowMutation.isPending ? '처리 중...' : 'Create'}</button>
       </form>
     </main>
   )

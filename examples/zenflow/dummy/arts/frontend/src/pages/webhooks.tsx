@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { api } from '@/lib/api'
 
 export default function Webhooks() {
@@ -12,16 +14,22 @@ export default function Webhooks() {
     queryFn: () => api.ListWebhooks(),
   })
 
-  const createWebhookForm = useForm()
+  const createWebhookSchema = z.object({
+  event_type: z.string().min(1),
+  url: z.string().min(1),
+})
+  const createWebhookForm = useForm({
+    resolver: zodResolver(createWebhookSchema),
+  })
   const createWebhookMutation = useMutation({
-    mutationFn: (data: any) => api.CreateWebhook(data),
+    mutationFn: (data) => api.CreateWebhook(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ListWebhooks'] })
     },
   })
 
   const deleteWebhookMutation = useMutation({
-    mutationFn: (data: any) => api.DeleteWebhook({ ...data, id: id }),
+    mutationFn: (data) => api.DeleteWebhook({ ...data, id: id }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ListWebhooks'] })
     },
@@ -35,8 +43,8 @@ export default function Webhooks() {
         <section>
           <h2>Webhooks</h2>
           <ul>
-            {listWebhooksData.webhooks?.map((item: any, index: number) => (
-              <li key={index}>
+            {listWebhooksData.webhooks?.map((item) => (
+              <li key={item.id}>
                 <span>{item.url}</span>
                 <span>{item.event_type}</span>
               </li>
@@ -46,11 +54,17 @@ export default function Webhooks() {
       )}
       <form onSubmit={createWebhookForm.handleSubmit((data) => createWebhookMutation.mutate(data))}>
         <h3>Add Webhook</h3>
-        <input type="text" placeholder="Webhook URL" {...createWebhookForm.register('url')} />
-        <input type="text" placeholder="Event Type" {...createWebhookForm.register('event_type')} />
-        <button type="submit">Create</button>
+        <div>
+          <label htmlFor="url">Url</label>
+          <input id="url" type="text" placeholder="Webhook URL" {...createWebhookForm.register('url')} />
+        </div>
+        <div>
+          <label htmlFor="event_type">Event Type</label>
+          <input id="event_type" type="text" placeholder="Event Type" {...createWebhookForm.register('event_type')} />
+        </div>
+        <button type="submit" disabled={createWebhookMutation.isPending}>{createWebhookMutation.isPending ? '처리 중...' : 'Create'}</button>
       </form>
-      <div><button onClick={() => deleteWebhookMutation.mutate({})}>Delete Webhook</button></div>
+      <div><button onClick={() => deleteWebhookMutation.mutate({})} disabled={deleteWebhookMutation.isPending}>{deleteWebhookMutation.isPending ? '처리 중...' : 'Delete Webhook'}</button></div>
     </main>
   )
 }

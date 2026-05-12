@@ -18,6 +18,8 @@ func TestGenerateReservationDetailPage(t *testing.T) {
 </main>`))
 	code := GeneratePage(page, "")
 	assertContains(t, code, "export default function ReservationDetailPage()")
+	assertContains(t, code, `<main className="mx-auto max-w-4xl px-4 py-8 space-y-6">`)
+	assertContains(t, code, `<h1 className="text-2xl font-bold">Reservation Detail</h1>`)
 	assertContains(t, code, "useParams")
 	assertContains(t, code, "ReservationID")
 	assertContains(t, code, "api.GetReservation")

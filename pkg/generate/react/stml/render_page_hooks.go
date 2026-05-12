@@ -15,6 +15,10 @@ func renderPageHooks(page stmlparser.PageSpec, is importSet, sb *strings.Builder
 		sb.WriteString(fmt.Sprintf("  %s\n", up))
 	}
 
+	if is.useNavigate {
+		sb.WriteString("  const navigate = useNavigate()\n")
+	}
+
 	if is.useQueryClient {
 		sb.WriteString("  const queryClient = useQueryClient()\n")
 	}

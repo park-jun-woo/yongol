@@ -34,8 +34,15 @@ func renderImports(is importSet, opt GenerateOptions) string {
 	}
 
 	// react-router
+	var routerImports []string
 	if is.useParams {
-		lines = append(lines, "import { useParams } from 'react-router-dom'")
+		routerImports = append(routerImports, "useParams")
+	}
+	if is.useNavigate {
+		routerImports = append(routerImports, "useNavigate")
+	}
+	if len(routerImports) > 0 {
+		lines = append(lines, fmt.Sprintf("import { %s } from 'react-router-dom'", strings.Join(routerImports, ", ")))
 	}
 
 	// react-hook-form
@@ -47,6 +54,17 @@ func renderImports(is importSet, opt GenerateOptions) string {
 	if is.useZod {
 		lines = append(lines, "import { z } from 'zod'")
 		lines = append(lines, "import { zodResolver } from '@hookform/resolvers/zod'")
+	}
+
+	// ui components
+	if is.useButton {
+		lines = append(lines, "import { Button } from '@/components/ui/Button'")
+	}
+	if is.useInput {
+		lines = append(lines, "import { Input } from '@/components/ui/Input'")
+	}
+	if is.useTable {
+		lines = append(lines, "import { Table, THead, TBody, TR, TH, TD } from '@/components/ui/Table'")
 	}
 
 	// api client

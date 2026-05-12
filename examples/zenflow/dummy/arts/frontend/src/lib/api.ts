@@ -15,7 +15,7 @@ export const api = {
         if (!(k in path)) body[k] = v
       }
     }
-    return client.POST('/api/workflows/{id}/activate' as any, { params: { path }, body } as any).then(r => (r as any).data)
+    return client.POST('/api/workflows/{id}/activate', { params: { path }, body }).then(r => r.data)
   },
   ArchiveWorkflow: (args?: Record<string, any>) => {
     const path: Record<string, any> = {}
@@ -26,7 +26,7 @@ export const api = {
         if (!(k in path)) body[k] = v
       }
     }
-    return client.POST('/api/workflows/{id}/archive' as any, { params: { path }, body } as any).then(r => (r as any).data)
+    return client.POST('/api/workflows/{id}/archive', { params: { path }, body }).then(r => r.data)
   },
   CloneTemplate: (args?: Record<string, any>) => {
     const path: Record<string, any> = {}
@@ -37,7 +37,7 @@ export const api = {
         if (!(k in path)) body[k] = v
       }
     }
-    return client.POST('/api/templates/{id}/clone' as any, { params: { path }, body } as any).then(r => (r as any).data)
+    return client.POST('/api/templates/{id}/clone', { params: { path }, body }).then(r => r.data)
   },
   CreateAction: (args?: Record<string, any>) => {
     const path: Record<string, any> = {}
@@ -48,13 +48,13 @@ export const api = {
         if (!(k in path)) body[k] = v
       }
     }
-    return client.POST('/api/workflows/{id}/actions' as any, { params: { path }, body } as any).then(r => (r as any).data)
+    return client.POST('/api/workflows/{id}/actions', { params: { path }, body }).then(r => r.data)
   },
   CreateWebhook: (args?: Record<string, any>) => {
-    return client.POST('/api/webhooks' as any, { body: args ?? {} } as any).then(r => (r as any).data)
+    return client.POST('/api/webhooks', { body: args ?? {} }).then(r => r.data)
   },
   CreateWorkflow: (args?: Record<string, any>) => {
-    return client.POST('/api/workflows' as any, { body: args ?? {} } as any).then(r => (r as any).data)
+    return client.POST('/api/workflows', { body: args ?? {} }).then(r => r.data)
   },
   CreateWorkflowVersion: (args?: Record<string, any>) => {
     const path: Record<string, any> = {}
@@ -65,7 +65,7 @@ export const api = {
         if (!(k in path)) body[k] = v
       }
     }
-    return client.POST('/api/workflows/{id}/new-version' as any, { params: { path }, body } as any).then(r => (r as any).data)
+    return client.POST('/api/workflows/{id}/new-version', { params: { path }, body }).then(r => r.data)
   },
   DeleteWebhook: (args?: Record<string, any>) => {
     const path: Record<string, any> = {}
@@ -76,7 +76,7 @@ export const api = {
         if (!(k in path)) body[k] = v
       }
     }
-    return client.DELETE('/api/webhooks/{id}' as any, { params: { path }, body } as any).then(r => (r as any).data)
+    return client.DELETE('/api/webhooks/{id}', { params: { path }, body }).then(r => r.data)
   },
   ExecuteWorkflow: (args?: Record<string, any>) => {
     const path: Record<string, any> = {}
@@ -87,10 +87,10 @@ export const api = {
         if (!(k in path)) body[k] = v
       }
     }
-    return client.POST('/api/workflows/{id}/execute' as any, { params: { path }, body } as any).then(r => (r as any).data)
+    return client.POST('/api/workflows/{id}/execute', { params: { path }, body }).then(r => r.data)
   },
   GetDashboard: (args?: Record<string, any>) => {
-    return client.GET('/api/dashboard' as any, { params: { query: args ?? {} } } as any).then(r => (r as any).data)
+    return client.GET('/api/dashboard', { params: { query: args ?? {} } }).then(r => r.data)
   },
   GetTemplate: (args?: Record<string, any>) => {
     const path: Record<string, any> = {}
@@ -102,7 +102,7 @@ export const api = {
         if (!(k in path)) query[k] = v
       }
     }
-    return client.GET('/api/templates/{id}' as any, { params: { path, query } } as any).then(r => (r as any).data)
+    return client.GET('/api/templates/{id}', { params: { path, query } }).then(r => r.data)
   },
   GetWorkflow: (args?: Record<string, any>) => {
     const path: Record<string, any> = {}
@@ -114,7 +114,7 @@ export const api = {
         if (!(k in path)) query[k] = v
       }
     }
-    return client.GET('/api/workflows/{id}' as any, { params: { path, query } } as any).then(r => (r as any).data)
+    return client.GET('/api/workflows/{id}', { params: { path, query } }).then(r => r.data)
   },
   ListActions: (args?: Record<string, any>) => {
     const path: Record<string, any> = {}
@@ -126,10 +126,10 @@ export const api = {
         if (!(k in path)) query[k] = v
       }
     }
-    return client.GET('/api/workflows/{id}/actions' as any, { params: { path, query } } as any).then(r => (r as any).data)
+    return client.GET('/api/workflows/{id}/actions', { params: { path, query } }).then(r => r.data)
   },
   ListAuditLogs: (args?: Record<string, any>) => {
-    return client.GET('/api/audit-logs' as any, { params: { query: args ?? {} } } as any).then(r => (r as any).data)
+    return client.GET('/api/audit-logs', { params: { query: args ?? {} } }).then(r => r.data)
   },
   ListExecutionLogs: (args?: Record<string, any>) => {
     const path: Record<string, any> = {}
@@ -141,13 +141,13 @@ export const api = {
         if (!(k in path)) query[k] = v
       }
     }
-    return client.GET('/api/workflows/{id}/logs' as any, { params: { path, query } } as any).then(r => (r as any).data)
+    return client.GET('/api/workflows/{id}/logs', { params: { path, query } }).then(r => r.data)
   },
   ListTemplates: (args?: Record<string, any>) => {
-    return client.GET('/api/templates' as any, { params: { query: args ?? {} } } as any).then(r => (r as any).data)
+    return client.GET('/api/templates', { params: { query: args ?? {} } }).then(r => r.data)
   },
   ListWebhooks: (args?: Record<string, any>) => {
-    return client.GET('/api/webhooks' as any, { params: { query: args ?? {} } } as any).then(r => (r as any).data)
+    return client.GET('/api/webhooks', { params: { query: args ?? {} } }).then(r => r.data)
   },
   ListWorkflowVersions: (args?: Record<string, any>) => {
     const path: Record<string, any> = {}
@@ -159,13 +159,13 @@ export const api = {
         if (!(k in path)) query[k] = v
       }
     }
-    return client.GET('/api/workflows/{id}/versions' as any, { params: { path, query } } as any).then(r => (r as any).data)
+    return client.GET('/api/workflows/{id}/versions', { params: { path, query } }).then(r => r.data)
   },
   ListWorkflows: (args?: Record<string, any>) => {
-    return client.GET('/api/workflows' as any, { params: { query: args ?? {} } } as any).then(r => (r as any).data)
+    return client.GET('/api/workflows', { params: { query: args ?? {} } }).then(r => r.data)
   },
   Login: (args?: Record<string, any>) => {
-    return client.POST('/auth/login' as any, { body: args ?? {} } as any).then(r => (r as any).data)
+    return client.POST('/auth/login', { body: args ?? {} }).then(r => r.data)
   },
   PauseWorkflow: (args?: Record<string, any>) => {
     const path: Record<string, any> = {}
@@ -176,12 +176,12 @@ export const api = {
         if (!(k in path)) body[k] = v
       }
     }
-    return client.POST('/api/workflows/{id}/pause' as any, { params: { path }, body } as any).then(r => (r as any).data)
+    return client.POST('/api/workflows/{id}/pause', { params: { path }, body }).then(r => r.data)
   },
   PublishTemplate: (args?: Record<string, any>) => {
-    return client.POST('/api/templates' as any, { body: args ?? {} } as any).then(r => (r as any).data)
+    return client.POST('/api/templates', { body: args ?? {} }).then(r => r.data)
   },
   Register: (args?: Record<string, any>) => {
-    return client.POST('/auth/register' as any, { body: args ?? {} } as any).then(r => (r as any).data)
+    return client.POST('/auth/register', { body: args ?? {} }).then(r => r.data)
   },
 }

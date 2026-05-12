@@ -16,8 +16,8 @@ export default function AuditLogs() {
         <section>
           <h2>Audit Logs</h2>
           <ul>
-            {listAuditLogsData.items?.map((item: any, index: number) => (
-              <li key={index}>
+            {listAuditLogsData.items?.map((item) => (
+              <li key={item.id}>
                 <span>{item.action}</span>
                 <span>{item.resource_type}</span>
                 <span>{item.detail}</span>

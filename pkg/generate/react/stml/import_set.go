@@ -9,9 +9,13 @@ type importSet struct {
 	useMutation    bool
 	useQueryClient bool
 	useParams      bool
+	useNavigate    bool
 	useForm        bool
 	useZod         bool // zod + @hookform/resolvers/zod
 	useState       bool
+	useButton      bool     // @/components/ui/Button
+	useInput       bool     // @/components/ui/Input
+	useTable       bool     // @/components/ui/Table
 	components     []string // unique component names
 	customFile     string   // non-empty if custom.ts exists
 }

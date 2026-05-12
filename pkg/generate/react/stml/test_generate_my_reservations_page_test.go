@@ -2,7 +2,11 @@
 //ff:what 예약 목록 페이지 TSX 생성을 검증
 package stml
 
-import ("strings"; "testing"; stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml")
+import (
+	stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
+	"strings"
+	"testing"
+)
 
 func TestGenerateMyReservationsPage(t *testing.T) {
 	page, _ := stmlparser.ParseReader("my-reservations-page.html", strings.NewReader(`<main class="max-w-4xl mx-auto p-6">
@@ -24,18 +28,26 @@ func TestGenerateMyReservationsPage(t *testing.T) {
 </main>`))
 	code := GeneratePage(page, "")
 	assertContains(t, code, "export default function MyReservationsPage()")
+	assertContains(t, code, `<main className="mx-auto max-w-4xl px-4 py-8 space-y-6">`)
+	assertContains(t, code, `<h1 className="text-2xl font-bold">My Reservations</h1>`)
 	assertContains(t, code, "useQuery")
 	assertContains(t, code, "api.ListMyReservations")
 	assertContains(t, code, `className="mb-8"`)
 	assertContains(t, code, `className="space-y-3"`)
-	assertContains(t, code, `className="font-semibold"`)
-	assertContains(t, code, "<ul")
-	assertContains(t, code, "<li")
+	assertContains(t, code, "<Table")
+	assertContains(t, code, "<THead>")
+	assertContains(t, code, "<TBody>")
+	assertContains(t, code, "<TR")
+	assertContains(t, code, "<TH>Room ID</TH>")
+	assertContains(t, code, "<TH>Status</TH>")
+	assertContains(t, code, "<TD>{item.RoomID}</TD>")
+	assertContains(t, code, "<TD>{item.Status}</TD>")
 	assertContains(t, code, "예약이 없습니다")
 	assertContains(t, code, "length === 0")
 	assertContains(t, code, "api.CreateReservation")
 	assertContains(t, code, `placeholder="스터디룸 번호"`)
 	assertContains(t, code, "'예약하기'")
+	assertContains(t, code, "import { Table, THead, TBody, TR, TH, TD } from '@/components/ui/Table'")
 	assertContains(t, code, "import DatePicker from '@/components/DatePicker'")
 	assertContains(t, code, "<DatePicker")
 	assertContains(t, code, "queryKey: ['ListMyReservations']")

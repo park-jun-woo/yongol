@@ -35,6 +35,19 @@ func (r *ReactTarget) GeneratePage(page stmlparser.PageSpec, specsDir string, op
 	if len(allActions) > 0 {
 		is.useMutation = true
 		is.useQueryClient = true
+		is.useButton = true
+	}
+	if anyActionHasInputFields(allActions) {
+		is.useInput = true
+	}
+
+	// Login + authz: navigate on success instead of invalidate
+	if opt.HasAuthz && hasLoginAction(allActions) {
+		is.useNavigate = true
+		// Drop queryClient only when every action is Login (no invalidation needed)
+		if allLoginActions(allActions) {
+			is.useQueryClient = false
+		}
 	}
 
 	var sb strings.Builder
@@ -45,7 +58,7 @@ func (r *ReactTarget) GeneratePage(page stmlparser.PageSpec, specsDir string, op
 	sb.WriteString(fmt.Sprintf("export default function %s() {\n", componentName))
 
 	renderPageHooks(page, is, &sb)
-	renderPageMutations(allActions, fetchOps, actionFetchMap, opt.RequestConstraints, &sb)
+	renderPageMutations(allActions, fetchOps, actionFetchMap, opt.RequestConstraints, opt.HasAuthz, &sb)
 	renderPageJSX(page, &sb)
 
 	sb.WriteString("}\n")

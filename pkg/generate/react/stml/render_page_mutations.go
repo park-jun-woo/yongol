@@ -10,12 +10,12 @@ import (
 	stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
 )
 
-func renderPageMutations(allActions []stmlparser.ActionBlock, fetchOps []string, actionFetchMap map[string][]string, constraints map[string]map[string]oapiparser.FieldConstraint, sb *strings.Builder) {
+func renderPageMutations(allActions []stmlparser.ActionBlock, fetchOps []string, actionFetchMap map[string][]string, constraints map[string]map[string]oapiparser.FieldConstraint, hasAuthz bool, sb *strings.Builder) {
 	for _, a := range allActions {
 		if len(a.Fields) > 0 {
 			sb.WriteString(fmt.Sprintf("  %s\n", renderFormHook(a, constraints)))
 		}
 		targetOps := resolveInvalidateOps(a.OperationID, fetchOps, actionFetchMap)
-		sb.WriteString(fmt.Sprintf("  %s\n\n", renderUseMutation(a, targetOps)))
+		sb.WriteString(fmt.Sprintf("  %s\n\n", renderUseMutation(a, targetOps, hasAuthz)))
 	}
 }

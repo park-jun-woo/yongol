@@ -17,6 +17,9 @@ func collectFetchImports(f stmlparser.FetchBlock, is *importSet, compSet map[str
 	for _, c := range f.Components {
 		compSet[c.Name] = true
 	}
+	if len(f.Eaches) > 0 {
+		is.useTable = true
+	}
 	for _, child := range f.NestedFetches {
 		collectFetchImports(child, is, compSet)
 	}

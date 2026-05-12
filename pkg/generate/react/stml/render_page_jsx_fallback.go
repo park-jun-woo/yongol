@@ -9,7 +9,6 @@ import (
 )
 
 func renderPageJSXFallback(page stmlparser.PageSpec, sb *strings.Builder) {
-	sb.WriteString("    <div>\n")
 	for _, f := range page.Fetches {
 		sb.WriteString(renderFetchJSX(f, 6))
 		sb.WriteString("\n")
@@ -18,5 +17,4 @@ func renderPageJSXFallback(page stmlparser.PageSpec, sb *strings.Builder) {
 		sb.WriteString(renderActionJSX(a, 6))
 		sb.WriteString("\n")
 	}
-	sb.WriteString("    </div>\n")
 }

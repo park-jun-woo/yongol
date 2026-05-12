@@ -1,5 +1,5 @@
 //ff:func feature=stml-gen type=generator control=sequence
-//ff:what Fields 없는 ActionBlock을 버튼 onClick JSX로 생성한다
+//ff:what Fields 없는 ActionBlock을 Button onClick JSX로 생성한다
 package stml
 
 import (
@@ -15,8 +15,12 @@ func renderActionButton(a stmlparser.ActionBlock, indent int) string {
 	cls := clsAttr(a.ClassName)
 	text := orDefault(a.SubmitText, a.OperationID)
 	pendingExpr := fmt.Sprintf("{%s.isPending ? '처리 중...' : '%s'}", mutName, text)
-	if tag == "button" {
-		return fmt.Sprintf(`%s<button onClick={() => %s.mutate({})} disabled={%s.isPending}%s>%s</button>`, ind, mutName, mutName, cls, pendingExpr)
+	variant := ""
+	if isDeleteOperation(a.OperationID) {
+		variant = ` variant="destructive"`
 	}
-	return fmt.Sprintf(`%s<%s%s><button onClick={() => %s.mutate({})} disabled={%s.isPending}>%s</button></%s>`, ind, tag, cls, mutName, mutName, pendingExpr, tag)
+	if tag == "button" {
+		return fmt.Sprintf(`%s<Button%s onClick={() => %s.mutate({})} disabled={%s.isPending}%s>%s</Button>`, ind, variant, mutName, mutName, cls, pendingExpr)
+	}
+	return fmt.Sprintf(`%s<%s%s><Button%s onClick={() => %s.mutate({})} disabled={%s.isPending}>%s</Button></%s>`, ind, tag, cls, variant, mutName, mutName, pendingExpr, tag)
 }

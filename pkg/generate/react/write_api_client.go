@@ -38,15 +38,7 @@ func writeAPIClient(srcDir string, doc *openapi3.T, hasAuthz bool) error {
 	b.WriteString("const client = createClient<paths>({ baseUrl: '/api' })\n")
 
 	if hasAuthz {
-		b.WriteString("\nclient.use({\n")
-		b.WriteString("  async onRequest({ request }) {\n")
-		b.WriteString("    const token = localStorage.getItem('access_token')\n")
-		b.WriteString("    if (token) {\n")
-		b.WriteString("      request.headers.set('Authorization', `Bearer ${token}`)\n")
-		b.WriteString("    }\n")
-		b.WriteString("    return request\n")
-		b.WriteString("  },\n")
-		b.WriteString("})\n")
+		writeAuthzMiddleware(&b)
 	}
 
 	b.WriteString("\n")

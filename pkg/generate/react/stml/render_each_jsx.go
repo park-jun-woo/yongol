@@ -1,5 +1,5 @@
-//ff:func feature=stml-gen type=generator control=sequence
-//ff:what EachBlock의 배열 순회 JSX를 생성한다
+//ff:func feature=stml-gen type=generator control=iteration dimension=1
+//ff:what EachBlock의 배열 순회 JSX를 Table 구조로 생성한다
 package stml
 
 import (
@@ -9,13 +9,10 @@ import (
 	stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
 )
 
-// renderEachJSX generates JSX for an EachBlock.
+// renderEachJSX generates JSX for an EachBlock as a Table.
 func renderEachJSX(e stmlparser.EachBlock, dataVar string, indent int) string {
 	ind := indentStr(indent)
-	tag := orDefault(e.Tag, "div")
 	cls := clsAttr(e.ClassName)
-	itemTag := orDefault(e.ItemTag, "div")
-	itemCls := clsAttr(e.ItemClassName)
 
 	// Determine map callback parameters and key expression
 	mapParams := "(item)"
@@ -25,22 +22,38 @@ func renderEachJSX(e stmlparser.EachBlock, dataVar string, indent int) string {
 		keyExpr = "index"
 	}
 
-	var lines []string
-	lines = append(lines, fmt.Sprintf("%s<%s%s>", ind, tag, cls))
-	lines = append(lines, fmt.Sprintf("%s  {%s.%s?.map(%s => (", ind, dataVar, e.Field, mapParams))
-	lines = append(lines, fmt.Sprintf("%s    <%s key={%s}%s>", ind, itemTag, keyExpr, itemCls))
-
-	if len(e.Children) > 0 {
-		lines = append(lines, renderChildNodes(e.Children, "item", "item", indent+6)...)
-	} else {
+	// Extract bind field names for table headers
+	fields := extractBindFieldsFromChildren(e.Children)
+	if len(fields) == 0 {
 		for _, b := range e.Binds {
-			lines = append(lines, renderBindJSX(b, "item", indent+6))
+			fields = append(fields, b.Name)
 		}
 	}
 
-	lines = append(lines, fmt.Sprintf("%s    </%s>", ind, itemTag))
-	lines = append(lines, fmt.Sprintf("%s  ))}", ind))
-	lines = append(lines, fmt.Sprintf("%s</%s>", ind, tag))
+	var lines []string
+	lines = append(lines, fmt.Sprintf("%s<Table%s>", ind, cls))
+
+	// THead
+	lines = append(lines, fmt.Sprintf("%s  <THead>", ind))
+	lines = append(lines, fmt.Sprintf("%s    <TR>", ind))
+	for _, f := range fields {
+		lines = append(lines, fmt.Sprintf("%s      <TH>%s</TH>", ind, toLabel(f)))
+	}
+	lines = append(lines, fmt.Sprintf("%s    </TR>", ind))
+	lines = append(lines, fmt.Sprintf("%s  </THead>", ind))
+
+	// TBody
+	lines = append(lines, fmt.Sprintf("%s  <TBody>", ind))
+	lines = append(lines, fmt.Sprintf("%s    {%s.%s?.map(%s => (", ind, dataVar, e.Field, mapParams))
+	lines = append(lines, fmt.Sprintf("%s      <TR key={%s}>", ind, keyExpr))
+	for _, f := range fields {
+		lines = append(lines, fmt.Sprintf("%s        <TD>{item.%s}</TD>", ind, f))
+	}
+	lines = append(lines, fmt.Sprintf("%s      </TR>", ind))
+	lines = append(lines, fmt.Sprintf("%s    ))}", ind))
+	lines = append(lines, fmt.Sprintf("%s  </TBody>", ind))
+
+	lines = append(lines, fmt.Sprintf("%s</Table>", ind))
 
 	return strings.Join(lines, "\n")
 }
