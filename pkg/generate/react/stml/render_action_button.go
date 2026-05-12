@@ -14,8 +14,9 @@ func renderActionButton(a stmlparser.ActionBlock, indent int) string {
 	tag := orDefault(a.Tag, "button")
 	cls := clsAttr(a.ClassName)
 	text := orDefault(a.SubmitText, a.OperationID)
+	pendingExpr := fmt.Sprintf("{%s.isPending ? '처리 중...' : '%s'}", mutName, text)
 	if tag == "button" {
-		return fmt.Sprintf(`%s<button onClick={() => %s.mutate({})}%s>%s</button>`, ind, mutName, cls, text)
+		return fmt.Sprintf(`%s<button onClick={() => %s.mutate({})} disabled={%s.isPending}%s>%s</button>`, ind, mutName, mutName, cls, pendingExpr)
 	}
-	return fmt.Sprintf(`%s<%s%s><button onClick={() => %s.mutate({})}>%s</button></%s>`, ind, tag, cls, mutName, text, tag)
+	return fmt.Sprintf(`%s<%s%s><button onClick={() => %s.mutate({})} disabled={%s.isPending}>%s</button></%s>`, ind, tag, cls, mutName, mutName, pendingExpr, tag)
 }

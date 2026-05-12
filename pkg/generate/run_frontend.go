@@ -8,6 +8,7 @@ import (
 
 	"github.com/park-jun-woo/yongol/pkg/generate/react"
 	stmlgen "github.com/park-jun-woo/yongol/pkg/generate/react/stml"
+	oapiparser "github.com/park-jun-woo/yongol/pkg/parser/openapi"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
@@ -40,6 +41,10 @@ func runSTMLCodegen(fs *yongol.Fullstack, artifactsDir string) error {
 		return nil
 	}
 	pagesDir := filepath.Join(artifactsDir, "frontend", "src", "pages")
-	_, err := stmlgen.Generate(fs.STMLPages, fs.SpecsDir, pagesDir)
+	opt := stmlgen.GenerateOptions{
+		RequestConstraints:      fs.RequestConstraints,
+		ResponseArrayItemFields: oapiparser.ExtractResponseArrayItemFields(fs.OpenAPIDoc),
+	}
+	_, err := stmlgen.Generate(fs.STMLPages, fs.SpecsDir, pagesDir, opt)
 	return err
 }

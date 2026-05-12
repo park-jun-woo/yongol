@@ -32,7 +32,7 @@ func renderUseMutation(a stmlparser.ActionBlock, fetchOps []string) string {
 	}
 
 	return fmt.Sprintf(`const %s = useMutation({
-    mutationFn: (data: any) => api.%s(%s),
+    mutationFn: (data) => api.%s(%s),
     onSuccess: () => {
       %s
     },

@@ -28,14 +28,17 @@ type stmlRoute struct {
 //   - page.Layout != "" → grouped under that layout
 //   - page.Layout == "" → grouped under defaultLayout (if non-empty)
 //   - defaultLayout == "" and page.Layout == "" → flat route (no wrapper)
-func writeAppTSX(srcDir string, pages []stml.PageSpec, layouts []stml.LayoutSpec, defaultLayout string) error {
+//
+// When hasAuthz is true, non-auth layout groups and flat routes are wrapped
+// with <ProtectedRoute>. The "auth" layout is always public.
+func writeAppTSX(srcDir string, pages []stml.PageSpec, layouts []stml.LayoutSpec, defaultLayout string, hasAuthz bool) error {
 	if len(pages) == 0 {
 		return writeAppTSXPlaceholder(srcDir)
 	}
 
 	routes := buildRoutes(pages, defaultLayout)
 	layoutSet := buildLayoutSet(layouts)
-	src := renderAppTSX(routes, layoutSet)
+	src := renderAppTSX(routes, layoutSet, hasAuthz)
 	return os.WriteFile(filepath.Join(srcDir, "App.tsx"), []byte(src), 0644)
 }
 
@@ -91,6 +94,7 @@ func buildLayoutSet(layouts []stml.LayoutSpec) map[string]bool {
 // pageToRoutes converts a single STML PageSpec into route definitions.
 //
 // Rules:
+//  0. If page.Route is set (data-route), use it as-is (single route)
 //  1. Strip .html → kebab-case path (e.g. "workflows.html" → "/workflows")
 //  2. "-detail" suffix → parent resource path + /:id (single route)
 //     e.g. "workflow-detail.html" → "/workflows/:id"
@@ -100,6 +104,15 @@ func pageToRoutes(p stml.PageSpec) []stmlRoute {
 	base := strings.TrimSuffix(p.FileName, ".html")
 	componentName := kebabToPascal(base)
 	importPath := "./pages/" + base
+
+	// Explicit data-route takes priority over filename-based inference.
+	if p.Route != "" {
+		return []stmlRoute{{
+			Path:          p.Route,
+			ComponentName: componentName,
+			ImportPath:    importPath,
+		}}
+	}
 
 	hasRouteParam := pageHasRouteParam(p)
 
@@ -176,10 +189,19 @@ func naivePluralize(s string) string {
 	return s + "s"
 }
 
+// isAuthLayout returns true if the layout name is "auth".
+// Auth layouts host public pages (login, register) and are never wrapped
+// with ProtectedRoute.
+func isAuthLayout(name string) bool {
+	return name == "auth"
+}
+
 // renderAppTSX generates the full App.tsx source from a list of routes.
 // layoutSet contains layout names that have LayoutSpec definitions.
 // Routes with a non-empty Layout field are grouped under a layout wrapper route.
-func renderAppTSX(routes []stmlRoute, layoutSet map[string]bool) string {
+// When hasAuthz is true, non-auth layout groups and flat routes are wrapped
+// with <ProtectedRoute>.
+func renderAppTSX(routes []stmlRoute, layoutSet map[string]bool, hasAuthz bool) string {
 	// Partition routes by layout
 	grouped := groupRoutesByLayout(routes)
 
@@ -206,6 +228,11 @@ func renderAppTSX(routes []stmlRoute, layoutSet map[string]bool) string {
 		fmt.Fprintf(&sb, "import %s from './layouts/%s'\n", compName, compName)
 	}
 
+	// Import ProtectedRoute when authz is enabled
+	if hasAuthz {
+		sb.WriteString("import ProtectedRoute from './components/ProtectedRoute'\n")
+	}
+
 	sb.WriteString("\nexport default function App() {\n  return (\n    <Routes>\n")
 
 	// Emit layout-grouped routes first, then flat routes
@@ -213,13 +240,25 @@ func renderAppTSX(routes []stmlRoute, layoutSet map[string]bool) string {
 		rs := grouped[name]
 		if name == "" {
 			// Flat routes (no layout)
-			for _, r := range rs {
-				fmt.Fprintf(&sb, "      <Route path=\"%s\" element={<%s />} />\n", r.Path, r.ComponentName)
+			if hasAuthz {
+				// Wrap each flat route with ProtectedRoute
+				for _, r := range rs {
+					fmt.Fprintf(&sb, "      <Route path=\"%s\" element={<ProtectedRoute><%s /></ProtectedRoute>} />\n", r.Path, r.ComponentName)
+				}
+			} else {
+				for _, r := range rs {
+					fmt.Fprintf(&sb, "      <Route path=\"%s\" element={<%s />} />\n", r.Path, r.ComponentName)
+				}
 			}
 			continue
 		}
 		compName := layoutComponentName(name)
-		fmt.Fprintf(&sb, "      <Route element={<%s />}>\n", compName)
+		if hasAuthz && !isAuthLayout(name) {
+			// Wrap the layout element with ProtectedRoute
+			fmt.Fprintf(&sb, "      <Route element={<ProtectedRoute><%s /></ProtectedRoute>}>\n", compName)
+		} else {
+			fmt.Fprintf(&sb, "      <Route element={<%s />}>\n", compName)
+		}
 		for _, r := range rs {
 			fmt.Fprintf(&sb, "        <Route path=\"%s\" element={<%s />} />\n", r.Path, r.ComponentName)
 		}

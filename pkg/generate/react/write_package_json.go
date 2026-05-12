@@ -35,6 +35,8 @@ func writePackageJSON(dir string) error {
 			"react-router-dom":     "^7",
 			"@tanstack/react-query": "^5",
 			"react-hook-form":      "^7",
+			"zod":                  "^3",
+			"@hookform/resolvers":  "^3",
 			"openapi-fetch":        "^0.13",
 			"clsx":                 "^2",
 			"tailwind-merge":       "^2",

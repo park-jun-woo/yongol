@@ -35,8 +35,14 @@ func TestGenerateMyReservationsPage(t *testing.T) {
 	assertContains(t, code, "length === 0")
 	assertContains(t, code, "api.CreateReservation")
 	assertContains(t, code, `placeholder="스터디룸 번호"`)
-	assertContains(t, code, ">예약하기</")
+	assertContains(t, code, "'예약하기'")
 	assertContains(t, code, "import DatePicker from '@/components/DatePicker'")
 	assertContains(t, code, "<DatePicker")
 	assertContains(t, code, "queryKey: ['ListMyReservations']")
+	// label + id attributes on form fields
+	assertContains(t, code, `<label htmlFor="RoomID">Room ID</label>`)
+	assertContains(t, code, `id="RoomID"`)
+	// isPending on submit button
+	assertContains(t, code, `disabled={createReservationMutation.isPending}`)
+	assertContains(t, code, `'처리 중...'`)
 }

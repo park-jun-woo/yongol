@@ -13,4 +13,5 @@ type EachBlock struct {
 	States        []StateBind    // data-state inside the loop (for validation)
 	Components    []ComponentRef // data-component inside the loop (for validation)
 	Children      []ChildNode    // item children in DOM order (for codegen)
+	KeyField      string         // item key field (e.g. "id"); empty → use index
 }

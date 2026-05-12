@@ -10,6 +10,7 @@ type importSet struct {
 	useQueryClient bool
 	useParams      bool
 	useForm        bool
+	useZod         bool // zod + @hookform/resolvers/zod
 	useState       bool
 	components     []string // unique component names
 	customFile     string   // non-empty if custom.ts exists

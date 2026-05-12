@@ -21,8 +21,16 @@ func TestGenerateLoginPage(t *testing.T) {
 	assertContains(t, code, `className="w-full px-3 py-2 border rounded"`)
 	assertContains(t, code, `type="email"`)
 	assertContains(t, code, `type="password"`)
-	assertContains(t, code, ">로그인</")
-	assertNotContains(t, code, ">제출</")
+	// label + id attributes
+	assertContains(t, code, `<label htmlFor="Email">Email</label>`)
+	assertContains(t, code, `<label htmlFor="Password">Password</label>`)
+	assertContains(t, code, `id="Email"`)
+	assertContains(t, code, `id="Password"`)
+	// isPending on submit button
+	assertContains(t, code, `disabled={loginMutation.isPending}`)
+	assertContains(t, code, "'로그인'")
+	assertContains(t, code, "isPending")
+	assertNotContains(t, code, "'제출'")
 	assertNotContains(t, code, "useQuery(")
 	assertNotContains(t, code, "useParams")
 }

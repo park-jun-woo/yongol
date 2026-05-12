@@ -27,7 +27,7 @@ func renderActionForm(a stmlparser.ActionBlock, indent int) string {
 		}
 	}
 
-	lines = append(lines, fmt.Sprintf(`%s  <button type="submit">%s</button>`, ind, submitText))
+	lines = append(lines, fmt.Sprintf(`%s  <button type="submit" disabled={%s.isPending}>{%s.isPending ? '처리 중...' : '%s'}</button>`, ind, mutName, mutName, submitText))
 	lines = append(lines, fmt.Sprintf(`%s</form>`, ind))
 
 	return strings.Join(lines, "\n")

@@ -14,7 +14,7 @@ import (
 
 func TestWriteAppTSX_NoPages_Placeholder(t *testing.T) {
 	dir := t.TempDir()
-	if err := writeAppTSX(dir, nil, nil, ""); err != nil {
+	if err := writeAppTSX(dir, nil, nil, "", false); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))
@@ -34,7 +34,7 @@ func TestWriteAppTSX_BasicPages(t *testing.T) {
 		{Name: "register", FileName: "register.html"},
 		{Name: "dashboard", FileName: "dashboard.html"},
 	}
-	if err := writeAppTSX(dir, pages, nil, ""); err != nil {
+	if err := writeAppTSX(dir, pages, nil, "", false); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))
@@ -69,7 +69,7 @@ func TestWriteAppTSX_DetailPage(t *testing.T) {
 			}},
 		},
 	}
-	if err := writeAppTSX(dir, pages, nil, ""); err != nil {
+	if err := writeAppTSX(dir, pages, nil, "", false); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))
@@ -103,7 +103,7 @@ func TestWriteAppTSX_FullZenflow(t *testing.T) {
 		{Name: "webhooks", FileName: "webhooks.html"},
 		{Name: "audit-logs", FileName: "audit-logs.html"},
 	}
-	if err := writeAppTSX(dir, pages, nil, ""); err != nil {
+	if err := writeAppTSX(dir, pages, nil, "", false); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))
@@ -226,7 +226,7 @@ func TestWriteAppTSX_NonDetailPageWithRouteParam(t *testing.T) {
 			},
 		},
 	}
-	if err := writeAppTSX(dir, pages, nil, ""); err != nil {
+	if err := writeAppTSX(dir, pages, nil, "", false); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))
@@ -272,6 +272,57 @@ func TestBuildRoutes_Sorted(t *testing.T) {
 	}
 	if routes[2].Path != "/zebra" {
 		t.Errorf("routes[2].Path = %q, want /zebra", routes[2].Path)
+	}
+}
+
+func TestWriteAppTSX_ExplicitRoute(t *testing.T) {
+	dir := t.TempDir()
+	pages := []stml.PageSpec{
+		{
+			Name:     "unit-detail",
+			FileName: "unit-detail.html",
+			Route:    "/buildings/:buildingId/units/:id",
+			Fetches: []stml.FetchBlock{{
+				OperationID: "GetUnit",
+				Params: []stml.ParamBind{
+					{Name: "buildingId", Source: "route.buildingId"},
+					{Name: "id", Source: "route.id"},
+				},
+			}},
+		},
+	}
+	if err := writeAppTSX(dir, pages, nil, "", false); err != nil {
+		t.Fatal(err)
+	}
+	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	content := string(data)
+
+	// Explicit route must override filename-based inference
+	assertContains(t, content, `<Route path="/buildings/:buildingId/units/:id" element={<UnitDetail />} />`)
+	// Must NOT have the inferred route
+	if strings.Contains(content, `<Route path="/units/:id"`) {
+		t.Error("should not contain filename-inferred route /units/:id when data-route is set")
+	}
+}
+
+func TestPageToRoutes_ExplicitRouteOverridesDetail(t *testing.T) {
+	p := stml.PageSpec{
+		Name:     "unit-detail",
+		FileName: "unit-detail.html",
+		Route:    "/buildings/:buildingId/units/:id",
+	}
+	routes := pageToRoutes(p)
+	if len(routes) != 1 {
+		t.Fatalf("got %d routes, want 1", len(routes))
+	}
+	if routes[0].Path != "/buildings/:buildingId/units/:id" {
+		t.Errorf("Path = %q, want /buildings/:buildingId/units/:id", routes[0].Path)
+	}
+	if routes[0].ComponentName != "UnitDetail" {
+		t.Errorf("ComponentName = %q, want UnitDetail", routes[0].ComponentName)
 	}
 }
 

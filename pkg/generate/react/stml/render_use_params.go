@@ -17,3 +17,18 @@ func renderUseParams(params []stmlparser.ParamBind) string {
 	}
 	return fmt.Sprintf("const { %s } = useParams()", strings.Join(routeParams, ", "))
 }
+
+// renderUseParamsWithRoute generates useParams destructuring by merging
+// param names from data-param-* bindings and from the data-route pattern.
+// Route pattern params (e.g. ":buildingId" from "/buildings/:buildingId/units/:id")
+// are included even if no ParamBind references them.
+func renderUseParamsWithRoute(params []stmlparser.ParamBind, route string) string {
+	routeParams := mergeRouteParamNames(
+		extractRouteParamNames(params),
+		extractRoutePatternParams(route),
+	)
+	if len(routeParams) == 0 {
+		return ""
+	}
+	return fmt.Sprintf("const { %s } = useParams()", strings.Join(routeParams, ", "))
+}

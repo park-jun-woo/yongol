@@ -17,10 +17,18 @@ func renderEachJSX(e stmlparser.EachBlock, dataVar string, indent int) string {
 	itemTag := orDefault(e.ItemTag, "div")
 	itemCls := clsAttr(e.ItemClassName)
 
+	// Determine map callback parameters and key expression
+	mapParams := "(item)"
+	keyExpr := "item." + e.KeyField
+	if e.KeyField == "" {
+		mapParams = "(item, index)"
+		keyExpr = "index"
+	}
+
 	var lines []string
 	lines = append(lines, fmt.Sprintf("%s<%s%s>", ind, tag, cls))
-	lines = append(lines, fmt.Sprintf("%s  {%s.%s?.map((item: any, index: number) => (", ind, dataVar, e.Field))
-	lines = append(lines, fmt.Sprintf("%s    <%s key={index}%s>", ind, itemTag, itemCls))
+	lines = append(lines, fmt.Sprintf("%s  {%s.%s?.map(%s => (", ind, dataVar, e.Field, mapParams))
+	lines = append(lines, fmt.Sprintf("%s    <%s key={%s}%s>", ind, itemTag, keyExpr, itemCls))
 
 	if len(e.Children) > 0 {
 		lines = append(lines, renderChildNodes(e.Children, "item", "item", indent+6)...)

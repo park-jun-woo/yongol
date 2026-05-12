@@ -36,9 +36,9 @@ func writeApiClientEntry(b *strings.Builder, ep endpoint) {
 			b.WriteString("        if (!(k in path)) query[k] = v\n")
 			b.WriteString("      }\n")
 			b.WriteString("    }\n")
-			b.WriteString(fmt.Sprintf("    return client.GET('%s' as any, { params: { path, query } } as any).then(r => (r as any).data)\n", pathLit))
+			b.WriteString(fmt.Sprintf("    return client.GET('%s', { params: { path, query } }).then(r => r.data)\n", pathLit))
 		} else {
-			b.WriteString(fmt.Sprintf("    return client.GET('%s' as any, { params: { query: args ?? {} } } as any).then(r => (r as any).data)\n", pathLit))
+			b.WriteString(fmt.Sprintf("    return client.GET('%s', { params: { query: args ?? {} } }).then(r => r.data)\n", pathLit))
 		}
 	} else {
 		verbCall := "POST"
@@ -53,9 +53,9 @@ func writeApiClientEntry(b *strings.Builder, ep endpoint) {
 			b.WriteString("        if (!(k in path)) body[k] = v\n")
 			b.WriteString("      }\n")
 			b.WriteString("    }\n")
-			b.WriteString(fmt.Sprintf("    return client.%s('%s' as any, { params: { path }, body } as any).then(r => (r as any).data)\n", verbCall, pathLit))
+			b.WriteString(fmt.Sprintf("    return client.%s('%s', { params: { path }, body }).then(r => r.data)\n", verbCall, pathLit))
 		} else {
-			b.WriteString(fmt.Sprintf("    return client.%s('%s' as any, { body: args ?? {} } as any).then(r => (r as any).data)\n", verbCall, pathLit))
+			b.WriteString(fmt.Sprintf("    return client.%s('%s', { body: args ?? {} }).then(r => r.data)\n", verbCall, pathLit))
 		}
 	}
 	b.WriteString("  },\n")

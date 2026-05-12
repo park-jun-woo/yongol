@@ -43,6 +43,12 @@ func renderImports(is importSet, opt GenerateOptions) string {
 		lines = append(lines, "import { useForm } from 'react-hook-form'")
 	}
 
+	// zod + zodResolver
+	if is.useZod {
+		lines = append(lines, "import { z } from 'zod'")
+		lines = append(lines, "import { zodResolver } from '@hookform/resolvers/zod'")
+	}
+
 	// api client
 	lines = append(lines, fmt.Sprintf("import { api } from '%s'", opt.APIImportPath))
 

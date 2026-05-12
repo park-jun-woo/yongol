@@ -27,8 +27,15 @@ func TestGenerateRoomEditPage(t *testing.T) {
 	assertContains(t, code, `placeholder="스터디룸 이름"`)
 	assertContains(t, code, `placeholder="수용 인원"`)
 	assertContains(t, code, `placeholder="위치"`)
-	assertContains(t, code, ">수정</")
+	assertContains(t, code, "'수정'")
 	assertContains(t, code, "onClick")
 	assertContains(t, code, "deleteRoomMutation.mutate")
 	assertNotContains(t, code, "deleteRoomForm")
+	// label + id on form fields
+	assertContains(t, code, `<label htmlFor="Name">Name</label>`)
+	assertContains(t, code, `<label htmlFor="Capacity">Capacity</label>`)
+	assertContains(t, code, `<label htmlFor="Location">Location</label>`)
+	// isPending on submit and action buttons
+	assertContains(t, code, `disabled={updateRoomMutation.isPending}`)
+	assertContains(t, code, `disabled={deleteRoomMutation.isPending}`)
 }

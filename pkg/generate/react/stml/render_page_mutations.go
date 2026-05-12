@@ -6,13 +6,14 @@ import (
 	"fmt"
 	"strings"
 
+	oapiparser "github.com/park-jun-woo/yongol/pkg/parser/openapi"
 	stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
 )
 
-func renderPageMutations(allActions []stmlparser.ActionBlock, fetchOps []string, actionFetchMap map[string][]string, sb *strings.Builder) {
+func renderPageMutations(allActions []stmlparser.ActionBlock, fetchOps []string, actionFetchMap map[string][]string, constraints map[string]map[string]oapiparser.FieldConstraint, sb *strings.Builder) {
 	for _, a := range allActions {
 		if len(a.Fields) > 0 {
-			sb.WriteString(fmt.Sprintf("  %s\n", renderFormHook(a)))
+			sb.WriteString(fmt.Sprintf("  %s\n", renderFormHook(a, constraints)))
 		}
 		// Determine scoped invalidation targets for this action
 		targetOps := resolveInvalidateOps(a.OperationID, fetchOps, actionFetchMap)

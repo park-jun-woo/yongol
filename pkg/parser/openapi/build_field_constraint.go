@@ -22,6 +22,17 @@ func buildFieldConstraint(prop *openapi3.Schema, required bool) FieldConstraint 
 		v := int(prop.MinLength)
 		fc.MinLength = &v
 	}
+	if prop.Min != nil {
+		v := *prop.Min
+		fc.Minimum = &v
+	}
+	if prop.Max != nil {
+		v := *prop.Max
+		fc.Maximum = &v
+	}
+	if prop.Pattern != "" {
+		fc.Pattern = prop.Pattern
+	}
 	if len(prop.Enum) > 0 {
 		fc.Enum = enumToStrings(prop.Enum)
 	}

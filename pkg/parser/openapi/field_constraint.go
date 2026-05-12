@@ -8,6 +8,9 @@ type FieldConstraint struct {
 	Format    string
 	MaxLength *int
 	MinLength *int
+	Minimum   *float64
+	Maximum   *float64
+	Pattern   string
 	Enum      []string
 	Required  bool
 	// Line: 해당 property 가 선언된 줄 번호 (1-based, 0 = 미상).

@@ -55,17 +55,24 @@ func generateFrontendSetup(fs *yongol.Fullstack, artifactsDir string) error {
 	var stmlPages []stml.PageSpec
 	var stmlLayouts []stml.LayoutSpec
 	var defaultLayout string
+	var hasAuthz bool
 	if fs != nil {
 		stmlPages = fs.STMLPages
 		stmlLayouts = fs.Layouts
 		if fs.Manifest != nil {
 			defaultLayout = fs.Manifest.Frontend.DefaultLayout
+			hasAuthz = fs.Manifest.Authz != nil
 		}
 	}
 	if err := writeLayoutsTSX(srcDir, stmlLayouts); err != nil {
 		return err
 	}
-	if err := writeAppTSX(srcDir, stmlPages, stmlLayouts, defaultLayout); err != nil {
+	if hasAuthz {
+		if err := writeProtectedRoute(srcDir); err != nil {
+			return err
+		}
+	}
+	if err := writeAppTSX(srcDir, stmlPages, stmlLayouts, defaultLayout, hasAuthz); err != nil {
 		return err
 	}
 	if err := writeLibUtils(srcDir); err != nil {
@@ -95,7 +102,7 @@ func generateFrontendSetup(fs *yongol.Fullstack, artifactsDir string) error {
 		_ = os.WriteFile(typesDest, []byte("export type paths = Record<string, any>\n"), 0o644)
 	}
 
-	if err := writeAPIClient(srcDir, fsOpenAPIDoc(fs)); err != nil {
+	if err := writeAPIClient(srcDir, fsOpenAPIDoc(fs), hasAuthz); err != nil {
 		return err
 	}
 	return deferredErr

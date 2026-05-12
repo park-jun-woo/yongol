@@ -17,6 +17,10 @@ func (r *ReactTarget) Dependencies(pages []stmlparser.PageSpec) map[string]strin
 		if is.useParams {
 			deps["react-router-dom"] = "^6"
 		}
+		if is.useZod {
+			deps["zod"] = "^3"
+			deps["@hookform/resolvers"] = "^3"
+		}
 	}
 	return deps
 }

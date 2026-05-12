@@ -13,13 +13,14 @@ import (
 func renderFieldJSX(f stmlparser.FieldBind, formName string, indent int) string {
 	ind := indentStr(indent)
 
-	// data-component field
+	// data-component field — no label wrapper
 	if strings.HasPrefix(f.Tag, "data-component:") {
 		comp := strings.TrimPrefix(f.Tag, "data-component:")
 		return fmt.Sprintf("%s<%s {...%s.register('%s')} />", ind, comp, formName, f.Name)
 	}
 
 	var attrs []string
+	attrs = append(attrs, fmt.Sprintf(`id="%s"`, f.Name))
 	if f.Type != "" {
 		attrs = append(attrs, fmt.Sprintf(`type="%s"`, f.Type))
 	}
@@ -36,10 +37,13 @@ func renderFieldJSX(f stmlparser.FieldBind, formName string, indent int) string 
 	}
 	reg += ")}"
 
-	attrStr := ""
-	if len(attrs) > 0 {
-		attrStr = " " + strings.Join(attrs, " ")
-	}
+	attrStr := " " + strings.Join(attrs, " ")
+	label := toLabel(f.Name)
 
-	return fmt.Sprintf("%s<input%s %s />", ind, attrStr, reg)
+	var lines []string
+	lines = append(lines, fmt.Sprintf("%s<div>", ind))
+	lines = append(lines, fmt.Sprintf(`%s  <label htmlFor="%s">%s</label>`, ind, f.Name, label))
+	lines = append(lines, fmt.Sprintf("%s  <input%s %s />", ind, attrStr, reg))
+	lines = append(lines, fmt.Sprintf("%s</div>", ind))
+	return strings.Join(lines, "\n")
 }

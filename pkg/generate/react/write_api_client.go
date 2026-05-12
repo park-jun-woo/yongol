@@ -22,7 +22,10 @@ import (
 // The object key matches the OpenAPI operationId exactly (PascalCase or
 // camelCase — preserved). This is the contract XOT-1 checks against at
 // validate time.
-func writeAPIClient(srcDir string, doc *openapi3.T) error {
+//
+// When hasAuthz is true, a JWT middleware is registered on the client that
+// attaches the Bearer token from localStorage to every outgoing request.
+func writeAPIClient(srcDir string, doc *openapi3.T, hasAuthz bool) error {
 	if err := os.MkdirAll(filepath.Join(srcDir, "lib"), 0o755); err != nil {
 		return err
 	}
@@ -32,7 +35,21 @@ func writeAPIClient(srcDir string, doc *openapi3.T) error {
 	b.WriteString("// Source of truth: specs/api/openapi.yaml (operationId-keyed).\n")
 	b.WriteString("import createClient from 'openapi-fetch'\n")
 	b.WriteString("import type { paths } from '../types/api'\n\n")
-	b.WriteString("const client = createClient<paths>({ baseUrl: '/api' })\n\n")
+	b.WriteString("const client = createClient<paths>({ baseUrl: '/api' })\n")
+
+	if hasAuthz {
+		b.WriteString("\nclient.use({\n")
+		b.WriteString("  async onRequest({ request }) {\n")
+		b.WriteString("    const token = localStorage.getItem('access_token')\n")
+		b.WriteString("    if (token) {\n")
+		b.WriteString("      request.headers.set('Authorization', `Bearer ${token}`)\n")
+		b.WriteString("    }\n")
+		b.WriteString("    return request\n")
+		b.WriteString("  },\n")
+		b.WriteString("})\n")
+	}
+
+	b.WriteString("\n")
 
 	if doc == nil || doc.Paths == nil {
 		b.WriteString("export const api = {}\n")

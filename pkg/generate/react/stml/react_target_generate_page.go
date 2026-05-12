@@ -10,6 +10,9 @@ import (
 )
 
 func (r *ReactTarget) GeneratePage(page stmlparser.PageSpec, specsDir string, opt GenerateOptions) string {
+	// Pre-populate EachBlock.KeyField from response schema
+	populateEachKeyFields(&page, opt.ResponseArrayItemFields)
+
 	is := collectImports(page, specsDir)
 
 	// Collect fetch operationIds for mutation onSuccess (all page-level fetches)
@@ -36,6 +39,19 @@ func (r *ReactTarget) GeneratePage(page stmlparser.PageSpec, specsDir string, op
 	}
 	is.useForm = needsForm
 
+	// Check if any form action has zod constraints
+	if needsForm && opt.RequestConstraints != nil {
+		for _, a := range allActions {
+			if len(a.Fields) == 0 {
+				continue
+			}
+			if fields := lookupConstraints(a.OperationID, opt.RequestConstraints); len(fields) > 0 {
+				is.useZod = true
+				break
+			}
+		}
+	}
+
 	if len(allActions) > 0 {
 		is.useMutation = true
 		is.useQueryClient = true
@@ -49,7 +65,7 @@ func (r *ReactTarget) GeneratePage(page stmlparser.PageSpec, specsDir string, op
 	sb.WriteString(fmt.Sprintf("export default function %s() {\n", componentName))
 
 	renderPageHooks(page, is, &sb)
-	renderPageMutations(allActions, fetchOps, actionFetchMap, &sb)
+	renderPageMutations(allActions, fetchOps, actionFetchMap, opt.RequestConstraints, &sb)
 	renderPageJSX(page, &sb)
 
 	sb.WriteString("}\n")

@@ -7,5 +7,11 @@ func mergeOpt(base, override GenerateOptions) GenerateOptions {
 		base.APIImportPath = override.APIImportPath
 	}
 	base.UseClient = override.UseClient
+	if override.RequestConstraints != nil {
+		base.RequestConstraints = override.RequestConstraints
+	}
+	if override.ResponseArrayItemFields != nil {
+		base.ResponseArrayItemFields = override.ResponseArrayItemFields
+	}
 	return base
 }

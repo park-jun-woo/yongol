@@ -19,6 +19,12 @@ func walkTopLevel(n *html.Node, page *PageSpec) {
 				page.Layout = v
 			}
 		}
+		// Extract data-route from the first non-implicit element.
+		if page.Route == "" {
+			if v := getAttr(n, "data-route"); v != "" {
+				page.Route = v
+			}
+		}
 		if dispatchTopLevelElement(n, page) {
 			return
 		}

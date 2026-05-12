@@ -7,6 +7,7 @@ type PageSpec struct {
 	Name     string        // page name derived from filename (e.g. "login-page")
 	FileName string        // original filename (e.g. "login-page.html")
 	Layout   string        // data-layout attribute from the top-level element (empty if unset)
+	Route    string        // data-route attribute for explicit route path (empty = infer from filename)
 	Fetches  []FetchBlock  // data-fetch blocks (for validation)
 	Actions  []ActionBlock // data-action blocks (for validation)
 	Children []ChildNode   // all top-level children in DOM order (for codegen)

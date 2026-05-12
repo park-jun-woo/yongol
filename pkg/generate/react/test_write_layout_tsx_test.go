@@ -120,7 +120,7 @@ func TestWriteAppTSX_LayoutGrouping(t *testing.T) {
 		{Name: "app", HasOutlet: true, NavItems: []stml.NavItem{{Path: "/workflows", Label: "Workflows"}}},
 		{Name: "auth", HasOutlet: true},
 	}
-	if err := writeAppTSX(dir, pages, layouts, ""); err != nil {
+	if err := writeAppTSX(dir, pages, layouts, "", false); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))
@@ -168,7 +168,7 @@ func TestWriteAppTSX_DefaultLayout(t *testing.T) {
 		{Name: "auth", HasOutlet: true},
 	}
 	// defaultLayout = "app" → workflows and dashboard go under AppLayout
-	if err := writeAppTSX(dir, pages, layouts, "app"); err != nil {
+	if err := writeAppTSX(dir, pages, layouts, "app", false); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))
@@ -194,7 +194,7 @@ func TestWriteAppTSX_NoLayoutNoDefault_FlatRoutes(t *testing.T) {
 		{Name: "dashboard", FileName: "dashboard.html"},
 	}
 	// No layouts, no defaultLayout → flat routes (current behavior)
-	if err := writeAppTSX(dir, pages, nil, ""); err != nil {
+	if err := writeAppTSX(dir, pages, nil, "", false); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))
@@ -220,7 +220,7 @@ func TestWriteAppTSX_MixedLayoutAndFlat(t *testing.T) {
 		{Name: "auth", HasOutlet: true},
 	}
 	// No defaultLayout → "about" stays flat
-	if err := writeAppTSX(dir, pages, layouts, ""); err != nil {
+	if err := writeAppTSX(dir, pages, layouts, "", false); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))
@@ -273,7 +273,7 @@ func TestWriteAppTSX_LayoutGrouping_ZenflowFull(t *testing.T) {
 		{Name: "auth", HasOutlet: true},
 	}
 	// defaultLayout = "app" → pages without explicit layout go under AppLayout
-	if err := writeAppTSX(dir, pages, layouts, "app"); err != nil {
+	if err := writeAppTSX(dir, pages, layouts, "app", false); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))

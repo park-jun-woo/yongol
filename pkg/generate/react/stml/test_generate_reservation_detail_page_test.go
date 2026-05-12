@@ -29,4 +29,7 @@ func TestGenerateReservationDetailPage(t *testing.T) {
 	assertContains(t, code, "<footer")
 	assertContains(t, code, "onClick")
 	assertContains(t, code, "cancelReservationMutation")
+	// isPending on action button
+	assertContains(t, code, `disabled={cancelReservationMutation.isPending}`)
+	assertContains(t, code, `'처리 중...'`)
 }

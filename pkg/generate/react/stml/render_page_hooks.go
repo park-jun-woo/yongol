@@ -11,7 +11,7 @@ import (
 
 func renderPageHooks(page stmlparser.PageSpec, is importSet, sb *strings.Builder) {
 	allParams := collectAllParams(page)
-	if up := renderUseParams(allParams); up != "" {
+	if up := renderUseParamsWithRoute(allParams, page.Route); up != "" {
 		sb.WriteString(fmt.Sprintf("  %s\n", up))
 	}
 
