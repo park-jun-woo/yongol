@@ -29,7 +29,7 @@ func TestWriteAPIClient_TypedSig_GetNoPathParams(t *testing.T) {
 	}
 	content := string(data)
 
-	assertContains(t, content, "ListItems: (args: Req<'ListItems'>) => {")
+	assertContains(t, content, "ListItems: (args?: Req<'ListItems'>) => {")
 	assertContains(t, content, "{ params: { query: args ?? {} } } as any")
 	assertContains(t, content, "as Res<'ListItems'>")
 }

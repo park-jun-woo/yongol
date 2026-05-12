@@ -21,9 +21,14 @@ func writeApiClientEntry(b *strings.Builder, ep endpoint) {
 	opQ := fmt.Sprintf("'%s'", ep.opID) // quoted operationId for type arg
 
 	// --- function signature: typed Req<K> ---
+	// GET without path params: all query keys are optional, so args itself is optional.
+	optionalMark := ""
+	if method == "GET" && len(ep.pathParams) == 0 {
+		optionalMark = "?"
+	}
 	b.WriteString("  ")
 	b.WriteString(ep.opID)
-	b.WriteString(fmt.Sprintf(": (args: Req<%s>) => {\n", opQ))
+	b.WriteString(fmt.Sprintf(": (args%s: Req<%s>) => {\n", optionalMark, opQ))
 
 	if len(ep.pathParams) > 0 {
 		// Extract path params by name.
