@@ -17,9 +17,9 @@ func writeReqResTypes(b *strings.Builder) {
 
 	b.WriteString("type BodyOf<K extends keyof operations> =\n")
 	b.WriteString("  operations[K] extends { requestBody: { content: { 'application/json': infer B } } }\n")
-	b.WriteString("    ? keyof B extends never ? {} : B\n")
+	b.WriteString("    ? B extends Record<string, never> ? {} : B\n")
 	b.WriteString("  : operations[K] extends { requestBody: { content: { 'multipart/form-data': infer B } } }\n")
-	b.WriteString("    ? keyof B extends never ? {} : B\n")
+	b.WriteString("    ? B extends Record<string, never> ? {} : B\n")
 	b.WriteString("    : {}\n\n")
 
 	b.WriteString("type Req<K extends keyof operations> =\n")

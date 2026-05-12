@@ -36,6 +36,9 @@ func renderFieldJSX(f stmlparser.FieldBind, formName string, indent int) string 
 		reg += ", { valueAsNumber: true }"
 	}
 	reg += ")}"
+	if f.Type == "file" {
+		reg = "{...(" + formName + ".register('" + f.Name + "') as any)}"
+	}
 
 	attrStr := " " + strings.Join(attrs, " ")
 	label := toLabel(f.Name)

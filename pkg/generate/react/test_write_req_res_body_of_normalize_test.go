@@ -1,5 +1,5 @@
 //ff:func feature=gen-react type=test control=sequence
-//ff:what BodyOf 타입에서 Record<string, never>를 {}로 정규화하는 keyof B extends never 분기 검증
+//ff:what BodyOf 타입에서 Record<string, never>를 {}로 정규화하는 B extends Record<string, never> 분기 검증
 
 package react
 
@@ -13,5 +13,5 @@ func TestWriteReqResTypes_BodyOfNormalize(t *testing.T) {
 	writeReqResTypes(&b)
 	out := b.String()
 
-	assertContains(t, out, "keyof B extends never ? {} : B")
+	assertContains(t, out, "B extends Record<string, never> ? {} : B")
 }
