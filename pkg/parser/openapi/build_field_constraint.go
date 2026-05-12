@@ -36,5 +36,10 @@ func buildFieldConstraint(prop *openapi3.Schema, required bool) FieldConstraint 
 	if len(prop.Enum) > 0 {
 		fc.Enum = enumToStrings(prop.Enum)
 	}
+	if typeName == "array" && prop.Items != nil && prop.Items.Value != nil {
+		if itemTypes := prop.Items.Value.Type.Slice(); len(itemTypes) > 0 {
+			fc.ItemType = itemTypes[0]
+		}
+	}
 	return fc
 }

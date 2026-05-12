@@ -14,7 +14,12 @@ func zodChain(fc oapiparser.FieldConstraint) string {
 		return zodEnumChain(fc)
 	}
 
-	base := zodBaseType(fc.Type)
+	var base string
+	if fc.Type == "array" {
+		base = zodBaseTypeArray(fc.ItemType)
+	} else {
+		base = zodBaseType(fc.Type)
+	}
 	parts := []string{base}
 	parts = appendStringValidations(parts, fc)
 	parts = appendNumericValidations(parts, fc)
