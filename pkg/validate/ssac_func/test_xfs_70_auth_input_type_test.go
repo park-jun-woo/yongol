@@ -1,5 +1,5 @@
 //ff:func feature=validate type=test control=sequence topic=func-check
-//ff:what XFS-70 test — @auth input type string 호환성 검증
+//ff:what TestXfs70_AuthInputUUIDFails — @auth input UUID 타입 비호환 XFS-70 발생 검증
 
 package ssac_func
 
@@ -55,30 +55,5 @@ func TestXfs70_AuthInputUUIDFails(t *testing.T) {
 	}
 	if !strings.Contains(diags[0].Message, "pgtype.UUID") {
 		t.Errorf("expected pgtype.UUID in message, got %q", diags[0].Message)
-	}
-}
-
-// TestXfs70_AuthInputStringPasses verifies that @auth with string-typed
-// input (e.g. request.id path param) does not trigger XFS-70.
-func TestXfs70_AuthInputStringPasses(t *testing.T) {
-	fs := &yongol.Fullstack{
-		ServiceFuncs: []parsessac.ServiceFunc{{
-			Name:     "GetWorkflow",
-			FileName: "service/get_workflow.ssac",
-			Sequences: []parsessac.Sequence{{
-				Type:     "auth",
-				Action:   "GetWorkflow",
-				Resource: "workflow",
-				Line:     3,
-				Inputs: map[string]string{
-					"ResourceID": "request.id",
-				},
-			}},
-		}},
-	}
-	fs.SetGround(ground.Build(fs))
-	diags := xfs70AuthInputType(fs)
-	if len(diags) != 0 {
-		t.Errorf("expected 0 diagnostics for string input, got %d (%+v)", len(diags), diags)
 	}
 }

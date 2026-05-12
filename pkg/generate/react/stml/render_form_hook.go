@@ -24,16 +24,3 @@ func renderFormHook(a stmlparser.ActionBlock, constraints map[string]map[string]
 	schemaName := toLowerFirst(a.OperationID) + "Schema"
 	return fmt.Sprintf("%s\n  const %s = useForm({\n    resolver: zodResolver(%s),\n  })", schemaCode, formName, schemaName)
 }
-
-// lookupConstraints retrieves the field constraints for the given operationId.
-// Returns nil when no constraints exist.
-func lookupConstraints(operationID string, constraints map[string]map[string]oapiparser.FieldConstraint) map[string]oapiparser.FieldConstraint {
-	if constraints == nil {
-		return nil
-	}
-	fields, ok := constraints[operationID]
-	if !ok || len(fields) == 0 {
-		return nil
-	}
-	return fields
-}

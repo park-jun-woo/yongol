@@ -18,26 +18,7 @@ func populateManifest(g *rule.Ground, fs *yongol.Fullstack) {
 	g.Lookup["Manifest.middleware"] = middleware
 
 	if fs.Manifest.Backend.Auth != nil {
-		claims := make(rule.StringSet)
-		claimKeys := make(rule.StringSet)
-		for field, def := range fs.Manifest.Backend.Auth.Claims {
-			claims[field] = true
-			claimKeys[def.Key] = true
-			goType := def.GoType
-			if goType == "uuid" {
-				goType = "pgtype.UUID"
-			}
-			g.Types["Manifest.claim."+field] = goType
-		}
-		g.Lookup["Manifest.claims"] = claims
-		g.Lookup["Manifest.claims.keys"] = claimKeys
-		g.Config["backend.auth.claims"] = len(claims) > 0
-
-		roles := make(rule.StringSet)
-		for _, r := range fs.Manifest.Backend.Auth.Roles {
-			roles[r] = true
-		}
-		g.Lookup["Manifest.roles"] = roles
+		populateManifestAuth(g, fs.Manifest.Backend.Auth)
 	}
 
 	if fs.Manifest.Queue != nil && fs.Manifest.Queue.Backend != "" {

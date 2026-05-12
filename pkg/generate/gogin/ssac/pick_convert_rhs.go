@@ -4,9 +4,6 @@
 package ssac
 
 import (
-	"strings"
-
-	"github.com/park-jun-woo/yongol/pkg/generate/gogin/types"
 	"github.com/park-jun-woo/yongol/pkg/parser/ddl"
 )
 
@@ -38,11 +35,8 @@ func pickConvertRHS(jsonName, apiField, dbField string, isRequired bool, jsonbs 
 	case isRequired:
 		return base
 	default:
-		if col != nil {
-			binding := types.MapPGType(*col)
-			if strings.HasPrefix(binding.ApiField, "*") {
-				return base
-			}
+		if isAlreadyPointerApiField(col) {
+			return base
 		}
 		return "ptrOf(" + base + ")"
 	}

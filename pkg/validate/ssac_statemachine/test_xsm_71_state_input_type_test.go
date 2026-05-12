@@ -1,5 +1,5 @@
 //ff:func feature=validate type=test control=sequence topic=ssac-statemachine
-//ff:what XSM-71 test — @state input type string 호환성 검증
+//ff:what TestXsm71_StateInputUUIDFails — @state input UUID 타입 비호환 XSM-71 발생 검증
 
 package ssac_statemachine
 
@@ -48,7 +48,7 @@ func TestXsm71_StateInputUUIDFails(t *testing.T) {
 	}
 	fs.SetGround(ground.Build(fs))
 	diags := xsm71StateInputType(fs)
-	// workflow.ID → pgtype.UUID → ERROR; workflow.Status → string → OK
+	// workflow.ID -> pgtype.UUID -> ERROR; workflow.Status -> string -> OK
 	if len(diags) != 1 {
 		t.Fatalf("expected 1 diagnostic, got %d (%+v)", len(diags), diags)
 	}
@@ -57,43 +57,5 @@ func TestXsm71_StateInputUUIDFails(t *testing.T) {
 	}
 	if !strings.Contains(diags[0].Message, "pgtype.UUID") {
 		t.Errorf("expected pgtype.UUID in message, got %q", diags[0].Message)
-	}
-}
-
-// TestXsm71_StateInputStringPasses verifies that @state with all
-// string-typed inputs does not trigger XSM-71.
-func TestXsm71_StateInputStringPasses(t *testing.T) {
-	fs := &yongol.Fullstack{
-		DDLTables: []ddl.Table{{
-			Name: "workflows",
-			Columns: map[string]ddl.Column{
-				"status": {Name: "status", RawType: "TEXT", NotNull: true},
-			},
-			ColumnOrder: []string{"status"},
-		}},
-		ServiceFuncs: []parsessac.ServiceFunc{{
-			Name:     "ActivateWorkflow",
-			FileName: "service/activate_workflow.ssac",
-			Sequences: []parsessac.Sequence{
-				{
-					Type:   "get",
-					Result: &parsessac.Result{Var: "wf", Type: "Workflow"},
-				},
-				{
-					Type:      "state",
-					DiagramID: "workflow",
-					Line:      5,
-					Inputs: map[string]string{
-						"status": "wf.Status",
-					},
-					Transition: "ActivateWorkflow",
-				},
-			},
-		}},
-	}
-	fs.SetGround(ground.Build(fs))
-	diags := xsm71StateInputType(fs)
-	if len(diags) != 0 {
-		t.Errorf("expected 0 diagnostics, got %d (%+v)", len(diags), diags)
 	}
 }

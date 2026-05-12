@@ -21,21 +21,3 @@ func requestBodyFields(op *openapi3.Operation) map[string]struct{} {
 	}
 	return out
 }
-
-// collectPropNames collects property names from schema + allOf.
-func collectPropNames(out map[string]struct{}, s *openapi3.Schema) {
-	if s == nil {
-		return
-	}
-	for name := range s.Properties {
-		out[name] = struct{}{}
-	}
-	for _, allOfRef := range s.AllOf {
-		if allOfRef == nil || allOfRef.Value == nil {
-			continue
-		}
-		for name := range allOfRef.Value.Properties {
-			out[name] = struct{}{}
-		}
-	}
-}

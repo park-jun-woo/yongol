@@ -1,4 +1,4 @@
-//ff:func feature=frontend type=parser control=sequence
+//ff:func feature=design-parse type=parser control=sequence
 //ff:what --- 구분자 사이의 YAML front matter 와 body 를 분리하여 반환
 package design
 

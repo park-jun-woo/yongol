@@ -1,4 +1,4 @@
-//ff:func feature=stml-gen type=generator control=iteration dimension=1 topic=output
+//ff:func feature=stml-gen type=generator control=sequence topic=output
 //ff:what PageSpec에서 React TSX 컴포넌트 전체 소스 코드를 생성한다
 package stml
 
@@ -29,28 +29,8 @@ func (r *ReactTarget) GeneratePage(page stmlparser.PageSpec, specsDir string, op
 	allActions = append(allActions, collectAllActions(page.Children)...)
 	allActions = deduplicateActions(allActions)
 
-	// Check if any action needs a form
-	needsForm := false
-	for _, a := range allActions {
-		if len(a.Fields) > 0 {
-			needsForm = true
-			break
-		}
-	}
-	is.useForm = needsForm
-
-	// Check if any form action has zod constraints
-	if needsForm && opt.RequestConstraints != nil {
-		for _, a := range allActions {
-			if len(a.Fields) == 0 {
-				continue
-			}
-			if fields := lookupConstraints(a.OperationID, opt.RequestConstraints); len(fields) > 0 {
-				is.useZod = true
-				break
-			}
-		}
-	}
+	is.useForm = anyActionHasFields(allActions)
+	is.useZod = is.useForm && anyActionHasZodConstraints(allActions, opt.RequestConstraints)
 
 	if len(allActions) > 0 {
 		is.useMutation = true

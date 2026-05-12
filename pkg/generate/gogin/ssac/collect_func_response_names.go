@@ -1,21 +1,11 @@
-//ff:func feature=gen-gogin type=util control=iteration dimension=1
+//ff:func feature=gen-gogin type=util control=iteration dimension=2
 //ff:what collectFuncResponseNames — ServiceFuncs 에서 @call Func Response 타입 이름 + full import path 수집
 
 package ssac
 
 import (
-	"path"
-	"strings"
-
 	ssacparser "github.com/park-jun-woo/yongol/pkg/parser/ssac"
 )
-
-// funcRespInfo holds the package alias and full import path for a Func
-// Response type collected from @call sequences.
-type funcRespInfo struct {
-	PkgAlias   string // "dashboard"
-	ImportPath string // "github.com/park-jun-woo/zenflow/internal/dashboard"
-}
 
 // collectFuncResponseNames scans all ServiceFuncs for @call sequences that
 // produce a typed Result. For each such sequence it extracts:
@@ -38,23 +28,7 @@ func collectFuncResponseNames(serviceFuncs []ssacparser.ServiceFunc) map[string]
 			if _, exists := result[typeName]; exists {
 				continue
 			}
-			// For @call, the package alias is the first element of Model
-			// (e.g. "dashboard.Summarize" → "dashboard").
-			pkgAlias := ""
-			if parts := strings.SplitN(seq.Model, ".", 2); len(parts) == 2 {
-				pkgAlias = parts[0]
-			}
-			importPath := ""
-			for _, imp := range sf.Imports {
-				if path.Base(imp) == pkgAlias {
-					importPath = imp
-					break
-				}
-			}
-			result[typeName] = funcRespInfo{
-				PkgAlias:   pkgAlias,
-				ImportPath: importPath,
-			}
+			result[typeName] = extractFuncRespInfo(seq, sf.Imports)
 		}
 	}
 	return result

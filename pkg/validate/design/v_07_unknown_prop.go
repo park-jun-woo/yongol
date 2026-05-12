@@ -1,4 +1,4 @@
-//ff:func feature=validate type=rule control=sequence topic=design-structural
+//ff:func feature=validate type=rule control=iteration dimension=1 topic=design-structural
 //ff:what V-07 — 미지의 component property (spec 정의 외) WARNING 검증
 package design
 
@@ -40,17 +40,7 @@ var knownComponentProps = map[string]bool{
 func v07UnknownProp(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	var diags []diagnostic.Diagnostic
 	for compName, comp := range fs.DesignSpec.Components {
-		for propName := range comp.Props {
-			if !knownComponentProps[propName] {
-				diags = append(diags, diagnostic.Diagnostic{
-					File:    fs.DesignSpec.File,
-					Phase:   diagnostic.PhaseValidate,
-					Level:   diagnostic.LevelWarning,
-					Message: "[V-07] component \"" + compName + "\" has unknown property: \"" + propName + "\"",
-					Advice:  "Verify this property name is intentional; known props: variant, size, color, disabled, fullWidth, icon, label, children, onClick, onChange, value, placeholder, type, name, required, className, style",
-				})
-			}
-		}
+		diags = append(diags, checkUnknownProps(fs.DesignSpec.File, compName, comp.Props)...)
 	}
 	return diags
 }

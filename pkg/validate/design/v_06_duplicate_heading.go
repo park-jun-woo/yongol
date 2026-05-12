@@ -1,4 +1,4 @@
-//ff:func feature=validate type=rule control=sequence topic=design-structural
+//ff:func feature=validate type=rule control=iteration dimension=1 topic=design-structural
 //ff:what V-06 — Markdown body에 중복 ## 섹션 헤딩 검증
 package design
 

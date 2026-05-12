@@ -1,4 +1,4 @@
-//ff:func feature=validate type=rule control=sequence topic=design-structural
+//ff:func feature=validate type=rule control=iteration dimension=1 topic=design-structural
 //ff:what V-04 — rounded, spacing 값이 유효한 dimension (px/em/rem) 또는 숫자 검증
 package design
 

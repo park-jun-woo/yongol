@@ -4,7 +4,6 @@ package yongol
 
 import (
 	"os"
-	"path/filepath"
 
 	"github.com/park-jun-woo/yongol/pkg/parser/design"
 )
@@ -29,15 +28,4 @@ func parseDesignIfPresent(fs *Fullstack, root string) {
 	if len(diags) == 0 {
 		fs.DesignSpec = spec
 	}
-}
-
-// resolveDesignPath determines the DESIGN.md path. Priority:
-// 1. manifest.frontend.design (explicit path relative to specs root)
-// 2. convention: frontend/DESIGN.md
-func resolveDesignPath(fs *Fullstack, root string) string {
-	if fs.Manifest != nil && fs.Manifest.Frontend.Design != "" {
-		return filepath.Join(root, fs.Manifest.Frontend.Design)
-	}
-	// Convention fallback.
-	return filepath.Join(root, "frontend", "DESIGN.md")
 }

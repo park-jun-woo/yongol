@@ -1,4 +1,4 @@
-//ff:func feature=validate type=rule control=sequence topic=design-structural
+//ff:func feature=validate type=rule control=iteration dimension=1 topic=design-structural
 //ff:what V-03 — typography 토큰에 fontFamily, fontSize, fontWeight 필수 검증
 package design
 

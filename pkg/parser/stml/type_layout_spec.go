@@ -10,9 +10,3 @@ type LayoutSpec struct {
 	NavItems  []NavItem // data-nav navigation links
 	HasOutlet bool      // whether slot data-outlet exists
 }
-
-// NavItem represents a navigation link extracted from a data-nav attribute.
-type NavItem struct {
-	Path  string // data-nav attribute value (e.g., "/workflows")
-	Label string // link text content
-}

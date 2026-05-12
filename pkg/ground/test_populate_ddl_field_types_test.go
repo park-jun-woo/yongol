@@ -1,4 +1,4 @@
-//ff:func feature=ground type=test control=sequence dimension=1 topic=ddl
+//ff:func feature=ground type=test control=iteration dimension=1 topic=ddl
 //ff:what populateDDL — DDL 컬럼 Go 타입이 Types["DDL.field.<Model>.<Field>"]에 등록
 
 package ground

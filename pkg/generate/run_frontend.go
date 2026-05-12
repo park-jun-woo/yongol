@@ -4,11 +4,8 @@ package generate
 
 import (
 	"fmt"
-	"path/filepath"
 
 	"github.com/park-jun-woo/yongol/pkg/generate/react"
-	stmlgen "github.com/park-jun-woo/yongol/pkg/generate/react/stml"
-	oapiparser "github.com/park-jun-woo/yongol/pkg/parser/openapi"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
@@ -32,19 +29,4 @@ func runFrontend(fs *yongol.Fullstack, artifactsDir string, frontend FrontendTyp
 	default:
 		return fmt.Errorf("unknown frontend %q", frontend)
 	}
-}
-
-// runSTMLCodegen generates page TSX files from STML specs when STMLPages
-// are present. Skips silently if no STML pages were parsed.
-func runSTMLCodegen(fs *yongol.Fullstack, artifactsDir string) error {
-	if fs == nil || len(fs.STMLPages) == 0 {
-		return nil
-	}
-	pagesDir := filepath.Join(artifactsDir, "frontend", "src", "pages")
-	opt := stmlgen.GenerateOptions{
-		RequestConstraints:      fs.RequestConstraints,
-		ResponseArrayItemFields: oapiparser.ExtractResponseArrayItemFields(fs.OpenAPIDoc),
-	}
-	_, err := stmlgen.Generate(fs.STMLPages, fs.SpecsDir, pagesDir, opt)
-	return err
 }

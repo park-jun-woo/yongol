@@ -1,4 +1,4 @@
-//ff:func feature=stml-gen type=test control=sequence
+//ff:func feature=stml-gen type=test control=iteration dimension=1
 //ff:what data-state="field=value" 비교 연산자 === 변환 검증
 package stml
 

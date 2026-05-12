@@ -5,7 +5,6 @@ package stml_openapi
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
 	"github.com/park-jun-woo/yongol/pkg/parser/stml"
@@ -27,21 +26,4 @@ func tm04Params(params []stml.ParamBind, opID, file string, entry operationEntry
 		}
 	}
 	return diags
-}
-
-// hasMatchingParam returns true if the operation has a parameter with the
-// given name (case-insensitive).
-func hasMatchingParam(entry operationEntry, name string) bool {
-	if entry.op == nil {
-		return false
-	}
-	for _, p := range entry.op.Parameters {
-		if p == nil || p.Value == nil {
-			continue
-		}
-		if strings.EqualFold(p.Value.Name, name) {
-			return true
-		}
-	}
-	return false
 }

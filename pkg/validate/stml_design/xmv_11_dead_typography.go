@@ -4,11 +4,9 @@ package stml_design
 
 import (
 	"fmt"
-	"sort"
 	"strings"
 
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
-	"github.com/park-jun-woo/yongol/pkg/parser/design"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
@@ -43,14 +41,4 @@ func xmv11DeadTypography(fs *yongol.Fullstack, tokens pageTokenRefs) []diagnosti
 		}
 	}
 	return diags
-}
-
-// sortedTypoKeys returns the keys of a TypographyToken map in sorted order.
-func sortedTypoKeys(m map[string]design.TypographyToken) []string {
-	keys := make([]string, 0, len(m))
-	for k := range m {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-	return keys
 }

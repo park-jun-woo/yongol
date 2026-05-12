@@ -4,10 +4,8 @@ package stml_design
 
 import (
 	"fmt"
-	"sort"
 
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
-	"github.com/park-jun-woo/yongol/pkg/parser/design"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
@@ -37,14 +35,4 @@ func xmv12DeadComponent(fs *yongol.Fullstack, tokens pageTokenRefs) []diagnostic
 		}
 	}
 	return diags
-}
-
-// sortedCompKeys returns the keys of a ComponentToken map in sorted order.
-func sortedCompKeys(m map[string]design.ComponentToken) []string {
-	keys := make([]string, 0, len(m))
-	for k := range m {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-	return keys
 }

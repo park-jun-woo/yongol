@@ -1,4 +1,4 @@
-//ff:func feature=validate type=util control=sequence topic=ssac-sqlc
+//ff:func feature=validate type=util control=iteration dimension=1 topic=ssac-sqlc
 //ff:what inferSqlcParamIntWidth — infer the integer width of a sqlc param from the query body cast
 
 package ssac_sqlc
@@ -35,18 +35,4 @@ func inferSqlcParamIntWidth(body, paramName string) string {
 		return castToIntWidth(m[1])
 	}
 	return ""
-}
-
-// castToIntWidth maps a PostgreSQL type-cast token to "int32" or "int64".
-// Empty token (no cast) defaults to "int32".
-func castToIntWidth(cast string) string {
-	switch cast {
-	case "bigint", "int8":
-		return "int64"
-	case "int", "int4", "integer", "":
-		return "int32"
-	default:
-		// Non-integer cast (e.g. ::text) — not an int param.
-		return ""
-	}
 }

@@ -24,25 +24,7 @@ func xfs70AuthInputType(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			if seq.Type != "auth" {
 				continue
 			}
-			for inputKey, inputValue := range seq.Inputs {
-				sourceType := resolveInputType(g, fn.Name, inputValue)
-				if sourceType == "" {
-					continue
-				}
-				if !TypesCompatible(sourceType, "string") {
-					diags = append(diags, diagnostic.Diagnostic{
-						File:  fn.FileName,
-						Line:  seq.Line,
-						Phase: diagnostic.PhaseValidate,
-						Level: diagnostic.LevelError,
-						Message: "[XFS-70] @auth input " + inputKey +
-							" value type " + sourceType + " is not string-compatible" +
-							" (authz.CheckRequest." + inputKey + " is string)",
-						Advice: "Use a string-typed source (e.g. request.id for path params) " +
-							"instead of a DB row UUID field",
-					})
-				}
-			}
+			diags = append(diags, checkAuthInputType(g, fn, seq)...)
 		}
 	}
 	return diags

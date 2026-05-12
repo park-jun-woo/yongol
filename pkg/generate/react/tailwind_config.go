@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 
 	"github.com/park-jun-woo/yongol/pkg/parser/design"
@@ -40,7 +39,6 @@ func writeTailwindConfig(frontendDir string, theme *manifest.FrontendTheme, dspe
 	b.WriteString(fmt.Sprintf("        foreground: '%s',\n", orDefault(theme, pickForeground, designColor(dspec, "foreground", "#0f172a"))))
 	b.WriteString(fmt.Sprintf("        border: '%s',\n", orDefault(theme, pickBorder, designColor(dspec, "border", "#e2e8f0"))))
 
-	// Extra DESIGN.md colors not covered by the semantic slots above.
 	if dspec != nil {
 		writeExtraDesignColors(&b, dspec.Colors)
 	}
@@ -48,28 +46,10 @@ func writeTailwindConfig(frontendDir string, theme *manifest.FrontendTheme, dspe
 	b.WriteString("      },\n")
 
 	// --- borderRadius ---
-	b.WriteString("      borderRadius: {\n")
-	if dspec != nil && len(dspec.Rounded) > 0 {
-		keys := sortedMapKeys(dspec.Rounded)
-		for _, k := range keys {
-			b.WriteString(fmt.Sprintf("        %s: '%s',\n", k, dspec.Rounded[k]))
-		}
-	} else {
-		b.WriteString(fmt.Sprintf("        lg: '%s',\n", orDefault(theme, pickRadius, "0.5rem")))
-		b.WriteString("        md: 'calc(var(--radius, 0.5rem) - 2px)',\n")
-		b.WriteString("        sm: 'calc(var(--radius, 0.5rem) - 4px)',\n")
-	}
-	b.WriteString("      },\n")
+	writeTailwindBorderRadius(&b, theme, dspec)
 
 	// --- spacing ---
-	if dspec != nil && len(dspec.Spacing) > 0 {
-		b.WriteString("      spacing: {\n")
-		keys := sortedMapKeys(dspec.Spacing)
-		for _, k := range keys {
-			b.WriteString(fmt.Sprintf("        %s: '%s',\n", k, dspec.Spacing[k]))
-		}
-		b.WriteString("      },\n")
-	}
+	writeTailwindSpacing(&b, dspec)
 
 	b.WriteString("    },\n")
 	b.WriteString("  },\n")
@@ -95,56 +75,4 @@ func writeTailwindConfig(frontendDir string, theme *manifest.FrontendTheme, dspe
 @tailwind utilities;
 `
 	return os.WriteFile(filepath.Join(frontendDir, "src", "index.css"), []byte(index), 0o644)
-}
-
-// semanticColorNames lists the DESIGN.md color keys that are already handled
-// by the fixed semantic slots (primary, secondary, accent, destructive,
-// muted, background, foreground, border) and their -foreground variants.
-var semanticColorNames = map[string]bool{
-	"primary":               true,
-	"primary-foreground":    true,
-	"secondary":             true,
-	"secondary-foreground":  true,
-	"accent":                true,
-	"accent-foreground":     true,
-	"destructive":           true,
-	"destructive-foreground": true,
-	"muted":                 true,
-	"muted-foreground":      true,
-	"background":            true,
-	"foreground":            true,
-	"border":                true,
-}
-
-// writeExtraDesignColors emits DESIGN.md color tokens not already covered
-// by the semantic slots.
-func writeExtraDesignColors(b *strings.Builder, colors map[string]string) {
-	keys := sortedMapKeys(colors)
-	for _, k := range keys {
-		if semanticColorNames[k] {
-			continue
-		}
-		b.WriteString(fmt.Sprintf("        '%s': '%s',\n", k, colors[k]))
-	}
-}
-
-// designColor returns the DESIGN.md color value for a key, falling back to def.
-func designColor(dspec *design.DesignSpec, key, def string) string {
-	if dspec == nil || dspec.Colors == nil {
-		return def
-	}
-	if v, ok := dspec.Colors[key]; ok {
-		return v
-	}
-	return def
-}
-
-// sortedMapKeys returns the keys of a string map in sorted order.
-func sortedMapKeys(m map[string]string) []string {
-	keys := make([]string, 0, len(m))
-	for k := range m {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-	return keys
 }

@@ -1,4 +1,4 @@
-//ff:func feature=ssac-parse type=test control=sequence topic=response
+//ff:func feature=ssac-parse type=test control=iteration dimension=1 topic=response
 //ff:what @response! 빈 응답 파싱 검증 — nil 아닌 빈 Sequence 반환 (BUG-053)
 
 package ssac

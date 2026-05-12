@@ -1,4 +1,4 @@
-//ff:func feature=rule type=test control=sequence
+//ff:func feature=rule type=test control=iteration dimension=1
 //ff:what resolveOAPIParamGoType test — OpenAPI type+format → Go 타입 매핑 검증
 
 package ground

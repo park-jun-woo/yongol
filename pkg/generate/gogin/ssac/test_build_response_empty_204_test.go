@@ -36,24 +36,3 @@ func TestBuildResponse_Empty204(t *testing.T) {
 		t.Fatalf("204 must not use JSONResponse suffix, got:\n%s", body)
 	}
 }
-
-// TestBuildResponse_Empty200StillUsesJSONResponse verifies that non-204
-// empty responses still use JSONResponse suffix (regression guard).
-func TestBuildResponse_Empty200StillUsesJSONResponse(t *testing.T) {
-	g := &methodGen{
-		FuncName:      "GetHealth",
-		SuccessStatus: 200,
-		RespFields:    make(map[string]responseField),
-		VarTypes:      map[string]string{},
-	}
-	seq := ssacparser.Sequence{
-		Type: "response",
-	}
-	lines := g.buildResponse(seq)
-	body := strings.Join(lines, "\n")
-
-	want := "return api.GetHealth200JSONResponse{}, nil"
-	if !strings.Contains(body, want) {
-		t.Fatalf("expected %q, got:\n%s", want, body)
-	}
-}

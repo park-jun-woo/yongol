@@ -1,5 +1,5 @@
 //ff:func feature=validate type=test control=sequence topic=stml-openapi
-//ff:what TM-03 test — data-action이 GET endpoint를 참조하는 경우 검증
+//ff:what TestTM03_ActionGetMethod_Positive
 
 package stml_openapi
 
@@ -23,21 +23,5 @@ func TestTM03_ActionGetMethod_Positive(t *testing.T) {
 	diags := Run(makeFS(pages, doc))
 	if !hasDiag(diags, "[TM-03]") {
 		t.Errorf("expected TM-03 diagnostic, got %v", diags)
-	}
-}
-
-func TestTM03_ActionGetMethod_Negative(t *testing.T) {
-	pages := []stml.PageSpec{{
-		FileName: "form.html",
-		Actions: []stml.ActionBlock{{
-			OperationID: "CreateUser",
-		}},
-	}}
-	doc := makeDoc(map[string]*openapi3.PathItem{
-		"/users": postOp("CreateUser", nil),
-	})
-	diags := Run(makeFS(pages, doc))
-	if hasDiag(diags, "[TM-03]") {
-		t.Errorf("unexpected TM-03 diagnostic, got %v", diags)
 	}
 }

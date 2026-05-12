@@ -1,5 +1,5 @@
 //ff:func feature=validate type=test control=sequence topic=stml-openapi
-//ff:what TM-05 test — data-field가 OpenAPI request body schema에 없는 경우 검증
+//ff:what TestTM05_FieldNotFound_Positive
 
 package stml_openapi
 
@@ -33,28 +33,5 @@ func TestTM05_FieldNotFound_Positive(t *testing.T) {
 	}
 	if countDiag(diags, "[TM-05]") != 1 {
 		t.Errorf("expected exactly 1 TM-05 diagnostic, got %d", countDiag(diags, "[TM-05]"))
-	}
-}
-
-func TestTM05_FieldNotFound_Negative(t *testing.T) {
-	pages := []stml.PageSpec{{
-		FileName: "form.html",
-		Actions: []stml.ActionBlock{{
-			OperationID: "CreateUser",
-			Fields: []stml.FieldBind{
-				{Name: "Email"},
-				{Name: "Name"},
-			},
-		}},
-	}}
-	doc := makeDoc(map[string]*openapi3.PathItem{
-		"/users": postOp("CreateUser", map[string]*openapi3.SchemaRef{
-			"Email": stringProp(),
-			"Name":  stringProp(),
-		}),
-	})
-	diags := Run(makeFS(pages, doc))
-	if hasDiag(diags, "[TM-05]") {
-		t.Errorf("unexpected TM-05 diagnostic, got %v", diags)
 	}
 }

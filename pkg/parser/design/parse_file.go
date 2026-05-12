@@ -1,4 +1,4 @@
-//ff:func feature=frontend type=parser control=sequence
+//ff:func feature=design-parse type=parser control=sequence
 //ff:what DESIGN.md 파일을 읽어 YAML front matter + body 헤딩을 파싱하여 DesignSpec 반환
 package design
 

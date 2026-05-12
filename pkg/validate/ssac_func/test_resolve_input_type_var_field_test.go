@@ -1,4 +1,4 @@
-//ff:func feature=validate type=test control=sequence topic=func-check
+//ff:func feature=validate type=test control=iteration dimension=1 topic=func-check
 //ff:what resolveInputType var.Field test — @get 결과 변수 필드 접근의 DDL Go 타입 해석
 
 package ssac_func

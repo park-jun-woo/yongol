@@ -1,4 +1,4 @@
-//ff:func feature=rule type=test control=sequence
+//ff:func feature=rule type=test control=iteration dimension=1
 //ff:what populateManifest — claim 필드 GoType을 g.Types["Manifest.claim.<Field>"]에 등록 (uuid → pgtype.UUID 변환 포함)
 
 package ground

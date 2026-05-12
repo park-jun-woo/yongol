@@ -1,11 +1,10 @@
-//ff:func feature=validate type=rule control=sequence topic=design-manifest
+//ff:func feature=validate type=rule control=iteration dimension=1 topic=design-manifest
 //ff:what XNV-02 — specs/frontend/ 내 DESIGN.md 파일이 manifest에 미선언이면 경고
 package design_manifest
 
 import (
 	"fmt"
 	"path/filepath"
-	"strings"
 
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
@@ -44,21 +43,4 @@ func xnv02Undeclared(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		})
 	}
 	return diags
-}
-
-// findDesignFiles globs for DESIGN.md and *.design.md under the given directory.
-func findDesignFiles(dir string) []string {
-	var results []string
-	// Pattern 1: DESIGN.md (exact)
-	matches, _ := filepath.Glob(filepath.Join(dir, "DESIGN.md"))
-	results = append(results, matches...)
-	// Pattern 2: *.design.md (convention)
-	matches, _ = filepath.Glob(filepath.Join(dir, "*.design.md"))
-	results = append(results, matches...)
-	return results
-}
-
-// normPath normalises path separators for comparison.
-func normPath(p string) string {
-	return strings.ReplaceAll(filepath.Clean(p), "\\", "/")
 }

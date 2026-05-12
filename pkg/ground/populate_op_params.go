@@ -12,19 +12,11 @@ func populateOpParams(g *rule.Ground, op *openapi3.Operation) {
 	opID := op.OperationID
 	params := make(rule.StringSet)
 	for _, p := range op.Parameters {
-		if p.Value != nil {
-			params[p.Value.Name] = true
-			// Register param Go type for XFS-73 (request.* param type resolution).
-			if p.Value.Schema != nil && p.Value.Schema.Value != nil {
-				sv := p.Value.Schema.Value
-				if sv.Type != nil && len(*sv.Type) > 0 {
-					goType := resolveOAPIParamGoType((*sv.Type)[0], sv.Format)
-					if goType != "" {
-						g.Types["OpenAPI.paramType."+opID+"."+p.Value.Name] = goType
-					}
-				}
-			}
+		if p.Value == nil {
+			continue
 		}
+		params[p.Value.Name] = true
+		registerParamGoType(g, opID, p.Value)
 	}
 	g.Lookup["OpenAPI.param."+opID] = params
 

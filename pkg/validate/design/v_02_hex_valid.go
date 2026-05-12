@@ -1,4 +1,4 @@
-//ff:func feature=validate type=rule control=sequence topic=design-structural
+//ff:func feature=validate type=rule control=iteration dimension=1 topic=design-structural
 //ff:what V-02 — colors 값이 유효한 hex (#XXX / #XXXX / #XXXXXX / #XXXXXXXX) 검증
 package design
 

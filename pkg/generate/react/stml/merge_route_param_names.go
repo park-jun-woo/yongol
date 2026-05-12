@@ -1,4 +1,4 @@
-//ff:func feature=stml-gen type=util control=sequence
+//ff:func feature=stml-gen type=util control=iteration dimension=1
 //ff:what 두 파라미터 이름 슬라이스를 순서 유지하며 중복 없이 병합한다
 package stml
 

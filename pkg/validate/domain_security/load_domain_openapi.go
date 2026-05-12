@@ -6,16 +6,8 @@ import (
 	"path/filepath"
 
 	"github.com/getkin/kin-openapi/openapi3"
-	"github.com/park-jun-woo/yongol/pkg/parser/manifest"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
-
-// domainDoc holds a loaded OpenAPI document and its domain name.
-type domainDoc struct {
-	Name string
-	Doc  *openapi3.T
-	Cfg  manifest.DomainConfig
-}
 
 // loadDomainOpenAPIDocs loads each domain's OpenAPI file relative to specsDir.
 // Domains whose OpenAPI file cannot be loaded are silently skipped (parse errors

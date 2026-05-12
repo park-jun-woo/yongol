@@ -32,14 +32,3 @@ func writeComponentsUI(srcDir string, spec *design.DesignSpec) error {
 	return nil
 }
 
-// writeDesignComponents emits one TSX file per DESIGN.md component definition.
-func writeDesignComponents(uiDir string, comps map[string]design.ComponentToken) error {
-	for name, tok := range comps {
-		src := renderComponentTSX(name, tok)
-		fileName := name + ".tsx"
-		if err := os.WriteFile(filepath.Join(uiDir, fileName), []byte(src), 0o644); err != nil {
-			return err
-		}
-	}
-	return nil
-}

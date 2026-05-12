@@ -1,4 +1,4 @@
-//ff:func feature=validate type=rule control=iteration dimension=1 topic=stml-openapi
+//ff:func feature=validate type=rule control=iteration dimension=2 topic=stml-openapi
 //ff:what XMO-10 — OpenAPI operationId가 STML data-fetch/data-action에서 소비되지 않음 (WARNING)
 
 package stml_openapi
@@ -23,15 +23,8 @@ func xmo10Unconsumed(pages []stml.PageSpec, doc *openapi3.T) []diagnostic.Diagno
 
 	var diags []diagnostic.Diagnostic
 	for _, item := range doc.Paths.Map() {
-		verbs := []*openapi3.Operation{
-			item.Get, item.Post, item.Put, item.Delete, item.Patch,
-		}
-		for _, op := range verbs {
-			if op == nil || op.OperationID == "" {
-				continue
-			}
-			// Exclude auth endpoints: operations with explicit empty security (security: [])
-			if isAuthEndpoint(op) {
+		for _, op := range []*openapi3.Operation{item.Get, item.Post, item.Put, item.Delete, item.Patch} {
+			if op == nil || op.OperationID == "" || isAuthEndpoint(op) {
 				continue
 			}
 			if _, ok := consumed[op.OperationID]; !ok {
@@ -46,13 +39,4 @@ func xmo10Unconsumed(pages []stml.PageSpec, doc *openapi3.T) []diagnostic.Diagno
 		}
 	}
 	return diags
-}
-
-// isAuthEndpoint returns true if the operation has an explicit empty
-// security requirement (security: []), indicating it is an auth endpoint
-// that does not require authentication.
-func isAuthEndpoint(op *openapi3.Operation) bool {
-	// When Security is non-nil and has zero entries, it means the author
-	// wrote `security: []` — an explicit opt-out.
-	return op.Security != nil && len(*op.Security) == 0
 }
