@@ -26,6 +26,7 @@ func runSTMLCodegen(fs *yongol.Fullstack, artifactsDir string) error {
 		HasAuthz:                hasAuthz,
 		RequestConstraints:      fs.RequestConstraints,
 		ResponseArrayItemFields: oapiparser.ExtractResponseArrayItemFields(fs.OpenAPIDoc),
+		NoBodyOps:               oapiparser.ExtractNoBodyOps(fs.OpenAPIDoc),
 	}
 	_, err := stmlgen.Generate(fs.STMLPages, fs.SpecsDir, pagesDir, opt)
 	return err

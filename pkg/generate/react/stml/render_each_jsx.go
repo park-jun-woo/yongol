@@ -44,10 +44,10 @@ func renderEachJSX(e stmlparser.EachBlock, dataVar string, indent int) string {
 
 	// TBody
 	lines = append(lines, fmt.Sprintf("%s  <TBody>", ind))
-	lines = append(lines, fmt.Sprintf("%s    {%s.%s?.map(%s => (", ind, dataVar, e.Field, mapParams))
+	lines = append(lines, fmt.Sprintf("%s    {%s.%s?.map(%s => (", ind, dataVar, optionalChainPath(e.Field), mapParams))
 	lines = append(lines, fmt.Sprintf("%s      <TR key={%s}>", ind, keyExpr))
 	for _, f := range fields {
-		lines = append(lines, fmt.Sprintf("%s        <TD>{item.%s}</TD>", ind, f))
+		lines = append(lines, fmt.Sprintf("%s        <TD>{item.%s}</TD>", ind, optionalChainPath(f)))
 	}
 	lines = append(lines, fmt.Sprintf("%s      </TR>", ind))
 	lines = append(lines, fmt.Sprintf("%s    ))}", ind))

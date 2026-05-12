@@ -5,7 +5,7 @@ package stml
 import stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
 
 // renderFetchJSXFlatChildren renders flat slices for backward compatibility.
-func renderFetchJSXFlatChildren(f stmlparser.FetchBlock, alias string, indent int) []string {
+func renderFetchJSXFlatChildren(f stmlparser.FetchBlock, alias string, indent int, noBodyOps map[string]bool) []string {
 	var lines []string
 	for _, b := range f.Binds {
 		lines = append(lines, renderBindJSX(b, alias, indent))
@@ -14,7 +14,7 @@ func renderFetchJSXFlatChildren(f stmlparser.FetchBlock, alias string, indent in
 		lines = append(lines, renderEachJSX(e, alias, indent))
 	}
 	for _, s := range f.States {
-		lines = append(lines, renderStateJSX(s, alias, indent))
+		lines = append(lines, renderStateJSX(s, alias, indent, noBodyOps))
 	}
 	for _, c := range f.Components {
 		lines = append(lines, renderComponentJSX(c, alias, indent))

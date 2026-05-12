@@ -12,7 +12,7 @@ import (
 func renderComponentJSX(c stmlparser.ComponentRef, dataVar string, indent int) string {
 	ind := indentStr(indent)
 	if c.Bind != "" {
-		return fmt.Sprintf("%s<%s data={%s.%s} />", ind, c.Name, dataVar, c.Bind)
+		return fmt.Sprintf("%s<%s data={%s.%s} />", ind, c.Name, dataVar, optionalChainPath(c.Bind))
 	}
 	return fmt.Sprintf("%s<%s />", ind, c.Name)
 }

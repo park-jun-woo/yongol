@@ -11,15 +11,15 @@ func resolveStateCondition(condition, dataVar string) string {
 	switch {
 	case strings.HasSuffix(condition, ".empty"):
 		field := strings.TrimSuffix(condition, ".empty")
-		return fmt.Sprintf("%s.%s?.length === 0", dataVar, field)
+		return fmt.Sprintf("%s.%s?.length === 0", dataVar, optionalChainPath(field))
 	case strings.HasSuffix(condition, ".loading"):
 		return dataVar + "Loading"
 	case strings.HasSuffix(condition, ".error"):
 		return dataVar + "Error"
 	default:
 		if parts := strings.SplitN(condition, "=", 2); len(parts) == 2 {
-			return fmt.Sprintf("%s.%s === '%s'", dataVar, parts[0], parts[1])
+			return fmt.Sprintf("%s.%s === '%s'", dataVar, optionalChainPath(parts[0]), parts[1])
 		}
-		return fmt.Sprintf("%s.%s", dataVar, condition)
+		return fmt.Sprintf("%s.%s", dataVar, optionalChainPath(condition))
 	}
 }

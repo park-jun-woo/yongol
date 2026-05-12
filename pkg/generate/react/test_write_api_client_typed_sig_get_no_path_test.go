@@ -1,0 +1,35 @@
+//ff:func feature=gen-react type=test control=sequence
+//ff:what writeAPIClient GET path-param 없는 시그니처 검증
+
+package react
+
+import (
+	"os"
+	"path/filepath"
+	"testing"
+
+	"github.com/getkin/kin-openapi/openapi3"
+)
+
+func TestWriteAPIClient_TypedSig_GetNoPathParams(t *testing.T) {
+	dir := t.TempDir()
+	doc := &openapi3.T{
+		Paths: openapi3.NewPaths(
+			openapi3.WithPath("/api/items", &openapi3.PathItem{
+				Get: &openapi3.Operation{OperationID: "ListItems"},
+			}),
+		),
+	}
+	if err := writeAPIClient(dir, doc, false); err != nil {
+		t.Fatal(err)
+	}
+	data, err := os.ReadFile(filepath.Join(dir, "lib", "api.ts"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	content := string(data)
+
+	assertContains(t, content, "ListItems: (args: Req<'ListItems'>) => {")
+	assertContains(t, content, "{ params: { query: args ?? {} } } as any")
+	assertContains(t, content, "as Res<'ListItems'>")
+}

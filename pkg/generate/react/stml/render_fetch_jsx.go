@@ -10,7 +10,7 @@ import (
 )
 
 // renderFetchJSX generates JSX for a FetchBlock using ChildNode tree.
-func renderFetchJSX(f stmlparser.FetchBlock, indent int) string {
+func renderFetchJSX(f stmlparser.FetchBlock, indent int, noBodyOps map[string]bool) string {
 	alias := toLowerFirst(f.OperationID) + "Data"
 	ind := indentStr(indent)
 	tag := orDefault(f.Tag, "div")
@@ -22,7 +22,7 @@ func renderFetchJSX(f stmlparser.FetchBlock, indent int) string {
 	lines = append(lines, fmt.Sprintf("%s{%s && (", ind, alias))
 	lines = append(lines, fmt.Sprintf("%s  <%s%s>", ind, tag, cls))
 
-	lines = append(lines, renderFetchJSXBody(f, alias, indent+4)...)
+	lines = append(lines, renderFetchJSXBody(f, alias, indent+4, noBodyOps)...)
 
 	lines = append(lines, fmt.Sprintf("%s  </%s>", ind, tag))
 	lines = append(lines, fmt.Sprintf("%s)}", ind))

@@ -5,7 +5,7 @@ package stml
 import stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
 
 // renderChildNodes renders ChildNode slice in DOM order for fetch context.
-func renderChildNodes(nodes []stmlparser.ChildNode, dataVar, itemVar string, indent int) []string {
+func renderChildNodes(nodes []stmlparser.ChildNode, dataVar, itemVar string, indent int, noBodyOps map[string]bool) []string {
 	var lines []string
 	for _, ch := range nodes {
 		switch ch.Kind {
@@ -14,15 +14,15 @@ func renderChildNodes(nodes []stmlparser.ChildNode, dataVar, itemVar string, ind
 		case "each":
 			lines = append(lines, renderEachJSX(*ch.Each, dataVar, indent))
 		case "state":
-			lines = append(lines, renderStateJSX(*ch.State, dataVar, indent))
+			lines = append(lines, renderStateJSX(*ch.State, dataVar, indent, noBodyOps))
 		case "component":
 			lines = append(lines, renderComponentJSX(*ch.Component, dataVar, indent))
 		case "static":
-			lines = append(lines, renderStaticJSX(*ch.Static, dataVar, itemVar, indent))
+			lines = append(lines, renderStaticJSX(*ch.Static, dataVar, itemVar, indent, noBodyOps))
 		case "action":
-			lines = append(lines, renderActionJSX(*ch.Action, indent))
+			lines = append(lines, renderActionJSX(*ch.Action, indent, noBodyOps))
 		case "fetch":
-			lines = append(lines, renderFetchJSX(*ch.Fetch, indent))
+			lines = append(lines, renderFetchJSX(*ch.Fetch, indent, noBodyOps))
 		}
 	}
 	return lines

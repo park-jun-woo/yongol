@@ -45,7 +45,7 @@ func renderFieldJSX(f stmlparser.FieldBind, formName string, indent int) string 
 	lines = append(lines, fmt.Sprintf(`%s  <label htmlFor="%s">%s</label>`, ind, f.Name, label))
 	lines = append(lines, fmt.Sprintf("%s  <Input%s %s />", ind, attrStr, reg))
 	lines = append(lines, fmt.Sprintf(`%s  {%s.formState.errors.%s && (`, ind, formName, f.Name))
-	lines = append(lines, fmt.Sprintf(`%s    <p className="text-sm text-destructive">{%s.formState.errors.%s.message}</p>`, ind, formName, f.Name))
+	lines = append(lines, fmt.Sprintf(`%s    <p className="text-sm text-destructive">{%s.formState.errors.%s?.message}</p>`, ind, formName, f.Name))
 	lines = append(lines, fmt.Sprintf(`%s  )}`, ind))
 	lines = append(lines, fmt.Sprintf("%s</div>", ind))
 	return strings.Join(lines, "\n")

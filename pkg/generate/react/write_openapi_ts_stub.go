@@ -13,6 +13,7 @@ import "os"
 func writeOpenapiTsStub(destPath string, reason error) {
 	content := "// openapi-typescript could not run: " + reason.Error() + "\n" +
 		"// Install it in your frontend project: npm install --save-dev openapi-typescript\n" +
-		"export type paths = Record<string, any>\n"
+		"export type paths = Record<string, any>\n" +
+		"export type operations = Record<string, any>\n"
 	_ = os.WriteFile(destPath, []byte(content), 0o644)
 }

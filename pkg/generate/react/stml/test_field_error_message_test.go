@@ -18,5 +18,5 @@ func TestFieldErrorMessage(t *testing.T) {
 </main>`))
 	code := GeneratePage(page, "")
 	assertContains(t, code, `{createWorkflowForm.formState.errors.title && (`)
-	assertContains(t, code, `<p className="text-sm text-destructive">{createWorkflowForm.formState.errors.title.message}</p>`)
+	assertContains(t, code, `<p className="text-sm text-destructive">{createWorkflowForm.formState.errors.title?.message}</p>`)
 }

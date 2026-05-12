@@ -8,7 +8,7 @@ import (
 	stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
 )
 
-func renderActionButton(a stmlparser.ActionBlock, indent int) string {
+func renderActionButton(a stmlparser.ActionBlock, indent int, noBodyOps map[string]bool) string {
 	ind := indentStr(indent)
 	mutName := toLowerFirst(a.OperationID) + "Mutation"
 	tag := orDefault(a.Tag, "button")
@@ -19,8 +19,12 @@ func renderActionButton(a stmlparser.ActionBlock, indent int) string {
 	if isDeleteOperation(a.OperationID) {
 		variant = ` variant="destructive"`
 	}
-	if tag == "button" {
-		return fmt.Sprintf(`%s<Button%s onClick={() => %s.mutate({})} disabled={%s.isPending}%s>%s</Button>`, ind, variant, mutName, mutName, cls, pendingExpr)
+	mutateArg := "{}"
+	if noBodyOps[a.OperationID] {
+		mutateArg = ""
 	}
-	return fmt.Sprintf(`%s<%s%s><Button%s onClick={() => %s.mutate({})} disabled={%s.isPending}>%s</Button></%s>`, ind, tag, cls, variant, mutName, mutName, pendingExpr, tag)
+	if tag == "button" {
+		return fmt.Sprintf(`%s<Button%s onClick={() => %s.mutate(%s)} disabled={%s.isPending}%s>%s</Button>`, ind, variant, mutName, mutateArg, mutName, cls, pendingExpr)
+	}
+	return fmt.Sprintf(`%s<%s%s><Button%s onClick={() => %s.mutate(%s)} disabled={%s.isPending}>%s</Button></%s>`, ind, tag, cls, variant, mutName, mutateArg, mutName, pendingExpr, tag)
 }

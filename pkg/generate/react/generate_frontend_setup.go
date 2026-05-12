@@ -99,7 +99,7 @@ func generateFrontendSetup(fs *yongol.Fullstack, artifactsDir string) error {
 			deferredErr = err
 		}
 	} else {
-		_ = os.WriteFile(typesDest, []byte("export type paths = Record<string, any>\n"), 0o644)
+		_ = os.WriteFile(typesDest, []byte("export type paths = Record<string, any>\nexport type operations = Record<string, any>\n"), 0o644)
 	}
 
 	if err := writeAPIClient(srcDir, fsOpenAPIDoc(fs), hasAuthz); err != nil {

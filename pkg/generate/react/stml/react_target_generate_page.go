@@ -59,7 +59,7 @@ func (r *ReactTarget) GeneratePage(page stmlparser.PageSpec, specsDir string, op
 
 	renderPageHooks(page, is, &sb)
 	renderPageMutations(allActions, fetchOps, actionFetchMap, opt.RequestConstraints, opt.HasAuthz, &sb)
-	renderPageJSX(page, &sb)
+	renderPageJSX(page, &sb, opt.NoBodyOps)
 
 	sb.WriteString("}\n")
 	return sb.String()

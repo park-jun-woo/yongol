@@ -13,5 +13,5 @@ func renderBindJSX(b stmlparser.FieldBind, dataVar string, indent int) string {
 	ind := indentStr(indent)
 	tag := orDefault(b.Tag, "span")
 	cls := clsAttr(b.ClassName)
-	return fmt.Sprintf("%s<%s%s>{%s.%s}</%s>", ind, tag, cls, dataVar, b.Name, tag)
+	return fmt.Sprintf("%s<%s%s>{%s.%s}</%s>", ind, tag, cls, dataVar, optionalChainPath(b.Name), tag)
 }

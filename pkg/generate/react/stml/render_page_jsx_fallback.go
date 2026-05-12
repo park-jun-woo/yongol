@@ -8,13 +8,13 @@ import (
 	stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
 )
 
-func renderPageJSXFallback(page stmlparser.PageSpec, sb *strings.Builder) {
+func renderPageJSXFallback(page stmlparser.PageSpec, sb *strings.Builder, noBodyOps map[string]bool) {
 	for _, f := range page.Fetches {
-		sb.WriteString(renderFetchJSX(f, 6))
+		sb.WriteString(renderFetchJSX(f, 6, noBodyOps))
 		sb.WriteString("\n")
 	}
 	for _, a := range page.Actions {
-		sb.WriteString(renderActionJSX(a, 6))
+		sb.WriteString(renderActionJSX(a, 6, noBodyOps))
 		sb.WriteString("\n")
 	}
 }

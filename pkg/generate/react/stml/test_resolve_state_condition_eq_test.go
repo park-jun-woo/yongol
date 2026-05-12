@@ -15,7 +15,7 @@ func TestResolveStateConditionEquality(t *testing.T) {
 			name:      "field=value produces strict equality",
 			condition: "workflow.status=draft",
 			dataVar:   "data",
-			want:      "data.workflow.status === 'draft'",
+			want:      "data.workflow?.status === 'draft'",
 		},
 		{
 			name:      "no equals sign passes through",
