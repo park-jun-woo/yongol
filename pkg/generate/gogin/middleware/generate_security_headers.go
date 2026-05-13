@@ -1,23 +1,17 @@
 //ff:func feature=gen-gogin type=generator control=sequence topic=security-headers
-//ff:what GenerateSecurityHeaders — internal/middleware/security_headers.go 기록
+//ff:what GenerateSecurityHeaders — internal/middleware/security_headers*.go 기록 (1 file 1 func)
 
 package middleware
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
-// GenerateSecurityHeaders emits internal/middleware/security_headers.go.
-// The file is static — all runtime behavior is driven by a
-// SecurityHeadersConfig value assembled in generated main.go (blockSecurityHeaders)
-// from manifest.backend.security_headers + env overrides. When the manifest
-// disables security headers (enabled=false) the file is still written so
-// importing middleware.SecurityHeadersMiddleware never fails to compile;
-// blockSecurityHeaders decides whether to call it.
+// GenerateSecurityHeaders emits security headers middleware files split so
+// each file carries one func or type (filefunc F1/F2).
 func GenerateSecurityHeaders(fs *yongol.Fullstack, artifactsDir string) error {
 	if fs == nil || fs.Manifest == nil {
 		return nil
@@ -26,12 +20,16 @@ func GenerateSecurityHeaders(fs *yongol.Fullstack, artifactsDir string) error {
 		return nil
 	}
 	mwDir := filepath.Join(artifactsDir, "backend", "internal", "middleware")
-	if err := os.MkdirAll(mwDir, 0o755); err != nil {
-		return fmt.Errorf("mkdir middleware: %w", err)
+	files := map[string]string{
+		"security_headers_config.go":       securityHeadersConfigSource,
+		"security_headers_middleware.go":   securityHeadersMiddlewareSource,
+		"build_static_security_headers.go": buildStaticSecurityHeadersSource,
+		"build_csp_header.go":              buildCSPHeaderSource,
+		"build_csp_value.go":               buildCSPValueSource,
+		"build_permissions_policy.go":      buildPermissionsPolicySource,
 	}
-	path := filepath.Join(mwDir, "security_headers.go")
-	if err := os.WriteFile(path, []byte(securityHeadersSource), 0o644); err != nil {
-		return fmt.Errorf("write security_headers.go: %w", err)
+	if err := writeFiles(mwDir, files); err != nil {
+		return fmt.Errorf("write security_headers: %w", err)
 	}
 	return nil
 }

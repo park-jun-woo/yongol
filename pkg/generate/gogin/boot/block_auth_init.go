@@ -41,5 +41,6 @@ func blockAuthInit(a prepared.Auth, modulePath string) MainBlock {
 		// calling blockAuthInit.
 		Imports: authInitImports(modulePath),
 		Lines:   authInitLines(cfg),
+		Funcs:   []string{authInitSameSiteHelperFunc, authInitHelperFunc(cfg)},
 	}
 }

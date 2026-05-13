@@ -1,28 +1,15 @@
 //ff:type feature=gen-gogin type=generator
-//ff:what bodyLimitSource — writeBodyLimit 가 기록하는 body_limit.go 템플릿 상수
+//ff:what bodyLimitSources — body_limit 를 5파일로 분할하는 소스 템플릿 맵
 
 package middleware
 
-// bodyLimitSource is the verbatim Go source written to
-// internal/middleware/body_limit.go. Provides three gin middlewares:
-//
-//   - BodyLimit(maxBytes)       — caps application/json & form-urlencoded.
-//   - MultipartLimit(maxBytes)  — caps multipart/form-data (upload) payloads.
-//   - OverrideBodyLimit(maps)   — per-route override keyed by "METHOD PATH".
-//
-// All three emit a 413 payload_too_large JSON envelope on overflow. They
-// rely on http.MaxBytesReader for the actual cap — the reader returns
-// *http.MaxBytesError on first overflow which RequestValidator translates
-// into 413 upstream of handlers. The post-Next branch here handles the rarer
-// case where a handler reads the body directly and records the error via
-// c.Error().
+// bodyLimitSource is the source for internal/middleware/body_limit.go.
 const bodyLimitSource = `//` + `ff:func feature=runtime-middleware type=util control=sequence topic=dos-guard
-//` + `ff:what BodyLimit / MultipartLimit — HTTP body 크기 제한 (DoS 방지, http.MaxBytesReader)
+//` + `ff:what BodyLimit — 비 multipart HTTP body 크기 제한 (DoS 방지, http.MaxBytesReader)
 
 package middleware
 
 import (
-	"errors"
 	"net/http"
 	"strings"
 
@@ -44,6 +31,20 @@ func BodyLimit(maxBytes int64) gin.HandlerFunc {
 		respondIfBodyTooLarge(c)
 	}
 }
+`
+
+// multipartLimitSource is the source for internal/middleware/multipart_limit.go.
+const multipartLimitSource = `//` + `ff:func feature=runtime-middleware type=util control=sequence topic=dos-guard
+//` + `ff:what MultipartLimit — multipart/form-data body 크기 제한 (업로드 DoS 방지)
+
+package middleware
+
+import (
+	"net/http"
+	"strings"
+
+	"github.com/gin-gonic/gin"
+)
 
 // MultipartLimit caps multipart/form-data bodies (typically for file
 // uploads). Non-multipart requests pass through.
@@ -56,6 +57,19 @@ func MultipartLimit(maxBytes int64) gin.HandlerFunc {
 		respondIfBodyTooLarge(c)
 	}
 }
+`
+
+// overrideBodyLimitSource is the source for internal/middleware/override_body_limit.go.
+const overrideBodyLimitSource = `//` + `ff:func feature=runtime-middleware type=util control=sequence topic=dos-guard
+//` + `ff:what OverrideBodyLimit — 라우트별 body limit 오버라이드 미들웨어
+
+package middleware
+
+import (
+	"strings"
+
+	"github.com/gin-gonic/gin"
+)
 
 // OverrideBodyLimit tightens or lifts the body limit for specific routes.
 // Keys are "METHOD PATH" where PATH matches c.FullPath() (gin route
@@ -80,13 +94,42 @@ func OverrideBodyLimit(bodyOverrides, multipartOverrides map[string]int64) gin.H
 		respondIfBodyTooLarge(c)
 	}
 }
+`
 
+// applyOverrideSource is the source for internal/middleware/apply_override.go.
+const applyOverrideSource = `//` + `ff:func feature=runtime-middleware type=util control=sequence topic=dos-guard
+//` + `ff:what applyOverride — 단일 라우트의 body limit 오버라이드 적용
+
+package middleware
+
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
+
+// applyOverride replaces the request body with a MaxBytesReader capped at
+// maxBytes. Called by OverrideBodyLimit for matched routes.
 func applyOverride(c *gin.Context, maxBytes int64) {
 	if maxBytes <= 0 {
 		return
 	}
 	c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, maxBytes)
 }
+`
+
+// respondIfBodyTooLargeSource is the source for internal/middleware/respond_if_body_too_large.go.
+const respondIfBodyTooLargeSource = `//` + `ff:func feature=runtime-middleware type=util control=iteration dimension=1 topic=dos-guard
+//` + `ff:what respondIfBodyTooLarge — c.Errors 에서 MaxBytesError 감지 시 413 응답
+
+package middleware
+
+import (
+	"errors"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
 
 // respondIfBodyTooLarge inspects c.Errors for *http.MaxBytesError and, if
 // the response has not yet been written, replaces it with a 413 payload

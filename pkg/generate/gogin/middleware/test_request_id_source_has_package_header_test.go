@@ -9,7 +9,7 @@ import (
 )
 
 func TestRequestIDSource_HasPackageHeader(t *testing.T) {
-	if !strings.Contains(requestIDSource, "package middleware") {
-		t.Fatalf("requestIDSource missing package header")
+	if !strings.Contains(requestIDMainSource, "package middleware") {
+		t.Fatalf("requestIDMainSource missing package header")
 	}
 }

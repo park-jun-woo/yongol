@@ -41,24 +41,25 @@ var authInitModeSwitchLines = []string{
 	`}`,
 }
 
-// authInitSameSiteCommentLines — SameSite comment preamble.
-var authInitSameSiteCommentLines = []string{
+// authInitSameSiteLines — SameSite resolution via extracted helper.
+var authInitSameSiteLines = []string{
 	`// Phase020 — SameSite string → http.SameSite enum. Values outside`,
 	`// {Lax, Strict, None} fall back to Lax which is the OWASP-recommended`,
 	`// default for same-site SaaS.`,
-	`var sameSite http.SameSite`,
 }
 
-// authInitSameSiteSwitchLines — http.SameSite enum resolution.
-var authInitSameSiteSwitchLines = []string{
-	`case "Strict":`,
-	`	sameSite = http.SameSiteStrictMode`,
-	`case "None":`,
-	`	sameSite = http.SameSiteNoneMode`,
-	`default:`,
-	`	sameSite = http.SameSiteLaxMode`,
-	`}`,
-}
+// authInitSameSiteHelperFunc — parseSameSite top-level func emitted as a
+// cmd/parse_same_site.go helper so main() body stays sequence-only.
+var authInitSameSiteHelperFunc = `func parseSameSite(s string) http.SameSite {
+	switch s {
+	case "Strict":
+		return http.SameSiteStrictMode
+	case "None":
+		return http.SameSiteNoneMode
+	default:
+		return http.SameSiteLaxMode
+	}
+}`
 
 // authInitStoreInjectionLines — yongol-generated postgres RefreshStore 를
 // package-level singleton 으로 설치 (ssac/purify Phase002).

@@ -1,21 +1,13 @@
+//ff:type feature=gen-gogin type=generator
+//ff:what prometheusSourceTemplate — prometheus.go 를 2파일로 분할하는 소스 템플릿 맵
+
 package middleware
 
-// prometheusSourceTemplate carries the verbatim Go source for
-// internal/middleware/prometheus.go. __BUCKETS__ is replaced with the
-// concrete buckets literal from the manifest (default prometheus.DefBuckets).
-// Provides:
-//
-//   - PrometheusMiddleware()     — gin.HandlerFunc measuring requests.
-//   - PrometheusHandler()        — gin handler wrapping promhttp.Handler.
-//   - http_requests_total        — Counter (method, path, status).
-//   - http_request_duration_seconds — Histogram (method, path, status).
-//   - http_requests_in_flight    — Gauge (method, path).
-//
-// path labels use c.FullPath() so the label set is the OpenAPI route
-// template (e.g. "/users/{id}"), not the concrete value — keeps cardinality
-// bounded.
-const prometheusSourceTemplate = `//` + `ff:func feature=runtime-middleware type=util control=sequence topic=observability
-//` + `ff:what PrometheusMiddleware / PrometheusHandler — /metrics + 기본 3종 지표 자동 수집
+// prometheusMiddlewareSourceTemplate carries the source for
+// internal/middleware/prometheus_middleware.go.
+// __BUCKETS__ is replaced with the concrete buckets literal.
+const prometheusMiddlewareSourceTemplate = `//` + `ff:func feature=runtime-middleware type=util control=sequence topic=observability
+//` + `ff:what PrometheusMiddleware — /metrics 기본 3종 지표 자동 수집 미들웨어
 
 package middleware
 
@@ -25,7 +17,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 // httpRequestsTotal counts completed HTTP requests labelled by method, path
@@ -86,6 +77,19 @@ func PrometheusMiddleware() gin.HandlerFunc {
 		httpRequestDuration.WithLabelValues(method, path, status).Observe(time.Since(start).Seconds())
 	}
 }
+`
+
+// prometheusHandlerSource carries the source for
+// internal/middleware/prometheus_handler.go.
+const prometheusHandlerSource = `//` + `ff:func feature=runtime-middleware type=util control=sequence topic=observability
+//` + `ff:what PrometheusHandler — Prometheus exposition format 으로 /metrics 핸들러 제공
+
+package middleware
+
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+)
 
 // PrometheusHandler returns a gin handler that exposes the Prometheus
 // default registry in the text exposition format. Mounted on the scrape

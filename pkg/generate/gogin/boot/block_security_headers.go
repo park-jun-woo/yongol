@@ -35,22 +35,27 @@ func blockSecurityHeaders(fs *yongol.Fullstack, modulePath string) MainBlock {
 		fmt.Sprintf(`shHSTSMaxAge := envInt("BACKEND_SECURITY_HEADERS_HSTS_MAX_AGE", %d)`, cfg.HSTSMaxAge),
 		fmt.Sprintf(`shCSPReportOnly := envBool("BACKEND_SECURITY_HEADERS_CSP_REPORT_ONLY", %v)`, cfg.CSPReportOnly),
 		`if shEnabled {`,
-		`	secHeadersCfg := middleware.SecurityHeadersConfig{`,
-		`		Enabled:           true,`,
-		`		Profile:           shProfile,`,
-		`		HSTSMaxAge:        shHSTSMaxAge,`,
-		fmt.Sprintf(`		HSTSIncludeSubs:   %v,`, cfg.HSTSIncludeSubs),
-		fmt.Sprintf(`		HSTSPreload:       %v,`, cfg.HSTSPreload),
-		fmt.Sprintf(`		CSPEnabled:        %v,`, cfg.CSPEnabled),
-		`		CSPReportOnly:     shCSPReportOnly,`,
-		fmt.Sprintf(`		CSPDirectives:     %s,`, goStringListMap(cfg.CSPDirectives)),
-		fmt.Sprintf(`		XFrameOptions:     %q,`, cfg.XFrameOptions),
-		fmt.Sprintf(`		ReferrerPolicy:    %q,`, cfg.ReferrerPolicy),
-		fmt.Sprintf(`		PermissionsPolicy: %s,`, goStringListMap(cfg.PermissionsPolicy)),
-		`	}`,
-		`	r.Use(middleware.SecurityHeadersMiddleware(secHeadersCfg))`,
+		`	r.Use(middleware.SecurityHeadersMiddleware(buildSecurityHeadersCfg(shProfile, shHSTSMaxAge, shCSPReportOnly)))`,
 		`}`,
 	}
+
+	helperFunc := fmt.Sprintf(`func buildSecurityHeadersCfg(profile string, hstsMaxAge int, cspReportOnly bool) middleware.SecurityHeadersConfig {
+	return middleware.SecurityHeadersConfig{
+		Enabled:           true,
+		Profile:           profile,
+		HSTSMaxAge:        hstsMaxAge,
+		HSTSIncludeSubs:   %v,
+		HSTSPreload:       %v,
+		CSPEnabled:        %v,
+		CSPReportOnly:     cspReportOnly,
+		CSPDirectives:     %s,
+		XFrameOptions:     %q,
+		ReferrerPolicy:    %q,
+		PermissionsPolicy: %s,
+	}
+}`, cfg.HSTSIncludeSubs, cfg.HSTSPreload, cfg.CSPEnabled,
+		goStringListMap(cfg.CSPDirectives), cfg.XFrameOptions,
+		cfg.ReferrerPolicy, goStringListMap(cfg.PermissionsPolicy))
 
 	imports := []string{
 		fmt.Sprintf(`"%s/internal/middleware"`, modulePath),
@@ -60,5 +65,6 @@ func blockSecurityHeaders(fs *yongol.Fullstack, modulePath string) MainBlock {
 		Name:    "security-headers",
 		Imports: imports,
 		Lines:   lines,
+		Funcs:   []string{helperFunc},
 	}
 }

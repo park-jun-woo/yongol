@@ -29,13 +29,14 @@ func TestBlockSecurityHeaders_CustomDirectives(t *testing.T) {
 			},
 		},
 	}
-	body := strings.Join(blockSecurityHeaders(fs, "example.com/zenflow").Lines, "\n")
-	if !strings.Contains(body, `"script-src": []string{"'self'", "cdn.example.com"}`) {
-		t.Fatalf("custom script-src not emitted; got:\n%s", body)
+	block := blockSecurityHeaders(fs, "example.com/zenflow")
+	combined := strings.Join(block.Lines, "\n") + "\n" + strings.Join(block.Funcs, "\n")
+	if !strings.Contains(combined, `"script-src": []string{"'self'", "cdn.example.com"}`) {
+		t.Fatalf("custom script-src not emitted; got:\n%s", combined)
 	}
 	// custom directives map replaces defaults entirely — frame-ancestors
 	// should NOT appear since the custom map omitted it.
-	if strings.Contains(body, `"frame-ancestors"`) {
-		t.Fatalf("custom directives should replace defaults; frame-ancestors leaked:\n%s", body)
+	if strings.Contains(combined, `"frame-ancestors"`) {
+		t.Fatalf("custom directives should replace defaults; frame-ancestors leaked:\n%s", combined)
 	}
 }

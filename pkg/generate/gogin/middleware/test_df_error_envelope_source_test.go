@@ -9,7 +9,8 @@ import (
 )
 
 func TestErrorEnvelopeSource_ContainsKeySymbols(t *testing.T) {
-	src := errorEnvelopeSource
+	src := errorEnvelopeTypeSource + defaultCodeForSource + defaultMessageForSource +
+		writeEnvelopeSource + writeEnvelopeWithContextSource + errorEnvelopeMiddlewareSource
 	for _, must := range []string{
 		"type ErrorEnvelope struct",
 		`Error       string`,
@@ -29,7 +30,7 @@ func TestErrorEnvelopeSource_ContainsKeySymbols(t *testing.T) {
 		`"internal_error"`,
 	} {
 		if !strings.Contains(src, must) {
-			t.Errorf("errorEnvelopeSource missing fragment %q", must)
+			t.Errorf("error envelope sources missing fragment %q", must)
 		}
 	}
 }

@@ -1,29 +1,15 @@
+//ff:func feature=gen-gogin type=util control=sequence topic=auth-refresh
+//ff:what authWrapperMethodHeader — infra/auth postgres adapter 파일별 //ff:func + //ff:what 헤더 조립
+
 package infra
 
-// authWrapperTemplate is the printf-style template for the generated
-// arts/backend/internal/infra/auth/postgres.go file. `%[1]s` is the user
-// module path; `%[2]s`-`%[5]s` are the sqlc query names pulled from
-// interface.yaml (Insert / FindByHash / Revoke / RevokeAll).
-//
-// The leading `//ff:` lines are part of the emitted file, not this file's
-// own annotations — we assemble them from string fragments below so filefunc
-// does not mistake them for a second header annotation on template_auth.go.
-var authWrapperTemplate = authWrapperHeaderType + authWrapperHeaderWhat + `
+// authWrapperTypeTemplate emits postgres.go with the type only.
+// %[1]s = modulePath.
+var authWrapperTypeTemplate = authWrapperHeaderType + authWrapperHeaderWhat + `
 
 package auth
 
-import (
-	"context"
-	"encoding/json"
-	"errors"
-	"time"
-
-	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/park-jun-woo/ssac/pkg/auth"
-
-	"%[1]s/internal/db"
-)
+import "%[1]s/internal/db"
 
 // postgresRefreshStore adapts the user's sqlc Queries onto auth.RefreshStore.
 // Construct via NewPostgres(queries); wire from main.go via
@@ -31,6 +17,19 @@ import (
 type postgresRefreshStore struct {
 	q *db.Queries
 }
+`
+
+// authWrapperNewPostgresTemplate emits postgres_new.go with the constructor.
+// %[1]s = modulePath.
+var authWrapperNewPostgresTemplate = authWrapperNewHeader + `
+
+package auth
+
+import (
+	"github.com/park-jun-woo/ssac/pkg/auth"
+
+	"%[1]s/internal/db"
+)
 
 // NewPostgres returns an auth.RefreshStore backed by the user's sqlc Queries.
 // All refresh-token state (hash / claims / expires_at / revoked_at) lives in
@@ -38,6 +37,23 @@ type postgresRefreshStore struct {
 func NewPostgres(q *db.Queries) auth.RefreshStore {
 	return &postgresRefreshStore{q: q}
 }
+`
+
+// authWrapperCreateTemplate emits postgres_create.go.
+// %[1]s = modulePath, %[2]s = InsertPort.
+var authWrapperCreateTemplate = authWrapperMethodHeader("Create", "postgresRefreshStore — Create: refresh-token 행 생성") + `
+
+package auth
+
+import (
+	"context"
+	"time"
+
+	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/park-jun-woo/ssac/pkg/auth"
+
+	"%[1]s/internal/db"
+)
 
 // Create persists a new refresh-token row. The plaintext token is hashed to
 // sha256 before storage (auth.HashRefreshToken); claims is marshalled to
@@ -54,21 +70,29 @@ func (s *postgresRefreshStore) Create(ctx context.Context, token string, claims 
 		ExpiresAt: pgtype.Timestamptz{Time: expiresAt, Valid: true},
 	})
 }
+`
 
-// Consume implements one-time-use rotation as a SELECT+UPDATE pair:
-//
-//  1. %[3]s returns claims / expires_at / revoked_at for the hash.
-//  2. If the row is revoked, surface ErrRefreshTokenReused with the stored
-//     claims so reuse-detection lockout can scope a family revoke.
-//  3. If expired, treat as not-found.
-//  4. Otherwise call %[4]s to mark it revoked atomically (the sqlc query
-//     uses WHERE revoked_at IS NULL so concurrent Consume calls return
-//     at most one winner).
-//
-// interface.yaml ports: %[3]s, %[4]s.
+// authWrapperConsumeTemplate emits postgres_consume.go.
+// %[1]s = modulePath, %[2]s = FindByHashPort, %[3]s = RevokePort.
+var authWrapperConsumeTemplate = authWrapperMethodHeader("Consume", "postgresRefreshStore — Consume: one-time-use rotation (SELECT+UPDATE)") + `
+
+package auth
+
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"time"
+
+	"github.com/jackc/pgx/v5"
+	"github.com/park-jun-woo/ssac/pkg/auth"
+)
+
+// Consume implements one-time-use rotation as a SELECT+UPDATE pair.
+// interface.yaml ports: %[2]s, %[3]s.
 func (s *postgresRefreshStore) Consume(ctx context.Context, token string) (json.RawMessage, error) {
 	hash := auth.HashRefreshToken(token)
-	row, err := s.q.%[3]s(ctx, hash)
+	row, err := s.q.%[2]s(ctx, hash)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, auth.ErrRefreshTokenNotFound
@@ -81,24 +105,48 @@ func (s *postgresRefreshStore) Consume(ctx context.Context, token string) (json.
 	if row.ExpiresAt.Valid && time.Now().After(row.ExpiresAt.Time) {
 		return nil, auth.ErrRefreshTokenNotFound
 	}
-	if err := s.q.%[4]s(ctx, hash); err != nil {
+	if err := s.q.%[3]s(ctx, hash); err != nil {
 		return nil, err
 	}
 	return row.Claims, nil
 }
+`
 
-// Revoke marks a single refresh-token row as revoked. Idempotent — the
-// sqlc query narrows to WHERE revoked_at IS NULL so a second Revoke on
-// an already-revoked token is a no-op with nil error.
-// interface.yaml port: %[4]s.
+// authWrapperRevokeTemplate emits postgres_revoke.go.
+// %[1]s = modulePath, %[2]s = RevokePort.
+var authWrapperRevokeTemplate = authWrapperMethodHeader("Revoke", "postgresRefreshStore — Revoke: 단일 refresh-token 무효화") + `
+
+package auth
+
+import (
+	"context"
+
+	"github.com/park-jun-woo/ssac/pkg/auth"
+)
+
+// Revoke marks a single refresh-token row as revoked. Idempotent.
+// interface.yaml port: %[2]s.
 func (s *postgresRefreshStore) Revoke(ctx context.Context, token string) error {
-	return s.q.%[4]s(ctx, auth.HashRefreshToken(token))
+	return s.q.%[2]s(ctx, auth.HashRefreshToken(token))
 }
+`
+
+// authWrapperRevokeAllTemplate emits postgres_revoke_all.go.
+// %[1]s = modulePath, %[2]s = RevokeAllPort.
+var authWrapperRevokeAllTemplate = authWrapperMethodHeader("RevokeAll", "postgresRefreshStore — RevokeAll: matcher 기반 일괄 무효화") + `
+
+package auth
+
+import (
+	"context"
+	"encoding/json"
+
+	"github.com/park-jun-woo/ssac/pkg/auth"
+)
 
 // RevokeAll revokes every active row whose stored JSONB claims contain
-// every key/value in matcher. Empty matcher must be rejected before the
-// DB call — unbounded revocation is a bug, never an intent.
-// interface.yaml port: %[5]s.
+// every key/value in matcher. Empty matcher must be rejected.
+// interface.yaml port: %[2]s.
 func (s *postgresRefreshStore) RevokeAll(ctx context.Context, matcher auth.ClaimMatcher) error {
 	if len(matcher) == 0 {
 		return auth.ErrEmptyMatcher
@@ -107,12 +155,18 @@ func (s *postgresRefreshStore) RevokeAll(ctx context.Context, matcher auth.Claim
 	if err != nil {
 		return err
 	}
-	return s.q.%[5]s(ctx, raw)
+	return s.q.%[2]s(ctx, raw)
 }
 `
 
-// authWrapperHeader* assemble the emitted file's `//ff:` annotations from
-// string literals that don't start with `//` so this file's own filefunc
-// scan does not see them as duplicate top-of-file annotations.
+// authWrapperHeader* assemble the emitted file's annotations.
 var authWrapperHeaderType = "//" + "ff:type feature=infra type=model topic=auth-refresh\n"
 var authWrapperHeaderWhat = "//" + "ff:what postgresRefreshStore — ssac/pkg/auth.RefreshStore 구현 (yongol codegen from ssac/pkg/auth/interface.yaml)"
+var authWrapperNewHeader = "//" + "ff:func feature=infra type=accessor control=sequence topic=auth-refresh\n" +
+	"//" + "ff:what NewPostgres — postgresRefreshStore 생성자 (auth.RefreshStore 반환)"
+
+// authWrapperMethodHeader returns the //ff:func + //ff:what header for a method file.
+func authWrapperMethodHeader(method, what string) string {
+	return "//" + "ff:func feature=infra type=accessor control=sequence topic=auth-refresh\n" +
+		"//" + "ff:what " + what
+}

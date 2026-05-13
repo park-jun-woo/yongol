@@ -11,16 +11,22 @@ import "github.com/park-jun-woo/yongol/pkg/yongol"
 func buildTopicEntries(fs *yongol.Fullstack) map[string]string {
 	_ = fs
 	return map[string]string{
-		"request-binding":      "collect request parameters and bind body",
-		"response-serialize":   "compose response fields",
-		"transaction-boundary": "BeginTx / Commit / Rollback",
-		"state-transition":     "execute @state transition",
 		"auth-check":           "@auth gate",
-		"pagination":           "apply pagination",
+		"auth-refresh":         "refresh-token store (ssac/pkg/auth.RefreshStore)",
+		"dos-guard":            "HTTP body size limit (DoS prevention)",
+		"error-envelope":       "canonical JSON error envelope",
 		"error-mapping":        "classify validation / domain / infra errors",
 		"observability":        "slog / metric / trace",
-		"publish":              "queue publish",
-		"subscribe":            "queue subscribe",
+		"pagination":           "apply pagination",
 		"pointer-helper":       "ptr/deref generic helpers",
+		"publish":              "queue publish",
+		"rate-limit":           "fixed rate limit guard",
+		"request-binding":      "collect request parameters and bind body",
+		"request-id":           "ULID-based request id middleware",
+		"response-serialize":   "compose response fields",
+		"security-headers":     "browser security headers (HSTS/CSP/XFO/etc.)",
+		"state-transition":     "execute @state transition",
+		"subscribe":            "queue subscribe",
+		"transaction-boundary": "BeginTx / Commit / Rollback",
 	}
 }

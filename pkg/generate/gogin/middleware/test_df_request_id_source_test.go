@@ -9,7 +9,8 @@ import (
 )
 
 func TestRequestIDSource_ContainsKeySymbols(t *testing.T) {
-	src := requestIDSource
+	src := requestIDTypeSource + requestIDMainSource + requestIDFromContextSource + requestIDFromStdContextSource +
+		generateRequestIDSource + sanitizeUpstreamIDSource
 	for _, must := range []string{
 		"func RequestID(",
 		"func RequestIDFromContext(",
@@ -20,7 +21,7 @@ func TestRequestIDSource_ContainsKeySymbols(t *testing.T) {
 		"sanitizeUpstreamID",
 	} {
 		if !strings.Contains(src, must) {
-			t.Errorf("requestIDSource missing fragment %q", must)
+			t.Errorf("requestID sources missing fragment %q", must)
 		}
 	}
 }

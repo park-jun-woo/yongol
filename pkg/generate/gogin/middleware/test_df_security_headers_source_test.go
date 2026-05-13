@@ -8,9 +8,12 @@ import (
 	"testing"
 )
 
-// TestSecurityHeadersSource_Contains checks the verbatim source ships with
-// every symbol the generator relies on (exported types and helpers).
+// TestSecurityHeadersSource_Contains checks the split source templates ship
+// with every symbol the generator relies on (exported types and helpers).
 func TestSecurityHeadersSource_Contains(t *testing.T) {
+	combined := securityHeadersConfigSource + securityHeadersMiddlewareSource +
+		buildStaticSecurityHeadersSource + buildCSPHeaderSource +
+		buildCSPValueSource + buildPermissionsPolicySource
 	for _, must := range []string{
 		"type SecurityHeadersConfig struct",
 		"func SecurityHeadersMiddleware(cfg SecurityHeadersConfig)",
@@ -24,8 +27,8 @@ func TestSecurityHeadersSource_Contains(t *testing.T) {
 		"\"Content-Security-Policy\"",
 		"\"Content-Security-Policy-Report-Only\"",
 	} {
-		if !strings.Contains(securityHeadersSource, must) {
-			t.Errorf("security_headers source missing fragment %q", must)
+		if !strings.Contains(combined, must) {
+			t.Errorf("security_headers sources missing fragment %q", must)
 		}
 	}
 }

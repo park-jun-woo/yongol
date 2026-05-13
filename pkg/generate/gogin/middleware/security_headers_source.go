@@ -1,41 +1,13 @@
 //ff:type feature=gen-gogin type=generator
-//ff:what securityHeadersSource — GenerateSecurityHeaders 가 기록하는 security_headers.go 정적 소스
+//ff:what securityHeadersSources — security_headers 를 6파일로 분할하는 소스 템플릿 맵
 
 package middleware
 
-// securityHeadersSource carries the verbatim Go source for
-// internal/middleware/security_headers.go. No placeholders — the generated
-// middleware is config-driven at boot time by SecurityHeadersConfig.
-// Bootstrap (blockSecurityHeaders in main.go) builds the static header map
-// + CSP value once and passes them to SecurityHeadersMiddleware, so per-
-// request cost is a short range loop over the pre-baked header set.
-//
-// Provides:
-//
-//   - SecurityHeadersConfig          — runtime shape fed by main.go.
-//   - SecurityHeadersMiddleware(cfg) — gin.HandlerFunc writing headers.
-//   - BuildStaticSecurityHeaders(cfg)/ BuildCSPHeader(cfg) — exported for
-//     tests and for bootstrap code.
-//
-// Profile semantics:
-//
-//   - production: HSTS + nosniff + XFO + CSP + Referrer-Policy +
-//     Permissions-Policy.
-//   - dev:        same as production minus HSTS. CSP reported via
-//                 Content-Security-Policy-Report-Only.
-//   - api:        same as production minus CSP.
-const securityHeadersSource = `//` + `ff:func feature=runtime-middleware type=util control=sequence topic=security-headers
-//` + `ff:what SecurityHeadersMiddleware — 브라우저 보안 헤더 6종(HSTS/nosniff/XFO/CSP/Referrer/Permissions) 자동 주입
+// securityHeadersConfigSource — SecurityHeadersConfig type.
+const securityHeadersConfigSource = `//` + `ff:type feature=runtime-middleware type=model topic=security-headers
+//` + `ff:what SecurityHeadersConfig — 보안 헤더 미들웨어 런타임 설정
 
 package middleware
-
-import (
-	"sort"
-	"strconv"
-	"strings"
-
-	"github.com/gin-gonic/gin"
-)
 
 // SecurityHeadersConfig is the runtime shape consumed by
 // SecurityHeadersMiddleware. Populated by generated main.go from
@@ -53,6 +25,15 @@ type SecurityHeadersConfig struct {
 	ReferrerPolicy    string
 	PermissionsPolicy map[string][]string
 }
+`
+
+// securityHeadersMiddlewareSource — SecurityHeadersMiddleware func.
+const securityHeadersMiddlewareSource = `//` + `ff:func feature=runtime-middleware type=middleware control=sequence topic=security-headers
+//` + `ff:what SecurityHeadersMiddleware — 브라우저 보안 헤더 6종 자동 주입 미들웨어
+
+package middleware
+
+import "github.com/gin-gonic/gin"
 
 // SecurityHeadersMiddleware returns a gin middleware that writes the
 // configured security headers on every response. When cfg.Enabled is false
@@ -75,6 +56,18 @@ func SecurityHeadersMiddleware(cfg SecurityHeadersConfig) gin.HandlerFunc {
 		c.Next()
 	}
 }
+`
+
+// buildStaticSecurityHeadersSource — BuildStaticSecurityHeaders func.
+const buildStaticSecurityHeadersSource = `//` + `ff:func feature=runtime-middleware type=util control=sequence topic=security-headers
+//` + `ff:what BuildStaticSecurityHeaders — profile 기반 비 CSP 보안 헤더 맵 조립
+
+package middleware
+
+import (
+	"strconv"
+	"strings"
+)
 
 // BuildStaticSecurityHeaders assembles the non-CSP header set for the
 // configured profile. Keys are returned exactly as they are emitted on the
@@ -89,9 +82,6 @@ func BuildStaticSecurityHeaders(cfg SecurityHeadersConfig) map[string]string {
 	if profile == "" {
 		profile = "production"
 	}
-
-	// HSTS — omitted in dev profile. MaxAge <= 0 also disables it so
-	// operators can toggle via BACKEND_SECURITY_HEADERS_HSTS_MAX_AGE=0.
 	if profile != "dev" && cfg.HSTSMaxAge > 0 {
 		parts := []string{"max-age=" + strconv.Itoa(cfg.HSTSMaxAge)}
 		if cfg.HSTSIncludeSubs {
@@ -102,31 +92,31 @@ func BuildStaticSecurityHeaders(cfg SecurityHeadersConfig) map[string]string {
 		}
 		headers["Strict-Transport-Security"] = strings.Join(parts, "; ")
 	}
-
-	// X-Content-Type-Options — always on when middleware is enabled.
 	headers["X-Content-Type-Options"] = "nosniff"
-
-	// X-Frame-Options — defaults to DENY.
 	xfo := strings.TrimSpace(cfg.XFrameOptions)
 	if xfo == "" {
 		xfo = "DENY"
 	}
 	headers["X-Frame-Options"] = xfo
-
-	// Referrer-Policy — defaults to strict-origin-when-cross-origin.
 	ref := strings.TrimSpace(cfg.ReferrerPolicy)
 	if ref == "" {
 		ref = "strict-origin-when-cross-origin"
 	}
 	headers["Referrer-Policy"] = ref
-
-	// Permissions-Policy — empty map yields no header.
 	if len(cfg.PermissionsPolicy) > 0 {
 		headers["Permissions-Policy"] = buildPermissionsPolicy(cfg.PermissionsPolicy)
 	}
-
 	return headers
 }
+`
+
+// buildCSPHeaderSource — BuildCSPHeader func.
+const buildCSPHeaderSource = `//` + `ff:func feature=runtime-middleware type=util control=sequence topic=security-headers
+//` + `ff:what BuildCSPHeader — CSP 헤더 이름 + 값 결정 (profile/ReportOnly 분기)
+
+package middleware
+
+import "strings"
 
 // BuildCSPHeader returns the (header-name, header-value) pair for the
 // Content-Security-Policy header. Empty name indicates CSP must not be
@@ -143,16 +133,28 @@ func BuildCSPHeader(cfg SecurityHeadersConfig) (string, string) {
 	if value == "" {
 		return "", ""
 	}
-	// dev profile forces report-only so inline violations are logged but
-	// never block SSR pages. Explicit ReportOnly also honoured.
 	if profile == "dev" || cfg.CSPReportOnly {
 		return "Content-Security-Policy-Report-Only", value
 	}
 	return "Content-Security-Policy", value
 }
+`
+
+// buildCSPValueSource — BuildCSPValue func.
+const buildCSPValueSource = `//` + `ff:func feature=runtime-middleware type=util control=iteration dimension=1 topic=security-headers
+//` + `ff:what BuildCSPValue — CSP directives map 을 표준 헤더 문자열로 렌더
+
+package middleware
+
+import (
+	"sort"
+	"strings"
+)
 
 // BuildCSPValue renders a CSP directives map into the canonical
-//   "directive1 source1 source2; directive2 source3"
+//
+//	"directive1 source1 source2; directive2 source3"
+//
 // header string. Directives are emitted in sorted order so output is
 // deterministic across processes.
 func BuildCSPValue(directives map[string][]string) string {
@@ -175,6 +177,18 @@ func BuildCSPValue(directives map[string][]string) string {
 	}
 	return strings.Join(parts, "; ")
 }
+`
+
+// buildPermissionsPolicySource — buildPermissionsPolicy func.
+const buildPermissionsPolicySource = `//` + `ff:func feature=runtime-middleware type=util control=iteration dimension=1 topic=security-headers
+//` + `ff:what buildPermissionsPolicy — Permissions-Policy 헤더 값 렌더
+
+package middleware
+
+import (
+	"sort"
+	"strings"
+)
 
 // buildPermissionsPolicy renders the Permissions-Policy header value. Each
 // entry "feature=(origin1 origin2)" or "feature=()" when the list is empty.

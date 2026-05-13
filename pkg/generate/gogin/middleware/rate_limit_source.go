@@ -1,17 +1,10 @@
+//ff:type feature=gen-gogin type=generator
+//ff:what rateLimitSources — rate_limit 를 2파일로 분할하는 소스 맵 생성
+
 package middleware
 
-// rateLimitSourceTemplate carries the verbatim Go source for
-// internal/middleware/rate_limit.go with __MODULE__ replaced by the
-// manifest's backend.module. Scope after Phase006 deprecation:
-//
-//	FixedRateLimit(name, keyAxis, rate, period) gin.HandlerFunc
-//
-// Global rate limit + per-operationId strict rules + memory/redis/postgres
-// store abstraction were all retired in favour of CDN/WAF/Gateway layers
-// (see plans/deprecated/Phase006-DeprecateAppLayerRateLimit.md). Only the
-// tight business-logic guards that the generated server mounts outside
-// OpenAPI (e.g. /auth/refresh 10 rpm/IP) live here now.
-const rateLimitSourceTemplate = `//` + `ff:func feature=runtime-middleware type=util control=sequence topic=rate-limit
+// rateLimitFixedSource is the source for internal/middleware/fixed_rate_limit.go.
+const rateLimitFixedSource = `//` + `ff:func feature=runtime-middleware type=util control=sequence topic=rate-limit
 //` + `ff:what FixedRateLimit — 특정 infra endpoint (/auth/refresh 등) 전용 하드코딩 rate 가드
 
 package middleware
@@ -68,6 +61,15 @@ func FixedRateLimit(name string, keyAxis string, rate int, period time.Duration)
 		c.Next()
 	}
 }
+`
+
+// rateLimitKeySource is the source for internal/middleware/fixed_rate_limit_key.go.
+const rateLimitKeySource = `//` + `ff:func feature=runtime-middleware type=util control=selection topic=rate-limit
+//` + `ff:what fixedRateLimitKey — rate-limit key axis(ip) 추출
+
+package middleware
+
+import "github.com/gin-gonic/gin"
 
 // fixedRateLimitKey extracts the rate-limit key axis from the gin context.
 // Only "ip" is supported; other axes return "" so the guard is skipped —

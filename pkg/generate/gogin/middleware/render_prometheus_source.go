@@ -1,14 +1,16 @@
 //ff:func feature=gen-gogin type=util control=sequence topic=observability
-//ff:what renderPrometheusSource — prometheus 템플릿의 __BUCKETS__ 를 buckets 리터럴로 치환
+//ff:what renderPrometheusSources — prometheus 템플릿을 파일별 소스 맵으로 치환
 
 package middleware
 
 import "strings"
 
-// renderPrometheusSource substitutes __BUCKETS__ with the buckets literal.
-// When buckets is empty prometheus.DefBuckets is emitted so operators can
-// still tune the slice without regenerating.
-func renderPrometheusSource(buckets []float64) string {
+// renderPrometheusSources substitutes __BUCKETS__ in the middleware template
+// and returns a map of filename to source content for multi-file emit.
+func renderPrometheusSources(buckets []float64) map[string]string {
 	lit := bucketsLiteral(buckets)
-	return strings.ReplaceAll(prometheusSourceTemplate, "__BUCKETS__", lit)
+	return map[string]string{
+		"prometheus_middleware.go": strings.ReplaceAll(prometheusMiddlewareSourceTemplate, "__BUCKETS__", lit),
+		"prometheus_handler.go":   prometheusHandlerSource,
+	}
 }

@@ -27,14 +27,15 @@ func TestBlockSecurityHeaders_HSTSOverride(t *testing.T) {
 			},
 		},
 	}
-	body := strings.Join(blockSecurityHeaders(fs, "example.com/zenflow").Lines, "\n")
-	if !strings.Contains(body, `63072000`) {
-		t.Fatalf("custom HSTS max_age not emitted; got:\n%s", body)
+	block := blockSecurityHeaders(fs, "example.com/zenflow")
+	combined := strings.Join(block.Lines, "\n") + "\n" + strings.Join(block.Funcs, "\n")
+	if !strings.Contains(combined, `63072000`) {
+		t.Fatalf("custom HSTS max_age not emitted; got:\n%s", combined)
 	}
-	if !strings.Contains(body, `HSTSPreload:       true`) {
-		t.Fatalf("HSTS preload=true not emitted; got:\n%s", body)
+	if !strings.Contains(combined, `HSTSPreload:       true`) {
+		t.Fatalf("HSTS preload=true not emitted; got:\n%s", combined)
 	}
-	if !strings.Contains(body, `HSTSIncludeSubs:   false`) {
-		t.Fatalf("HSTS include_subdomains=false not emitted; got:\n%s", body)
+	if !strings.Contains(combined, `HSTSIncludeSubs:   false`) {
+		t.Fatalf("HSTS include_subdomains=false not emitted; got:\n%s", combined)
 	}
 }

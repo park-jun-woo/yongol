@@ -9,7 +9,7 @@ import (
 )
 
 func TestErrorEnvelopeSource_HasPackageHeader(t *testing.T) {
-	if !strings.Contains(errorEnvelopeSource, "package middleware") {
-		t.Fatalf("errorEnvelopeSource missing package header")
+	if !strings.Contains(errorEnvelopeTypeSource, "package middleware") {
+		t.Fatalf("errorEnvelopeTypeSource missing package header")
 	}
 }

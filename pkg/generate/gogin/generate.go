@@ -81,5 +81,8 @@ func Generate(fs *yongol.Fullstack, artifactsDir string) error {
 	if err := filefunc.Generate(fs, artifactsDir); err != nil {
 		return fmt.Errorf("filefunc codebook: %w", err)
 	}
+	if err := generateFFIgnore(artifactsDir); err != nil {
+		return fmt.Errorf("ffignore: %w", err)
+	}
 	return nil
 }

@@ -1,23 +1,29 @@
 //ff:func feature=gen-gogin type=generator control=sequence topic=error-envelope
-//ff:what GenerateErrorEnvelope — internal/middleware/error_envelope.go 기록 (Phase004)
+//ff:what GenerateErrorEnvelope — internal/middleware/error_envelope*.go 기록 (1 file 1 func)
 
 package middleware
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 )
 
-// GenerateErrorEnvelope emits internal/middleware/error_envelope.go
-// containing the canonical ErrorEnvelope struct, status → code/message
-// tables, and the ErrorEnvelopeMiddleware gin middleware. Runtime toggles
-// (ExposeInternalError) are set in main.go via blockErrorEnvelope.
+// GenerateErrorEnvelope emits the error envelope middleware files split so
+// each file carries one func or type (filefunc F1/F2): error_envelope.go
+// (type), default_code_for.go, default_message_for.go, write_envelope.go,
+// write_envelope_with_context.go, error_envelope_middleware.go.
 func GenerateErrorEnvelope(artifactsDir string) error {
 	mwDir := filepath.Join(artifactsDir, "backend", "internal", "middleware")
-	if err := os.MkdirAll(mwDir, 0o755); err != nil {
-		return fmt.Errorf("mkdir middleware: %w", err)
+	files := map[string]string{
+		"error_envelope.go":              errorEnvelopeTypeSource,
+		"default_code_for.go":            defaultCodeForSource,
+		"default_message_for.go":         defaultMessageForSource,
+		"write_envelope.go":              writeEnvelopeSource,
+		"write_envelope_with_context.go": writeEnvelopeWithContextSource,
+		"error_envelope_middleware.go":   errorEnvelopeMiddlewareSource,
 	}
-	path := filepath.Join(mwDir, "error_envelope.go")
-	return os.WriteFile(path, []byte(errorEnvelopeSource), 0o644)
+	if err := writeFiles(mwDir, files); err != nil {
+		return fmt.Errorf("write error_envelope: %w", err)
+	}
+	return nil
 }

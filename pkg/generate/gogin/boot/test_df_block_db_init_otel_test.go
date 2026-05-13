@@ -27,16 +27,16 @@ func TestBlockDBInit_TracingBranchRemoved(t *testing.T) {
 		},
 	}
 	block := blockDBInit(fs, "example.com/zenflow")
-	body := strings.Join(block.Lines, "\n")
+	funcs := strings.Join(block.Funcs, "\n")
 	imports := strings.Join(block.Imports, "\n")
 
 	if strings.Contains(imports, "github.com/XSAM/otelsql") {
 		t.Fatalf("otelsql import must be gone after Phase005, got:\n%s", imports)
 	}
-	if strings.Contains(body, "otelsql.") {
-		t.Fatalf("otelsql reference must be gone after Phase005, got:\n%s", body)
+	if strings.Contains(funcs, "otelsql.") {
+		t.Fatalf("otelsql reference must be gone after Phase005, got:\n%s", funcs)
 	}
-	if !strings.Contains(body, "pgxpool.NewWithConfig") {
-		t.Fatalf("tracing-enabled db-init must still take the pgxpool path, got:\n%s", body)
+	if !strings.Contains(funcs, "pgxpool.NewWithConfig") {
+		t.Fatalf("tracing-enabled db-init must still take the pgxpool path, got:\n%s", funcs)
 	}
 }

@@ -162,6 +162,7 @@ optional:
     security-headers: "SecurityHeaders 미들웨어 (CSP/HSTS 등) 생성/등록 — pkg/generate/gogin/boot/*security_headers*.go, middleware/*security_headers*.go"
     error-envelope: "ErrorEnvelope 미들웨어 (표준 에러 응답) 생성/등록 (Phase004) — pkg/generate/gogin/boot/*error_envelope*.go, middleware/*error_envelope*.go"
     dos-guard: "BodyLimit / MultipartLimit 등 DoS 방어 미들웨어 등록 — pkg/generate/gogin/boot/block_body_limit.go"
+    rate-limit: "IP 기반 고정 윈도우 rate-limit 미들웨어 생성/등록 — pkg/generate/gogin/middleware/*rate_limit*.go"
     path-convert: "OpenAPI 경로 템플릿 ↔ gin 라우트 변환 — pkg/generate/gogin/boot/openapi_path_to_gin.go"
     size-parse: "human-readable size(1MiB 등) → bytes 변환 — pkg/generate/gogin/middleware/parse_size.go"
     http-config: "manifest backend.http 섹션 (body_limit / multipart_limit / overrides) 파싱"

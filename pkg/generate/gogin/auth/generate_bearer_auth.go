@@ -1,5 +1,5 @@
-//ff:func feature=gen-gogin type=generator control=sequence
-//ff:what generateBearerAuth — internal/middleware/bearerauth.go 생성 (mode 기반 토큰 추출)
+//ff:func feature=gen-gogin type=generator control=iteration dimension=1
+//ff:what generateBearerAuth — internal/middleware/bearerauth*.go 3파일 생성 (1 file 1 func)
 package auth
 
 import (
@@ -10,34 +10,49 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/generate/gogin/ffannot"
 )
 
-// generateBearerAuth writes internal/middleware/bearerauth.go — a
-// StrictMiddlewareFunc that validates session tokens per operation. The
-// middleware consults a publicOps map (passed in by main.go from
-// collectPublicOps) to bypass auth for endpoints marked `security: []` in
-// OpenAPI.
-//
-// Phase020 — the middleware branches on the manifest-resolved auth mode at
-// request time (bearer / cookie / hybrid). Phase001 UserClaimUnification —
-// the middleware stores a single model.UserClaim pointer in the request
-// ctx under the "currentUser" key; the previous split between auth.Claim
-// (write side) and model.CurrentUser (read side) is collapsed.
-//
-// The static template lives in template_bearer_auth.go so this function
-// stays under the Q3 sequence line budget. The fields argument is retained
-// in the signature because auth.Generate already parses claims once; the
-// body no longer emits per-field assignments now that the typed claim
-// itself is the ctx value.
+// generateBearerAuth writes internal/middleware/auth_mode.go,
+// extract_token.go, and bearerauth.go — each with one func (filefunc F1).
 func generateBearerAuth(artifactsDir, modulePath string, fields []ClaimField, defaultMode string) error {
+	_ = fields
 	mwDir := filepath.Join(artifactsDir, "backend", "internal", "middleware")
 	if err := os.MkdirAll(mwDir, 0o755); err != nil {
 		return err
 	}
-	_ = fields
 
-	header := ffannot.EmitAnnotationBlock(ffannot.Block{
+	authModeHeader := ffannot.EmitAnnotationBlock(ffannot.Block{
+		Func: ffannot.FuncAnnot{Feature: "middleware", Type: "middleware", Control: "selection", Topic: "auth-check"},
+		What: "authMode — 현재 인증 전송 모드(bearer/cookie/hybrid) 반환",
+	})
+	extractTokenHeader := ffannot.EmitAnnotationBlock(ffannot.Block{
+		Func: ffannot.FuncAnnot{Feature: "middleware", Type: "middleware", Control: "selection", Topic: "auth-check"},
+		What: "extractToken — auth mode 에 따라 JWT 토큰 추출",
+	})
+	bearerAuthHeader := ffannot.EmitAnnotationBlock(ffannot.Block{
 		Func: ffannot.FuncAnnot{Feature: "middleware", Type: "middleware", Control: "sequence", Topic: "auth-check"},
 		What: "BearerAuthStrict — oapi-codegen per-op 세션 토큰 검증 미들웨어 (mode 기반 분기, ssac/pkg/auth 기반)",
 	})
-	src := header + fmt.Sprintf(bearerAuthTemplate, modulePath, modulePath, defaultMode)
-	return os.WriteFile(filepath.Join(mwDir, "bearerauth.go"), []byte(src), 0o644)
+
+	files := map[string]struct {
+		name    string
+		content string
+	}{
+		"auth_mode": {
+			name:    "auth_mode.go",
+			content: authModeHeader + fmt.Sprintf(authModeTemplate, defaultMode),
+		},
+		"extract_token": {
+			name:    "extract_token.go",
+			content: extractTokenHeader + extractTokenTemplate,
+		},
+		"bearerauth": {
+			name:    "bearerauth.go",
+			content: bearerAuthHeader + fmt.Sprintf(bearerAuthStrictTemplate, modulePath, modulePath),
+		},
+	}
+	for _, f := range files {
+		if err := os.WriteFile(filepath.Join(mwDir, f.name), []byte(f.content), 0o644); err != nil {
+			return fmt.Errorf("write %s: %w", f.name, err)
+		}
+	}
+	return nil
 }

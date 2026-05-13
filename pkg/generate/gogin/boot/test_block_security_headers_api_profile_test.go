@@ -24,8 +24,9 @@ func TestBlockSecurityHeaders_APIProfile(t *testing.T) {
 			},
 		},
 	}
-	body := strings.Join(blockSecurityHeaders(fs, "example.com/zenflow").Lines, "\n")
-	if !strings.Contains(body, `"api"`) {
-		t.Fatalf("api profile not emitted; got:\n%s", body)
+	block := blockSecurityHeaders(fs, "example.com/zenflow")
+	combined := strings.Join(block.Lines, "\n") + "\n" + strings.Join(block.Funcs, "\n")
+	if !strings.Contains(combined, `"api"`) {
+		t.Fatalf("api profile not emitted; got:\n%s", combined)
 	}
 }

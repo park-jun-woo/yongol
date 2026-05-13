@@ -24,8 +24,10 @@ func TestBlockSecurityHeaders_DefaultActive(t *testing.T) {
 		t.Fatalf("unexpected name %q", block.Name)
 	}
 	body := strings.Join(block.Lines, "\n")
+	funcs := strings.Join(block.Funcs, "\n")
+	combined := body + "\n" + funcs
 	for _, must := range []string{
-		`middleware.SecurityHeadersMiddleware(secHeadersCfg)`,
+		`middleware.SecurityHeadersMiddleware(buildSecurityHeadersCfg(`,
 		`BACKEND_SECURITY_HEADERS_ENABLED`,
 		`BACKEND_SECURITY_HEADERS_PROFILE`,
 		`BACKEND_SECURITY_HEADERS_HSTS_MAX_AGE`,
@@ -39,8 +41,8 @@ func TestBlockSecurityHeaders_DefaultActive(t *testing.T) {
 		`"base-uri": []string{"'self'"}`,
 		`"camera": []string{}`,
 	} {
-		if !strings.Contains(body, must) {
-			t.Errorf("default block missing fragment %q; got:\n%s", must, body)
+		if !strings.Contains(combined, must) {
+			t.Errorf("default block missing fragment %q; got:\n%s", must, combined)
 		}
 	}
 }

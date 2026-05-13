@@ -24,8 +24,9 @@ func TestBlockSecurityHeaders_DevProfile(t *testing.T) {
 			},
 		},
 	}
-	body := strings.Join(blockSecurityHeaders(fs, "example.com/zenflow").Lines, "\n")
-	if !strings.Contains(body, `"dev"`) {
-		t.Fatalf("dev profile not emitted; got:\n%s", body)
+	block := blockSecurityHeaders(fs, "example.com/zenflow")
+	combined := strings.Join(block.Lines, "\n") + "\n" + strings.Join(block.Funcs, "\n")
+	if !strings.Contains(combined, `"dev"`) {
+		t.Fatalf("dev profile not emitted; got:\n%s", combined)
 	}
 }

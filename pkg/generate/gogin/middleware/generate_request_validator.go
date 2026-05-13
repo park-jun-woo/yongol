@@ -26,6 +26,12 @@ func Generate(fs *yongol.Fullstack, p prepared.State, artifactsDir string) error
 		return fmt.Errorf("mkdir middleware: %w", err)
 	}
 
+	// Remove stale combined files from previous runs (e.g. prometheus.go
+	// replaced by prometheus_middleware.go + prometheus_handler.go).
+	if err := removeStaleCombined(mwDir); err != nil {
+		return fmt.Errorf("remove stale combined: %w", err)
+	}
+
 	// Copy specs/api/openapi.yaml → middleware/openapi.yaml for go:embed.
 	src := filepath.Join(fs.SpecsDir, "api", "openapi.yaml")
 	dst := filepath.Join(mwDir, "openapi.yaml")

@@ -1,45 +1,19 @@
-//ff:func feature=gen-gogin type=generator control=sequence topic=auth-refresh
-//ff:what emitAuthWrapper — ssac/pkg/auth.RefreshStore 를 사용자 sqlc Queries 로 구현하는 adapter 를 emit
+//ff:func feature=gen-gogin type=generator control=iteration dimension=1 topic=auth-refresh
+//ff:what emitAuthWrapper — ssac/pkg/auth.RefreshStore adapter 를 6파일로 분할 emit (1 file 1 func/type)
 
 package infra
 
 import (
-	"bytes"
 	"fmt"
+	"os"
+	"path/filepath"
 
+	"github.com/park-jun-woo/yongol/pkg/generate/ffhash"
 	"github.com/park-jun-woo/yongol/pkg/ssacmeta"
 )
 
-// emitAuthWrapper writes `arts/backend/internal/infra/auth/postgres.go` — a
-// postgres adapter that satisfies ssac/pkg/auth.RefreshStore by forwarding
-// each method onto the user's sqlc Queries declared in
-// ssac/pkg/auth/interface.yaml.
-//
-// Mapping (RefreshStore method → interface.yaml port):
-//
-//   Create       → RefreshTokenInsert
-//   Consume      → RefreshTokenFindByHash + RefreshTokenRevoke
-//                  (SELECT active row, validate, then UPDATE revoked_at —
-//                   this is the only RefreshStore method that needs two
-//                   queries; every other method is a single forwarder.)
-//   Revoke       → RefreshTokenRevoke
-//   RevokeAll    → RefreshTokenRevokeAll
-//
-// Type-translation glue:
-//
-//   - RefreshStore.Create takes `claims any`; the wrapper json.Marshals
-//     it so the sqlc param stays []byte (stored as JSONB).
-//   - RefreshStore.Consume plaintext token → sha256 hash before every
-//     DB touch via auth.HashRefreshToken. Revoked rows surface as
-//     ErrRefreshTokenReused together with their claims so reuse-detection
-//     lockout can inspect the claim set.
-//   - expires_at / revoked_at are pgtype.Timestamptz for pgx/v5 params;
-//     the wrapper converts to/from time.Time at the boundary.
-//
-// LoginLookup is declared in interface.yaml `when: always` but is NOT
-// implemented by this adapter — it is consumed directly by user SSaC
-// @call auth.Login handlers (Phase003 handler codegen), not by the
-// RefreshStore interface.
+// emitAuthWrapper writes adapter files under arts/backend/internal/infra/auth/
+// with one file per method (filefunc F3) plus the type + constructor file.
 func emitAuthWrapper(iface *ssacmeta.PackageInterface, active []ssacmeta.Port, modulePath, artifactsDir string) error {
 	insertPort := portByName(active, "RefreshTokenInsert")
 	findPort := portByName(active, "RefreshTokenFindByHash")
@@ -49,8 +23,24 @@ func emitAuthWrapper(iface *ssacmeta.PackageInterface, active []ssacmeta.Port, m
 		return fmt.Errorf("auth: interface.yaml missing one of RefreshTokenInsert/FindByHash/Revoke/RevokeAll (active ports: %d)", len(active))
 	}
 
-	var buf bytes.Buffer
-	fmt.Fprintf(&buf, authWrapperTemplate, modulePath, insertPort.Name, findPort.Name, revokePort.Name, revokeAllPort.Name)
+	dir := filepath.Join(artifactsDir, "backend", "internal", "infra", iface.Package)
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return err
+	}
 
-	return writeAdapterFile(artifactsDir, iface.Package, buf.Bytes())
+	files := map[string]string{
+		"postgres.go":            fmt.Sprintf(authWrapperTypeTemplate, modulePath),
+		"postgres_new.go":        fmt.Sprintf(authWrapperNewPostgresTemplate, modulePath),
+		"postgres_create.go":     fmt.Sprintf(authWrapperCreateTemplate, modulePath, insertPort.Name),
+		"postgres_consume.go":    fmt.Sprintf(authWrapperConsumeTemplate, modulePath, findPort.Name, revokePort.Name),
+		"postgres_revoke.go":     fmt.Sprintf(authWrapperRevokeTemplate, modulePath, revokePort.Name),
+		"postgres_revoke_all.go": fmt.Sprintf(authWrapperRevokeAllTemplate, modulePath, revokeAllPort.Name),
+	}
+	for name, content := range files {
+		data := ffhash.InjectCheckedLine([]byte(content))
+		if err := os.WriteFile(filepath.Join(dir, name), data, 0o644); err != nil {
+			return fmt.Errorf("write %s: %w", name, err)
+		}
+	}
+	return nil
 }

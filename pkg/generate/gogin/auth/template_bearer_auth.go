@@ -1,28 +1,12 @@
 package auth
 
-// bearerAuthTemplate is the raw Go source emitted into
-// internal/middleware/bearerauth.go. The three %s verbs bind, in order:
-//
-//  1. modulePath for the api import
-//  2. modulePath for the model import
-//  3. the default auth mode literal returned when BACKEND_AUTH_MODE is unset
-//     or invalid
-//
-// Kept as a var so generateBearerAuth stays under the Q3 sequence line budget.
-var bearerAuthTemplate = `package middleware
+// authModeTemplate is the source for internal/middleware/auth_mode.go.
+// %s is the default auth mode literal.
+var authModeTemplate = `package middleware
 
 import (
-	"encoding/json"
-	"net/http"
 	"os"
 	"strings"
-
-	"github.com/gin-gonic/gin"
-
-	"github.com/park-jun-woo/ssac/pkg/auth"
-
-	"%s/internal/api"
-	"%s/internal/model"
 )
 
 // authMode returns the effective auth transport mode. BACKEND_AUTH_MODE
@@ -36,6 +20,17 @@ func authMode() string {
 	}
 	return %q
 }
+`
+
+// extractTokenTemplate is the source for internal/middleware/extract_token.go.
+var extractTokenTemplate = `package middleware
+
+import (
+	"strings"
+
+	"github.com/gin-gonic/gin"
+	"github.com/park-jun-woo/ssac/pkg/auth"
+)
 
 // extractToken reads the session JWT according to the current auth mode.
 // Return "" signals "no token present" — the middleware converts that to
@@ -60,6 +55,23 @@ func extractToken(ctx *gin.Context) string {
 	}
 	return headerToken
 }
+`
+
+// bearerAuthStrictTemplate is the source for internal/middleware/bearerauth.go.
+// %s verbs: 1=modulePath (api), 2=modulePath (model).
+var bearerAuthStrictTemplate = `package middleware
+
+import (
+	"encoding/json"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/park-jun-woo/ssac/pkg/auth"
+
+	"%s/internal/api"
+	"%s/internal/model"
+)
 
 // BearerAuthStrict returns a StrictMiddlewareFunc that validates the
 // session token per operation. Operations whose operationID is in
@@ -87,10 +99,6 @@ func BearerAuthStrict(publicOps map[string]bool) api.StrictMiddlewareFunc {
 				ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 				return nil, nil
 			}
-			// MapClaims → typed UserClaim via JSON round-trip. Keeps this
-			// file agnostic to the concrete claim field list; the
-			// UserClaim struct (generated from manifest.backend.auth.claims)
-			// carries the json tags that match the JWT claim keys.
 			raw, err := json.Marshal(out.Claims)
 			if err != nil {
 				ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})

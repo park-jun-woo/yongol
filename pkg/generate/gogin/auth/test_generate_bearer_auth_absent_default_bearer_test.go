@@ -35,7 +35,7 @@ func TestGenerateBearerAuth_AbsentDefaultBearer(t *testing.T) {
 	if err := generateBearerAuth(dir, "example.com/proj", nil, "bearer"); err != nil {
 		t.Fatalf("generateBearerAuth: %v", err)
 	}
-	path := filepath.Join(dir, "backend", "internal", "middleware", "bearerauth.go")
+	path := filepath.Join(dir, "backend", "internal", "middleware", "auth_mode.go")
 	raw, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("read emitted file: %v", err)

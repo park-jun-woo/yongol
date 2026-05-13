@@ -24,20 +24,27 @@ func blockCORS(fs *yongol.Fullstack) MainBlock {
 	c := fs.Manifest.Backend.CORS
 
 	lines := []string{
-		`corsCfg := cors.Config{`,
-		fmt.Sprintf(`	AllowMethods:     envStringList("CORS_ALLOW_METHODS", %s),`, goStringSlice(c.AllowMethods)),
-		fmt.Sprintf(`	AllowHeaders:     %s,`, goStringSlice(c.AllowHeaders)),
-		fmt.Sprintf(`	ExposeHeaders:    %s,`, goStringSlice(c.ExposeHeaders)),
-		fmt.Sprintf(`	AllowCredentials: envBool("CORS_ALLOW_CREDENTIALS", %v),`, c.AllowCredentials),
-		fmt.Sprintf(`	MaxAge:           %s,`, durationLiteral(c.MaxAge)),
-		`}`,
-		fmt.Sprintf(`corsCfg.AllowOrigins = envStringList("CORS_ALLOW_ORIGINS", %s)`, goStringSlice(c.AllowOrigins)),
-		`r.Use(cors.New(corsCfg))`,
+		`r.Use(cors.New(buildCORSConfig()))`,
 	}
+
+	helperFunc := fmt.Sprintf(`func buildCORSConfig() cors.Config {
+	cfg := cors.Config{
+		AllowMethods:     envStringList("CORS_ALLOW_METHODS", %s),
+		AllowHeaders:     %s,
+		ExposeHeaders:    %s,
+		AllowCredentials: envBool("CORS_ALLOW_CREDENTIALS", %v),
+		MaxAge:           %s,
+	}
+	cfg.AllowOrigins = envStringList("CORS_ALLOW_ORIGINS", %s)
+	return cfg
+}`, goStringSlice(c.AllowMethods), goStringSlice(c.AllowHeaders),
+		goStringSlice(c.ExposeHeaders), c.AllowCredentials,
+		durationLiteral(c.MaxAge), goStringSlice(c.AllowOrigins))
 
 	return MainBlock{
 		Name:    "cors",
 		Imports: []string{`"github.com/gin-contrib/cors"`},
 		Lines:   lines,
+		Funcs:   []string{helperFunc},
 	}
 }

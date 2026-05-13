@@ -12,13 +12,14 @@ import (
 // expressed as string comparisons in source; verify each branch literal is
 // present so a refactor cannot silently remove a profile.
 func TestSecurityHeadersSource_ProfileBranches(t *testing.T) {
+	combined := buildStaticSecurityHeadersSource + buildCSPHeaderSource
 	for _, must := range []string{
 		`profile != "dev"`,
 		`profile == "api"`,
 		`profile == "dev"`,
 	} {
-		if !strings.Contains(securityHeadersSource, must) {
-			t.Errorf("security_headers source missing profile branch %q", must)
+		if !strings.Contains(combined, must) {
+			t.Errorf("security_headers sources missing profile branch %q", must)
 		}
 	}
 }

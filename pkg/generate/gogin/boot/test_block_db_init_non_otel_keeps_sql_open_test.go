@@ -29,16 +29,21 @@ func TestBlockDBInit_UsesPgxpool(t *testing.T) {
 	}
 	block := blockDBInit(fs, "example.com/zenflow")
 	body := strings.Join(block.Lines, "\n")
+	funcs := strings.Join(block.Funcs, "\n")
 	imports := strings.Join(block.Imports, "\n")
 
-	if !strings.Contains(body, `pgxpool.NewWithConfig`) {
-		t.Fatalf("db-init must use pgxpool.NewWithConfig, got:\n%s", body)
+	// pgxpool.NewWithConfig lives in the helper func, called from main via initDBPool.
+	if !strings.Contains(body, `initDBPool(ctx)`) {
+		t.Fatalf("db-init Lines must call initDBPool, got:\n%s", body)
 	}
-	if strings.Contains(body, `sql.Open("postgres"`) {
-		t.Fatalf("db-init must NOT use sql.Open (pgx/v5 refit), got:\n%s", body)
+	if !strings.Contains(funcs, `pgxpool.NewWithConfig`) {
+		t.Fatalf("db-init helper must use pgxpool.NewWithConfig, got:\n%s", funcs)
 	}
-	if strings.Contains(body, `stdlib.OpenDBFromPool`) {
-		t.Fatalf("db-init must NOT bridge to database/sql (ssac/purify Phase002 removed the bridge), got:\n%s", body)
+	if strings.Contains(funcs, `sql.Open("postgres"`) {
+		t.Fatalf("db-init must NOT use sql.Open (pgx/v5 refit), got:\n%s", funcs)
+	}
+	if strings.Contains(funcs, `stdlib.OpenDBFromPool`) {
+		t.Fatalf("db-init must NOT bridge to database/sql (ssac/purify Phase002 removed the bridge), got:\n%s", funcs)
 	}
 	if !strings.Contains(body, `queries := db.New(pool)`) {
 		t.Fatalf("db-init must initialise sqlc Queries from the pool, got:\n%s", body)

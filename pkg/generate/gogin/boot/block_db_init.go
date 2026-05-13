@@ -30,28 +30,34 @@ func blockDBInit(fs *yongol.Fullstack, modulePath string) MainBlock {
 	lines := []string{
 		`ctx, cancelBootstrap := context.WithCancel(context.Background())`,
 		`defer cancelBootstrap()`,
-		`slog.Info("connecting to database")`,
-		`poolCfg, err := pgxpool.ParseConfig(os.Getenv("DATABASE_URL"))`,
-		`if err != nil {`,
-		`	slog.Error("db init: parse DATABASE_URL", "err", err)`,
-		`	os.Exit(1)`,
-		`}`,
-		`poolCfg.MaxConns = int32(envInt("DB_MAX_OPEN_CONNS", 25))`,
-		`poolCfg.MinConns = int32(envInt("DB_MAX_IDLE_CONNS", 5))`,
-		`poolCfg.MaxConnLifetime = envDuration("DB_CONN_MAX_LIFETIME", 5*time.Minute)`,
-		`pool, err := pgxpool.NewWithConfig(ctx, poolCfg)`,
-		`if err != nil {`,
-		`	slog.Error("db init", "err", err)`,
-		`	os.Exit(1)`,
-		`}`,
+		`pool := initDBPool(ctx)`,
 		`defer pool.Close()`,
 		`queries := db.New(pool)`,
-		`slog.Info("database connected", "max_conns", poolCfg.MaxConns)`,
 	}
+
+	helperFunc := `func initDBPool(ctx context.Context) *pgxpool.Pool {
+	slog.Info("connecting to database")
+	poolCfg, err := pgxpool.ParseConfig(os.Getenv("DATABASE_URL"))
+	if err != nil {
+		slog.Error("db init: parse DATABASE_URL", "err", err)
+		os.Exit(1)
+	}
+	poolCfg.MaxConns = int32(envInt("DB_MAX_OPEN_CONNS", 25))
+	poolCfg.MinConns = int32(envInt("DB_MAX_IDLE_CONNS", 5))
+	poolCfg.MaxConnLifetime = envDuration("DB_CONN_MAX_LIFETIME", 5*time.Minute)
+	pool, err := pgxpool.NewWithConfig(ctx, poolCfg)
+	if err != nil {
+		slog.Error("db init", "err", err)
+		os.Exit(1)
+	}
+	slog.Info("database connected", "max_conns", poolCfg.MaxConns)
+	return pool
+}`
 
 	return MainBlock{
 		Name:    "db-init",
 		Imports: imports,
 		Lines:   lines,
+		Funcs:   []string{helperFunc},
 	}
 }
