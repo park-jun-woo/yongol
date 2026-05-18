@@ -9,3 +9,7 @@ SELECT id, org_id, email, role FROM users WHERE id = @id;
 INSERT INTO users (org_id, email, role, password_hash)
 VALUES (@org_id, @email, @role, @password_hash)
 RETURNING id, org_id, email, role;
+
+-- name: UserListByOrg :many
+-- +no-pagination
+SELECT id, org_id, email, role FROM users WHERE org_id = @org_id ORDER BY email ASC;

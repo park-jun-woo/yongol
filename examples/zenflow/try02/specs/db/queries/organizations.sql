@@ -11,3 +11,11 @@ UPDATE organizations
 SET credits_balance = credits_balance - @amount
 WHERE id = @id AND credits_balance >= @amount
 RETURNING *;
+
+-- name: OrganizationUpdateGeocode :exec
+UPDATE organizations
+SET latitude = @latitude, longitude = @longitude, address_verified = true
+WHERE id = @id;
+
+-- name: OwnerLookupOrganization :one
+SELECT id FROM organizations WHERE id = @id;

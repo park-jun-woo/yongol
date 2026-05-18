@@ -40,6 +40,14 @@ components:
         credits_balance:
           type: integer
           format: int64
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        address_verified:
+          type: boolean
 
     User:
       type: object
@@ -79,9 +87,23 @@ components:
         root_workflow_id:
           type: string
           format: uuid
+        assigned_to:
+          type: string
+          format: uuid
+        assignment_confidence:
+          type: string
         created_at:
           type: string
           format: date-time
+
+    MatchMemberResponse:
+      type: object
+      properties:
+        member_id:
+          type: string
+          format: uuid
+        confidence:
+          type: string
 
     Action:
       type: object
@@ -172,6 +194,25 @@ components:
           type: string
         next_run:
           type: string
+
+    ActionInput:
+      type: object
+      properties:
+        type:
+          type: string
+        config:
+          type: string
+        sequence_order:
+          type: integer
+          format: int64
+      required: [type, config, sequence_order]
+
+    SaveWorkflowActionsResponse:
+      type: object
+      properties:
+        count:
+          type: integer
+          format: int64
 
     AuditLog:
       type: object
@@ -371,6 +412,59 @@ paths:
                 $ref: "#/components/schemas/Error"
 
   /workflows/{id}/actions:
+    put:
+      operationId: SaveWorkflowActions
+      summary: Replace all actions of a workflow (batch insert)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [actions]
+              properties:
+                actions:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/ActionInput"
+      responses:
+        "200":
+          description: Actions replaced
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SaveWorkflowActionsResponse"
+        "404":
+          description: Workflow not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: Invalid state for replacing actions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
     post:
       operationId: AddAction
       summary: Add an action to a workflow
@@ -614,6 +708,43 @@ paths:
                 $ref: "#/components/schemas/Error"
         "409":
           description: Workflow not active
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /workflows/{id}/auto-assign:
+    post:
+      operationId: AutoAssignWorkflow
+      summary: Auto-assign workflow to best-matching team member
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Updated workflow after auto-assign
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
+        "404":
+          description: Workflow not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Forbidden
           content:
             application/json:
               schema:
@@ -1261,6 +1392,53 @@ paths:
                 properties:
                   summary:
                     $ref: "#/components/schemas/SummarizeResponse"
+        "404":
+          description: Organization not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /organizations/{id}/verify-address:
+    post:
+      operationId: VerifyOrgAddress
+      summary: Verify and geocode the organization's address
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [address]
+              properties:
+                address:
+                  type: string
+      responses:
+        "200":
+          description: Organization with verified address
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Organization"
         "404":
           description: Organization not found
           content:

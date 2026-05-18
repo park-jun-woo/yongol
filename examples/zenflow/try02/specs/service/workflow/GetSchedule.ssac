@@ -9,8 +9,8 @@ import (
 // @auth "GetSchedule" "workflow" {ResourceID: request.id} "Forbidden"
 // @get Workflow wf = Workflow.FindByID({ID: request.id})
 // @empty wf "Workflow not found"
-// @call schedule.ScheduleKeyResponse keyResult = schedule.ScheduleKey({WorkflowID: request.id})
-// @call session.GetResponse scheduleResult = session.Get({Key: keyResult.Key})
-// @call schedule.DecodeValueResponse decoded = schedule.DecodeValue({Raw: scheduleResult.Value})
+// @call ScheduleKeyResponse keyResult = schedule.ScheduleKey({WorkflowID: request.id})
+// @call GetResponse scheduleResult = session.Get({Key: keyResult.Key})
+// @call DecodeValueResponse decoded = schedule.DecodeValue({Raw: scheduleResult.Value})
 // @response { expression: decoded.Value, next_run: "" }
 func GetSchedule() {}

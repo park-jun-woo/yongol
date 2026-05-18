@@ -8,4 +8,5 @@ stateDiagram-v2
     active --> active: ExecuteWorkflow
     active --> active: ExecuteWithReport
     draft --> draft: AddAction
+    draft --> draft: SaveWorkflowActions
 ```

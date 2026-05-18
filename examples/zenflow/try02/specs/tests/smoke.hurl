@@ -25,6 +25,7 @@ Content-Type: application/json
 HTTP 201
 [Captures]
 workflow_id: jsonpath "$.id"
+org_id: jsonpath "$.org_id"
 [Asserts]
 jsonpath "$.status" == "draft"
 jsonpath "$.title" == "My Test Workflow"
@@ -75,6 +76,37 @@ HTTP 201
 [Asserts]
 jsonpath "$.action_type" == "notify_slack"
 jsonpath "$.sequence_order" == 2
+
+# Step 6b: SaveWorkflowActions — replace all actions with a batch of 3
+PUT {{host}}/workflows/{{workflow_id}}/actions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+{
+  "actions": [
+    {"type": "send_email", "config": "{}", "sequence_order": 1},
+    {"type": "notify_slack", "config": "{}", "sequence_order": 2},
+    {"type": "log_result", "config": "{}", "sequence_order": 3}
+  ]
+}
+
+HTTP 200
+[Asserts]
+jsonpath "$.count" == 3
+
+# Step 6c: SaveWorkflowActions again — replace with 2 actions
+PUT {{host}}/workflows/{{workflow_id}}/actions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+{
+  "actions": [
+    {"type": "send_email", "config": "{}", "sequence_order": 1},
+    {"type": "notify_slack", "config": "{}", "sequence_order": 2}
+  ]
+}
+
+HTTP 200
+[Asserts]
+jsonpath "$.count" == 2
 
 # Step 7: Activate the workflow
 POST {{host}}/workflows/{{workflow_id}}/activate
@@ -324,3 +356,56 @@ Authorization: Bearer {{token}}
 HTTP 200
 [Asserts]
 jsonpath "$.detail.status" != null
+
+# Step 28: VerifyOrgAddress — geocode the org's address
+POST {{host}}/organizations/{{org_id}}/verify-address
+Authorization: Bearer {{token}}
+Content-Type: application/json
+{
+  "address": "123 Main St, San Francisco, CA 94102"
+}
+
+HTTP 200
+[Asserts]
+jsonpath "$.address_verified" == true
+
+# Step 29: AutoAssignWorkflow — matched (admin.* trigger → admin role member gets assigned)
+POST {{host}}/workflows
+Authorization: Bearer {{token}}
+Content-Type: application/json
+{
+  "title": "Auto-Assign Test Workflow (match)",
+  "trigger_event": "admin.onboard"
+}
+
+HTTP 201
+[Captures]
+assign_wf_id: jsonpath "$.id"
+
+POST {{host}}/workflows/{{assign_wf_id}}/auto-assign
+Authorization: Bearer {{token}}
+
+HTTP 200
+[Asserts]
+jsonpath "$.assignment_confidence" == "high"
+jsonpath "$.assigned_to" != null
+
+# Step 30: AutoAssignWorkflow — unmatched (payment.processed trigger → no role match → assigned_to stays null)
+POST {{host}}/workflows
+Authorization: Bearer {{token}}
+Content-Type: application/json
+{
+  "title": "Auto-Assign Test Workflow (no match)",
+  "trigger_event": "payment.processed"
+}
+
+HTTP 201
+[Captures]
+nomatch_wf_id: jsonpath "$.id"
+
+POST {{host}}/workflows/{{nomatch_wf_id}}/auto-assign
+Authorization: Bearer {{token}}
+
+HTTP 200
+[Asserts]
+jsonpath "$.assignment_confidence" == "none"

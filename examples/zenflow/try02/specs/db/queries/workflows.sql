@@ -24,3 +24,9 @@ RETURNING *;
 -- name: WorkflowListVersions :many
 -- +no-pagination
 SELECT * FROM workflows WHERE (root_workflow_id = @root_workflow_id OR id = @root_workflow_id) AND org_id = @org_id ORDER BY version ASC;
+
+-- name: WorkflowAutoAssign :exec
+UPDATE workflows
+SET assigned_to = COALESCE(NULLIF(@member_id::text, '00000000-0000-0000-0000-000000000000')::uuid, assigned_to),
+    assignment_confidence = @confidence
+WHERE id = @id;

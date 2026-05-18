@@ -178,7 +178,58 @@ Variable redeclaration bug: when SSaC reuses the same variable name in a second 
   3. BuildExecutionDetailResponse.id/workflow_id/org_id: initially declared as int64 in OpenAPI schema but the Go struct returns strings (UUID.String()). Fix: change OpenAPI schema to `type: string` for all UUID fields.
   4. D-7 positional parameter: AuditLogFindByID used `$1` instead of `@id`. Fix: use named parameter `@id`.
 
-## Final Summary
+
+## Add-on 08 — Batch Operations
+
+- Start: 2026-05-18T14:25:21Z
+- End: 2026-05-18T14:35:54Z
+- Duration: ~10m
+- Validate iterations: 4 (Round 1: 10 pre-existing parse errors + my 1; Round 2: 1 error XOH-11 + 2 warnings; Round 3: 1 error XOS-21; Round 4: 0 errors, 0 warnings)
+- New endpoints: 1 (SaveWorkflowActions)
+- New tables: 0
+- New queries: 2 (ActionDeleteByWorkflow, ActionBatchInsert)
+- Hurl requests added: 2 (steps 6b, 6c in smoke.hurl: SaveWorkflowActions with 3 actions, then 2 actions)
+- Result: pass (59/59 requests across 5 hurl files)
+- Issues:
+  1. yongol v0.3.14 regression: `@call` result type must now be a bare struct name (not package-qualified). All 10 existing SSaC files from add-ons 01-07 used `package.TypeName` form (e.g. `versioning.ResolveRootIDResponse`). Fixed all to bare names (e.g. `ResolveRootIDResponse`). This was a breaking validator change introduced between v0.3.12 (used in add-ons 01-07) and v0.3.14.
+  2. Func type mismatch for array params: `@call SerializeActions({Actions: request.actions})` generates `workflow.SerializeActionsRequest{Actions: request.Body.Actions}` where `request.Body.Actions` is `[]api.ActionInput`. The func's own `ActionInput` struct would be a different type. Fix: import `github.com/park-jun-woo/zenflow/internal/api` directly in the func spec and declare `Actions []api.ActionInput` — no circular dependency since `internal/api` does not import `internal/workflow`.
+  3. sqlc `@items::jsonb` maps to `[]byte`, not `string`. Changed func to return `ItemsJSON []byte` (using `json.Marshal`) to match the generated `ActionBatchInsertParams.Items []byte` field.
+
+## Add-on 09 — External API Integration
+
+- Start: 2026-05-18T14:36:49Z
+- End: 2026-05-18T14:50:29Z
+- Duration: ~14m
+- Validate iterations: 3 (Round 1: 3 errors, 1 warning; Round 2: 0 errors, 0 warnings; Round 3: 0 errors, 0 warnings after DDL type change)
+- New endpoints: 1 (VerifyOrgAddress)
+- New tables: 0 (3 columns added to organizations: latitude DOUBLE PRECISION nullable, longitude DOUBLE PRECISION nullable, address_verified BOOLEAN NOT NULL DEFAULT false)
+- New queries: 3 (OrganizationUpdateGeocode, OwnerLookupOrganization, geocoding-api.yaml external client via yongol import)
+- Hurl requests added: 1 (step 28 in smoke.hurl: VerifyOrgAddress)
+- Result: pass (60/60 requests across 5 hurl files)
+- Issues:
+  1. yongol import generates `package external` hardcoded: The generated `geocoding.go` used `package external` which conflicts with `package geocoding` in the hand-authored `geocode.go`. Fixed by manually editing the package declaration in the generated file to `package geocoding`.
+  2. Generated `GeocodeResponse` conflicts with hand-authored `GeocodeResponse`: Both files in `func/geocoding/` declared `GeocodeResponse`. Fixed by renaming the generated struct to `GeocodingAPIResponse` in the `yongol import`-generated file.
+  3. NUMERIC → DOUBLE PRECISION type migration: Initially used `NUMERIC` for latitude/longitude, but `pgtypex.FromPgNumericPtr` returns `*string` while OpenAPI `type: number` generates `*float32/*float64`. Switched to `DOUBLE PRECISION` (FLOAT8) which maps natively to `pgtype.Float8` and `pgtypex.FromPgFloat8Ptr` returns `*float64`. Updated OpenAPI to `format: double` for the match.
+  4. `pgtype.Float8` in func spec: The `OrganizationUpdateGeocode` sqlc params require `pgtype.Float8` but `GeocodeResponse.Latitude` was `float64`. Fixed by using `pgtype.Float8{Float64: ..., Valid: true}` in the func spec and importing `github.com/jackc/pgx/v5/pgtype`.
+  5. OwnerLookupOrganization query: Initially wrote a `:many` ANY query. The authz codegen passes a single UUID to OwnerLookup. Fixed to `:one` SELECT id FROM organizations WHERE id = @id.
+  6. Mock geocoding server required: The external API URL `api.geocoding.example.com` doesn't exist. Started a local Go HTTP mock server on port 9090 returning fixed lat/lng, and set `GEOCODING_API_URL=http://localhost:9090`.
+
+## Add-on 10 — Conditional Update without @if
+
+- Start: 2026-05-18T14:51:26Z
+- End: 2026-05-18T15:07:58Z
+- Duration: ~16m
+- Validate iterations: 3 (Round 1: 2 errors XFS-44 + XOH-11, 1 warning S-63; Round 2: 1 error XOH-11, 1 warning S-63; Round 3: 0 errors, 0 warnings)
+- New endpoints: 1 (AutoAssignWorkflow)
+- New tables: 0 (2 columns added to workflows: assigned_to UUID nullable, assignment_confidence VARCHAR(10) NOT NULL DEFAULT 'none')
+- New queries: 2 (WorkflowAutoAssign, UserListByOrg)
+- Hurl requests added: 4 (steps 29-30: 2 POST /workflows + 2 POST /auto-assign; matched + unmatched scenarios)
+- Result: pass (64/64 requests across 5 hurl files)
+- Issues:
+  1. XFS-44 type mismatch for @call Members param: yongol infers DB query results using bare type names (e.g. `[]UserListByOrgRow`) but func declarations need Go-valid package-qualified names (e.g. `[]db.UserListByOrgRow`). These don't match as-is. Fix: define `type UserListByOrgRow = db.UserListByOrgRow` (type alias) in the `workflow` func package, so the field declaration uses the bare name `[]UserListByOrgRow` which is identical to `[]db.UserListByOrgRow` via Go type alias semantics. Validated OK; however, at `go build` the generated handler passes `[]db.UserListByOrgRow` while the func's param is `[]workflow.UserListByOrgRow` — identical types via alias, but the codegen and the arts func file were out of sync (arts had the old pre-alias version). Fixed by updating the arts func file to use the type alias.
+  2. `convert_workflow.go` nullable UUID conversion: Generated `AssignedTo: ptrOf(openapi_types.UUID(pgtypex.FromPgUUIDPtr(row.AssignedTo)))` is invalid — `FromPgUUIDPtr` returns `*openapi_types.UUID` (pointer) and cannot be type-converted to the non-pointer `openapi_types.UUID`. Fix: `AssignedTo: pgtypex.FromPgUUIDPtr(row.AssignedTo)` (no `ptrOf` wrapper, no type conversion). This is a yongol codegen bug for nullable UUID columns in `convertT` helper functions.
+
+## Final Summary (Updated)
 
 | Stage | Duration | Cumulative |
 |---|---|---|
@@ -190,7 +241,10 @@ Variable redeclaration bug: when SSaC reuses the same variable name in a second 
 | Add-on 05 | ~10m | ~71m |
 | Add-on 06 | ~6m | ~77m |
 | Add-on 07 | ~14m | ~91m |
+| Add-on 08 | ~10m | ~101m |
+| Add-on 09 | ~14m | ~115m |
+| Add-on 10 | ~16m | ~131m |
 
-Total endpoints: 29
+Total endpoints: 30
 Total tables: 12 (6 core + fullend_queue + webhooks + templates + fullend_sessions + fullend_cache + audit_logs)
-Total hurl requests: 57
+Total hurl requests: 64

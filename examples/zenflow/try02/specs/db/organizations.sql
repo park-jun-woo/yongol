@@ -2,5 +2,8 @@ CREATE TABLE organizations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
     plan_type TEXT NOT NULL CHECK (plan_type IN ('free', 'pro', 'enterprise')),
-    credits_balance BIGINT NOT NULL DEFAULT 0
+    credits_balance BIGINT NOT NULL DEFAULT 0,
+    latitude DOUBLE PRECISION, -- @nullable
+    longitude DOUBLE PRECISION, -- @nullable
+    address_verified BOOLEAN NOT NULL DEFAULT false
 );

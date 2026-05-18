@@ -5,6 +5,7 @@ package authz
 # @ownership template: templates.org_id
 # @ownership execution_log: execution_logs.org_id
 # @ownership audit_log: audit_logs.org_id
+# @ownership organization: organizations.id
 
 import future.keywords.if
 
@@ -220,4 +221,29 @@ allow if {
     input.action == "GetExecutionDetail"
     input.resource == "execution_log"
     is_same_org_execution_log
+}
+
+allow if {
+    input.action == "SaveWorkflowActions"
+    input.resource == "workflow"
+    is_admin
+    is_same_org
+}
+
+is_same_org_organization if {
+    data.owners.organization[input.resource_id] == input.claims.org_id
+}
+
+allow if {
+    input.action == "VerifyOrgAddress"
+    input.resource == "organization"
+    is_admin
+    is_same_org_organization
+}
+
+allow if {
+    input.action == "AutoAssignWorkflow"
+    input.resource == "workflow"
+    is_admin
+    is_same_org
 }

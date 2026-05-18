@@ -1,0 +1,12 @@
+package org
+
+import "github.com/park-jun-woo/zenflow/internal/geocoding"
+
+// @auth "VerifyOrgAddress" "organization" {ResourceID: request.id} "Forbidden"
+// @get Organization org = Organization.FindByID({ID: request.id})
+// @empty org "Organization not found"
+// @call GeocodeResponse geo = geocoding.Geocode({Address: request.address})
+// @put Organization.UpdateGeocode({ID: request.id, Latitude: geo.Latitude, Longitude: geo.Longitude})
+// @get Organization updatedOrg = Organization.FindByID({ID: request.id})
+// @response updatedOrg
+func VerifyOrgAddress() {}
