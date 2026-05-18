@@ -1,5 +1,9 @@
 # yongol
 
+<p align="center">
+  <img src="yongol.webp" alt="yongol — the keel of your AI-coded SaaS" width="480">
+</p>
+
 The keel of your AI-coded SaaS.
 
 **Add 10 endpoints to a 500-endpoint codebase in 30 minutes. Nothing breaks.**
