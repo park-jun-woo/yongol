@@ -32,6 +32,8 @@ Adding features never slowed down. Existing tests never broke.
 
 A full-stack SSOT orchestrator. Validates the consistency of 8 declarative sources and generates code from them.
 
+> **Status:** Go+Gin backend generation is **Beta** — functional end-to-end. React frontend generation is **Alpha** (work in progress).
+
 ## Quick Start
 
 ```bash
