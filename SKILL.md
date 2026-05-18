@@ -124,5 +124,5 @@ Requires Go 1.25+.
 | `manual-for-ai.md` | Complete AI manual: all SSOT syntax, conventions, examples |
 | `rulebook.md` | ~270 validation rules with IDs, levels, descriptions |
 | `codebook.yaml` | Feature/type/topic keyword index |
-| `examples/zenflow/` | Working SSOT example project: specs, add-on specs, benchmark reports. SSOT 작성 시 참고할 것 |
+| `examples/zenflow/` | Working SSOT example project: specs, add-on specs, benchmark reports. Refer to this when writing SSOTs |
 | `README.md` | Quick start and benchmarks |

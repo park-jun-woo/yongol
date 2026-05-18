@@ -168,9 +168,9 @@ Standard SQL DDL and sqlc. Details: [`docs/ddl.md`](docs/ddl.md).
 - Cardinality maps: `:one` → `*T`, `:many` → `[]T`, `:exec` → no return.
 - Positional `$N` is forbidden (D-7). Use `@name` for WHERE/SET/VALUES,
   `sqlc.arg(name)` inside LIMIT/OFFSET or arithmetic.
-- `page`/`per_page` query param 의 `format` 은 sqlc LIMIT/OFFSET 타입과
-  일치해야 한다 (XQS-72). sqlc 기본은 `int32`. `format: int64` 사용 시
-  sqlc 쿼리에 `::bigint` 캐스트 필요, 또는 `format: int32` 로 통일.
+- `page`/`per_page` query param `format` must match the sqlc LIMIT/OFFSET
+  type (XQS-72). sqlc defaults to `int32`. If using `format: int64`, add
+  `::bigint` cast in the sqlc query, or use `format: int32` consistently.
 - Avoid Go-reserved column names (`type`, `range`, `select`, `map`, …) — rename
   to `tx_type`, `date_range`, etc.
 - `NOT NULL DEFAULT 0` FK sentinel pattern avoids nullable FKs; the referenced
@@ -223,7 +223,7 @@ build). Full reference: [`docs/ssac.md`](docs/ssac.md).
 | `@post` | Create | `Type var = Model.Method(args...)` | Required |
 | `@put` | Update (no return) | `Model.Method(args...)` | Required |
 | `@delete` | Delete | `Model.Method(args...)` | 0 args → WARNING |
-| `@empty` | Guard: nil/zero → 404 | `target "message" [STATUS]` | default 404. Target must be a Model var (S-64); scalars rejected. S-37 은 단일 Model 조회만 적용 — scalar 결과에는 `@empty` 불필요. |
+| `@empty` | Guard: nil/zero → 404 | `target "message" [STATUS]` | default 404. Target must be a Model var (S-64); scalars rejected. S-37 applies only to single-Model queries — `@empty` is not needed for scalar results. |
 | `@exists` | Guard: not nil → 409 | `target "message" [STATUS]` | default 409. Target must be a Model var (S-64); scalars rejected. |
 | `@state` | State transition | `diagramID {inputs} "transition" "message" [STATUS]` | default 409 |
 | `@auth` | Permission check | `"action" "resource" {inputs} "message" [STATUS]` | default 403 |
@@ -263,15 +263,15 @@ quotes; numeric / boolean / `nil` as Go literals.
   property names (snake_case or camelCase, whichever OpenAPI uses).
 - Every other source uses Go PascalCase (`user.Email`, `course.InstructorID`).
 - `config.*` is forbidden; custom funcs read env vars directly.
-- `@auth` Inputs 의 `ResourceID` 값은 `string` 호환 타입이어야 한다
-  (XFS-70). `request.id` (OpenAPI path param = string) 사용을 권장.
-  DB row 의 UUID 필드 (`wf.ID` 등) 는 `pgtype.UUID` 이므로 직접 전달 불가.
-- `@call` 에 `request.*` 를 전달할 때 OpenAPI param 타입과 Func Request
-  필드 타입이 일치해야 한다 (XFS-73). path param `format: uuid` 는
-  `openapi_types.UUID` — Func 필드도 `openapi_types.UUID` 로 선언할 것.
-- `@state` Inputs 값도 `string` 호환이어야 한다 (XSM-71).
-  `{status: wf.Status}` (TEXT 컬럼 = string) 는 OK.
-  `{ID: wf.ID}` (UUID 컬럼 = pgtype.UUID) 는 불필요하며 타입 에러.
+- `@auth` Inputs `ResourceID` value must be a `string`-compatible type
+  (XFS-70). Use `request.id` (OpenAPI path param = string).
+  DB row UUID fields (`wf.ID` etc.) are `pgtype.UUID` and cannot be passed directly.
+- When passing `request.*` to `@call`, the OpenAPI param type must match
+  the Func Request field type (XFS-73). Path param `format: uuid` maps to
+  `openapi_types.UUID` — declare the Func field as `openapi_types.UUID` too.
+- `@state` Inputs values must also be `string`-compatible (XSM-71).
+  `{status: wf.Status}` (TEXT column = string) is OK.
+  `{ID: wf.ID}` (UUID column = pgtype.UUID) is unnecessary and causes a type error.
 - Reserved sources (`currentUser`, `request`, `query`, `message`) must
   always appear in **dotted** form inside `@post` / `@put` Inputs —
   e.g. `currentUser.Email`, never `currentUser` alone (S-70). Standalone
