@@ -24,6 +24,9 @@ func (g *methodGen) renderResponseFieldHoisted(
 		return fmt.Sprintf("\t%s: %s,", goFieldName, varExpr)
 	}
 	if isLiteral(varExpr) {
+		if isIntegerLiteralStr(varExpr) {
+			varExpr = "int64(" + varExpr + ")"
+		}
 		return fmt.Sprintf("\t%s: ptrOf(%s),", goFieldName, varExpr)
 	}
 	return fmt.Sprintf("\t%s: &%s,", goFieldName, varExpr)

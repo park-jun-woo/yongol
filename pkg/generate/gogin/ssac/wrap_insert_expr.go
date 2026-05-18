@@ -38,6 +38,13 @@ func (g *methodGen) wrapInsertExpr(inputKey, rendered string, alreadyPgtype bool
 		return rendered, nil
 	}
 
+	// BUG-072 Pattern 1b: nil literal cannot be passed to a pgtypex bridge
+	// function (e.g. ToPgInt8(nil) — nil is not assignable to int64).
+	// Emit the pgtype zero value directly: pgtype.Int8{}, pgtype.Text{}, etc.
+	if rendered == "nil" && binding.Kind == types.KindPgtype {
+		return binding.SqlcGoType + "{}", []string{`"github.com/jackc/pgx/v5/pgtype"`}
+	}
+
 	// BUG-072 Pattern 3: integer literals need an explicit Go type cast so
 	// the pgtypex bridge function receives the correct sized integer.
 	// e.g. "1" → "int64(1)" when the column is BIGINT (pgtype.Int8).
