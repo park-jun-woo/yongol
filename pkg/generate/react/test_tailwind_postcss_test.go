@@ -1,5 +1,5 @@
 //ff:func feature=gen-react type=test control=sequence
-//ff:what writeTailwindConfig postcss.config.js 생성 검증
+//ff:what writeTailwindConfig postcss.config.cjs 생성 검증
 
 package react
 
@@ -18,7 +18,7 @@ func TestWriteTailwindConfig_PostcssEmitted(t *testing.T) {
 	if err := writeTailwindConfig(dir, nil, nil); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := os.Stat(filepath.Join(dir, "postcss.config.js")); os.IsNotExist(err) {
-		t.Error("postcss.config.js not emitted")
+	if _, err := os.Stat(filepath.Join(dir, "postcss.config.cjs")); os.IsNotExist(err) {
+		t.Error("postcss.config.cjs not emitted")
 	}
 }

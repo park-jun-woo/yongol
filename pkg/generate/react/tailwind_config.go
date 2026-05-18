@@ -66,7 +66,7 @@ func writeTailwindConfig(frontendDir string, theme *manifest.FrontendTheme, dspe
   },
 }
 `
-	if err := os.WriteFile(filepath.Join(frontendDir, "postcss.config.js"), []byte(postcss), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(frontendDir, "postcss.config.cjs"), []byte(postcss), 0o644); err != nil {
 		return err
 	}
 
