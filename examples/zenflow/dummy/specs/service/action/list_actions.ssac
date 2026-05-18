@@ -1,7 +1,0 @@
-package service
-
-// @no-pagination
-// @auth "ListActions" "workflow" {ResourceID: request.id} "Forbidden"
-// @get []Action actions = Action.ListByWorkflowID({WorkflowID: request.id})
-// @response { actions: actions }
-func ListActions() {}
