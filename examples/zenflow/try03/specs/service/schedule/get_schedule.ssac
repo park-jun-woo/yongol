@@ -1,0 +1,10 @@
+package service
+
+import "github.com/park-jun-woo/zenflow/internal/schedule"
+import "github.com/park-jun-woo/ssac/pkg/session"
+
+// @auth "GetSchedule" "workflow" {ResourceID: request.id} "Forbidden"
+// @call BuildScheduleKeyResponse keyResult = schedule.BuildScheduleKey({WorkflowID: request.id})
+// @call GetResponse sessionResp = session.Get({Key: keyResult.Key})
+// @response { cron: sessionResp.Value, next_fire: "" }
+func GetSchedule() {}

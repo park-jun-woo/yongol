@@ -1,0 +1,10 @@
+package service
+
+import "github.com/park-jun-woo/zenflow/internal/dashboard"
+
+// @auth "GetDashboard" "organization" {} "Forbidden"
+// @get Organization org = Organization.FindByID({ID: currentUser.OrgID})
+// @empty org "Organization not found" 404
+// @call SummarizeResponse summary = dashboard.Summarize({OrgID: org.ID, OrgName: org.Name, PlanType: org.PlanType, CreditsBalance: org.CreditsBalance})
+// @response { summary: summary }
+func GetDashboard() {}

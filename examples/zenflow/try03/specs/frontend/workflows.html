@@ -1,0 +1,16 @@
+<main>
+  <section data-fetch="ListWorkflows">
+    <ul data-each="workflows">
+      <li>
+        <span data-bind="title"></span>
+        <span data-bind="status"></span>
+      </li>
+    </ul>
+  </section>
+
+  <div data-action="CreateWorkflow">
+    <input data-field="title" type="text" />
+    <input data-field="trigger_event" type="text" />
+    <button type="submit">Create</button>
+  </div>
+</main>

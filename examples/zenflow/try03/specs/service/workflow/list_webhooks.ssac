@@ -1,0 +1,7 @@
+package service
+
+// @auth "ListWebhooks" "webhook" {} "Forbidden"
+// @no-pagination
+// @get []Webhook webhooks = Webhook.ListByOrg({OrgID: currentUser.OrgID})
+// @response { webhooks: webhooks }
+func ListWebhooks() {}

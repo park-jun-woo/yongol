@@ -1,0 +1,17 @@
+-- name: ExecutionLogCreate :one
+INSERT INTO execution_logs (workflow_id, org_id, status, credits_spent)
+VALUES (@workflow_id, @org_id, @status, @credits_spent)
+RETURNING *;
+
+-- name: ExecutionLogFindByID :one
+SELECT * FROM execution_logs WHERE id = @id;
+
+-- name: ExecutionLogUpdateReportKey :exec
+UPDATE execution_logs SET report_key = @report_key WHERE id = @id;
+
+-- name: ExecutionLogListByWorkflow :many
+-- +no-pagination
+SELECT * FROM execution_logs WHERE workflow_id = @workflow_id ORDER BY executed_at DESC;
+
+-- name: OwnerLookupExecutionLog :one
+SELECT org_id FROM execution_logs WHERE id = @id;

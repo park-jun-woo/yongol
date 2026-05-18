@@ -1,0 +1,15 @@
+package service
+
+import "github.com/park-jun-woo/zenflow/internal/workflow"
+
+// @state-neutral
+// @no-pagination
+// @auth "SaveWorkflowActions" "workflow" {ResourceID: request.id} "Forbidden"
+// @get Workflow wf = Workflow.FindByID({ID: request.id})
+// @empty wf "Workflow not found"
+// @call SerializeActionsResponse serialized = workflow.SerializeActions({Items: request.items})
+// @delete Action.DeleteByWorkflow({WorkflowID: wf.ID})
+// @put Action.BatchInsert({WorkflowID: wf.ID, Items: serialized.ItemsJSON})
+// @get []Action actions = Action.ListByWorkflow({WorkflowID: wf.ID})
+// @response { actions: actions }
+func SaveWorkflowActions() {}

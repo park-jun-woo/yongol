@@ -1,0 +1,9 @@
+package service
+
+// @auth "ListExecutionLogs" "workflow" {ResourceID: request.id} "Forbidden"
+// @get Workflow wf = Workflow.FindByID({ID: request.id})
+// @empty wf "Workflow not found"
+// @no-pagination
+// @get []ExecutionLog execLogs = ExecutionLog.ListByWorkflow({WorkflowID: wf.ID})
+// @response { execution_logs: execLogs }
+func ListExecutionLogs() {}

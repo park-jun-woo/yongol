@@ -1,0 +1,35 @@
+openapi: "3.0.3"
+info:
+  title: Geocoding API
+  version: "1.0.0"
+servers:
+  - url: http://localhost:9999
+paths:
+  /geocode:
+    post:
+      operationId: Geocode
+      summary: Geocode an address
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [address]
+              properties:
+                address:
+                  type: string
+      responses:
+        '200':
+          description: Geocoding result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  latitude:
+                    type: string
+                  longitude:
+                    type: string
+                  verified:
+                    type: boolean

@@ -1,0 +1,19 @@
+<main>
+  <section data-fetch="GetDashboard">
+    <div data-bind="summary.org_name"></div>
+    <div data-bind="summary.plan_type"></div>
+    <div data-bind="summary.credits_balance"></div>
+    <div data-component="CreditsGauge" data-bind="summary"></div>
+  </section>
+
+  <article data-fetch="GetAuditLog" data-param-id="route.id">
+    <span data-bind="audit_log.action"></span>
+    <span data-bind="audit_log.detail"></span>
+  </article>
+
+  <article data-fetch="GetExecutionDetail" data-param-id="route.id">
+    <span data-bind="detail.workflow_title"></span>
+    <span data-bind="detail.status"></span>
+    <span data-bind="detail.credits_spent"></span>
+  </article>
+</main>
