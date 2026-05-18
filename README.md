@@ -4,6 +4,9 @@
   <img src="yongol.webp" alt="yongol — the keel of your AI-coded SaaS" width="480">
 </p>
 
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![skills.sh](https://skills.sh/b/park-jun-woo/yongol)](https://skills.sh/park-jun-woo/yongol)
+
 The keel of your AI-coded SaaS.
 
 **Add 10 endpoints to a 100-endpoint codebase in 30 minutes. Nothing breaks.**
