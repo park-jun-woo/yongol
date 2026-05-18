@@ -39,7 +39,7 @@ func (g *methodGen) ownershipLookup(seq ssacparser.Sequence, mapping *rego.Owner
 	alreadyPgtype := !strings.HasPrefix(rawRID, "request.")
 	sqlcArg, imports := resolvePKSqlcArg(pkCol, ridExpr, alreadyPgtype)
 
-	ownerAssign := g.assignOp(true)
+	ownerAssign := g.assignOp(true, ownerVar)
 	lines := []string{
 		fmt.Sprintf("%s, err %s %s.%s(ctx, %s)", ownerVar, ownerAssign, queriesRecv, queryName, sqlcArg),
 		"if err != nil {",

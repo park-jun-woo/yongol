@@ -67,7 +67,7 @@ func (g *methodGen) buildVerifyPassword(seq ssacparser.Sequence) ([]string, []st
 	col := lookupDDLColumn(g.DDLTables, seq.Model, "id")
 	guard := zeroValueCheckWithCol(varName+".ID", col)
 
-	assign := g.assignOp(true) // binds a new variable
+	assign := g.assignOp(true, varName) // binds a new variable
 	lines := []string{
 		fmt.Sprintf("%s, err %s %s.%s(ctx, %s)", varName, assign, g.queryVar(), findMethod, emailArg),
 		"if err != nil && !errors.Is(err, pgx.ErrNoRows) { " + g.returnErr() + " }",

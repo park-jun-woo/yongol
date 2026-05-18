@@ -16,10 +16,11 @@ import (
 // list must include the otel module so the dedup phase keeps it.
 func TestBuildCall_WrapCallsOn(t *testing.T) {
 	g := &methodGen{
-		FuncName:   "CreateUser",
-		FileName:   "user_service.ssac",
-		ModulePath: "example.com/zenflow",
-		WrapCalls:  true,
+		FuncName:     "CreateUser",
+		FileName:     "user_service.ssac",
+		ModulePath:   "example.com/zenflow",
+		WrapCalls:    true,
+		DeclaredVars: make(map[string]bool),
 	}
 	seq := ssacparser.Sequence{
 		Type:  "call",

@@ -42,7 +42,7 @@ func (g *methodGen) buildCall(seq ssacparser.Sequence) ([]string, []string) {
 	if seq.Result != nil {
 		varName = seq.Result.Var
 	}
-	assign := g.assignOp(varName != "_")
+	assign := g.assignOp(varName != "_", varName)
 
 	msg := seq.Message
 	if msg == "" {

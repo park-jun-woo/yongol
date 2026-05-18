@@ -36,7 +36,7 @@ func (g *methodGen) buildAuthRefreshStoreCall(seq ssacparser.Sequence, callFunc 
 	if seq.Result != nil {
 		varName = seq.Result.Var
 	}
-	assign := g.assignOp(varName != "_")
+	assign := g.assignOp(varName != "_", varName)
 
 	msg := seq.Message
 	if msg == "" {

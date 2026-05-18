@@ -20,7 +20,7 @@ func (g *methodGen) buildPut(seq ssacparser.Sequence) ([]string, []string) {
 		g.FirstErr = false
 		assign = "="
 	} else {
-		assign = g.assignOp(false)
+		assign = g.assignOp(false, "")
 	}
 	lines := append([]string(nil), preamble...)
 	lines = append(lines,

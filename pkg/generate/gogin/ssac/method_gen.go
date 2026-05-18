@@ -104,4 +104,9 @@ type methodGen struct {
 	// SQLcQueries. Cleared back to empty after each emission so leakage
 	// across sequences cannot misdirect a downstream literal wrap.
 	activeMethod string
+	// DeclaredVars tracks result variable names already introduced via :=
+	// in the current method. When assignOp receives a resultVar that is
+	// already in this set it returns = instead of := to avoid a
+	// "no new variables on left side of :=" compile error (BUG-069).
+	DeclaredVars map[string]bool
 }

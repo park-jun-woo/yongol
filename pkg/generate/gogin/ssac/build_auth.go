@@ -35,7 +35,7 @@ func (g *methodGen) buildAuth(seq ssacparser.Sequence) ([]string, []string) {
 	// ownership branch below runs it re-evaluates assignOp after emitting
 	// the owner lookup (which itself declares err via :=), so `assign`
 	// must remain reactive to methodGen's FirstErr state. (BUG-029)
-	assign := g.assignOp(false)
+	assign := g.assignOp(false, "")
 
 	mapping := findOwnershipMapping(g.Ownerships, seq.Resource)
 	imports := []string{`"github.com/park-jun-woo/ssac/pkg/authz"`, `"log/slog"`}
@@ -45,7 +45,7 @@ func (g *methodGen) buildAuth(seq ssacparser.Sequence) ([]string, []string) {
 	if len(ownerLines) > 0 {
 		// After emitting the initial lookup, subsequent err assignments in
 		// this block must reuse `=` (the first := already declared err).
-		assign = g.assignOp(false)
+		assign = g.assignOp(false, "")
 	}
 
 	checkFields := []string{

@@ -15,12 +15,13 @@ import (
 // emitted and Owners is passed as nil.
 func TestBuildAuth_NoOwnershipMappingUnchanged(t *testing.T) {
 	g := &methodGen{
-		FuncName:   "ListWorkflows",
-		FileName:   "workflow_service.ssac",
-		ModulePath: "example.com/zenflow",
-		UseTx:      false,
-		FirstErr:   true,
-		Ownerships: nil,
+		FuncName:     "ListWorkflows",
+		FileName:     "workflow_service.ssac",
+		ModulePath:   "example.com/zenflow",
+		UseTx:        false,
+		FirstErr:     true,
+		Ownerships:   nil,
+		DeclaredVars: make(map[string]bool),
 	}
 	seq := ssacparser.Sequence{
 		Type:     "auth",

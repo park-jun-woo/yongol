@@ -25,6 +25,7 @@ func TestBuildAuth_ResourceIDNonZero_KeepsOwnerLookup(t *testing.T) {
 		Ownerships: []rego.OwnershipMapping{
 			{Resource: "workflow", Table: "workflows", Column: "owner_id"},
 		},
+		DeclaredVars: make(map[string]bool),
 	}
 	seq := ssacparser.Sequence{
 		Type:     "auth",

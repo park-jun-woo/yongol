@@ -22,7 +22,7 @@ func (g *methodGen) buildGet(seq ssacparser.Sequence, next *ssacparser.Sequence)
 	if seq.Result != nil {
 		varName = seq.Result.Var
 	}
-	assign := g.assignOp(varName != "_")
+	assign := g.assignOp(varName != "_", varName)
 	preamble, argStr, argImports := g.sqlcArgs(method, seq.Inputs)
 
 	imports := append([]string(nil), argImports...)

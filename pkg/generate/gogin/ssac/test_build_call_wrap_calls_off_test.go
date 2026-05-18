@@ -15,10 +15,11 @@ import (
 // projects that leave wrap_calls off have identical output.
 func TestBuildCall_WrapCallsOff(t *testing.T) {
 	g := &methodGen{
-		FuncName:   "CreateUser",
-		FileName:   "user_service.ssac",
-		ModulePath: "example.com/zenflow",
-		WrapCalls:  false,
+		FuncName:     "CreateUser",
+		FileName:     "user_service.ssac",
+		ModulePath:   "example.com/zenflow",
+		WrapCalls:    false,
+		DeclaredVars: make(map[string]bool),
 	}
 	seq := ssacparser.Sequence{
 		Type:  "call",
