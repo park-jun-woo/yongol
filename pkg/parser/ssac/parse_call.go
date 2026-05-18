@@ -3,6 +3,7 @@
 package ssac
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 )
@@ -24,6 +25,9 @@ func parseCall(rest string) (*Sequence, error) {
 		result := parseResult(lhs)
 		if result == nil {
 			return nil, nil
+		}
+		if strings.Contains(result.Type, ".") {
+			return nil, fmt.Errorf("@call result type must be a bare struct name, not package-qualified: %q", result.Type)
 		}
 		seq.Result = result
 

@@ -30,5 +30,9 @@ func ParseReader(filename string, r io.Reader) (PageSpec, []diagnostic.Diagnosti
 	}
 
 	walkTopLevel(doc, &page)
+
+	if diags := collectEachDiags(&page, filename); len(diags) > 0 {
+		return page, diags
+	}
 	return page, nil
 }

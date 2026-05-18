@@ -1,11 +1,22 @@
 //ff:func feature=stml-parse type=parser control=selection
-//ff:what each 블록 내 단일 요소를 분기 처리
+//ff:what each 블록 내 단일 요소를 분기 처리 (data-action 거부 포함)
 package stml
 
-import "golang.org/x/net/html"
+import (
+	"golang.org/x/net/html"
+
+	"github.com/park-jun-woo/yongol/pkg/diagnostic"
+)
 
 func dispatchEachChild(n *html.Node, eb *EachBlock) bool {
 	switch {
+	case getAttr(n, "data-action") != "":
+		eb.Diags = append(eb.Diags, diagnostic.Diagnostic{
+			Phase:   diagnostic.PhaseParse,
+			Level:   diagnostic.LevelError,
+			Message: "TM-10: data-action is not allowed inside data-each; move it to the parent data-fetch",
+		})
+		return true
 	case getAttr(n, "data-bind") != "":
 		field := getAttr(n, "data-bind")
 		bind := FieldBind{
