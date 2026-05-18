@@ -26,6 +26,8 @@ Vibe coding hits a wall around 200 endpoints: the AI loses the global picture, p
 
 Adding features never slowed down. Existing tests never broke.
 
+[Full benchmark report (Sonnet, try02)](examples/zenflow/try02/REPORT.md) — 29 endpoints, 12 tables, 57 hurl requests, ~91 min total.
+
 ---
 
 A full-stack SSOT orchestrator. Validates the consistency of 8 declarative sources and generates code from them.
