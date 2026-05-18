@@ -18,8 +18,14 @@ backend:
       OrgID: org_id:uuid
   middleware:
     - bearerAuth
+cache:
+  backend: postgres
 queue:
   backend: postgres
+session:
+  backend: postgres
+file:
+  backend: local
 frontend:
   lang: typescript
   framework: react

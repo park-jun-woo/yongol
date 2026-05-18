@@ -1,0 +1,16 @@
+package workflow
+
+import (
+	"github.com/park-jun-woo/ssac/pkg/session"
+	"github.com/park-jun-woo/zenflow/internal/schedule"
+)
+
+// @state-neutral
+// @auth "SetSchedule" "workflow" {ResourceID: request.id} "Forbidden"
+// @get Workflow wf = Workflow.FindByID({ID: request.id})
+// @empty wf "Workflow not found"
+// @call schedule.ParseCronResponse parsed = schedule.ParseCron({Expression: request.cron})
+// @call schedule.ScheduleKeyResponse keyResult = schedule.ScheduleKey({WorkflowID: request.id})
+// @call session.Set({Key: keyResult.Key, Value: parsed.Expression, TTL: 2592000})
+// @response { expression: parsed.Expression, next_run: parsed.NextRun }
+func SetSchedule() {}

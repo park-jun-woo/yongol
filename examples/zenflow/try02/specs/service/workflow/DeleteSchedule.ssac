@@ -1,0 +1,15 @@
+package workflow
+
+import (
+	"github.com/park-jun-woo/ssac/pkg/session"
+	"github.com/park-jun-woo/zenflow/internal/schedule"
+)
+
+// @state-neutral
+// @auth "DeleteSchedule" "workflow" {ResourceID: request.id} "Forbidden"
+// @get Workflow wf = Workflow.FindByID({ID: request.id})
+// @empty wf "Workflow not found"
+// @call schedule.ScheduleKeyResponse keyResult = schedule.ScheduleKey({WorkflowID: request.id})
+// @call session.Delete({Key: keyResult.Key})
+// @response!
+func DeleteSchedule() {}

@@ -1,0 +1,14 @@
+package workflow
+
+import "github.com/park-jun-woo/zenflow/internal/versioning"
+
+// @state-neutral
+// @auth "CreateWorkflowVersion" "workflow" {ResourceID: request.id} "Forbidden"
+// @get Workflow wf = Workflow.FindByID({ID: request.id})
+// @empty wf "Workflow not found"
+// @call versioning.ResolveRootIDResponse rootRes = versioning.ResolveRootID({WorkflowID: wf.ID, RootWorkflowID: wf.RootWorkflowID})
+// @call versioning.NextVersionResponse verRes = versioning.NextVersion({CurrentVersion: wf.Version})
+// @post Workflow newWf = Workflow.CreateVersion({OrgID: wf.OrgID, Title: wf.Title, TriggerEvent: wf.TriggerEvent, Version: verRes.Version, RootWorkflowID: rootRes.RootID})
+// @put Action.CopyToWorkflow({NewWorkflowID: newWf.ID, SrcWorkflowID: wf.ID})
+// @response newWf
+func CreateWorkflowVersion() {}

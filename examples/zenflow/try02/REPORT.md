@@ -69,7 +69,7 @@ Variable redeclaration bug: when SSaC reuses the same variable name in a second 
 - Issues:
   1. sqlc ambiguous column reference: `ActionCopyToWorkflow` INSERT...SELECT required table alias `src` to avoid ambiguity between INSERT column `workflow_id` and SELECT column `workflow_id`.
   2. SSOT authoring error (not a yongol bug): used `request.id` (openapi_types.UUID) for `@put` sqlc param expecting pgtype.UUID. XFS-73 is `@call`-only — correct rule is XQS-18. manual-for-ai.md states: use fetched model fields (`wf.ID`) for sqlc params, not `request.id`. Fixed by using `wf.ID`.
-  3. pgtype.UUID zero-value comparison bug in ResolveRootID func: `pgtype.UUID{}` has `Valid=false` but the DB-returned zero UUID `'00000000-0000-0000-0000-000000000000'` has `Valid=true`. Struct equality check failed. Fixed by comparing `Bytes [16]byte` directly instead.
+  3. pgtype.UUID zero-value comparison (not a yongol bug): Go의 `pgtype.UUID{}` (Valid=false)와 DB에서 온 zero UUID (Valid=true)는 struct 비교 시 불일치. pgtype 라이브러리 특성. `Bytes [16]byte` 직접 비교로 해결.
   4. Hurl scenario: initial version used `v2_id` for ListWorkflowVersions — wrong; the query requires the original workflow's ID. Fixed by querying with `workflow_id` and removing unused `v2_id` capture.
   5. DB seeding: initial setup only seeded one org/user. Invariant tests required `admin-b@zenflow.test` and `zero@zenflow.test` in separate orgs.
 

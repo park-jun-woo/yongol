@@ -1,0 +1,12 @@
+-- name: ActionCreate :one
+INSERT INTO actions (workflow_id, action_type, config, sequence_order)
+VALUES (@workflow_id, @action_type, @config, @sequence_order)
+RETURNING *;
+
+-- name: ActionListByWorkflow :many
+-- +no-pagination
+SELECT * FROM actions WHERE workflow_id = @workflow_id ORDER BY sequence_order ASC;
+
+-- name: ActionCopyToWorkflow :exec
+INSERT INTO actions (workflow_id, action_type, config, sequence_order)
+SELECT @new_workflow_id, src.action_type, src.config, src.sequence_order FROM actions src WHERE src.workflow_id = @src_workflow_id;

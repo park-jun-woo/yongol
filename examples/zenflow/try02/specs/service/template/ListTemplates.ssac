@@ -1,0 +1,6 @@
+package template
+
+// @auth "ListTemplates" "template" {ResourceID: ""} "Forbidden"
+// @get []Template items = Template.ListCursor({Cursor: request.cursor, PerPage: request.per_page, Category: request.category})
+// @response { items: items }
+func ListTemplates() {}

@@ -1,0 +1,15 @@
+<main>
+  <section data-fetch="GetSchedule" data-param-id="route.id">
+    <span data-bind="expression"></span>
+    <span data-bind="next_run"></span>
+  </section>
+
+  <div data-action="SetSchedule" data-param-id="route.id">
+    <input data-field="cron" type="text" placeholder="Cron expression (e.g. 0 9 * * 1)" />
+    <button type="submit">Set Schedule</button>
+  </div>
+
+  <div data-action="DeleteSchedule" data-param-id="route.id">
+    <button type="submit">Delete Schedule</button>
+  </div>
+</main>
