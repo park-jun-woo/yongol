@@ -13,8 +13,8 @@ func (g *methodGen) sqlcArgsSingle(inputs map[string]string) (preamble []string,
 		}
 		rendered := g.mapValue(v)
 		rendered = g.wrapJSONBLiteral(k, rendered)
-		alreadyPgtype := !strings.HasPrefix(v, "request.") && !strings.HasPrefix(v, `"`)
-		rendered, extraImports := g.wrapInsertExpr(k, rendered, alreadyPgtype)
+		alreadyPgtype := !strings.HasPrefix(v, "request.") && !isLiteral(v)
+		rendered, extraImports := g.wrapInsertExpr(k, rendered, alreadyPgtype, v)
 		imports = append(imports, extraImports...)
 		return nil, "ctx, " + rendered, imports
 	}

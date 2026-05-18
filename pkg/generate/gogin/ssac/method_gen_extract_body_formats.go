@@ -16,6 +16,11 @@ func (g *methodGen) extractBodyFormats(op *openapi3.Operation) {
 	if mt == nil || mt.Schema == nil || mt.Schema.Value == nil {
 		return
 	}
+	// Populate BodyRequiredFields so wrapInsertExpr can distinguish
+	// value types (required) from pointer types (optional) in oapi-codegen
+	// output when choosing between Ptr / non-Ptr pgtypex variants (BUG-072).
+	g.BodyRequiredFields = requiredSet(mt.Schema.Value)
+
 	for propName, propRef := range mt.Schema.Value.Properties {
 		if propRef == nil || propRef.Value == nil {
 			continue

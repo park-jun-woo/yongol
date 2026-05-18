@@ -109,4 +109,11 @@ type methodGen struct {
 	// already in this set it returns = instead of := to avoid a
 	// "no new variables on left side of :=" compile error (BUG-069).
 	DeclaredVars map[string]bool
+	// BodyRequiredFields records the OpenAPI request body property names
+	// that are listed in the schema's `required` array. oapi-codegen emits
+	// these as value types (string, int64, …) while optional properties
+	// become pointers (*string, *int64, …). wrapInsertExpr consults this
+	// set to choose between Ptr and non-Ptr pgtypex bridge variants
+	// (BUG-072 Pattern 2).
+	BodyRequiredFields map[string]bool
 }

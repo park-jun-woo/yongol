@@ -69,7 +69,8 @@ func newMethodGen(doc *openapi3.T, sf ssacparser.ServiceFunc, modulePath string,
 		Ownerships:    ownerships,
 		DDLTables:     ddlTables,
 		SQLcQueries:   sqlcQueries,
-		DeclaredVars:  make(map[string]bool),
+		DeclaredVars:       make(map[string]bool),
+		BodyRequiredFields: make(map[string]bool),
 	}
 	if doc != nil {
 		g.extractFromOpenAPI(doc, sf.Name)
