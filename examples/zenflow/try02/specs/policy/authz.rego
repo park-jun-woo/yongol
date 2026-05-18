@@ -2,6 +2,9 @@ package authz
 
 # @ownership workflow: workflows.org_id
 # @ownership webhook: webhooks.org_id
+# @ownership template: templates.org_id
+# @ownership execution_log: execution_logs.org_id
+# @ownership audit_log: audit_logs.org_id
 
 import future.keywords.if
 
@@ -75,6 +78,12 @@ allow if {
 }
 
 allow if {
+    input.action == "ExecuteWithReport"
+    input.resource == "workflow"
+    is_same_org
+}
+
+allow if {
     input.action == "ListExecutionLogs"
     input.resource == "workflow"
     is_same_org
@@ -91,6 +100,16 @@ allow if {
     input.action == "ListWorkflowVersions"
     input.resource == "workflow"
     is_same_org
+}
+
+is_same_org_execution_log if {
+    data.owners.execution_log[input.resource_id] == input.claims.org_id
+}
+
+allow if {
+    input.action == "GetExecutionReport"
+    input.resource == "execution_log"
+    is_same_org_execution_log
 }
 
 is_same_org_webhook if {
@@ -115,4 +134,90 @@ allow if {
     input.resource == "webhook"
     is_admin
     is_same_org_webhook
+}
+
+is_same_org_template if {
+    data.owners.template[input.resource_id] == input.claims.org_id
+}
+
+allow if {
+    input.action == "PublishTemplate"
+    input.resource == "workflow"
+    is_admin
+    is_same_org
+}
+
+allow if {
+    input.action == "ListTemplates"
+    input.resource == "template"
+    is_authenticated
+}
+
+allow if {
+    input.action == "GetTemplate"
+    input.resource == "template"
+    is_authenticated
+}
+
+allow if {
+    input.action == "CloneTemplate"
+    input.resource == "template"
+    is_authenticated
+}
+
+allow if {
+    input.action == "SetSchedule"
+    input.resource == "workflow"
+    is_admin
+    is_same_org
+}
+
+allow if {
+    input.action == "GetSchedule"
+    input.resource == "workflow"
+    is_same_org
+}
+
+allow if {
+    input.action == "DeleteSchedule"
+    input.resource == "workflow"
+    is_admin
+    is_same_org
+}
+
+allow if {
+    input.action == "ListAuditLogs"
+    input.resource == "audit_log"
+    is_admin
+    is_authenticated
+}
+
+allow if {
+    input.action == "GetRecentAuditLogs"
+    input.resource == "audit_log"
+    is_admin
+    is_authenticated
+}
+
+is_same_org_audit_log if {
+    data.owners.audit_log[input.resource_id] == input.claims.org_id
+}
+
+allow if {
+    input.action == "GetAuditLog"
+    input.resource == "audit_log"
+    is_admin
+    is_same_org_audit_log
+}
+
+allow if {
+    input.action == "GetDashboard"
+    input.resource == "dashboard"
+    is_authenticated
+}
+
+allow if {
+    input.action == "GetExecutionDetail"
+    input.resource == "execution_log"
+    is_same_org_execution_log
 }
