@@ -7,33 +7,23 @@
 - Go: go1.25.0 linux/amd64
 - OS: Linux localhost 6.6.87.2-microsoft-standard-WSL2 x86_64
 
-## Timeline
-- Start: 2026-05-18T09:25:38Z
-- End: 2026-05-18T09:48:24Z
-- Total wall-clock: ~23 minutes
+## Summary
 
-## Stages
 | Stage | Description | Duration | Result |
 |---|---|---|---|
-| SSOT authoring | Write all spec files | ~10m | done |
-| Validation | yongol validate | ~8m (5 iterations) | pass (0 errors, 0 warnings) |
-| Generation | yongol generate | ~2m (5 attempts) | pass |
-| Build | go build ./... | ~1m (2 attempts) | pass |
-| Smoke test | hurl --test | ~2m (4 iterations) | pass (12/12 smoke + 7/7 invariants) |
+| Initial build | 10 endpoints, 6 tables, auth, state machine | ~23m | pass (19 hurl) |
+| Add-on 01 | Workflow versioning | ~16m | pass (28 hurl) |
+| Add-on 02 | Webhook notifications | ~8m | pass (31 hurl) |
+| Add-on 03 | Template marketplace | ~7m | pass (46 hurl) |
+| Add-on 04 | Execution report files | ~7m | pass (48 hurl) |
+| Add-on 05 | Workflow scheduling | ~10m | pass (52 hurl) |
+| Add-on 06 | Audit logs | ~6m | pass (54 hurl) |
+| Add-on 07 | Dashboard + relation enrichment | ~14m | pass (57 hurl) |
+| Add-on 08 | Batch operations | ~10m | pass (59 hurl) |
+| Add-on 09 | External API integration | ~14m | pass (60 hurl) |
+| Add-on 10 | Conditional update without @if | ~16m | pass (64 hurl) |
 
-## Validation iterations
-- Round 1: Parse errors — SSaC files missing package declaration
-- Round 2: 60+ errors — NOT NULL constraints, refresh_tokens DDL, claim names, CSRF mode, sqlc param casing, @eval type mismatch, missing OwnerLookupWorkflow query, etc.
-- Round 3: 8 errors — revoked_at nullable, XSD-55 refresh_tokens, XFS-44 type mismatch, XQP-30 OwnerLookupWorkflow, XNP-53 Rego claim names
-- Round 4: 1 error (XSD-55 refresh_tokens @archived placement) + 1 warning (XOH-05 invariant false positive)
-- Round 5: 0 errors, 0 warnings
-
-## Final stats
-- Tables: 6 (organizations, users, workflows, actions, execution_logs, refresh_tokens)
-- Endpoints: 10 (Login, CreateWorkflow, ListWorkflows, GetWorkflow, AddAction, ActivateWorkflow, PauseWorkflow, ArchiveWorkflow, ExecuteWorkflow, ListExecutionLogs)
-- Services: 10 SSaC functions (1 auth + 9 workflow)
-- Auth rules: 9 Rego allow rules
-- Hurl requests: 19 (12 smoke + 4 tenant-breach invariant + 3 insufficient-credits invariant)
+**Total: ~131 min, 30 endpoints, 12 tables, 64 hurl requests. All green.**
 
 ## Issues encountered
 
@@ -229,22 +219,3 @@ Variable redeclaration bug: when SSaC reuses the same variable name in a second 
   1. XFS-44 type mismatch for @call Members param: yongol infers DB query results using bare type names (e.g. `[]UserListByOrgRow`) but func declarations need Go-valid package-qualified names (e.g. `[]db.UserListByOrgRow`). These don't match as-is. Fix: define `type UserListByOrgRow = db.UserListByOrgRow` (type alias) in the `workflow` func package, so the field declaration uses the bare name `[]UserListByOrgRow` which is identical to `[]db.UserListByOrgRow` via Go type alias semantics. Validated OK; however, at `go build` the generated handler passes `[]db.UserListByOrgRow` while the func's param is `[]workflow.UserListByOrgRow` — identical types via alias, but the codegen and the arts func file were out of sync (arts had the old pre-alias version). Fixed by updating the arts func file to use the type alias.
   2. `convert_workflow.go` nullable UUID conversion: Generated `AssignedTo: ptrOf(openapi_types.UUID(pgtypex.FromPgUUIDPtr(row.AssignedTo)))` is invalid — `FromPgUUIDPtr` returns `*openapi_types.UUID` (pointer) and cannot be type-converted to the non-pointer `openapi_types.UUID`. Fix: `AssignedTo: pgtypex.FromPgUUIDPtr(row.AssignedTo)` (no `ptrOf` wrapper, no type conversion). This is a yongol codegen bug for nullable UUID columns in `convertT` helper functions.
 
-## Final Summary (Updated)
-
-| Stage | Duration | Cumulative |
-|---|---|---|
-| Initial build | ~23m | ~23m |
-| Add-on 01 | ~16m | ~39m |
-| Add-on 02 | ~8m | ~47m |
-| Add-on 03 | ~7m | ~54m |
-| Add-on 04 | ~7m | ~61m |
-| Add-on 05 | ~10m | ~71m |
-| Add-on 06 | ~6m | ~77m |
-| Add-on 07 | ~14m | ~91m |
-| Add-on 08 | ~10m | ~101m |
-| Add-on 09 | ~14m | ~115m |
-| Add-on 10 | ~16m | ~131m |
-
-Total endpoints: 30
-Total tables: 12 (6 core + fullend_queue + webhooks + templates + fullend_sessions + fullend_cache + audit_logs)
-Total hurl requests: 64
