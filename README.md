@@ -40,12 +40,7 @@ A full-stack SSOT orchestrator. Validates the consistency of 8 declarative sourc
 ## Quick Start
 
 ```bash
-# install
-go install github.com/park-jun-woo/yongol/cmd/yongol@latest
-
-# try with the bundled example
-git clone https://github.com/park-jun-woo/yongol && cd yongol
-yongol validate examples/zenflow
+npx skills add park-jun-woo/yongol
 ```
 
 ```
