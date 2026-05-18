@@ -6,7 +6,7 @@
 
 The keel of your AI-coded SaaS.
 
-**Add 10 endpoints to a 500-endpoint codebase in 30 minutes. Nothing breaks.**
+**Add 10 endpoints to a 100-endpoint codebase in 30 minutes. Nothing breaks.**
 
 Vibe coding hits a wall around 200 endpoints: the AI loses the global picture, patterns drift, and the 201st feature costs 10× the 21st. yongol shifts the AI workload from generated code to declarative SSOTs (8 specialized specs, ~10× context compression) and catches cross-layer drift before it compiles.
 
