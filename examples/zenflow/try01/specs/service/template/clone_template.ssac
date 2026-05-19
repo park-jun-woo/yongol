@@ -1,0 +1,8 @@
+package template
+
+// @state-neutral
+// @get Template template = Template.FindByID({ID: request.id})
+// @empty template "Template not found" 404
+// @auth "CloneTemplate" "user" {} "Permission denied"
+// @response {}
+func CloneTemplate() {}

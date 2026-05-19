@@ -1,0 +1,8 @@
+package workflow
+
+// @get Workflow workflow = Workflow.FindByID({ID: request.id})
+// @empty workflow "Workflow not found" 404
+// @auth "ListExecutionLogs" "workflow" {} "Permission denied"
+// @get []ExecutionLog items = ExecutionLog.ListByWorkflowID({WorkflowID: request.id, PerPage: request.per_page, Page: request.page})
+// @response { execution_logs: items }
+func ListExecutionLogs() {}

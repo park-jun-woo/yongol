@@ -1,0 +1,8 @@
+package webhook
+
+// @state-neutral
+// @get Webhook webhook = Webhook.FindByID({ID: request.id})
+// @empty webhook "Webhook not found" 404
+// @auth "DeleteWebhook" "webhook" {} "Permission denied"
+// @response {}
+func DeleteWebhook() {}

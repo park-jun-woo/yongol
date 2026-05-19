@@ -1,0 +1,8 @@
+package workflow
+
+// @state-neutral
+// @get ExecutionLog executionLog = ExecutionLog.FindByID({ID: request.id})
+// @empty executionLog "Execution log not found" 404
+// @auth "GetExecutionReport" "execution_log" {} "Permission denied"
+// @response {}
+func GetExecutionReport() {}

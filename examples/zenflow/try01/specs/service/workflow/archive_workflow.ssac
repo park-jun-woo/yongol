@@ -1,0 +1,10 @@
+package workflow
+
+// @get Workflow workflow = Workflow.FindByID({ID: request.id})
+// @empty workflow "Workflow not found" 404
+// @auth "ArchiveWorkflow" "workflow" {} "Permission denied"
+// @state workflow {status: workflow.Status} "ArchiveWorkflow" "Workflow archived"
+// @put Workflow.UpdateStatus({ID: workflow.ID, Status: "archived"})
+// @get Workflow updated = Workflow.FindByID({ID: workflow.ID})
+// @response { workflow: updated }
+func ArchiveWorkflow() {}

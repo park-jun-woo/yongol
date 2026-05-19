@@ -1,0 +1,5 @@
+package organization
+
+// @post Organization organization = Organization.Create({Name: request.name, PlanType: request.plan_type, CreditsBalance: request.credits_balance})
+// @response { organization: organization }
+func CreateOrganization() {}

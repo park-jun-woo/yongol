@@ -1,0 +1,5 @@
+package template
+
+// @state-neutral
+// @response {}
+func ListTemplates() {}

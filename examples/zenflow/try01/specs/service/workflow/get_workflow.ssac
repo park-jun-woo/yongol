@@ -1,0 +1,7 @@
+package workflow
+
+// @get Workflow workflow = Workflow.FindByID({ID: request.id})
+// @empty workflow "Workflow not found" 404
+// @auth "GetWorkflow" "workflow" {} "Permission denied"
+// @response { workflow: workflow }
+func GetWorkflow() {}

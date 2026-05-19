@@ -1,0 +1,8 @@
+package workflow
+
+// @no-pagination
+// @get Workflow workflow = Workflow.FindByID({ID: request.id})
+// @empty workflow "Workflow not found" 404
+// @get []Action actions = Action.ListByWorkflowID({WorkflowID: request.id})
+// @response { actions: actions }
+func ListActions() {}

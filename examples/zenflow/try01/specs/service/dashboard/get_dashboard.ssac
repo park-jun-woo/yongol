@@ -1,0 +1,6 @@
+package dashboard
+
+// @state-neutral
+// @auth "GetDashboard" "user" {} "Permission denied"
+// @response {}
+func GetDashboard() {}

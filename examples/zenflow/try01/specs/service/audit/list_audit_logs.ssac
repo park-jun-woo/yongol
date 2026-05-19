@@ -1,0 +1,6 @@
+package audit
+
+// @state-neutral
+// @auth "ListAuditLogs" "user" {} "Permission denied"
+// @response {}
+func ListAuditLogs() {}

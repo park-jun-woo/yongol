@@ -1,0 +1,6 @@
+package workflow
+
+// @auth "ListWorkflows" "workflow" {} "Forbidden"
+// @get []Workflow workflows = Workflow.ListByOrgID({OrgID: currentUser.OrgID, PerPage: request.per_page, Page: request.page})
+// @response { workflows: workflows }
+func ListWorkflows() {}

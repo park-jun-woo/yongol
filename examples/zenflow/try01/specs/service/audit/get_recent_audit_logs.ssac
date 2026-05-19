@@ -1,0 +1,6 @@
+package audit
+
+// @state-neutral
+// @auth "GetRecentAuditLogs" "user" {} "Permission denied"
+// @response {}
+func GetRecentAuditLogs() {}

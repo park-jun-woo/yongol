@@ -1,0 +1,6 @@
+package webhook
+
+// @state-neutral
+// @auth "ListWebhooks" "user" {} "Permission denied"
+// @response {}
+func ListWebhooks() {}

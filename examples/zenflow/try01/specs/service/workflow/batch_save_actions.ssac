@@ -1,0 +1,16 @@
+package workflow
+
+import "github.com/park-jun-woo/zenflow/internal/workflow"
+
+// @state-neutral
+// @get Workflow wf = Workflow.FindByID({ID: request.id})
+// @empty wf "Workflow not found" 404
+// @auth "BatchSaveActions" "workflow" {} "Permission denied"
+// @call BatchProcessActionsResponse serialized = workflow.BatchProcessActions({WorkflowID: wf.ID, Items: request.items})
+// @delete Action.DeleteByWorkflowID({WorkflowID: wf.ID})
+// @put Action.BatchInsert({WorkflowID: wf.ID, Items: serialized.ItemsJSON})
+// @no-pagination
+// @get []Action actions = Action.ListByWorkflowID({WorkflowID: wf.ID})
+
+// @response { actions: actions }
+func BatchSaveActions() {}
