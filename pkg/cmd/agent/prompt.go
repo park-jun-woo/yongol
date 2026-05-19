@@ -5,6 +5,7 @@ package agent
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 )
@@ -94,10 +95,55 @@ func layerName(l layer) string {
 	}
 }
 
-// buildSystemPrompt returns the system prompt with a layer-specific example.
-func buildSystemPrompt(l layer) string {
-	return "You fix yongol SSOT files. Output ONLY the corrected file content. No explanations. No markdown.\n\n" +
-		"Example for " + layerName(l) + ":\n" + layerExample(l)
+// buildSystemPrompt returns the system prompt with layer docs + example.
+// docsDir is the path to yongol's docs/ directory.
+func buildSystemPrompt(l layer, docsDir string) string {
+	base := "You fix yongol SSOT files. Output ONLY the corrected file content. No explanations. No markdown.\n\n"
+
+	doc := loadLayerDoc(l, docsDir)
+	if doc != "" {
+		base += doc + "\n\n"
+	}
+
+	base += "Example for " + layerName(l) + ":\n" + layerExample(l)
+	return base
+}
+
+// layerDocFile returns the docs filename for a layer.
+func layerDocFile(l layer) string {
+	switch l {
+	case layerSSaC:
+		return "ssac.md"
+	case layerDDL, layerSQLcQuery:
+		return "ddl.md"
+	case layerOpenAPI:
+		return "openapi.md"
+	case layerManifest:
+		return "manifest.md"
+	case layerRego:
+		return "policy.md"
+	case layerStateDiagram:
+		return "states.md"
+	case layerHurl:
+		return "scenario.md"
+	case layerFuncSpec:
+		return "func.md"
+	default:
+		return ""
+	}
+}
+
+// loadLayerDoc reads the docs file for a layer. Returns empty string on error.
+func loadLayerDoc(l layer, docsDir string) string {
+	name := layerDocFile(l)
+	if name == "" || docsDir == "" {
+		return ""
+	}
+	data, err := os.ReadFile(filepath.Join(docsDir, name))
+	if err != nil {
+		return ""
+	}
+	return string(data)
 }
 
 // buildUserPrompt assembles the user prompt from feature desc, file content, and diagnostics.
