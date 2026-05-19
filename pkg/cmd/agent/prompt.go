@@ -94,10 +94,17 @@ func layerName(l layer) string {
 	}
 }
 
-// buildSystemPrompt returns the system prompt with layer example.
-func buildSystemPrompt(l layer) string {
-	return "You fix yongol SSOT files. Output ONLY the corrected file content. No explanations. No markdown.\n\n" +
-		"Example for " + layerName(l) + ":\n" + layerExample(l)
+// buildSystemPrompt returns the system prompt with docs sections and layer example.
+func buildSystemPrompt(l layer, diagMsgs []string) string {
+	base := "You fix yongol SSOT files. Output ONLY the corrected file content. No explanations. No markdown.\n\n"
+
+	docSection := searchDocs(l, diagMsgs)
+	if docSection != "" {
+		base += docSection + "\n\n"
+	}
+
+	base += "Example for " + layerName(l) + ":\n" + layerExample(l)
+	return base
 }
 
 // buildUserPrompt assembles the user prompt from feature desc, file content, and diagnostics.

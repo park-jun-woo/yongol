@@ -95,8 +95,8 @@ func Run(w io.Writer, cfg Config) error {
 			}
 
 			// Build prompts
-			systemPrompt := buildSystemPrompt(l)
 			messages := diagMessages(g.diags)
+			systemPrompt := buildSystemPrompt(l, messages)
 			userPrompt := buildUserPrompt(desc, path, filepath.Base(g.relFile), string(content), messages)
 
 			// Call LLM
