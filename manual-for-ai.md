@@ -7,7 +7,7 @@ as the ground truth; examples below omit error output.
 
 ## What yongol does
 
-Orchestrates 9 SSOTs into one contract, cross-validates them, and generates a
+Orchestrates 10 SSOTs into one contract, cross-validates them, and generates a
 Go+Gin backend plus a React frontend. The keystone is **`operationId`**: every
 OpenAPI operation, SSaC `func`, STML `data-fetch`/`data-action` attribute,
 Mermaid transition label, and Hurl scenario references the same PascalCase
@@ -17,6 +17,7 @@ identifier.
 
 ```
 <project-root>/
+├── features.yaml                 # Feature catalog (optional, cross-validates with OpenAPI)
 ├── manifest.yaml                 # Project config (required)
 ├── api/openapi.yaml              # OpenAPI 3.x
 ├── db/
