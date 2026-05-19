@@ -1,0 +1,8 @@
+package service
+
+// @no-pagination
+// @auth "ListWorkflows" "workflow" {} "Forbidden"
+// @get []Workflow workflows = Workflow.ListByOrg({OrgID: currentUser.OrgID})
+// @get int64 total = Workflow.CountByOrg({OrgID: currentUser.OrgID})
+// @response { items: workflows, total: total }
+func ListWorkflows() {}

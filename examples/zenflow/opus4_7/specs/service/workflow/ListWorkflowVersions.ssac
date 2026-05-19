@@ -1,0 +1,10 @@
+package service
+
+// @no-pagination
+// @state-neutral
+// @auth "ListWorkflowVersions" "workflow" {ResourceID: request.id} "Forbidden"
+// @get Workflow wf = Workflow.FindByID({ID: request.id})
+// @empty wf "Workflow not found"
+// @get []Workflow workflows = Workflow.ListVersions({RootID: wf.ID, OrgID: currentUser.OrgID})
+// @response { workflows: workflows }
+func ListWorkflowVersions() {}

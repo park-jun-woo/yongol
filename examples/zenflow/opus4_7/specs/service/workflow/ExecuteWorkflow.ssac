@@ -1,0 +1,13 @@
+package service
+
+import "github.com/park-jun-woo/opus4_7/internal/worker"
+
+// @auth "ExecuteWorkflow" "workflow" {ResourceID: request.id} "Forbidden"
+// @get Workflow wf = Workflow.FindByID({ID: request.id})
+// @empty wf "Workflow not found"
+// @state workflow {status: wf.Status} "ExecuteWorkflow" "Workflow not active" 409
+// @call ProcessActionResponse _ = worker.ProcessAction({ActionType: wf.TriggerEvent, Config: wf.Title})
+// @put Organization.DeductCredit({ID: wf.OrgID, Amount: 1})
+// @post ExecutionLog log = ExecutionLog.Create({WorkflowID: wf.ID, OrgID: wf.OrgID, Status: "completed", CreditsSpent: 1})
+// @response { execution_log: log }
+func ExecuteWorkflow() {}

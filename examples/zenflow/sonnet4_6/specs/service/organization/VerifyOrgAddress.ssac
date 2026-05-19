@@ -1,0 +1,8 @@
+package service
+
+import "github.com/park-jun-woo/zenflow/internal/geocode"
+
+// @auth "VerifyOrgAddress" "organization" {ResourceID: request.id} "Forbidden"
+// @call VerifyAddressResponse result = geocode.VerifyAddress({Address: request.address})
+// @response { verified: result.Verified, formatted_address: result.FormattedAddress }
+func VerifyOrgAddress() {}

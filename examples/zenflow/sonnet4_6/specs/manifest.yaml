@@ -1,0 +1,41 @@
+apiVersion: yongol/v1
+kind: Project
+metadata:
+  name: zenflow
+  description: "ZenFlow — multi-tenant workflow-automation SaaS"
+backend:
+  lang: go
+  framework: gin
+  module: github.com/park-jun-woo/zenflow
+  middleware:
+    - bearerAuth
+  auth:
+    type: jwt
+    mode: bearer
+    secret_env: JWT_SECRET
+    user_table: users
+    claims:
+      ID: id:uuid
+      OrgID: org_id:uuid
+      Email: email:string
+      Role: role:string
+  cors:
+    allowed_origins:
+      - "http://localhost:5173"
+    allowed_methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - OPTIONS
+    allowed_headers:
+      - Authorization
+      - Content-Type
+    allow_credentials: true
+file:
+  backend: local
+frontend:
+  lang: typescript
+  framework: react
+  bundler: vite
+  name: zenflow-web

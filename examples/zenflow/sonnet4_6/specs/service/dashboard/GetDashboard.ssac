@@ -1,0 +1,10 @@
+package service
+
+// @no-pagination
+// @auth "GetDashboard" "dashboard" {} "Forbidden"
+// @get Organization org = Organization.FindByID({ID: currentUser.OrgID})
+// @empty org "Organization not found"
+// @get int64 wfCount = Workflow.CountByOrg({OrgID: currentUser.OrgID})
+// @get []ExecutionLog recent = ExecutionLog.ListByOrg({OrgID: currentUser.OrgID})
+// @response { credits_balance: org.CreditsBalance, workflow_count: wfCount, recent_executions: recent }
+func GetDashboard() {}

@@ -1,0 +1,9 @@
+package service
+
+// @auth "CloneTemplate" "template" {ResourceID: request.id} "Forbidden"
+// @get Template tmpl = Template.FindByID({ID: request.id})
+// @empty tmpl "Template not found"
+// @post Workflow wf = Workflow.Create({OrgID: currentUser.OrgID, Title: tmpl.Title, TriggerEvent: "cloned"})
+// @put Template.IncrementCloneCount({ID: tmpl.ID})
+// @response { workflow: wf }
+func CloneTemplate() {}

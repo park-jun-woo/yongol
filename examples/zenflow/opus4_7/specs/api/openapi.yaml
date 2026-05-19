@@ -1,0 +1,645 @@
+openapi: 3.0.3
+info:
+  title: opus4_7
+  description: ZenFlow multi-tenant workflow automation SaaS
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080
+security:
+  - bearerAuth: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    ErrorResponse:
+      type: object
+      required: [error, code]
+      properties:
+        error: { type: string }
+        code: { type: string }
+        details:
+          type: object
+          additionalProperties: true
+    Template:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        source_workflow_id: { type: string, format: uuid }
+        org_id: { type: string, format: uuid }
+        title: { type: string }
+        description: { type: string }
+        category: { type: string, maxLength: 50 }
+        clone_count: { type: integer, format: int64 }
+        created_at: { type: string, format: date-time }
+    Workflow:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        org_id: { type: string, format: uuid }
+        title: { type: string }
+        trigger_event: { type: string }
+        status: { type: string }
+        version: { type: integer, format: int64 }
+        root_workflow_id: { type: string, format: uuid }
+        created_at: { type: string, format: date-time }
+    Action:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        workflow_id: { type: string, format: uuid }
+        action_type: { type: string }
+        config: { type: string }
+        sequence_order: { type: integer, format: int64 }
+    ExecutionLog:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        workflow_id: { type: string, format: uuid }
+        org_id: { type: string, format: uuid }
+        status: { type: string }
+        credits_spent: { type: integer, format: int64 }
+        executed_at: { type: string, format: date-time }
+paths:
+  /auth/login:
+    post:
+      operationId: Login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8 }
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [access_token]
+                properties:
+                  access_token: { type: string }
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /workflows:
+    post:
+      operationId: CreateWorkflow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, trigger_event]
+              properties:
+                title: { type: string }
+                trigger_event: { type: string }
+      responses:
+        '201':
+          description: Workflow created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [workflow]
+                properties:
+                  workflow: { $ref: '#/components/schemas/Workflow' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+    get:
+      operationId: ListWorkflows
+      responses:
+        '200':
+          description: List of workflows
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [workflows]
+                properties:
+                  workflows:
+                    type: array
+                    items: { $ref: '#/components/schemas/Workflow' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /workflows/{id}:
+    get:
+      operationId: GetWorkflow
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Workflow detail
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [workflow]
+                properties:
+                  workflow: { $ref: '#/components/schemas/Workflow' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /workflows/{id}/actions:
+    post:
+      operationId: AddAction
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action_type, config, sequence_order]
+              properties:
+                action_type: { type: string }
+                config: { type: string }
+                sequence_order: { type: integer, format: int64 }
+      responses:
+        '201':
+          description: Action added
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [action]
+                properties:
+                  action: { $ref: '#/components/schemas/Action' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: Workflow not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /workflows/{id}/activate:
+    post:
+      operationId: ActivateWorkflow
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Workflow activated
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [workflow]
+                properties:
+                  workflow: { $ref: '#/components/schemas/Workflow' }
+        '402':
+          description: Insufficient credits
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /workflows/{id}/pause:
+    post:
+      operationId: PauseWorkflow
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Workflow paused
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [workflow]
+                properties:
+                  workflow: { $ref: '#/components/schemas/Workflow' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /workflows/{id}/archive:
+    post:
+      operationId: ArchiveWorkflow
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Workflow archived
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [workflow]
+                properties:
+                  workflow: { $ref: '#/components/schemas/Workflow' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /workflows/{id}/execute:
+    post:
+      operationId: ExecuteWorkflow
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Workflow executed
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [execution_log]
+                properties:
+                  execution_log: { $ref: '#/components/schemas/ExecutionLog' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /workflows/{id}/new-version:
+    post:
+      operationId: CreateWorkflowVersion
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '201':
+          description: New workflow version created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [workflow]
+                properties:
+                  workflow: { $ref: '#/components/schemas/Workflow' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: Source workflow not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /workflows/{id}/versions:
+    get:
+      operationId: ListWorkflowVersions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: List of workflow versions
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [workflows]
+                properties:
+                  workflows:
+                    type: array
+                    items: { $ref: '#/components/schemas/Workflow' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: Workflow not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /workflows/{id}/execution-logs:
+    get:
+      operationId: ListExecutionLogs
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: List of execution logs
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [execution_logs]
+                properties:
+                  execution_logs:
+                    type: array
+                    items: { $ref: '#/components/schemas/ExecutionLog' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: Workflow not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /templates:
+    post:
+      operationId: PublishTemplate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [workflow_id, title, description, category]
+              properties:
+                workflow_id: { type: string, format: uuid }
+                title: { type: string }
+                description: { type: string }
+                category: { type: string, maxLength: 50 }
+      responses:
+        '201':
+          description: Template published
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [template]
+                properties:
+                  template: { $ref: '#/components/schemas/Template' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: Workflow not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '409':
+          description: Already published
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+    get:
+      operationId: ListTemplates
+      parameters:
+        - { name: cursor, in: query, schema: { type: string } }
+        - { name: per_page, in: query, schema: { type: integer, default: 20, maximum: 100 } }
+        - { name: category, in: query, schema: { type: string } }
+      responses:
+        '200':
+          description: List of templates
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Template' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /templates/{id}:
+    get:
+      operationId: GetTemplate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Template detail
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [template]
+                properties:
+                  template: { $ref: '#/components/schemas/Template' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /templates/{id}/clone:
+    post:
+      operationId: CloneTemplate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '201':
+          description: Template cloned as new workflow
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [workflow]
+                properties:
+                  workflow: { $ref: '#/components/schemas/Workflow' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: Template not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }

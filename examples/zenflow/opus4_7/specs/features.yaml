@@ -1,0 +1,64 @@
+features:
+  - op: Login
+    path: POST /auth/login
+    desc: Authenticate user and issue JWT token
+
+  - op: CreateWorkflow
+    path: POST /workflows
+    desc: Create a new workflow in draft state
+
+  - op: ListWorkflows
+    path: GET /workflows
+    desc: List workflows for the current org
+
+  - op: GetWorkflow
+    path: GET /workflows/{id}
+    desc: Get workflow detail
+
+  - op: AddAction
+    path: POST /workflows/{id}/actions
+    desc: Add an action to a workflow
+
+  - op: ActivateWorkflow
+    path: POST /workflows/{id}/activate
+    desc: Transition workflow to active (requires credits > 0)
+
+  - op: PauseWorkflow
+    path: POST /workflows/{id}/pause
+    desc: Pause an active workflow
+
+  - op: ArchiveWorkflow
+    path: POST /workflows/{id}/archive
+    desc: Archive an active workflow
+
+  - op: ExecuteWorkflow
+    path: POST /workflows/{id}/execute
+    desc: Run all actions, deduct credit, log result
+
+  - op: ListExecutionLogs
+    path: GET /workflows/{id}/execution-logs
+    desc: List execution logs for a workflow
+
+  - op: CreateWorkflowVersion
+    path: POST /workflows/{id}/new-version
+    desc: Clone workflow into a new draft version with copied actions
+
+  - op: ListWorkflowVersions
+    path: GET /workflows/{id}/versions
+    desc: List all versions by root_workflow_id
+
+  - op: PublishTemplate
+    path: POST /templates
+    desc: Publish a workflow as a public template
+
+  - op: ListTemplates
+    path: GET /templates
+    desc: Cursor-paginated template search with category filter
+
+  - op: GetTemplate
+    path: GET /templates/{id}
+    desc: Template detail
+
+  - op: CloneTemplate
+    path: POST /templates/{id}/clone
+    desc: Clone a template into caller org as a new workflow

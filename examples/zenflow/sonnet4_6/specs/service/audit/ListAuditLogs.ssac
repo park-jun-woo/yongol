@@ -1,0 +1,8 @@
+package service
+
+// @no-pagination
+// @auth "ListAuditLogs" "audit" {} "Forbidden"
+// @get []AuditLog logs = AuditLog.ListByOrg({OrgID: currentUser.OrgID})
+// @get int64 total = AuditLog.CountByOrg({OrgID: currentUser.OrgID})
+// @response { items: logs, total: total }
+func ListAuditLogs() {}

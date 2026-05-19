@@ -1,0 +1,7 @@
+package service
+
+// @auth "GetExecutionReport" "execution" {} "Forbidden"
+// @get ExecutionLog log = ExecutionLog.FindByID({ID: request.id})
+// @empty log "Execution log not found"
+// @response { report_file_key: log.ReportFileKey }
+func GetExecutionReport() {}

@@ -1,0 +1,7 @@
+package service
+
+// @no-pagination
+// @auth "GetRecentAuditLogs" "audit" {} "Forbidden"
+// @get []AuditLog logs = AuditLog.ListRecent({OrgID: currentUser.OrgID})
+// @response { items: logs }
+func GetRecentAuditLogs() {}

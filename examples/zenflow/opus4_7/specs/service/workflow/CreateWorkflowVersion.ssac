@@ -1,0 +1,13 @@
+package service
+
+import "github.com/park-jun-woo/opus4_7/internal/versioning"
+
+// @state-neutral
+// @auth "CreateWorkflowVersion" "workflow" {ResourceID: request.id} "Forbidden"
+// @get Workflow wf = Workflow.FindByID({ID: request.id})
+// @empty wf "Workflow not found"
+// @call NextVersionResponse ver = versioning.NextVersion({CurrentVersion: wf.Version})
+// @post Workflow newWf = Workflow.CreateVersion({OrgID: wf.OrgID, Title: wf.Title, TriggerEvent: wf.TriggerEvent, Version: ver.Version, RootWorkflowID: wf.ID})
+// @put Action.CopyToWorkflow({TargetWorkflowID: newWf.ID, SourceWorkflowID: wf.ID})
+// @response { workflow: newWf }
+func CreateWorkflowVersion() {}

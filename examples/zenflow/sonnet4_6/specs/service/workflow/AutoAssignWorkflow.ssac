@@ -1,0 +1,9 @@
+package service
+
+// @state-neutral
+// @no-pagination
+// @auth "AutoAssignWorkflow" "workflow" {ResourceID: request.id} "Forbidden"
+// @get Workflow wf = Workflow.FindByID({ID: request.id})
+// @empty wf "Workflow not found"
+// @response { assigned: false, workflow: wf }
+func AutoAssignWorkflow() {}

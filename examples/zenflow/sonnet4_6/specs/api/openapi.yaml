@@ -1,0 +1,1031 @@
+openapi: 3.0.3
+info:
+  title: ZenFlow API
+  description: Multi-tenant workflow-automation SaaS
+  version: 0.1.0
+servers:
+  - url: http://localhost:8081
+security:
+  - bearerAuth: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    ErrorResponse:
+      type: object
+      required: [error, code]
+      properties:
+        error: { type: string }
+        code: { type: string }
+        details:
+          type: object
+          additionalProperties: true
+    Organization:
+      type: object
+      required: [id, name, credits_balance]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        plan_type: { type: string }
+        credits_balance: { type: integer, format: int64 }
+    User:
+      type: object
+      required: [id, email, role]
+      properties:
+        id: { type: string, format: uuid }
+        org_id: { type: string, format: uuid }
+        email: { type: string }
+        role: { type: string }
+    Workflow:
+      type: object
+      required: [id, org_id, root_workflow_id, title, trigger_event, status, cron_expr]
+      properties:
+        id: { type: string, format: uuid }
+        org_id: { type: string, format: uuid }
+        root_workflow_id: { type: string, format: uuid }
+        title: { type: string }
+        trigger_event: { type: string }
+        status: { type: string }
+        cron_expr: { type: string }
+        created_at: { type: string, format: date-time }
+    Action:
+      type: object
+      required: [id, workflow_id, action_type, config, sequence_order]
+      properties:
+        id: { type: string, format: uuid }
+        workflow_id: { type: string, format: uuid }
+        action_type: { type: string }
+        config: { type: string }
+        sequence_order: { type: integer, format: int64 }
+    ExecutionLog:
+      type: object
+      required: [id, workflow_id, org_id, status, report_file_key]
+      properties:
+        id: { type: string, format: uuid }
+        workflow_id: { type: string, format: uuid }
+        org_id: { type: string, format: uuid }
+        status: { type: string }
+        credits_spent: { type: integer, format: int64 }
+        report_file_key: { type: string }
+        executed_at: { type: string, format: date-time }
+    Webhook:
+      type: object
+      required: [id, org_id, url, event_type]
+      properties:
+        id: { type: string, format: uuid }
+        org_id: { type: string, format: uuid }
+        url: { type: string }
+        event_type: { type: string }
+        created_at: { type: string, format: date-time }
+    Template:
+      type: object
+      required: [id, org_id, source_workflow_id, title, category]
+      properties:
+        id: { type: string, format: uuid }
+        org_id: { type: string, format: uuid }
+        source_workflow_id: { type: string, format: uuid }
+        title: { type: string }
+        description: { type: string }
+        category: { type: string }
+        is_public: { type: boolean }
+        created_at: { type: string, format: date-time }
+    AuditLog:
+      type: object
+      required: [id, org_id, user_id, action, resource_type]
+      properties:
+        id: { type: string, format: uuid }
+        org_id: { type: string, format: uuid }
+        user_id: { type: string, format: uuid }
+        action: { type: string }
+        resource_type: { type: string }
+        resource_id: { type: string }
+        details: { type: string }
+        created_at: { type: string, format: date-time }
+
+paths:
+  /auth/login:
+    post:
+      operationId: Login
+      security: []
+      summary: Authenticate user and issue JWT token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8 }
+      responses:
+        '200':
+          description: JWT access token
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [access_token]
+                properties:
+                  access_token: { type: string }
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /workflows:
+    post:
+      operationId: CreateWorkflow
+      summary: Create a new workflow in draft state
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, trigger_event]
+              properties:
+                title: { type: string }
+                trigger_event: { type: string }
+      responses:
+        '201':
+          description: Created workflow
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Workflow' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+    get:
+      operationId: ListWorkflows
+      summary: List workflows for the current org
+      responses:
+        '200':
+          description: Workflows list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, total]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Workflow' }
+                  total: { type: integer, format: int64 }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /workflows/{id}:
+    get:
+      operationId: GetWorkflow
+      summary: Get workflow detail
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Workflow detail
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Workflow' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /workflows/{id}/actions:
+    post:
+      operationId: AddAction
+      summary: Add an action to a workflow
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action_type, config, sequence_order]
+              properties:
+                action_type: { type: string }
+                config: { type: string }
+                sequence_order: { type: integer, format: int64 }
+      responses:
+        '201':
+          description: Created action
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Action' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+    put:
+      operationId: SaveWorkflowActions
+      summary: Replace all actions in one request
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Updated actions
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Action' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /workflows/{id}/activate:
+    post:
+      operationId: ActivateWorkflow
+      summary: Transition workflow to active (requires credits > 0)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Activated workflow
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Workflow' }
+        '402':
+          description: Insufficient credits
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /workflows/{id}/pause:
+    post:
+      operationId: PauseWorkflow
+      summary: Pause an active workflow
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Paused workflow
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Workflow' }
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /workflows/{id}/archive:
+    post:
+      operationId: ArchiveWorkflow
+      summary: Archive an active workflow
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Archived workflow
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Workflow' }
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /workflows/{id}/execute:
+    post:
+      operationId: ExecuteWorkflow
+      summary: Run all actions, deduct credit, log result
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Execution log
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExecutionLog' }
+        '409':
+          description: Workflow not active
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /workflows/{id}/execution-logs:
+    get:
+      operationId: ListExecutionLogs
+      summary: List execution logs for a workflow
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Execution logs
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, total]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/ExecutionLog' }
+                  total: { type: integer, format: int64 }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /workflows/{id}/new-version:
+    post:
+      operationId: CreateWorkflowVersion
+      summary: Clone workflow into a new draft version
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '201':
+          description: New workflow version
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Workflow' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /workflows/{id}/versions:
+    get:
+      operationId: ListWorkflowVersions
+      summary: List all versions by root_workflow_id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Workflow versions
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Workflow' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /webhooks:
+    post:
+      operationId: CreateWebhook
+      summary: Register a webhook URL for the org
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [url, event_type]
+              properties:
+                url: { type: string }
+                event_type: { type: string }
+      responses:
+        '201':
+          description: Created webhook
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Webhook' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+    get:
+      operationId: ListWebhooks
+      summary: List org webhooks
+      responses:
+        '200':
+          description: Webhooks list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Webhook' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /webhooks/{id}:
+    delete:
+      operationId: DeleteWebhook
+      summary: Delete a webhook
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /templates:
+    post:
+      operationId: PublishTemplate
+      summary: Publish a workflow as a public template
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [source_workflow_id, title, description, category]
+              properties:
+                source_workflow_id: { type: string, format: uuid }
+                title: { type: string }
+                description: { type: string }
+                category: { type: string }
+      responses:
+        '201':
+          description: Published template
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Template' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+    get:
+      operationId: ListTemplates
+      summary: Template list
+      responses:
+        '200':
+          description: Template list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Template' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /templates/{id}:
+    get:
+      operationId: GetTemplate
+      summary: Template detail
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Template detail
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Template' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /templates/{id}/clone:
+    post:
+      operationId: CloneTemplate
+      summary: Clone a template into caller's org as a new workflow
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '201':
+          description: New workflow from template
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Workflow' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /workflows/{id}/execute-with-report:
+    post:
+      operationId: ExecuteWithReport
+      summary: Execute workflow and generate/upload report file
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Execution log with report key
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExecutionLog' }
+        '409':
+          description: Workflow not active
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /execution-logs/{id}/report:
+    get:
+      operationId: GetExecutionReport
+      summary: Download the report file linked to an execution log
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Report file key
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [report_file_key]
+                properties:
+                  report_file_key: { type: string }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /workflows/{id}/schedule:
+    post:
+      operationId: SetSchedule
+      summary: Register a cron schedule for a workflow
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [cron_expr]
+              properties:
+                cron_expr: { type: string }
+      responses:
+        '200':
+          description: Schedule set
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [workflow_id, cron_expr]
+                properties:
+                  workflow_id: { type: string, format: uuid }
+                  cron_expr: { type: string }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+    get:
+      operationId: GetSchedule
+      summary: Read current schedule from session
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Current schedule
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [workflow_id, cron_expr]
+                properties:
+                  workflow_id: { type: string, format: uuid }
+                  cron_expr: { type: string }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+    delete:
+      operationId: DeleteSchedule
+      summary: Clear schedule from session
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /audit-logs:
+    get:
+      operationId: ListAuditLogs
+      summary: Audit logs list
+      responses:
+        '200':
+          description: Audit logs
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, total]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/AuditLog' }
+                  total: { type: integer, format: int64 }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /audit-logs/recent:
+    get:
+      operationId: GetRecentAuditLogs
+      summary: Cache-backed recent audit entries
+      responses:
+        '200':
+          description: Recent audit logs
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/AuditLog' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /audit-logs/{id}:
+    get:
+      operationId: GetAuditLog
+      summary: Single audit log detail
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Audit log detail
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuditLog' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /dashboard:
+    get:
+      operationId: GetDashboard
+      summary: Org summary dashboard
+      responses:
+        '200':
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [credits_balance, workflow_count, recent_executions]
+                properties:
+                  credits_balance: { type: integer, format: int64 }
+                  workflow_count: { type: integer, format: int64 }
+                  recent_executions:
+                    type: array
+                    items: { $ref: '#/components/schemas/ExecutionLog' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /execution-logs/{id}/detail:
+    get:
+      operationId: GetExecutionDetail
+      summary: Execution log with workflow and org enrichment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Enriched execution detail
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [execution, workflow, org]
+                properties:
+                  execution: { $ref: '#/components/schemas/ExecutionLog' }
+                  workflow: { $ref: '#/components/schemas/Workflow' }
+                  org: { $ref: '#/components/schemas/Organization' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /organizations/{id}/verify-address:
+    post:
+      operationId: VerifyOrgAddress
+      summary: Geocode org address via external API
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [address]
+              properties:
+                address: { type: string }
+      responses:
+        '200':
+          description: Verified address result
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [verified, formatted_address]
+                properties:
+                  verified: { type: boolean }
+                  formatted_address: { type: string }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /workflows/{id}/auto-assign:
+    post:
+      operationId: AutoAssignWorkflow
+      summary: Auto-assign workflow to best-matching member
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Assignment result
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [assigned, workflow]
+                properties:
+                  assigned: { type: boolean }
+                  workflow: { $ref: '#/components/schemas/Workflow' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }

@@ -1,0 +1,8 @@
+package service
+
+// @state-neutral
+// @auth "GetSchedule" "workflow" {ResourceID: request.id} "Forbidden"
+// @get Workflow wf = Workflow.FindByID({ID: request.id})
+// @empty wf "Schedule not found"
+// @response { workflow_id: request.id, cron_expr: wf.CronExpr }
+func GetSchedule() {}

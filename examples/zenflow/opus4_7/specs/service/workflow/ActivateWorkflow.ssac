@@ -1,0 +1,15 @@
+package service
+
+import "github.com/park-jun-woo/opus4_7/internal/billing"
+
+// @auth "ActivateWorkflow" "workflow" {ResourceID: request.id} "Forbidden"
+// @get Workflow wf = Workflow.FindByID({ID: request.id})
+// @empty wf "Workflow not found"
+// @get Organization org = Organization.FindByID({ID: wf.OrgID})
+// @empty org "Organization not found"
+// @call billing.CheckCredits({Balance: org.CreditsBalance})
+// @state workflow {status: wf.Status} "ActivateWorkflow" "Cannot activate workflow" 409
+// @put Workflow.UpdateStatus({ID: wf.ID, Status: "active"})
+// @get Workflow updated = Workflow.FindByID({ID: wf.ID})
+// @response { workflow: updated }
+func ActivateWorkflow() {}

@@ -1,0 +1,6 @@
+package service
+
+// @auth "PublishTemplate" "template" {} "Forbidden"
+// @post Template tmpl = Template.Create({OrgID: currentUser.OrgID, SourceWorkflowID: request.source_workflow_id, Title: request.title, Description: request.description, Category: request.category, IsPublic: true})
+// @response tmpl
+func PublishTemplate() {}
