@@ -114,6 +114,8 @@ Requires Go 1.25+.
 | `XOH-*` | Hurl test drifted from OpenAPI | Align Hurl with current OpenAPI spec |
 | `C-6` | Missing `backend.auth` in manifest | Add JWT auth block (mandatory) |
 | `D-2` | Non-PK column missing NOT NULL | Add `NOT NULL` or `-- @nullable` |
+| `D-15` | FK column is nullable | Add `NOT NULL` (use sentinel pattern) or `-- @nullable` if intentional |
+| `XOE-01` | ErrorResponse.code not in `required` | Add `code` to ErrorResponse `required` list |
 
 ## Key Conventions
 

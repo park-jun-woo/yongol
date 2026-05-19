@@ -163,6 +163,7 @@ OpenAPI self-consistency (based on the document parsed by kin-openapi).
 | O-5 | ERROR | 4xx/5xx response is missing `content: application/json` + schema (204/304 exempt; 1xx-3xx out of scope) | `pkg/validate/openapi/o_05_response_body_required.go` |
 | XOO-71 | WARNING | Password-like fields have no `minLength` | `pkg/validate/openapi/xoo_71_password_no_min_length.go` |
 | XOO-72 | WARNING | Email-like fields have no `format` | `pkg/validate/openapi/xoo_72_email_no_format.go` |
+| XOE-01 | WARNING | ErrorResponse schema의 `error`/`code` 프로퍼티가 `required`에 없으면 oapi-codegen이 `*string`으로 생성하여 빌드 실패 | `pkg/validate/openapi/xoe_01_error_response_required.go` |
 
 ## D. Query / sqlc
 
@@ -206,6 +207,7 @@ DDL self-consistency (PostgreSQL + sqlc query definitions).
 | D-9 | ERROR | Top-level `INSERT` in a DDL file must be preceded by `-- @sentinel` (otherwise migration would silently drop it) | `pkg/validate/ddl/d_09_top_level_insert_without_sentinel.go` |
 | D-10 | ERROR | `@sentinel` `INSERT` must include `ON CONFLICT DO NOTHING` so repeated application is idempotent | `pkg/validate/ddl/d_10_sentinel_without_on_conflict.go` |
 | D-11 | ERROR | Column uses an unsupported PG type — multi-word tokens (`DOUBLE PRECISION`, `TIMESTAMP WITH TIME ZONE`) or `CREATE TYPE` user-defined ENUMs. Use single-token aliases (`FLOAT8`, `TIMESTAMPTZ`) or inline `VARCHAR(N) + CHECK IN (...)`. | `pkg/validate/ddl/d_11_unsupported_pg_type.go` |
+| D-15 | WARNING | FK 컬럼(`REFERENCES`)에 `NOT NULL`이 없고 `-- @nullable` 어노테이션도 없음 | `pkg/validate/ddl/d_15_fk_nullable.go` |
 | XDD-61 | WARNING | Columns matching sensitive patterns (`password` / `secret` / `hash` / `token`) are missing the `@sensitive` annotation | `pkg/validate/ddl/xdd_61_sensitive_no_annotation.go` |
 
 ## F. DDL ↔ OpenAPI

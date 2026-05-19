@@ -129,6 +129,8 @@ Standard OpenAPI 3.x. yongol-specific conventions: see
   `backend.middleware`.
 - Every 4xx/5xx response requires `content: application/json` + schema (O-5).
   204 / 304 are exempt. RFC 7807 recommended but not enforced.
+- **ErrorResponse 스키마의 `error`, `code` 필드는 `required` 필수** (XOE-01).
+  required에 빠지면 oapi-codegen이 `*string`으로 생성하여 codegen 빌드 실패.
 
 ## DDL + sqlc
 
@@ -193,8 +195,10 @@ Standard SQL DDL and sqlc. Details: [`docs/ddl.md`](docs/ddl.md).
   `::bigint` cast in the sqlc query, or use `format: int32` consistently.
 - Avoid Go-reserved column names (`type`, `range`, `select`, `map`, …) — rename
   to `tx_type`, `date_range`, etc.
-- `NOT NULL DEFAULT 0` FK sentinel pattern avoids nullable FKs; the referenced
-  table must contain an `id=0` sentinel row.
+- **FK 컬럼은 NOT NULL 필수** (D-15). nullable FK는 codegen 타입 에러를
+  유발한다. 선택적 관계는 `NOT NULL DEFAULT 0` sentinel 패턴을 사용하고,
+  참조 테이블에 `id=0` sentinel row를 둔다. 의도적 nullable이면
+  `-- @nullable` 어노테이션으로 D-15를 면제할 수 있다.
 - Auto-increment primary keys must use `GENERATED ALWAYS AS IDENTITY`.
   `SERIAL` / `BIGSERIAL` / `SMALLSERIAL` are banned (D-8). Write
   `id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY`.

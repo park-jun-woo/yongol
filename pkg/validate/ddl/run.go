@@ -21,6 +21,7 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	diags = append(diags, d09TopLevelInsertWithoutSentinel(fs)...)
 	diags = append(diags, d10SentinelWithoutOnConflict(fs)...)
 	diags = append(diags, d11UnsupportedPgType(fs)...)
+	diags = append(diags, d15FkNullable(fs)...)
 	diags = append(diags, xdd61SensitiveNoAnnotation(fs)...)
 	return diags
 }
