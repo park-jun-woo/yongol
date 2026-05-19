@@ -1,4 +1,0 @@
-Execution Report
-Workflow: b072454d-5bef-4ac4-97ba-7ac26b476b57
-Actions: 0
-Status: success
