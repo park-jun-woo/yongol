@@ -39,6 +39,7 @@ features:
 |---|---|---|
 | FT-01 | ERROR | Duplicate `op` in features.yaml. |
 | FT-02 | ERROR | Duplicate `path` in features.yaml. |
+| FT-03 | ERROR | `specs/.yongol` missing or SHA-256 hash mismatch with features.yaml. |
 
 ### Cross-validation (features ↔ OpenAPI)
 
@@ -48,6 +49,40 @@ features:
 | XOF-01 | ERROR | `operationId` in OpenAPI is not listed in features.yaml. The endpoint exists but is not declared as a feature. |
 
 Both directions are ERROR level. When `features.yaml` is present, the feature list and OpenAPI must be in exact agreement.
+
+## Hash Lock (`specs/.yongol`)
+
+`yongol init` generates a `specs/.yongol` file that stores the SHA-256 hash of the features.yaml used to create the project:
+
+```yaml
+hashes:
+  features.yaml: sha256:<64hex>
+```
+
+`yongol validate` checks this hash via FT-03:
+
+- **features.yaml exists, .yongol missing** → FT-03 ERROR: `specs/.yongol not found`
+- **features.yaml exists, .yongol exists, hashes differ** → FT-03 ERROR: `features.yaml was modified after baseline`
+- **features.yaml exists, hashes match** → pass
+- **features.yaml absent** → skip (no error)
+
+Only `yongol init` creates `.yongol`; `yongol validate` reads it but never writes. To reset after intentional features.yaml changes: `rm specs/.yongol` then re-run `yongol init`.
+
+## Scaffolding via `yongol init`
+
+```bash
+yongol init MyApp features.yaml "My workflow SaaS"
+```
+
+Reads features.yaml and generates SSOT stubs for each feature:
+
+- **OpenAPI**: `specs/api/openapi.yaml` with path + operationId stubs
+- **SSaC**: `specs/service/{domain}/{Op}.ssac` stub files
+- **Rego**: `specs/policy/authz.rego` with allow rule stubs
+- **Hurl**: `specs/tests/smoke.hurl` with request stubs
+- **Hash lock**: `specs/.yongol` with SHA-256
+
+Does NOT generate: DDL, sqlc queries, states, func specs, STML.
 
 ## When features.yaml is absent
 

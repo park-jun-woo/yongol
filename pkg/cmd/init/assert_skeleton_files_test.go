@@ -12,6 +12,9 @@ func assertSkeletonFiles(t *testing.T, target string) {
 		"specs/api/openapi.yaml",
 		"specs/db/sqlc.yaml",
 		"specs/policy/authz.rego",
+		"specs/features.yaml",
+		"specs/.yongol",
+		"specs/tests/smoke.hurl",
 		"README.md",
 		".gitignore",
 	}

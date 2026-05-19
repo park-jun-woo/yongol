@@ -1,3 +1,4 @@
+//ff:func feature=features type=test control=sequence
 //ff:what Load — features.yaml 없을 때 에러 진단 테스트
 package features
 

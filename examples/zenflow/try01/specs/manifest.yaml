@@ -1,0 +1,34 @@
+apiVersion: yongol/v1
+kind: Project
+metadata:
+  name: zenflow
+backend:
+  lang: go
+  framework: gin
+  module: github.com/park-jun-woo/zenflow
+  middleware:
+    - bearerAuth
+  auth:
+    type: jwt
+    mode: bearer
+    secret_env: JWT_SECRET
+    user_table: users
+    roles:
+      - admin
+      - member
+    claims:
+      ID: id:uuid
+      Email: email:string
+      Role: role:string
+      OrgID: org_id:uuid
+cache:
+  backend: postgres
+session:
+  backend: postgres
+file:
+  backend: local
+frontend:
+  lang: typescript
+  framework: react
+  bundler: vite
+  name: zenflow-web

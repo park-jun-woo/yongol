@@ -510,6 +510,7 @@ Internal validation for `features.yaml`. Ensures no duplicate entries.
 |---|---|---|---|
 | FT-01 | ERROR | Duplicate `op` in features.yaml | `pkg/validate/features/ft_01_duplicate_op.go` |
 | FT-02 | ERROR | Duplicate `path` in features.yaml | `pkg/validate/features/ft_02_duplicate_path.go` |
+| FT-03 | ERROR | features.yaml hash mismatch with specs/.yongol (or .yongol missing) | `pkg/validate/features/ft_03_hash_mismatch.go` |
 
 ## W. Features ↔ OpenAPI (`XFO-*` / `XOF-*`)
 

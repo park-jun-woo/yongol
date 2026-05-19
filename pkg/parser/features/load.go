@@ -1,4 +1,4 @@
-//ff:func feature=features type=loader control=sequence
+//ff:func feature=features type=loader control=iteration dimension=1
 //ff:what features.yaml 파일을 읽어 파싱하고 Feature 슬라이스를 반환한다
 package features
 

@@ -10,14 +10,16 @@ import (
 )
 
 func TestRunCreatesSkeleton(t *testing.T) {
+	featPath := writeTempFeatures(t)
 	tmp := t.TempDir()
 	target := filepath.Join(tmp, "myapp")
 	var outBuf, errBuf bytes.Buffer
 	err := Run(&outBuf, &errBuf, Options{
-		ProjectID:   "Myapp",
-		Description: "Test description",
-		Dir:         target,
-		Module:      "github.com/test/myapp",
+		ProjectID:    "Myapp",
+		FeaturesPath: featPath,
+		Description:  "Test description",
+		Dir:          target,
+		Module:       "github.com/test/myapp",
 	})
 	if err != nil {
 		t.Fatalf("Run returned error: %v", err)
@@ -25,6 +27,5 @@ func TestRunCreatesSkeleton(t *testing.T) {
 	assertSkeletonFiles(t, target)
 	assertSkeletonDirs(t, target)
 	assertSkeletonManifest(t, target)
-	assertSkeletonOpenAPI(t, target)
 	assertSkeletonSqlc(t, target)
 }

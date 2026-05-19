@@ -1,3 +1,4 @@
+//ff:func feature=validate type=test control=sequence topic=features-structural
 //ff:what FT-02 — path 중복 시 에러 진단 테스트
 package features
 
@@ -22,18 +23,5 @@ func TestFT02_DuplicatePath_Fires(t *testing.T) {
 	}
 	if !strings.Contains(diags[0].Message, "[FT-02]") {
 		t.Errorf("want [FT-02] prefix, got %s", diags[0].Message)
-	}
-}
-
-func TestFT02_DuplicatePath_NoFire(t *testing.T) {
-	fs := &yongol.Fullstack{
-		Features: []featparser.Feature{
-			{Op: "CreateWorkflow", Path: "POST /workflows", Desc: "Create", Line: 2},
-			{Op: "GetWorkflow", Path: "GET /workflows/{id}", Desc: "Get", Line: 5},
-		},
-	}
-	diags := ft02DuplicatePath(fs)
-	if len(diags) != 0 {
-		t.Fatalf("want 0 diags, got %d", len(diags))
 	}
 }

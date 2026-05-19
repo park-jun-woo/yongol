@@ -1,5 +1,5 @@
 //ff:func feature=cli type=command control=sequence
-//ff:what initCmd — yongol init <ProjectID> "<description>" subcommand
+//ff:what initCmd — yongol init <ProjectID> <features.yaml> ["description"] subcommand
 package main
 
 import (
@@ -8,10 +8,10 @@ import (
 	cliinit "github.com/park-jun-woo/yongol/pkg/cmd/init"
 )
 
-// initCmd returns the `yongol init` subcommand. The command materializes a
-// minimal SSOT skeleton that `yongol validate specs` accepts with zero errors
-// so new users can move straight into `yongol add` / `yongol get` without
-// writing any boilerplate YAML by hand.
+// initCmd returns the `yongol init` subcommand. The command reads a
+// features.yaml file and materializes SSOT stubs (OpenAPI, SSaC, Rego, Hurl)
+// plus a hash lock (specs/.yongol) so the project is ready for iterative
+// feature implementation.
 func initCmd() *cobra.Command {
 	var (
 		dirFlag    string
@@ -19,18 +19,23 @@ func initCmd() *cobra.Command {
 		forceFlag  bool
 	)
 	cmd := &cobra.Command{
-		Use:           `init <ProjectID> "<description>"`,
-		Short:         "Scaffold a new yongol project (manifest + OpenAPI + sqlc + rego skeleton)",
-		Args:          usageArgs(cobra.ExactArgs(2)),
+		Use:           `init <ProjectID> <features.yaml> ["description"]`,
+		Short:         "Scaffold a new yongol project from features.yaml",
+		Args:          usageArgs(cobra.RangeArgs(2, 3)),
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			var desc string
+			if len(args) >= 3 {
+				desc = args[2]
+			}
 			opts := cliinit.Options{
-				ProjectID:   args[0],
-				Description: args[1],
-				Dir:         dirFlag,
-				Module:      moduleFlag,
-				Force:       forceFlag,
+				ProjectID:    args[0],
+				FeaturesPath: args[1],
+				Description:  desc,
+				Dir:          dirFlag,
+				Module:       moduleFlag,
+				Force:        forceFlag,
 			}
 			return cliinit.Run(cmd.OutOrStdout(), cmd.ErrOrStderr(), opts)
 		},

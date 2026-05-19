@@ -1,0 +1,18 @@
+package service
+
+import "github.com/park-jun-woo/zenflow/internal/billing"
+import "github.com/park-jun-woo/zenflow/internal/worker"
+
+// @no-pagination
+// @auth "ExecuteWorkflow" "workflow" {ResourceID: request.id} "Forbidden"
+// @get Workflow wf = Workflow.FindByID({ID: request.id})
+// @empty wf "Workflow not found" 404
+// @get Organization org = Organization.FindByID({ID: wf.OrgID})
+// @empty org "Organization not found" 404
+// @eval billing.IsZeroBalance({Balance: org.CreditsBalance}) "Insufficient credits" 402
+// @state workflow {status: wf.Status} "ExecuteWorkflow" "Workflow is not active" 409
+// @call ProcessActionsResponse result = worker.ProcessActions({ActionCount: 1})
+// @put Organization.DeductCredit({ID: wf.OrgID, Amount: 1})
+// @post ExecutionLog log = ExecutionLog.Create({WorkflowID: wf.ID, OrgID: wf.OrgID, Status: result.Status, CreditsSpent: 1, ReportKey: ""})
+// @response { execution_log: log }
+func ExecuteWorkflow() {}

@@ -11,17 +11,19 @@ import (
 )
 
 func TestRunForceOverridesNonEmptyDir(t *testing.T) {
+	featPath := writeTempFeatures(t)
 	tmp := t.TempDir()
 	if err := os.WriteFile(filepath.Join(tmp, "existing.txt"), []byte("x"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	var outBuf, errBuf bytes.Buffer
 	err := Run(&outBuf, &errBuf, Options{
-		ProjectID:   "Myapp",
-		Description: "Test",
-		Dir:         tmp,
-		Module:      "github.com/test/myapp",
-		Force:       true,
+		ProjectID:    "Myapp",
+		FeaturesPath: featPath,
+		Description:  "Test",
+		Dir:          tmp,
+		Module:       "github.com/test/myapp",
+		Force:        true,
 	})
 	if err != nil {
 		t.Fatalf("Run with --force unexpectedly failed: %v", err)

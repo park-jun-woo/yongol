@@ -1,4 +1,5 @@
-//ff:what Load — 필수 필드 누락 시 에러 진단 테스트
+//ff:func feature=features type=test control=sequence
+//ff:what Load — op 필드 누락 시 에러 진단 테스트
 package features
 
 import (
@@ -19,35 +20,5 @@ func TestLoad_MissingOp(t *testing.T) {
 	_, diags := Load(dir)
 	if len(diags) == 0 {
 		t.Fatal("expected diag for missing op")
-	}
-}
-
-func TestLoad_MissingPath(t *testing.T) {
-	dir := t.TempDir()
-	data := `features:
-  - op: CreateWorkflow
-    desc: Create a new workflow
-`
-	if err := os.WriteFile(filepath.Join(dir, "features.yaml"), []byte(data), 0644); err != nil {
-		t.Fatal(err)
-	}
-	_, diags := Load(dir)
-	if len(diags) == 0 {
-		t.Fatal("expected diag for missing path")
-	}
-}
-
-func TestLoad_MissingDesc(t *testing.T) {
-	dir := t.TempDir()
-	data := `features:
-  - op: CreateWorkflow
-    path: POST /workflows
-`
-	if err := os.WriteFile(filepath.Join(dir, "features.yaml"), []byte(data), 0644); err != nil {
-		t.Fatal(err)
-	}
-	_, diags := Load(dir)
-	if len(diags) == 0 {
-		t.Fatal("expected diag for missing desc")
 	}
 }

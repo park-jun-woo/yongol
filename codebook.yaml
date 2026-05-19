@@ -58,6 +58,7 @@ required:
     util: "범용 유틸 패키지 — case 변환 등 (pkg/util/*)"
     cli-init: "yongol init 서브커맨드 (신규 프로젝트 스캐폴드 / 모듈 감지 / 프로젝트 ID 정규화)"
     ssacmeta: "SSaC 패키지 interface.yaml 메타 로드 및 when 조건 평가"
+    features: "features.yaml 파서 — op/path/desc 슬라이스 로드 및 라인 번호 추출"
   type:
     command: "CLI 명령 엔트리포인트"
     rule: "검증 규칙"
@@ -116,6 +117,8 @@ optional:
     authz-check: "SSaC @auth 입력 ↔ authz CheckRequest 필드"
     sensitive: "DDL 컬럼 민감 패턴 감지"
     # --- pkg/validate per-SSOT structural topics ---
+    features-structural: "features.yaml 내부 정합성 검증 (FT-*) — op/path 중복 감지"
+    features-openapi: "features.yaml ↔ OpenAPI operationId 교차 검증 (XFO-*, XOF-*)"
     manifest-structural: "manifest.yaml 로드 및 최소 스키마 검증 (C-*) — C-6 은 backend.auth 필수 강제 (yongol = backend = auth)"
     openapi-structural: "OpenAPI 문서 구조 + x-확장 의미 검증 (O-*, XOO-*)"
     ddl-structural: "DDL 구조 검증 + 민감 패턴 주석 (D-*, XDD-*)"

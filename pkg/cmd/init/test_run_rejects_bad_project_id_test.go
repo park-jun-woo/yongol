@@ -9,13 +9,15 @@ import (
 )
 
 func TestRunRejectsBadProjectID(t *testing.T) {
+	featPath := writeTempFeatures(t)
 	tmp := t.TempDir()
 	var outBuf, errBuf bytes.Buffer
 	err := Run(&outBuf, &errBuf, Options{
-		ProjectID:   "my-app", // hyphen disallowed
-		Description: "Test",
-		Dir:         tmp,
-		Module:      "github.com/test/myapp",
+		ProjectID:    "my-app", // hyphen disallowed
+		FeaturesPath: featPath,
+		Description:  "Test",
+		Dir:          tmp,
+		Module:       "github.com/test/myapp",
 	})
 	if err == nil {
 		t.Fatalf("Run should reject ProjectID with hyphen")

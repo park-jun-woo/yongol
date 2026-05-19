@@ -244,17 +244,20 @@ The full contract, the PRV-10~17 runtime guards, and CLI usage are documented in
 
 ## Commands
 
-### `yongol init <ProjectID> "<description>"`
+### `yongol init <ProjectID> <features.yaml> ["description"]`
 
-Scaffolds a minimal SSOT skeleton — manifest, OpenAPI with empty `paths`, sqlc
-config, and an authz stub — into a new directory so `yongol validate specs`
-passes immediately. Infra (`cache` / `session` / `queue`) and feature
-templates are not added here; use `yongol get` / `yongol add` for those.
+Reads a `features.yaml` file and scaffolds SSOT stubs — manifest, OpenAPI with
+operationId stubs, SSaC stub files, authz Rego rules, Hurl smoke requests,
+sqlc config, and a `specs/.yongol` hash lock — so the project is ready for
+iterative feature implementation via `yongol validate specs`.
 
 ```bash
-yongol init Myapp "My workflow automation SaaS"
+yongol init Myapp features.yaml "My workflow automation SaaS"
 cd Myapp && yongol validate specs     # 0 errors
 ```
+
+The description argument is optional; when omitted it defaults to
+`<ProjectID> project`.
 
 Flags: `--dir <path>` (target directory, defaults to `./<ProjectID>`),
 `--module <go-module>` (overrides the auto-detected Go module path),

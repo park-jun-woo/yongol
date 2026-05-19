@@ -1,0 +1,11 @@
+package service
+
+import "github.com/park-jun-woo/ssac/pkg/cache"
+
+// @no-pagination
+// @auth "GetRecentAuditLogs" "audit_log" {} "Forbidden"
+// @call GetResponse cached = cache.Get({Key: "recent-audit-logs"})
+// @get []AuditLog items = AuditLog.ListRecent({OrgID: currentUser.OrgID})
+// @call cache.Set({Key: "recent-audit-logs", Value: cached.Value, TTL: 300})
+// @response { items: items }
+func GetRecentAuditLogs() {}

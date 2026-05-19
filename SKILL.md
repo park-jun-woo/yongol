@@ -54,7 +54,7 @@ Requires Go 1.25+.
 |---|---|
 | `yongol validate <specs>` | Cross-validate all SSOTs. Non-zero exit on ERROR. |
 | `yongol generate <specs> <arts>` | Generate backend + frontend + migrations |
-| `yongol init <id> "<desc>"` | Scaffold minimal SSOT skeleton |
+| `yongol init <id> <features.yaml> ["desc"]` | Scaffold SSOT stubs from features.yaml + hash lock |
 | `yongol chain <operationId> <specs>` | Trace one feature across all SSOT layers |
 | `yongol import <openapi> <out>` | Generate Go client from external OpenAPI |
 | `yongol status <specs>` | SSOT summary + drift dashboard |

@@ -1,0 +1,7 @@
+package service
+
+// @auth "GetAuditLog" "audit_log" {ResourceID: request.id} "Forbidden"
+// @get AuditLog auditLog = AuditLog.FindByID({ID: request.id})
+// @empty auditLog "Audit log not found" 404
+// @response { audit_log: auditLog }
+func GetAuditLog() {}

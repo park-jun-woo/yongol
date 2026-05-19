@@ -22,11 +22,7 @@ func extractFeatureLines(data []byte) []int {
 		key := mapping.Content[i]
 		val := mapping.Content[i+1]
 		if key.Value == "features" && val.Kind == yaml.SequenceNode {
-			lines := make([]int, len(val.Content))
-			for j, item := range val.Content {
-				lines[j] = item.Line
-			}
-			return lines
+			return collectSequenceLines(val)
 		}
 	}
 	return nil

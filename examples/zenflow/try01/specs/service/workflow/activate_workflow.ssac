@@ -1,0 +1,15 @@
+package service
+
+import "github.com/park-jun-woo/zenflow/internal/billing"
+
+// @auth "ActivateWorkflow" "workflow" {ResourceID: request.id} "Forbidden"
+// @get Workflow wf = Workflow.FindByID({ID: request.id})
+// @empty wf "Workflow not found" 404
+// @get Organization org = Organization.FindByID({ID: wf.OrgID})
+// @empty org "Organization not found" 404
+// @eval billing.IsZeroBalance({Balance: org.CreditsBalance}) "Insufficient credits" 402
+// @state workflow {status: wf.Status} "ActivateWorkflow" "Cannot activate workflow" 409
+// @put Workflow.UpdateStatus({ID: wf.ID, Status: "active"})
+// @get Workflow updatedWf = Workflow.FindByID({ID: wf.ID})
+// @response { workflow: updatedWf }
+func ActivateWorkflow() {}

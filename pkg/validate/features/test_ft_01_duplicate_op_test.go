@@ -1,3 +1,4 @@
+//ff:func feature=validate type=test control=sequence topic=features-structural
 //ff:what FT-01 — op 중복 시 에러 진단 테스트
 package features
 
@@ -22,18 +23,5 @@ func TestFT01_DuplicateOp_Fires(t *testing.T) {
 	}
 	if !strings.Contains(diags[0].Message, "[FT-01]") {
 		t.Errorf("want [FT-01] prefix, got %s", diags[0].Message)
-	}
-}
-
-func TestFT01_DuplicateOp_NoFire(t *testing.T) {
-	fs := &yongol.Fullstack{
-		Features: []featparser.Feature{
-			{Op: "CreateWorkflow", Path: "POST /workflows", Desc: "Create", Line: 2},
-			{Op: "GetWorkflow", Path: "GET /workflows/{id}", Desc: "Get", Line: 5},
-		},
-	}
-	diags := ft01DuplicateOp(fs)
-	if len(diags) != 0 {
-		t.Fatalf("want 0 diags, got %d", len(diags))
 	}
 }

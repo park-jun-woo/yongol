@@ -1,3 +1,4 @@
+//ff:func feature=features type=test control=sequence
 //ff:what Load — features.yaml 정상 파싱 테스트
 package features
 

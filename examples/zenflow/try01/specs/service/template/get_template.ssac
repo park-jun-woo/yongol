@@ -1,0 +1,7 @@
+package service
+
+// @auth "GetTemplate" "template" {ResourceID: request.id} "Forbidden"
+// @get Template tpl = Template.FindByID({ID: request.id})
+// @empty tpl "Template not found" 404
+// @response { template: tpl }
+func GetTemplate() {}

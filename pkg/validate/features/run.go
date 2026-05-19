@@ -12,5 +12,6 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	var diags []diagnostic.Diagnostic
 	diags = append(diags, ft01DuplicateOp(fs)...)
 	diags = append(diags, ft02DuplicatePath(fs)...)
+	diags = append(diags, ft03HashMismatch(fs)...)
 	return diags
 }
