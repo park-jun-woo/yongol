@@ -11,7 +11,7 @@ The keel of your AI-coded SaaS.
 
 **Add 10 endpoints to a 100-endpoint codebase in 30 minutes. Nothing breaks.**
 
-Vibe coding hits a wall around 200 endpoints: the AI loses the global picture, patterns drift, and the 201st feature costs 10× the 21st. yongol shifts the AI workload from generated code to declarative SSOTs (8 specialized specs, ~10× context compression) and catches cross-layer drift before it compiles.
+Vibe coding hits a wall around 200 endpoints: the AI loses the global picture, patterns drift, and the 201st feature costs 10× the 21st. yongol shifts the AI workload from generated code to declarative SSOTs (10 specialized specs, ~10× context compression) and catches cross-layer drift before it compiles.
 
 ---
 
@@ -29,11 +29,12 @@ Vibe coding hits a wall around 200 endpoints: the AI loses the global picture, p
 
 Adding features never slowed down. Existing tests never broke.
 
-[Full benchmark report (Sonnet, try02)](examples/zenflow/try02/REPORT.md) — 29 endpoints, 12 tables, 57 hurl requests, ~91 min total.
+[Sonnet benchmark (try02)](examples/zenflow/try02/REPORT.md) — 30 endpoints, 12 tables, 64 hurl requests, ~131 min.
+[Opus benchmark (try03)](examples/zenflow/try03/REPORT.md) — 30 endpoints, 12 tables, 73 hurl requests, ~76 min.
 
 ---
 
-A full-stack SSOT orchestrator. Validates the consistency of 8 declarative sources and generates code from them.
+A full-stack SSOT orchestrator. Validates the consistency of 10 declarative sources and generates code from them.
 
 > **Status:** Go+Gin backend generation is **Beta** — functional end-to-end. React frontend generation is **Alpha** (work in progress).
 
@@ -110,10 +111,11 @@ Read yongol/manual-for-ai.md and build the spec in yongol/examples/zenflow/zenfl
 
 The AI writes specs. `yongol validate` catches cross-layer inconsistencies the moment they appear. AI stays free within the rails; step off the rails and validation fails fast.
 
-## The 8 SSOT Sources
+## The 10 SSOT Sources
 
 ```
 specs/
+├── features.yaml              → feature catalog (optional, cross-validates with OpenAPI)
 ├── manifest.yaml              → project configuration (required)
 ├── api/openapi.yaml           → OpenAPI 3.x
 ├── db/*.sql                   → SQL DDL + sqlc queries
@@ -150,7 +152,7 @@ When an AI reads that code, it cannot tell which line is a decision and which is
 - OpenAPI → API contract decisions
 - SSaC → service-flow decisions
 - Rego → authorization decisions
-- … 9 sources total
+- … 10 sources total
 
 The AI authors and edits SSOTs. Code is re-rendered from them on every `yongol generate`. Decisions live permanently in the SSOTs; the code is a disposable projection.
 
@@ -160,7 +162,7 @@ The AI authors and edits SSOTs. Code is re-rendered from them on every `yongol g
 
 ## Why SSaC is a custom DSL
 
-Of yongol's 9 SSOT sources, 7 are industry standards (OpenAPI, SQL DDL, sqlc, Rego, Mermaid, Hurl, manifest YAML). SSaC and STML are yongol inventions. SSaC — Service Sequence as Code — captures service flow decisions. STML — Semantic Template Markup Language — captures frontend page structure as HTML with `data-*` attributes.
+Of yongol's 10 SSOT sources, 8 are industry standards (OpenAPI, SQL DDL, sqlc, Rego, Mermaid, Hurl, manifest YAML). SSaC and STML are yongol inventions. SSaC — Service Sequence as Code — captures service flow decisions. STML — Semantic Template Markup Language — captures frontend page structure as HTML with `data-*` attributes.
 
 **The gap SSaC fills.** Consider the spectrum of declarative tools. On one end sit contract standards (OpenAPI, SQL, Rego) that declare *what* but not *in what order*. On the other end sit workflow runtimes (Temporal, Inngest, Restate) that are *code* — decisions and implementation details remix in the same file. SSaC occupies the empty seat between them: "what happens inside one endpoint, in what order, and with what guards."
 

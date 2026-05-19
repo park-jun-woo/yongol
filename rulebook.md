@@ -518,7 +518,7 @@ Cross-validation between `features.yaml` and the OpenAPI spec. Ensures that ever
 | Rule ID | Level | Description | Source |
 |---|---|---|---|
 | XFO-01 | ERROR | Features op has no matching OpenAPI operationId | `pkg/validate/features_openapi/xfo_01_op_not_in_openapi.go` |
-| XOF-01 | WARNING | OpenAPI operationId is not listed in features.yaml | `pkg/validate/features_openapi/xof_01_op_id_not_in_features.go` |
+| XOF-01 | ERROR | OpenAPI operationId is not listed in features.yaml | `pkg/validate/features_openapi/xof_01_op_id_not_in_features.go` |
 
 ---
 

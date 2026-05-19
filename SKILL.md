@@ -1,15 +1,15 @@
 ---
 name: yongol
-description: Full-stack SSOT orchestrator that validates the consistency of 9 declarative sources (manifest, OpenAPI, SQL DDL, sqlc, SSaC, Mermaid stateDiagram, OPA Rego, Hurl, STML) and generates Go+Gin backend and React frontend code from them. Use this skill when writing, editing, or validating SSOT spec files for a yongol project, when troubleshooting cross-layer validation errors, or when generating backend/frontend code from declarative specifications.
+description: Full-stack SSOT orchestrator that validates the consistency of 10 declarative sources (features, manifest, OpenAPI, SQL DDL, sqlc, SSaC, Mermaid stateDiagram, OPA Rego, Hurl, STML) and generates Go+Gin backend and React frontend code from them. Use this skill when writing, editing, or validating SSOT spec files for a yongol project, when troubleshooting cross-layer validation errors, or when generating backend/frontend code from declarative specifications.
 license: MIT
 metadata:
   author: park-jun-woo
-  version: "0.3.14"
+  version: "0.3.15"
 ---
 
 # yongol — Full-Stack SSOT Orchestrator
 
-yongol cross-validates 9 declarative SSOT (Single Source of Truth) files and generates a Go+Gin backend plus a React frontend from them. The AI edits only the SSOT specs; code is a disposable projection re-rendered on every `yongol generate`.
+yongol cross-validates 10 declarative SSOT (Single Source of Truth) files and generates a Go+Gin backend plus a React frontend from them. The AI edits only the SSOT specs; code is a disposable projection re-rendered on every `yongol generate`.
 
 ## When to Use This Skill
 
@@ -59,21 +59,22 @@ Requires Go 1.25+.
 | `yongol import <openapi> <out>` | Generate Go client from external OpenAPI |
 | `yongol status <specs>` | SSOT summary + drift dashboard |
 
-## The 9 SSOT Sources
+## The 10 SSOT Sources
 
 `operationId` (PascalCase) is the keystone identifier that chains all layers together.
 
 | # | Source | File Pattern | Purpose |
 |---|---|---|---|
-| 1 | manifest.yaml | `manifest.yaml` | Project config: auth, CORS, middleware, infra backends |
-| 2 | OpenAPI | `api/openapi.yaml` | API contract: endpoints, schemas, parameters, status codes |
-| 3 | SQL DDL | `db/*.sql` | Data model: tables, columns, types, constraints |
-| 4 | sqlc queries | `db/queries/*.sql` | Named queries with cardinality (:one, :many, :exec) |
-| 5 | SSaC | `service/**/*.ssac` | Service flow: ordered steps inside one endpoint |
-| 6 | Mermaid stateDiagram | `states/*.md` | State transitions for stateful entities |
-| 7 | OPA Rego | `policy/*.rego` | Authorization: who can do what on which resource |
-| 8 | Hurl | `tests/*.hurl` | HTTP tests: smoke, scenario, invariant |
-| 9 | STML | `frontend/*.html` | Frontend page specs: declarative HTML with `data-*` attributes |
+| 1 | features.yaml | `features.yaml` | Feature catalog: op/path/desc list, cross-validates with OpenAPI |
+| 2 | manifest.yaml | `manifest.yaml` | Project config: auth, CORS, middleware, infra backends |
+| 3 | OpenAPI | `api/openapi.yaml` | API contract: endpoints, schemas, parameters, status codes |
+| 4 | SQL DDL | `db/*.sql` | Data model: tables, columns, types, constraints |
+| 5 | sqlc queries | `db/queries/*.sql` | Named queries with cardinality (:one, :many, :exec) |
+| 6 | SSaC | `service/**/*.ssac` | Service flow: ordered steps inside one endpoint |
+| 7 | Mermaid stateDiagram | `states/*.md` | State transitions for stateful entities |
+| 8 | OPA Rego | `policy/*.rego` | Authorization: who can do what on which resource |
+| 9 | Hurl | `tests/*.hurl` | HTTP tests: smoke, scenario, invariant |
+| 10 | STML | `frontend/*.html` | Frontend page specs: declarative HTML with `data-*` attributes |
 
 ## SSaC Keywords
 
@@ -102,6 +103,8 @@ Requires Go 1.25+.
 | `XAS-*` | SSaC `@auth` has no Rego `allow` rule | Add corresponding Rego rule |
 | `XMS-*` | SSaC `@state` transition not in Mermaid | Add transition to stateDiagram |
 | `Q-12~18` | DDL uses UUID/TIMESTAMPTZ without sqlc override | Add pgtype override to sqlc.yaml (validator prints exact YAML) |
+| `XFO-01` | features op not in OpenAPI | Add endpoint to OpenAPI |
+| `XOF-01` | OpenAPI operationId not in features | Add feature to features.yaml |
 | `XOH-*` | Hurl test drifted from OpenAPI | Align Hurl with current OpenAPI spec |
 | `C-6` | Missing `backend.auth` in manifest | Add JWT auth block (mandatory) |
 | `D-2` | Non-PK column missing NOT NULL | Add `NOT NULL` or `-- @nullable` |
