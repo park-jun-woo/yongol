@@ -39,13 +39,17 @@ Requires Go 1.25+.
 ## Workflow
 
 ```
-1. Write/edit SSOT specs in specs/
-2. yongol validate specs/        → catch cross-layer errors
-3. Fix errors (validator provides rule ID + advice)
-4. Repeat 2-3 until 0 errors
-5. yongol generate specs/ arts/  → deterministic code output
-6. go build ./... inside arts/backend
-7. hurl --test against the running server
+1. Write features.yaml
+2. Agent reviews features.yaml       → challenge if incomplete or ambiguous
+3. User confirms features.yaml
+4. yongol init <id> <features.yaml>  → scaffold SSOT stubs + .yongol
+5. Write/edit SSOT specs in specs/
+6. yongol validate specs/            → catch cross-layer errors
+7. Fix errors (validator provides rule ID + advice)
+8. Repeat 6-7 until 0 errors
+9. yongol generate specs/ arts/      → deterministic code output
+10. go build ./... inside arts/backend
+11. hurl --test against the running server
 ```
 
 ## Commands
