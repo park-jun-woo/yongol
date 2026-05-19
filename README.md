@@ -7,6 +7,8 @@
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![skills.sh](https://skills.sh/b/park-jun-woo/yongol)](https://skills.sh/park-jun-woo/yongol)
 
+> **Claude Code only.** yongol is designed and tested exclusively for [Claude Code](https://claude.ai/code). Other AI coding tools are not supported.
+
 The keel of your AI-coded SaaS.
 
 **Add 10 endpoints to a 100-endpoint codebase in 30 minutes. Nothing breaks.**

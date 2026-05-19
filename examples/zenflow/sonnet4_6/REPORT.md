@@ -29,21 +29,22 @@
 ### SSOT Authoring Mistakes Fixed via Validate
 (Sonnet agent did not record per-iteration details. Validator was used iteratively until 0 errors.)
 
-### Codegen Issues (Bugs Filed)
+### Codegen Issues
+None — no real yongol bugs found in this benchmark.
 
-1. **BUG-077**: Service codegen emits bare string literal `Code: "forbidden"` for `ErrorResponse.Code` field, but oapi-codegen generates `Code *string` when `code` is not in OpenAPI `required`. Workaround: add `code` to required in ErrorResponse schema.
-2. **BUG-078**: Converter codegen wraps nullable UUID with `openapi_types.UUID(pgtypex.FromPgUUIDPtr(x))` — invalid Go. `FromPgUUIDPtr` returns `*openapi_types.UUID` (pointer), cannot be type-converted to non-pointer. Workaround: make all FK columns NOT NULL.
-3. **BUG-079**: Non-PK UUID params not wrapped with `pgtypex.ToPgUUID` in codegen. Workaround: SSOT-level adjustment.
-4. **BUG-080**: `@call` codegen does not capitalize `request.id` in string concatenation expressions (`"schedule:" + request.id` stays lowercase, causing build failure). Workaround: redesigned schedule storage from session to a `cron_expr TEXT NOT NULL DEFAULT ''` DB column on the workflows table.
+### SSOT Authoring Mistakes Misidentified as Bugs
+1. ~~BUG-077~~: bare string assigned to *string — add `code` to OpenAPI ErrorResponse `required`. SSOT authoring mistake
+2. ~~BUG-078~~: nullable UUID conversion error — manual specifies NOT NULL DEFAULT 0 sentinel pattern. Should not use nullable FKs
+3. ~~BUG-079~~: non-PK UUID missing ToPgUUID — works correctly when DDL-sqlc mapping is proper. SSOT authoring mistake
+4. ~~BUG-080~~: request.id not converted in @call string concatenation — string concatenation syntax not documented in manual. Unsupported usage
 
-### SSOT Design Decisions (Workarounds)
-- All FK columns made NOT NULL — avoids BUG-078 nullable UUID codegen bug.
-- `root_workflow_id UUID NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'` — sentinel UUID for optional versioning column.
-- Schedule operations redesigned from `session.Get/Set/Delete` to `@put Workflow.SetCronExpr(...)` + `@get Workflow.FindByID(...)` — avoids BUG-080.
-- `ErrorResponse.code` added to `required` — avoids BUG-077.
-- `ExecutionLogUpdateReportKey :exec` (no RETURNING) — correct `@put` semantics.
-- `Login.ssac` fixed to pass `OrgID: user.OrgID` to `IssueToken`.
-- `CreateWorkflow.ssac` fixed to use `currentUser.OrgID` not `currentUser.ID`.
+### SSOT Design Decisions
+- All FK columns NOT NULL — manual convention (sentinel pattern)
+- `root_workflow_id UUID NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'` — sentinel UUID
+- `ErrorResponse.code` added to `required` — OpenAPI convention
+- `ExecutionLogUpdateReportKey :exec` (no RETURNING) — correct `@put` semantics
+- `Login.ssac` fixed to pass `OrgID: user.OrgID` to `IssueToken`
+- `CreateWorkflow.ssac` fixed to use `currentUser.OrgID` not `currentUser.ID`
 
 ### Runtime Issues
 - Backend port hardcoded to `:8080` by yongol codegen — `PORT` env var not respected.
