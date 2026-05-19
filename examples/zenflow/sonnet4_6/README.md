@@ -4,6 +4,6 @@ sonnet4_6 project
 
 ## Development
 
-`yongol generate specs arts` 로 코드 산출.
+`yongol generate specs arts` to generate code artifacts.
 
-생성된 `arts/backend/` 에서 `go build ./...` 후 서버 기동.
+Run `go build ./...` inside `arts/backend/`, then start the server.

@@ -1,3 +1,6 @@
+-- name: LoginLookup :one
+SELECT id, password_hash, claims FROM users WHERE email = @email;
+
 -- name: RefreshTokenInsert :exec
 INSERT INTO refresh_tokens (token_hash, claims, expires_at)
 VALUES (@token_hash, @claims, @expires_at);

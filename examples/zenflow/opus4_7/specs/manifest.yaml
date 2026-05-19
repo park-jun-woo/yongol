@@ -1,12 +1,12 @@
 apiVersion: yongol/v1
 kind: Project
 metadata:
-  name: opus4_7
-  description: "ZenFlow multi-tenant workflow automation SaaS"
+  name: zenflow
+  description: "Multi-tenant workflow-automation SaaS"
 backend:
   lang: go
   framework: gin
-  module: github.com/park-jun-woo/opus4_7
+  module: github.com/park-jun-woo/zenflow
   middleware:
     - bearerAuth
   auth:
@@ -22,8 +22,12 @@ backend:
     roles:
       - admin
       - member
+queue:
+  backend: postgres
+session:
+  backend: postgres
 frontend:
   lang: typescript
   framework: react
   bundler: vite
-  name: opus4_7-web
+  name: zenflow-web

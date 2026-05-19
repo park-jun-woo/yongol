@@ -1,13 +1,14 @@
 package service
 
-import "github.com/park-jun-woo/opus4_7/internal/versioning"
+import "github.com/park-jun-woo/zenflow/internal/version"
 
 // @state-neutral
-// @auth "CreateWorkflowVersion" "workflow" {ResourceID: request.id} "Forbidden"
+// @auth "CreateWorkflowVersion" "workflow" {ResourceID: request.id} "Forbidden" 403
 // @get Workflow wf = Workflow.FindByID({ID: request.id})
-// @empty wf "Workflow not found"
-// @call NextVersionResponse ver = versioning.NextVersion({CurrentVersion: wf.Version})
-// @post Workflow newWf = Workflow.CreateVersion({OrgID: wf.OrgID, Title: wf.Title, TriggerEvent: wf.TriggerEvent, Version: ver.Version, RootWorkflowID: wf.ID})
-// @put Action.CopyToWorkflow({TargetWorkflowID: newWf.ID, SourceWorkflowID: wf.ID})
+// @empty wf "Workflow not found" 404
+// @call ResolveRootIDResponse rootResult = version.ResolveRootID({WorkflowID: wf.ID, RootWorkflowID: wf.RootWorkflowID})
+// @call NextVersionResponse versionResult = version.NextVersion({CurrentVersion: wf.Version})
+// @post Workflow newWf = Workflow.CreateVersion({OrgID: wf.OrgID, Title: wf.Title, TriggerEvent: wf.TriggerEvent, Version: versionResult.Version, RootWorkflowID: rootResult.RootID})
+// @put Action.CopyToWorkflow({NewWorkflowID: newWf.ID, SourceWorkflowID: wf.ID})
 // @response { workflow: newWf }
 func CreateWorkflowVersion() {}

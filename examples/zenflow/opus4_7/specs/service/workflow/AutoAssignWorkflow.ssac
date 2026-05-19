@@ -1,0 +1,15 @@
+package service
+
+import "github.com/park-jun-woo/zenflow/internal/workflow"
+
+// @state-neutral
+// @auth "AutoAssignWorkflow" "workflow" {ResourceID: request.id} "Forbidden" 403
+// @get Workflow wf = Workflow.FindByID({ID: request.id})
+// @empty wf "Workflow not found" 404
+// @get int64 memberCount = User.CountByOrgID({OrgID: wf.OrgID})
+// @call MatchMemberResponse match = workflow.MatchMember({TriggerEvent: wf.TriggerEvent, MemberCount: memberCount})
+// @put Workflow.AutoAssign({ID: wf.ID, MemberID: match.MemberID, Confidence: match.Confidence})
+// @get Workflow updated = Workflow.FindByID({ID: wf.ID})
+// @empty updated "Workflow not found" 404
+// @response { workflow: updated }
+func AutoAssignWorkflow() {}

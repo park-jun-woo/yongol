@@ -47,6 +47,18 @@ features:
     path: GET /workflows/{id}/versions
     desc: List all versions by root_workflow_id
 
+  - op: CreateWebhook
+    path: POST /webhooks
+    desc: Register a webhook URL for the org
+
+  - op: ListWebhooks
+    path: GET /webhooks
+    desc: List org webhooks
+
+  - op: DeleteWebhook
+    path: DELETE /webhooks/{id}
+    desc: Delete a webhook
+
   - op: PublishTemplate
     path: POST /templates
     desc: Publish a workflow as a public template
@@ -62,3 +74,55 @@ features:
   - op: CloneTemplate
     path: POST /templates/{id}/clone
     desc: Clone a template into caller org as a new workflow
+
+  - op: ExecuteWithReport
+    path: POST /workflows/{id}/execute-with-report
+    desc: Execute workflow and generate/upload report file
+
+  - op: GetExecutionReport
+    path: GET /execution-logs/{id}/report
+    desc: Download the report file linked to an execution log
+
+  - op: SetSchedule
+    path: POST /workflows/{id}/schedule
+    desc: Register a cron schedule for a workflow
+
+  - op: GetSchedule
+    path: GET /workflows/{id}/schedule
+    desc: Read current schedule from session
+
+  - op: DeleteSchedule
+    path: DELETE /workflows/{id}/schedule
+    desc: Clear schedule from session
+
+  - op: ListAuditLogs
+    path: GET /audit-logs
+    desc: Offset-paginated audit logs with sort and filter
+
+  - op: GetRecentAuditLogs
+    path: GET /audit-logs/recent
+    desc: Cache-backed recent entries for dashboard
+
+  - op: SaveWorkflowActions
+    path: PUT /workflows/{id}/actions
+    desc: Replace all actions of a workflow via batch insert
+
+  - op: GetDashboard
+    path: GET /dashboard
+    desc: Org dashboard summary with credits and plan info
+
+  - op: GetAuditLog
+    path: GET /audit-logs/{id}
+    desc: Get audit log detail by ID
+
+  - op: AutoAssignWorkflow
+    path: POST /workflows/{id}/auto-assign
+    desc: Auto-assign workflow to best-matching team member
+
+  - op: VerifyOrgAddress
+    path: POST /organizations/{id}/verify-address
+    desc: Verify and geocode an organization address
+
+  - op: GetExecutionDetail
+    path: GET /execution-logs/{id}/detail
+    desc: Enriched execution log detail with workflow and org info

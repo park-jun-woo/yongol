@@ -32,13 +32,3 @@ sql:
             go_type:
               import: "github.com/jackc/pgx/v5/pgtype"
               type: "Timestamptz"
-          - db_type: "timestamp"
-            nullable: false
-            go_type:
-              import: "github.com/jackc/pgx/v5/pgtype"
-              type: "Timestamp"
-          - db_type: "timestamp"
-            nullable: true
-            go_type:
-              import: "github.com/jackc/pgx/v5/pgtype"
-              type: "Timestamp"

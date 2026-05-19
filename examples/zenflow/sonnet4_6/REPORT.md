@@ -10,17 +10,15 @@
 
 | Stage | Description | Duration | Result |
 |---|---|---|---|
-| Initial build | 10 endpoints, 6 tables, auth, state machine | — | pass (37 hurl) |
-| Add-on 01 | Workflow versioning | — | pass |
-| Add-on 02 | Webhook notifications | — | pass |
-| Add-on 03 | Template marketplace | — | pass |
-| Add-on 04 | Execution report files | — | pass |
-| Add-on 05 | Workflow scheduling | — | pass |
-| Add-on 06 | Audit logs | — | pass |
-| Add-on 07 | Dashboard + relation enrichment | — | pass |
-| Add-on 08 | Batch operations | — | pass |
-| Add-on 09 | External API integration | — | pass |
-| Add-on 10 | Conditional update | — | pass |
+| Monolithic build | All 32 endpoints written at once, not incrementally | ~43m | pass (37 hurl) |
+
+Note: Sonnet wrote all 32 features (initial + add-on 01-10) in one batch rather than incrementally per add-on. No per-stage breakdown is available.
+
+- Start: 2026-05-19T03:03:36Z (first validate)
+- First generate: 2026-05-19T03:19:54Z (~16m of validate iterations)
+- First build success: ~2026-05-19T03:37:50Z
+- First hurl attempt: 2026-05-19T03:40:09Z (failed)
+- Final hurl pass: 2026-05-19T03:45:33Z (37/37 requests)
 
 **Total: ~43 min, 32 SSaC files, 9 DDL tables, 9 query files, 37 hurl requests. All green.**
 

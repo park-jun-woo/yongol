@@ -1,10 +1,8 @@
 package service
 
-// @auth "PublishTemplate" "template" {} "Forbidden"
-// @get Workflow wf = Workflow.FindByID({ID: request.workflow_id})
-// @empty wf "Workflow not found" 404
-// @get Template existing = Template.FindBySourceWorkflow({SourceWorkflowID: request.workflow_id})
+// @auth "PublishTemplate" "template" {} "Forbidden" 403
+// @get Template existing = Template.FindBySourceWorkflowID({SourceWorkflowID: request.source_workflow_id})
 // @exists existing "Already published" 409
-// @post Template tmpl = Template.Create({SourceWorkflowID: wf.ID, OrgID: currentUser.OrgID, Title: request.title, Description: request.description, Category: request.category})
-// @response { template: tmpl }
+// @post Template template = Template.Create({SourceWorkflowID: request.source_workflow_id, OrgID: currentUser.OrgID, Title: request.title, Description: request.description, Category: request.category})
+// @response { template: template }
 func PublishTemplate() {}

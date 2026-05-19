@@ -1,0 +1,7 @@
+package service
+
+// @no-pagination
+// @auth "GetRecentAuditLogs" "audit_log" {} "Forbidden" 403
+// @get []AuditLog items = AuditLog.ListByOrgIDPaged({OrgID: currentUser.OrgID, FilterAction: "", PerPage: 10, PageOffset: 0})
+// @response { items: items }
+func GetRecentAuditLogs() {}

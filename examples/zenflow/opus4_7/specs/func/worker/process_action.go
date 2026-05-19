@@ -1,7 +1,7 @@
 package worker
 
 // @func processAction
-// @description Simulates processing an external action
+// @description Simulates processing a workflow action (external API call stub)
 
 type ProcessActionRequest struct {
 	ActionType string
@@ -13,5 +13,7 @@ type ProcessActionResponse struct {
 }
 
 func ProcessAction(req ProcessActionRequest) (ProcessActionResponse, error) {
-	return ProcessActionResponse{Success: true}, nil
+	return ProcessActionResponse{
+		Success: true,
+	}, nil
 }

@@ -1,7 +1,7 @@
-package versioning
+package version
 
 // @func nextVersion
-// @description Returns current version + 1
+// @description Returns CurrentVersion + 1
 
 type NextVersionRequest struct {
 	CurrentVersion int64

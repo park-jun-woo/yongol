@@ -1,8 +1,8 @@
 package service
 
-// @auth "PauseWorkflow" "workflow" {ResourceID: request.id} "Forbidden"
+// @auth "PauseWorkflow" "workflow" {ResourceID: request.id} "Forbidden" 403
 // @get Workflow wf = Workflow.FindByID({ID: request.id})
-// @empty wf "Workflow not found"
+// @empty wf "Workflow not found" 404
 // @state workflow {status: wf.Status} "PauseWorkflow" "Cannot pause workflow" 409
 // @put Workflow.UpdateStatus({ID: wf.ID, Status: "paused"})
 // @get Workflow updated = Workflow.FindByID({ID: wf.ID})

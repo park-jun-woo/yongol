@@ -1,0 +1,14 @@
+package service
+
+import "github.com/park-jun-woo/zenflow/internal/dashboard"
+
+// @auth "GetExecutionDetail" "execution_log" {ResourceID: request.id} "Forbidden" 403
+// @get ExecutionLog log = ExecutionLog.FindByID({ID: request.id})
+// @empty log "Execution log not found" 404
+// @get Workflow wf = Workflow.FindByID({ID: log.WorkflowID})
+// @empty wf "Workflow not found" 404
+// @get Organization org = Organization.FindByID({ID: log.OrgID})
+// @empty org "Organization not found" 404
+// @call BuildExecutionDetailResponse detail = dashboard.BuildExecutionDetail({LogID: "now", WorkflowID: "now", WorkflowTitle: wf.Title, OrgID: "now", OrgName: org.Name, Status: log.Status, CreditsSpent: log.CreditsSpent, ExecutedAt: "now"})
+// @response { detail: detail }
+func GetExecutionDetail() {}

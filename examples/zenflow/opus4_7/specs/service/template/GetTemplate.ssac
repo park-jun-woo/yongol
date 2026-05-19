@@ -1,7 +1,6 @@
 package service
 
-// @auth "GetTemplate" "template" {} "Forbidden"
-// @get Template tmpl = Template.FindByID({ID: request.id})
-// @empty tmpl "Template not found"
-// @response { template: tmpl }
+// @get Template template = Template.FindByID({ID: request.id})
+// @empty template "Template not found" 404
+// @response { template: template }
 func GetTemplate() {}

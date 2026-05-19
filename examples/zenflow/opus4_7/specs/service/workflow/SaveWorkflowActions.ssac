@@ -1,0 +1,10 @@
+package service
+
+// @state-neutral
+// @auth "SaveWorkflowActions" "workflow" {ResourceID: request.id} "Forbidden" 403
+// @get Workflow wf = Workflow.FindByID({ID: request.id})
+// @empty wf "Workflow not found" 404
+// @delete Action.DeleteByWorkflowID({WorkflowID: wf.ID})
+// @put Action.BatchInsert({WorkflowID: wf.ID, Items: request.actions_json})
+// @response { message: "ok" }
+func SaveWorkflowActions() {}

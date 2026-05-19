@@ -1,0 +1,13 @@
+package service
+
+import "github.com/park-jun-woo/zenflow/internal/webhookdelivery"
+
+type WorkflowExecutedMessage struct {
+	WorkflowID string
+	OrgID      string
+	Status     string
+}
+
+// @subscribe "workflow.executed"
+// @call webhookdelivery.Deliver({URL: "simulated", Payload: message.Status})
+func OnWorkflowExecuted(message WorkflowExecutedMessage) {}

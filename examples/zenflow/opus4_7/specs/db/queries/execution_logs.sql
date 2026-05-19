@@ -3,9 +3,17 @@ INSERT INTO execution_logs (workflow_id, org_id, status, credits_spent)
 VALUES (@workflow_id, @org_id, @status, @credits_spent)
 RETURNING *;
 
--- name: ExecutionLogListByWorkflow :many
+-- name: ExecutionLogListByWorkflowID :many
 -- +no-pagination
 SELECT * FROM execution_logs WHERE workflow_id = @workflow_id ORDER BY executed_at DESC;
+
+-- name: ExecutionLogFindByID :one
+SELECT * FROM execution_logs WHERE id = @id;
+
+-- name: ExecutionLogCreateWithReport :one
+INSERT INTO execution_logs (workflow_id, org_id, status, credits_spent, report_key)
+VALUES (@workflow_id, @org_id, @status, @credits_spent, @report_key)
+RETURNING *;
 
 -- name: OwnerLookupExecutionLog :one
 SELECT org_id FROM execution_logs WHERE id = @id;
