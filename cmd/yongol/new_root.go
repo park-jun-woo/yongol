@@ -31,6 +31,7 @@ func newRoot() *cobra.Command {
 	root.AddCommand(statusCmd())
 	root.AddCommand(initCmd())
 	root.AddCommand(featuresCmd())
+	root.AddCommand(agentCmd())
 
 	return root
 }

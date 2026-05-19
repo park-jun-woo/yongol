@@ -63,6 +63,7 @@ Requires Go 1.25+.
 | `yongol features remove <opId> [...] [--yes]` | Remove features: SSaC + features.yaml cleanup + hash update |
 | `yongol chain <operationId> <specs>` | Trace one feature across all SSOT layers |
 | `yongol import <openapi> <out>` | Generate Go client from external OpenAPI |
+| `yongol agent <specs> [--model backend:name] [--max-rounds N]` | Auto-fix SSOT files until validate reports 0 errors |
 | `yongol status <specs>` | SSOT summary + drift dashboard |
 
 ## The 10 SSOT Sources

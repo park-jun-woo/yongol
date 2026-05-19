@@ -285,6 +285,16 @@ shows the deletion plan and asks for confirmation.
 yongol features remove ExportWorkflow ImportWorkflow --yes
 ```
 
+### `yongol agent <specs-dir>`
+
+Auto-fix SSOT files by calling an LLM in a validate-fix loop until 0 errors.
+
+```bash
+yongol agent specs/ --model ollama:gemma4:e4b --max-rounds 20
+```
+
+Flags: `--model <backend:name>` (default `ollama:gemma4:e4b`; backends: `ollama`, `xai`, `gemini`), `--max-rounds <N>` (default 20).
+
 ### `yongol validate <specs-dir>`
 
 Individual SSOT validation followed by cross-layer consistency checks.
