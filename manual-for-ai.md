@@ -566,7 +566,7 @@ invalid → 401. Permission checks are handled by `@auth`.
 
 ## Validation
 
-`yongol validate` runs 150+ rules across 18 categories (C-*, D-*, M-*, T-*,
+`yongol validate` runs 287 rules across 20 categories (C-*, D-*, M-*, T-*,
 S-*, XOT-*, XPS-*, XDM-*, XPD-*, XNS-*, PRV-*, MIG-*, CORS-*, SEC-*, OBS-*,
 H-*, …). AI authors do not memorise IDs — the validator prints rule ID, level,
 file, line, message. Catalog: [`rulebook.md`](rulebook.md). `yongol generate`

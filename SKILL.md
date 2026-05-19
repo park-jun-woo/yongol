@@ -26,7 +26,7 @@ Raw code mixes **user decisions**, **business logic**, and **implementation deta
 yongol separates these concerns:
 1. **SSOTs hold only decisions.** DDL = data model, OpenAPI = API contract, SSaC = service flow, Rego = authorization.
 2. **Code is generated from SSOTs.** Every `yongol generate` re-renders code deterministically. Code is disposable.
-3. **`validate` catches contradictions** (~270 cross-SSOT rules). Validation fails until all contradictions are resolved.
+3. **`validate` catches contradictions** (~287 cross-SSOT rules). Validation fails until all contradictions are resolved.
 
 ## Install
 
@@ -125,7 +125,7 @@ Requires Go 1.25+.
 | Document | Purpose |
 |---|---|
 | `manual-for-ai.md` | Complete AI manual: all SSOT syntax, conventions, examples |
-| `rulebook.md` | ~270 validation rules with IDs, levels, descriptions |
+| `rulebook.md` | ~287 validation rules with IDs, levels, descriptions |
 | `codebook.yaml` | Feature/type/topic keyword index |
 | `examples/zenflow/` | Working SSOT example project: specs, add-on specs, benchmark reports. Refer to this when writing SSOTs |
 | `README.md` | Quick start and benchmarks |
