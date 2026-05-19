@@ -1,7 +1,0 @@
-package service
-
-// @auth "GetDashboard" "dashboard" {} "Forbidden"
-// @get Organization org = Organization.FindByID({ID: currentUser.OrgID})
-// @empty org "Organization not found" 404
-// @response { summary: org }
-func GetDashboard() {}

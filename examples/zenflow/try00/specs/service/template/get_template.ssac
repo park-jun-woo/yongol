@@ -1,7 +1,0 @@
-package service
-
-// @state-neutral
-// @get Template tmpl = Template.FindByID({ID: request.id})
-// @empty tmpl "Template not found"
-// @response { template: tmpl }
-func GetTemplate() {}
