@@ -11,6 +11,7 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
 	"github.com/park-jun-woo/yongol/pkg/parser/ddl"
 	"github.com/park-jun-woo/yongol/pkg/parser/design"
+	"github.com/park-jun-woo/yongol/pkg/parser/features"
 	"github.com/park-jun-woo/yongol/pkg/parser/funcspec"
 	"github.com/park-jun-woo/yongol/pkg/parser/hurl"
 	"github.com/park-jun-woo/yongol/pkg/parser/manifest"
@@ -50,6 +51,7 @@ type Fullstack struct {
 	ResponseConstraints map[string]map[string]oapiparser.FieldConstraint
 	STMLPages           []stml.PageSpec
 	Layouts             []stml.LayoutSpec
+	Features            []features.Feature
 	DesignSpec          *design.DesignSpec
 	ParseDiagnostics    []diagnostic.Diagnostic   // All errors collected during the parser phase. Gated at the CLI level.
 	Presences           map[SSOTKind]SSOTPresence // Presence state (Absent/Declared/Populated) per SSOT kind.

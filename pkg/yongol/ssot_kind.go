@@ -16,4 +16,5 @@ const (
 	KindConfig   SSOTKind = "Config"
 	KindSTML     SSOTKind = "STML"
 	KindDesign   SSOTKind = "Design"
+	KindFeatures SSOTKind = "Features"
 )

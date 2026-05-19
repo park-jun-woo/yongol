@@ -36,6 +36,10 @@ func DetectSSOTs(root string) ([]DetectedSSOT, error) {
 	if _, err := os.Stat(openapiPath); err == nil {
 		found = append(found, DetectedSSOT{Kind: KindOpenAPI, Path: openapiPath, Presence: SSOTPopulated})
 	}
+	featuresPath := filepath.Join(abs, "features.yaml")
+	if _, err := os.Stat(featuresPath); err == nil {
+		found = append(found, DetectedSSOT{Kind: KindFeatures, Path: featuresPath, Presence: SSOTPopulated})
+	}
 
 	dirs := directorySSOTs(abs)
 	for _, d := range dirs {

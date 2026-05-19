@@ -502,6 +502,24 @@ Cross-validation between STML template attributes (`data-fetch`, `data-action`, 
 | TM-08 | ERROR | `data-each` field exists in the response schema but is not an array type | `pkg/validate/stml_openapi/tm_0708_each.go` |
 | TM-09 | ERROR | `data-component` references a `.tsx` file that does not exist | `pkg/validate/stml_openapi/tm_09_component_not_found.go` |
 
+## V. Features Internal (`FT-*`)
+
+Internal validation for `features.yaml`. Ensures no duplicate entries.
+
+| Rule ID | Level | Description | Source |
+|---|---|---|---|
+| FT-01 | ERROR | Duplicate `op` in features.yaml | `pkg/validate/features/ft_01_duplicate_op.go` |
+| FT-02 | ERROR | Duplicate `path` in features.yaml | `pkg/validate/features/ft_02_duplicate_path.go` |
+
+## W. Features ↔ OpenAPI (`XFO-*` / `XOF-*`)
+
+Cross-validation between `features.yaml` and the OpenAPI spec. Ensures that every feature op maps to a real OpenAPI operationId and vice versa.
+
+| Rule ID | Level | Description | Source |
+|---|---|---|---|
+| XFO-01 | ERROR | Features op has no matching OpenAPI operationId | `pkg/validate/features_openapi/xfo_01_op_not_in_openapi.go` |
+| XOF-01 | WARNING | OpenAPI operationId is not listed in features.yaml | `pkg/validate/features_openapi/xof_01_op_id_not_in_features.go` |
+
 ---
 
 ## Deprecated

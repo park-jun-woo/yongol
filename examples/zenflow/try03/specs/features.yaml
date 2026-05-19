@@ -1,0 +1,140 @@
+features:
+  - op: CreateOrganization
+    path: POST /organizations
+    desc: Create a new organization
+
+  - op: Register
+    path: POST /auth/register
+    desc: Register a new user account
+
+  - op: Login
+    path: POST /auth/login
+    desc: Authenticate and receive tokens
+
+  - op: ListWorkflows
+    path: GET /workflows
+    desc: List all workflows for the current user
+
+  - op: CreateWorkflow
+    path: POST /workflows
+    desc: Create a new workflow in draft state
+
+  - op: GetWorkflow
+    path: GET /workflows/{id}
+    desc: Retrieve a specific workflow by ID
+
+  - op: AutoAssignWorkflow
+    path: POST /workflows/{id}/auto-assign
+    desc: Auto-assign workflow to a member
+
+  - op: SaveWorkflowActions
+    path: PUT /workflows/{id}/actions
+    desc: Save all actions for a workflow
+
+  - op: CreateAction
+    path: POST /actions
+    desc: Create a new action
+
+  - op: ListActions
+    path: GET /actions
+    desc: List all available actions
+
+  - op: CreateWorkflowVersion
+    path: POST /workflows/{id}/versions
+    desc: Create a new version of a workflow
+
+  - op: ListWorkflowVersions
+    path: GET /workflows/{id}/versions
+    desc: List all versions of a workflow
+
+  - op: ActivateWorkflow
+    path: POST /workflows/{id}/activate
+    desc: Transition workflow to active state
+
+  - op: PauseWorkflow
+    path: POST /workflows/{id}/pause
+    desc: Pause an active workflow
+
+  - op: ArchiveWorkflow
+    path: POST /workflows/{id}/archive
+    desc: Archive a workflow
+
+  - op: ExecuteWorkflow
+    path: POST /workflows/{id}/execute
+    desc: Run all actions in sequence
+
+  - op: ListExecutionLogs
+    path: GET /workflows/{id}/executions
+    desc: List execution logs for a workflow
+
+  - op: VerifyOrgAddress
+    path: POST /organizations/{id}/verify-address
+    desc: Verify organization address
+
+  - op: GetDashboard
+    path: GET /dashboard
+    desc: Get dashboard summary data
+
+  - op: GetAuditLog
+    path: GET /audit-logs/{id}
+    desc: Get a specific audit log entry
+
+  - op: GetExecutionDetail
+    path: GET /executions/{id}
+    desc: Get detailed execution result
+
+  - op: ListAuditLogs
+    path: GET /audit-logs
+    desc: List all audit log entries
+
+  - op: GetRecentAuditLogs
+    path: GET /audit-logs/recent
+    desc: Get recent audit log entries
+
+  - op: SetSchedule
+    path: PUT /workflows/{id}/schedule
+    desc: Set execution schedule for a workflow
+
+  - op: GetSchedule
+    path: GET /workflows/{id}/schedule
+    desc: Get execution schedule for a workflow
+
+  - op: DeleteSchedule
+    path: DELETE /workflows/{id}/schedule
+    desc: Delete execution schedule for a workflow
+
+  - op: ExecuteWithReport
+    path: POST /workflows/{id}/execute-with-report
+    desc: Execute workflow and generate report
+
+  - op: GetExecutionReport
+    path: GET /executions/{id}/report
+    desc: Get execution report
+
+  - op: CreateWebhook
+    path: POST /webhooks
+    desc: Create a new webhook
+
+  - op: ListWebhooks
+    path: GET /webhooks
+    desc: List all webhooks
+
+  - op: PublishTemplate
+    path: POST /templates
+    desc: Publish a workflow as a template
+
+  - op: ListTemplates
+    path: GET /templates
+    desc: List all available templates
+
+  - op: GetTemplate
+    path: GET /templates/{id}
+    desc: Get a specific template
+
+  - op: CloneTemplate
+    path: POST /templates/{id}/clone
+    desc: Clone a template into a new workflow
+
+  - op: DeleteWebhook
+    path: DELETE /webhooks/{id}
+    desc: Delete a webhook

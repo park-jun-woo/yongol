@@ -27,6 +27,8 @@ func kindPresent(fs *yongol.Fullstack, k yongol.SSOTKind) bool {
 		return fs.STMLPages != nil
 	case yongol.KindDesign:
 		return fs.DesignSpec != nil
+	case yongol.KindFeatures:
+		return fs.Features != nil
 	}
 	return false
 }

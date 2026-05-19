@@ -93,6 +93,25 @@ bearer / hybrid), `session.backend`, `cache.backend`, `file.backend`,
 
 Validation rule families: `CORS-*`, `SEC-*`, `OBS-*`.
 
+## features.yaml
+
+Optional SSOT. A flat list of project features keyed by `operationId`.
+Human-readable feature catalog that cross-validates against OpenAPI.
+
+```yaml
+features:
+  - op: CreateWorkflow
+    path: POST /workflows
+    desc: Create a new workflow in draft state
+```
+
+Fields (all required):
+- `op` — operationId (PascalCase). Must match an OpenAPI `operationId`.
+- `path` — HTTP method + URI pattern.
+- `desc` — one-line human description.
+
+Validation rule families: `FT-*` (internal), `XFO-*` / `XOF-*` (cross with OpenAPI).
+
 ## OpenAPI
 
 Standard OpenAPI 3.x. yongol-specific conventions: see
