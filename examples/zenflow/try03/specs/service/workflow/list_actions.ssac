@@ -1,9 +1,0 @@
-package service
-
-// @auth "ListActions" "workflow" {ResourceID: request.id} "Forbidden"
-// @get Workflow wf = Workflow.FindByID({ID: request.id})
-// @empty wf "Workflow not found"
-// @no-pagination
-// @get []Action actions = Action.ListByWorkflow({WorkflowID: wf.ID})
-// @response { actions: actions }
-func ListActions() {}

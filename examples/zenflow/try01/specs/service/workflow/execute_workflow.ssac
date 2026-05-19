@@ -1,9 +1,0 @@
-package workflow
-
-// @state-neutral
-// @get Workflow workflow = Workflow.FindByID({ID: request.id})
-// @empty workflow "Workflow not found" 404
-// @auth "ExecuteWorkflow" "workflow" {} "Permission denied"
-// @post ExecutionLog log = ExecutionLog.Create({WorkflowID: workflow.ID, OrgID: workflow.OrgID, Status: "completed", CreditsSpent: 1})
-// @response { execution_log: log }
-func ExecuteWorkflow() {}

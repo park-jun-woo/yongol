@@ -1,7 +1,0 @@
-package template
-
-// @state-neutral
-// @get Template template = Template.FindByID({ID: request.id})
-// @empty template "Template not found" 404
-// @response {}
-func GetTemplate() {}

@@ -1,6 +1,0 @@
-package auth
-
-// For now, store password as-is. In production, this should hash the password.
-// @post User user = User.Create({OrgID: request.org_id, Email: request.email, PasswordHash: request.password, Role: request.role})
-// @response { user: user }
-func Register() {}

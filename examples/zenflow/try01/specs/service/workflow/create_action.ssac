@@ -1,9 +1,0 @@
-package workflow
-
-// @state-neutral
-// @get Workflow workflow = Workflow.FindByID({ID: request.id})
-// @empty workflow "Workflow not found" 404
-// @auth "CreateAction" "workflow" {} "Permission denied"
-// @post Action action = Action.Create({WorkflowID: workflow.ID, ActionType: request.action_type, Config: request.config, SequenceOrder: request.sequence_order})
-// @response { action: action }
-func CreateAction() {}

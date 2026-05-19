@@ -1,8 +1,0 @@
-package webhook
-
-// @state-neutral
-// @auth "CreateWebhook" "user" {} "Permission denied"
-// @post Webhook _ = Webhook.Create({OrgID: currentUser.OrgID, Url: request.url, EventType: request.event_type})
-
-// @response {}
-func CreateWebhook() {}

@@ -1,8 +1,0 @@
-package workflow
-
-// @state-neutral
-// @get Workflow workflow = Workflow.FindByID({ID: request.id})
-// @empty workflow "Workflow not found" 404
-// @auth "CreateWorkflowVersion" "workflow" {} "Permission denied"
-// @response { workflow: workflow }
-func CreateWorkflowVersion() {}

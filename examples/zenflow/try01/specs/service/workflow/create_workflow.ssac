@@ -1,5 +1,0 @@
-package workflow
-
-// @post Workflow workflow = Workflow.Create({OrgID: request.org_id, Title: request.title, TriggerEvent: request.trigger_event, Status: "draft"})
-// @response { workflow: workflow }
-func CreateWorkflow() {}
