@@ -23,7 +23,6 @@ import (
 // Config holds CLI flags for the agent command.
 type Config struct {
 	SpecsDir  string
-	DocsDir   string // path to yongol docs/ directory
 	Backend   string // "ollama", "xai", "gemini"
 	Model     string // model name within the backend
 	MaxRounds int
@@ -96,7 +95,7 @@ func Run(w io.Writer, cfg Config) error {
 			}
 
 			// Build prompts
-			systemPrompt := buildSystemPrompt(l, cfg.DocsDir)
+			systemPrompt := buildSystemPrompt(l)
 			messages := diagMessages(g.diags)
 			userPrompt := buildUserPrompt(desc, path, filepath.Base(g.relFile), string(content), messages)
 

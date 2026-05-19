@@ -15,7 +15,6 @@ import (
 func agentCmd() *cobra.Command {
 	var modelFlag string
 	var maxRoundsFlag int
-	var docsFlag string
 
 	cmd := &cobra.Command{
 		Use:           "agent <specs-dir>",
@@ -31,7 +30,6 @@ func agentCmd() *cobra.Command {
 
 			cfg := agent.Config{
 				SpecsDir:  args[0],
-				DocsDir:   docsFlag,
 				Backend:   backend,
 				Model:     model,
 				MaxRounds: maxRoundsFlag,
@@ -45,8 +43,6 @@ func agentCmd() *cobra.Command {
 		"LLM backend and model (format: ollama:<name>, xai:<name>, gemini:<name>)")
 	cmd.Flags().IntVar(&maxRoundsFlag, "max-rounds", 20,
 		"maximum validate-fix rounds")
-	cmd.Flags().StringVar(&docsFlag, "docs", "",
-		"path to yongol docs/ directory (auto-detected if empty)")
 
 	return cmd
 }
