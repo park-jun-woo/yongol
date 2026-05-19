@@ -265,6 +265,26 @@ Flags: `--dir <path>` (target directory, defaults to `./<ProjectID>`),
 `--module <go-module>` (overrides the auto-detected Go module path),
 `-f, --force` (allow writing into a non-empty directory).
 
+### `yongol features add <features.yaml>`
+
+Compares the given features.yaml with the existing `specs/features.yaml`,
+generates SSaC stub files for new operations, replaces `specs/features.yaml`,
+and updates the `.yongol` hash. Already existing ops are skipped.
+
+```bash
+yongol features add new_features.yaml
+```
+
+### `yongol features remove <operationId> [...] [--yes]`
+
+Removes the specified operationIds from `specs/features.yaml`, deletes
+their SSaC stub files, and updates the `.yongol` hash. Without `--yes`,
+shows the deletion plan and asks for confirmation.
+
+```bash
+yongol features remove ExportWorkflow ImportWorkflow --yes
+```
+
 ### `yongol validate <specs-dir>`
 
 Individual SSOT validation followed by cross-layer consistency checks.

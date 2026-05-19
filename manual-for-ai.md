@@ -635,6 +635,8 @@ hatch: `// nolint:prv-NN` (or `// nolint:panic` for PRV-10). Full spec:
 | Command | Description |
 |---|---|
 | `yongol init <ProjectID> <features.yaml> ["description"] [--dir <path>] [--module <go-module>] [-f]` | Read features.yaml and scaffold SSOT stubs (manifest + OpenAPI paths + SSaC + Rego + Hurl + sqlc) plus a `specs/.yongol` SHA-256 hash lock. Description is optional (defaults to `<ProjectID> project`). `yongol validate` checks the hash lock via FT-03. |
+| `yongol features add <features.yaml>` | 신규 features.yaml 과 기존 specs/features.yaml 을 비교하여 신규 op 의 SSaC stub 생성 + features.yaml 교체 + `.yongol` 해시 갱신. |
+| `yongol features remove <operationId> [...] [--yes]` | 지정된 operationId 를 features.yaml 에서 삭제 + SSaC 파일 삭제 + `.yongol` 해시 갱신. `--yes` 없으면 확인 프롬프트. |
 | `yongol validate [-f md\|json\|sarif] <specs-dir>` | Per-SSOT + cross validation. Non-zero on any ERROR. |
 | `yongol generate [--backend go-gin] [--frontend react] <specs-dir> <artifacts-dir>` | Runs validate then emits code. Refuses on any ERROR or WARNING. |
 | `yongol status <specs-dir> [<arts-dir>]` | Read-only dashboard. With `<arts-dir>`, lists preserved files and PRV-01~17 drift. Never fails. |
