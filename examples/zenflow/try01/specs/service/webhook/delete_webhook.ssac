@@ -1,8 +1,0 @@
-package service
-
-// @auth "DeleteWebhook" "webhook" {ResourceID: request.id} "Forbidden"
-// @get Webhook hook = Webhook.FindByID({ID: request.id})
-// @empty hook "Webhook not found" 404
-// @delete Webhook.Delete({ID: hook.ID})
-// @response! { ok: true }
-func DeleteWebhook() {}

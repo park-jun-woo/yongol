@@ -1,7 +1,0 @@
-package workflow
-
-// @no-pagination
-// @auth "ListWorkflowVersions" "workflow" {ResourceID: request.id} "Forbidden"
-// @get []Workflow versions = Workflow.ListVersions({RootWorkflowID: request.id, OrgID: currentUser.OrgID})
-// @response { items: versions }
-func ListWorkflowVersions() {}

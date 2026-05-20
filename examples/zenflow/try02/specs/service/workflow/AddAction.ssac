@@ -1,9 +1,0 @@
-package workflow
-
-// @auth "AddAction" "workflow" {ResourceID: request.id} "Forbidden"
-// @get Workflow wf = Workflow.FindByID({ID: request.id})
-// @empty wf "Workflow not found"
-// @state workflow {status: wf.Status} "AddAction" "Cannot add action in current state"
-// @post Action action = Action.Create({WorkflowID: request.id, ActionType: request.action_type, Config: request.config, SequenceOrder: request.sequence_order})
-// @response action
-func AddAction() {}

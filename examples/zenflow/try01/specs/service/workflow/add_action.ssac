@@ -1,9 +1,0 @@
-package service
-
-// @state-neutral
-// @auth "AddAction" "workflow" {ResourceID: request.id} "Forbidden"
-// @get Workflow wf = Workflow.FindByID({ID: request.id})
-// @empty wf "Workflow not found" 404
-// @post Action action = Action.Create({WorkflowID: wf.ID, ActionType: request.action_type, Config: request.config, SequenceOrder: request.sequence_order})
-// @response { action: action }
-func AddAction() {}

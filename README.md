@@ -31,8 +31,8 @@ Vibe coding hits a wall around 200 endpoints: the AI loses the global picture, p
 
 Adding features never slowed down. Existing tests never broke.
 
-[Sonnet benchmark (try02)](examples/zenflow/try02/REPORT.md) — 30 endpoints, 12 tables, 64 hurl requests, ~131 min.
-[Opus benchmark (try03)](examples/zenflow/try03/REPORT.md) — 30 endpoints, 12 tables, 73 hurl requests, ~76 min.
+[Sonnet 4.6 benchmark](examples/zenflow/sonnet4_6/REPORT.md) — 32 endpoints, 9 tables, 37 hurl requests, ~43 min.
+[Opus 4.6 benchmark](examples/zenflow/opus4_7/REPORT.md) — 32 endpoints, 14 tables, 47 hurl requests, ~69 min.
 
 ---
 

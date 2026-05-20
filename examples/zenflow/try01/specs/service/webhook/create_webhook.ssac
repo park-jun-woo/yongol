@@ -1,6 +1,0 @@
-package service
-
-// @auth "CreateWebhook" "webhook" {} "Forbidden"
-// @post Webhook hook = Webhook.Create({OrgID: currentUser.OrgID, Url: request.url, EventType: request.event_type})
-// @response { webhook: hook }
-func CreateWebhook() {}

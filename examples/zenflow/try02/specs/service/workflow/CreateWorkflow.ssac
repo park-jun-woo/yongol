@@ -1,7 +1,0 @@
-package workflow
-
-// @auth "CreateWorkflow" "workflow" {ResourceID: ""} "Forbidden"
-// @post Workflow wf = Workflow.Create({OrgID: currentUser.OrgID, Title: request.title, TriggerEvent: request.trigger_event})
-// @post AuditLog _ = AuditLog.Create({OrgID: currentUser.OrgID, ActorID: currentUser.ID, Action: "CreateWorkflow", ResourceType: "workflow", ResourceID: 0, Detail: ""})
-// @response wf
-func CreateWorkflow() {}

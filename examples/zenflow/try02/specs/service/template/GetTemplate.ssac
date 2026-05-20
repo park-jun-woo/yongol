@@ -1,7 +1,0 @@
-package template
-
-// @auth "GetTemplate" "template" {ResourceID: request.id} "Forbidden"
-// @get Template tmpl = Template.FindByID({ID: request.id})
-// @empty tmpl "Template not found"
-// @response tmpl
-func GetTemplate() {}

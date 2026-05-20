@@ -1,6 +1,0 @@
-package webhook
-
-// @auth "CreateWebhook" "webhook" {ResourceID: ""} "Forbidden"
-// @post Webhook wh = Webhook.Create({OrgID: currentUser.OrgID, Url: request.url, EventType: request.event_type})
-// @response wh
-func CreateWebhook() {}
