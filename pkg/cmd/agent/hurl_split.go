@@ -68,6 +68,19 @@ func mergeHurlBlock(originalContent string, startLine, endLine int, fixedBlock s
 	return spliceLines(originalContent, startLine, endLine, fixedBlock), nil
 }
 
+// insertHurlBlock appends a new request block to the end of the hurl file.
+// Validates that the new block contains an HTTP method line.
+func insertHurlBlock(originalContent, newBlock string) (string, error) {
+	if !containsHTTPMethodLine(newBlock) {
+		return "", fmt.Errorf("new Hurl block is missing HTTP method line (GET/POST/PUT/DELETE/PATCH)")
+	}
+
+	content := strings.TrimRight(originalContent, "\n")
+	newBlock = strings.TrimRight(newBlock, "\n")
+
+	return content + "\n\n" + newBlock + "\n", nil
+}
+
 // containsHTTPMethodLine checks if the text contains a line starting with an HTTP method.
 func containsHTTPMethodLine(s string) bool {
 	methods := []string{"GET ", "POST ", "PUT ", "DELETE ", "PATCH ", "HEAD ", "OPTIONS "}

@@ -110,6 +110,68 @@ func mergeOpenAPIBlock(originalContent string, startLine, endLine int, fixedBloc
 	return spliceLines(originalContent, startLine, endLine, fixedBlock), nil
 }
 
+// insertOpenAPIBlock inserts a new path block into openapi.yaml.
+// Finds the end of the paths: section (before components: or EOF) and inserts there.
+// Validates yaml before insertion.
+func insertOpenAPIBlock(originalContent, newBlock string) (string, error) {
+	// Validate: the newBlock must parse as valid YAML
+	var node yaml.Node
+	if err := yaml.Unmarshal([]byte(newBlock), &node); err != nil {
+		return "", fmt.Errorf("new OpenAPI block is not valid YAML: %w", err)
+	}
+
+	// Validate: must contain an operationId field
+	if !strings.Contains(newBlock, "operationId:") {
+		return "", fmt.Errorf("new OpenAPI block is missing operationId field")
+	}
+
+	lines := strings.Split(originalContent, "\n")
+
+	// Find "paths:" top-level key
+	pathsLine := -1
+	for i, l := range lines {
+		trimmed := strings.TrimSpace(l)
+		if trimmed == "paths:" && countLeadingSpaces(l) == 0 {
+			pathsLine = i
+			break
+		}
+	}
+	if pathsLine < 0 {
+		return "", fmt.Errorf("'paths:' section not found in OpenAPI content")
+	}
+
+	// Find the end of the paths section: next top-level key (indent 0) or EOF
+	insertAt := len(lines)
+	for i := pathsLine + 1; i < len(lines); i++ {
+		trimmed := strings.TrimSpace(lines[i])
+		if trimmed == "" {
+			continue
+		}
+		if countLeadingSpaces(lines[i]) == 0 {
+			insertAt = i
+			break
+		}
+	}
+
+	// Insert the new block before the next section (or at EOF)
+	newBlock = strings.TrimRight(newBlock, "\n")
+	var b strings.Builder
+	for i := 0; i < insertAt; i++ {
+		b.WriteString(lines[i])
+		b.WriteByte('\n')
+	}
+	b.WriteString(newBlock)
+	b.WriteByte('\n')
+	for i := insertAt; i < len(lines); i++ {
+		b.WriteString(lines[i])
+		if i < len(lines)-1 {
+			b.WriteByte('\n')
+		}
+	}
+
+	return b.String(), nil
+}
+
 // isHTTPMethod checks if a trimmed line starts with a YAML key for an HTTP method.
 func isHTTPMethod(trimmed string) bool {
 	methods := []string{"get:", "post:", "put:", "delete:", "patch:", "head:", "options:"}

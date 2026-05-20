@@ -343,28 +343,46 @@ func chainResolve(specsDir, relPath string, lookup map[string]features.Feature) 
 
 // reOperationID matches operationId references in diagnostic messages.
 // Patterns: "operationId X", "operationId: X", "operationId \"X\"",
-// "operationId 'X'", "func X", "action == \"X\"", "# X" comment refs.
+// "operationId 'X'", "func X", "action == \"X\"", "# X" comment refs,
+// "SSaC authorize (X, ...)", "Missing: X, Y, ...".
 var reOperationID = regexp.MustCompile(
 	`(?:operationId[:\s]+\"?([A-Z][A-Za-z0-9]+)\"?` +
 		`|SSaC func ([A-Z][A-Za-z0-9]+)` +
+		`|SSaC authorize \(([A-Z][A-Za-z0-9]+)` +
 		`|input\.action == "([A-Z][A-Za-z0-9]+)"` +
 		`|# ([A-Z][A-Za-z0-9]+))`,
 )
+
+// reMissingList matches "Missing: X, Y, Z" lists from XOH-11 style diagnostics.
+var reMissingList = regexp.MustCompile(`Missing:\s*([A-Z][A-Za-z0-9]+(?:\s*,\s*[A-Z][A-Za-z0-9]+)*)`)
+
+// reMissingItem extracts individual operationIds from a comma-separated list.
+var reMissingItem = regexp.MustCompile(`[A-Z][A-Za-z0-9]+`)
 
 // extractOperationIDs extracts unique operationIds from diagnostic messages.
 func extractOperationIDs(diags []diagnostic.Diagnostic) []string {
 	seen := map[string]struct{}{}
 	var result []string
+	addUnique := func(id string) {
+		if _, ok := seen[id]; !ok {
+			seen[id] = struct{}{}
+			result = append(result, id)
+		}
+	}
 	for _, d := range diags {
 		matches := reOperationID.FindAllStringSubmatch(d.Message, -1)
 		for _, m := range matches {
 			for _, g := range m[1:] {
 				if g != "" {
-					if _, ok := seen[g]; !ok {
-						seen[g] = struct{}{}
-						result = append(result, g)
-					}
+					addUnique(g)
 				}
+			}
+		}
+		// Handle "Missing: X, Y, Z" lists (XOH-11 style)
+		if ml := reMissingList.FindStringSubmatch(d.Message); len(ml) > 1 {
+			items := reMissingItem.FindAllString(ml[1], -1)
+			for _, item := range items {
+				addUnique(item)
 			}
 		}
 	}
@@ -384,28 +402,29 @@ func filterMessagesByOp(messages []string, opID string) []string {
 
 // fixSingleBlock extracts a block for an operationId, sends it to LLM, and merges
 // the result back into fileContent. Returns true if the block was fixed.
+// If the block does not exist, attempts to generate new content using SSaC + features.
 func fixSingleBlock(w io.Writer, cfg Config, l layer, relFile, absPath string, fileContent *string, opID, desc, path string, diagMsgs []string) bool {
 	var block string
 	var startLine, endLine int
-	var err error
+	var extractErr error
 
 	switch l {
 	case layerOpenAPI:
-		block, startLine, endLine, err = extractOpenAPIBlock(*fileContent, opID)
+		block, startLine, endLine, extractErr = extractOpenAPIBlock(*fileContent, opID)
 	case layerRego:
-		block, startLine, endLine, err = extractRegoBlock(*fileContent, opID)
+		block, startLine, endLine, extractErr = extractRegoBlock(*fileContent, opID)
 	case layerHurl:
-		block, startLine, endLine, err = extractHurlBlock(*fileContent, opID)
+		block, startLine, endLine, extractErr = extractHurlBlock(*fileContent, opID)
 	default:
 		return false
 	}
 
-	if err != nil {
-		fmt.Fprintf(w, "  skipped block: %s/%s (%v)\n", relFile, opID, err)
-		return false
+	// Block not found — try generating new content
+	if extractErr != nil {
+		return generateNewBlock(w, cfg, l, relFile, absPath, fileContent, opID, desc, path)
 	}
 
-	// Build prompts with block only
+	// Block found — fix existing content (original flow)
 	systemPrompt := buildSystemPrompt(l, diagMsgs)
 	userPrompt := buildBlockUserPrompt(desc, path, filepath.Base(relFile), opID, block, diagMsgs)
 
@@ -439,6 +458,102 @@ func fixSingleBlock(w io.Writer, cfg Config, l layer, relFile, absPath string, f
 
 	*fileContent = merged
 	return true
+}
+
+// generateNewBlock generates a new block for an operationId using SSaC content + features,
+// then inserts it into the file. Returns true if block was generated and inserted.
+func generateNewBlock(w io.Writer, cfg Config, l layer, relFile, absPath string, fileContent *string, opID, desc, featurePath string) bool {
+	// Find SSaC file: search service/*/{opID}.ssac
+	specsDir := filepath.Dir(filepath.Dir(absPath))
+	if l == layerRego {
+		// For policy/*.rego, specs dir is one level up from policy/
+		specsDir = filepath.Dir(filepath.Dir(absPath))
+	}
+	// Normalize: for api/openapi.yaml → specsDir is parent of api/
+	// For policy/authz.rego → specsDir is parent of policy/
+	// For tests/api.hurl → specsDir is parent of tests/
+	// In all cases we want the specs root containing service/
+	specsDir = resolveSpecsRoot(absPath, l)
+
+	ssacContent, ssacFound := findSSaCFile(specsDir, opID)
+	if !ssacFound {
+		fmt.Fprintf(w, "  skipped generate: %s/%s (SSaC file not found)\n", relFile, opID)
+		return false
+	}
+
+	// Build generate prompt
+	systemPrompt := "You generate yongol SSOT content. Output ONLY the requested block. No explanations. No markdown fences.\n\nExample for " + layerName(l) + ":\n" + layerExample(l)
+	userPrompt := buildGeneratePrompt(l, opID, desc, featurePath, ssacContent)
+
+	reply, err := llmCall(cfg.Backend, cfg.Model, systemPrompt, userPrompt)
+	if err != nil {
+		fmt.Fprintf(w, "  skipped generate: %s/%s (LLM error: %v)\n", relFile, opID, err)
+		return false
+	}
+
+	newBlock := stripMarkdownFences(reply)
+	if newBlock == "" {
+		fmt.Fprintf(w, "  skipped generate: %s/%s (empty LLM response)\n", relFile, opID)
+		return false
+	}
+
+	// Insert new block into file content
+	var inserted string
+	switch l {
+	case layerOpenAPI:
+		inserted, err = insertOpenAPIBlock(*fileContent, newBlock)
+	case layerRego:
+		inserted, err = insertRegoBlock(*fileContent, newBlock)
+	case layerHurl:
+		inserted, err = insertHurlBlock(*fileContent, newBlock)
+	default:
+		return false
+	}
+
+	if err != nil {
+		fmt.Fprintf(w, "  skipped generate: %s/%s (insert error: %v)\n", relFile, opID, err)
+		return false
+	}
+
+	*fileContent = inserted
+	fmt.Fprintf(w, "  generated: %s/%s\n", relFile, opID)
+	return true
+}
+
+// resolveSpecsRoot derives the specs root directory from an absolute file path and its layer.
+func resolveSpecsRoot(absPath string, l layer) string {
+	switch l {
+	case layerOpenAPI:
+		// absPath = .../specs/api/openapi.yaml → specs root = parent of api/
+		return filepath.Dir(filepath.Dir(absPath))
+	case layerRego:
+		// absPath = .../specs/policy/authz.rego → specs root = parent of policy/
+		return filepath.Dir(filepath.Dir(absPath))
+	case layerHurl:
+		// absPath = .../specs/tests/api.hurl → specs root = parent of tests/
+		return filepath.Dir(filepath.Dir(absPath))
+	default:
+		return filepath.Dir(absPath)
+	}
+}
+
+// findSSaCFile searches for service/*/{operationId}.ssac under specsDir.
+// Returns the file content and true if found.
+func findSSaCFile(specsDir, operationId string) (string, bool) {
+	serviceDir := filepath.Join(specsDir, "service")
+
+	// Glob for service/*/{operationId}.ssac
+	pattern := filepath.Join(serviceDir, "*", operationId+".ssac")
+	matches, err := filepath.Glob(pattern)
+	if err != nil || len(matches) == 0 {
+		return "", false
+	}
+
+	data, err := os.ReadFile(matches[0])
+	if err != nil {
+		return "", false
+	}
+	return string(data), true
 }
 
 // buildBlockUserPrompt assembles the user prompt for a single block fix.

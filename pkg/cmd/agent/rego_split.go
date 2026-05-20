@@ -85,3 +85,16 @@ func mergeRegoBlock(originalContent string, startLine, endLine int, fixedBlock s
 
 	return spliceLines(originalContent, startLine, endLine, fixedBlock), nil
 }
+
+// insertRegoBlock appends a new allow block to the end of the rego file.
+// Validates that the new block contains "allow if {" pattern.
+func insertRegoBlock(originalContent, newBlock string) (string, error) {
+	if !strings.Contains(newBlock, "allow") || !strings.Contains(newBlock, "if") || !strings.Contains(newBlock, "{") {
+		return "", fmt.Errorf("new Rego block is missing 'allow if {' pattern")
+	}
+
+	content := strings.TrimRight(originalContent, "\n")
+	newBlock = strings.TrimRight(newBlock, "\n")
+
+	return content + "\n\n" + newBlock + "\n", nil
+}
