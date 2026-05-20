@@ -4,7 +4,7 @@ description: Full-stack SSOT orchestrator that validates the consistency of 10 d
 license: MIT
 metadata:
   author: park-jun-woo
-  version: "0.5.0"
+  version: "0.5.1"
 ---
 
 # yongol — Full-Stack SSOT Orchestrator
@@ -67,6 +67,7 @@ Requires Go 1.25+.
 | `yongol init <id> <features.yaml> ["desc"]` | Scaffold SSOT stubs from features.yaml + hash lock |
 | `yongol features add <features.yaml>` | Add new features: SSaC stub gen + hash update |
 | `yongol features remove <opId> [...] [--yes]` | Remove features: SSaC + features.yaml cleanup + hash update |
+| `yongol hash <specs-dir>` | Generate .yongol hash lock from features.yaml (for existing projects) |
 | `yongol chain <operationId> <specs>` | Trace one feature across all SSOT layers |
 | `yongol import <openapi> <out>` | Generate Go client from external OpenAPI |
 | `yongol agent <specs> [--model backend:name] [--max-rounds N]` | Auto-fix SSOT files until validate reports 0 errors |

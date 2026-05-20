@@ -32,6 +32,7 @@ func newRoot() *cobra.Command {
 	root.AddCommand(initCmd())
 	root.AddCommand(featuresCmd())
 	root.AddCommand(agentCmd())
+	root.AddCommand(hashCmd())
 
 	return root
 }
