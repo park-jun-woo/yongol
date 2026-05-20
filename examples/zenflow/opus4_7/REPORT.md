@@ -1,7 +1,7 @@
 # ZenFlow opus4_7 — Benchmark Report
 
 ## Environment
-- Model: Claude Opus 4.6 (1M context)
+- Model: Claude Opus 4.7 (1M context)
 - Claude Code: 2.1.144
 - yongol: v0.4.1
 - Go: go1.25.0 linux/amd64
