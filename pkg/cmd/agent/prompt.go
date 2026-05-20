@@ -27,7 +27,6 @@ const (
 
 // layerPriority defines the fix order — lower index = fix first.
 var layerPriority = []layer{
-	layerSSaC,
 	layerDDL,
 	layerSQLcQuery,
 	layerOpenAPI,
@@ -36,6 +35,7 @@ var layerPriority = []layer{
 	layerStateDiagram,
 	layerFuncSpec,
 	layerHurl,
+	layerSSaC,
 }
 
 // classifyFile returns the SSOT layer for a file path (relative to specs-dir).
