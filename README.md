@@ -54,7 +54,7 @@ A full-stack SSOT orchestrator. Validates the consistency of 10 declarative sour
 npx skills add park-jun-woo/yongol
 ```
 
-> 💬 Ask your agent: *"Build a multi-tenant todo SaaS with auth, CRUD, and Hurl tests using yongol"*
+> 💬 Ask your agent: *"Build a multi-tenant todo SaaS with auth and CRUD using yongol. Keep going until `yongol validate` shows 0 errors and 0 warnings, and all Hurl smoke tests pass."*
 
 ```
 ## Validation
