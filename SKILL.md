@@ -13,7 +13,9 @@ yongol cross-validates 10 declarative SSOT (Single Source of Truth) files and ge
 
 ## Critical Rule
 
-**Never stop at `yongol generate`.** When a user asks you to build something, keep iterating `yongol validate` → fix → validate until the output shows **0 errors and 0 warnings**. Then generate, build, and run Hurl tests until all pass. A build that skips validation ships broken decisions.
+**Always start with `yongol init`.** Write `features.yaml` first, then run `yongol init` to scaffold SSOT stubs before writing any specs. Never create SSOT files by hand.
+
+**Never stop at `yongol generate`.** Keep iterating `yongol validate` → fix → validate until the output shows **0 errors and 0 warnings**. Then generate, build, and run Hurl tests until all pass. A build that skips validation ships broken decisions.
 
 ## When to Use This Skill
 
