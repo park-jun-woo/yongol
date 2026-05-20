@@ -4,6 +4,7 @@ package validate
 
 import (
 	"github.com/park-jun-woo/yongol/pkg/yongol"
+	"github.com/park-jun-woo/yongol/pkg/validate/initcheck"
 	"github.com/park-jun-woo/yongol/pkg/validate/ddl"
 	"github.com/park-jun-woo/yongol/pkg/validate/ddl_rego"
 	"github.com/park-jun-woo/yongol/pkg/validate/ddl_statemachine"
@@ -43,6 +44,7 @@ import (
 // allSteps returns the validation steps in fixed execution order.
 func allSteps() []step {
 	return []step{
+		{Name: "init", Kinds: nil, Run: initcheck.Run},
 		{Name: "manifest", Kinds: []yongol.SSOTKind{yongol.KindConfig}, Run: manifest.Run},
 		{Name: "openapi", Kinds: []yongol.SSOTKind{yongol.KindOpenAPI}, Run: openapi.Run},
 		{Name: "ddl", Kinds: []yongol.SSOTKind{yongol.KindDDL}, Run: ddl.Run},

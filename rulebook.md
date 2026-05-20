@@ -21,6 +21,7 @@ Complete catalog of rules executed by `yongol validate`. The manual (`manual-for
 | `Q-` | sqlc queries |
 | `CORS-` | manifest CORS block |
 | `TM-` | STML ↔ OpenAPI cross-validation |
+| `INI-` | Init check (project initialization) |
 
 ### Cross SSOT — `X<target><source>-<N>`
 
@@ -48,6 +49,14 @@ Example: SSaC → OpenAPI (SSaC is the claim, OpenAPI is the ground truth) → `
 The `Source` column of each rule row is a Go file path relative to the repo root. Example: `pkg/validate/ssac/s_27_var_declared.go`.
 
 ---
+
+## INI. Init Check
+
+Project initialization check — verifies that `specs/.yongol` exists before other validations run.
+
+| Rule ID | Level | Description | Source |
+|---|---|---|---|
+| INI-01 | WARNING | `.yongol` not found in specs directory — project not initialized | `pkg/validate/initcheck/ini_01_require_init.go` |
 
 ## A. SSaC Internal
 
