@@ -29,6 +29,76 @@ func Register() {}
 
 When using `@call pkg.Func` or `@eval pkg.Func`, the package must appear in the file's `import` block with a full Go import path (S-72, S-73).
 
+**Critical: SSaC is NOT regular Go.** Three rules that differ from Go conventions:
+
+1. **func has NO parameters and an empty body:**
+```go
+// ✅ correct
+func GetWorkflow() {}
+
+// ❌ wrong — SSaC func never takes parameters
+func GetWorkflow(id string) {}
+```
+
+2. **Args use `{Key: value}` format, never bare values:**
+```go
+// ✅ correct
+// @get Workflow wf = Workflow.FindByID({ID: request.id})
+
+// ❌ wrong — bare arg
+// @get Workflow wf = Workflow.FindByID(request.id)
+
+// ❌ wrong — bare arg
+// @get Workflow wf = Workflow.FindByID(id)
+```
+
+3. **@call result type is a bare struct name, never package-qualified:**
+```go
+// ✅ correct — bare name
+// @call VerifyAddressResponse result = geocoding.VerifyAddress({Address: org.Address})
+
+// ❌ wrong — package-qualified
+// @call geocoding.VerifyAddressResponse result = geocoding.VerifyAddress({Address: org.Address})
+```
+
+More examples:
+
+```go
+package service
+
+// @auth "GetWorkflow" "workflow" {ResourceID: request.id} "Forbidden"
+// @get Workflow wf = Workflow.FindByID({ID: request.id})
+// @empty wf "Workflow not found"
+// @response { workflow: wf }
+func GetWorkflow() {}
+```
+
+```go
+package service
+
+// @auth "ActivateWorkflow" "workflow" {ResourceID: request.id} "Forbidden"
+// @get Workflow wf = Workflow.FindByID({ID: request.id})
+// @empty wf "Workflow not found"
+// @get Organization org = Organization.FindByID({ID: currentUser.OrgID})
+// @eval billing.IsZeroBalance({Balance: org.CreditsBalance}) "Insufficient credits" 402
+// @state workflow {status: wf.Status} "ActivateWorkflow" "Cannot activate" 409
+// @put Workflow.UpdateStatus({ID: wf.ID, Status: "active"})
+// @get Workflow updated = Workflow.FindByID({ID: wf.ID})
+// @response { workflow: updated }
+func ActivateWorkflow() {}
+```
+
+```go
+package service
+
+// @auth "CloneTemplate" "template" {ResourceID: request.id} "Forbidden"
+// @get Template tmpl = Template.FindByID({ID: request.id})
+// @empty tmpl "Template not found"
+// @call CloneResult cloned = workflow.CloneFromTemplate({TemplateID: tmpl.ID, OrgID: currentUser.OrgID})
+// @response { workflow: cloned }
+func CloneTemplate() {}
+```
+
 ## Sequence Types
 
 | Type | Purpose | Format |
