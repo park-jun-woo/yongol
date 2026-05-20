@@ -21,18 +21,24 @@ Vibe coding hits a wall around 200 endpoints: the AI loses the global picture, p
 
 | Stage | Description | Time | Cumulative |
 |---|---|---:|---:|
-| Initial build | multi-tenant, credits, state machine, 5 tables, 12 endpoints | 20 min | 20 min |
-| + Versioning | workflow clone, version list, INSERT...SELECT action copy | 12 min | 32 min |
-| + Webhooks | event publish, webhook CRUD, queue backend | 6 min | 38 min |
-| + Template marketplace | cursor pagination, cross-org clone, public endpoints | 5 min | 43 min |
-| + File attachments | execution reports, file backend | 4 min | 47 min |
+| Initial build | 10 endpoints, 6 tables, auth, state machine | 13 min | 13 min |
+| + Versioning | workflow clone, version list | 6 min | 19 min |
+| + Webhooks | webhook CRUD, queue backend | 6 min | 25 min |
+| + Template marketplace | cursor pagination, cross-org clone | 3 min | 28 min |
+| + File attachments | execution reports, file backend | 4 min | 32 min |
+| + Scheduling | cron scheduling, session backend | 6 min | 38 min |
+| + Audit logs | offset pagination, cache backend | 3 min | 41 min |
+| + Dashboard | relation enrichment, func response types | 7 min | 48 min |
+| + Batch operations | jsonb batch insert | 14 min | 62 min |
+| + External API | geocoding func, column additions | 3 min | 65 min |
+| + Conditional update | sentinel pattern, auto-assign | 4 min | 69 min |
 
-**Final: 23 endpoints, 7 tables, 23 services, 18 auth rules, 65 test requests. All green.**
+**Final: 32 endpoints, 14 tables, 47 hurl requests. 11/11 stages green.**
 
 Adding features never slowed down. Existing tests never broke.
 
-[Sonnet 4.6 benchmark](examples/zenflow/sonnet4_6/REPORT.md) — 32 endpoints, 9 tables, 37 hurl requests, ~43 min.
 [Opus 4.7 benchmark](examples/zenflow/opus4_7/REPORT.md) — 32 endpoints, 14 tables, 47 hurl requests, ~69 min.
+[Sonnet 4.6 benchmark](examples/zenflow/sonnet4_6/REPORT.md) — 32 endpoints, 9 tables, 37 hurl requests, ~43 min.
 
 ---
 
