@@ -41,9 +41,6 @@ func Run(w io.Writer, cfg Config) error {
 	// Build feature lookup (op → Feature)
 	featureLookup := loadFeatureLookup(cfg.SpecsDir)
 
-	// Track consecutive failures per (file, ruleID) for convergence detection.
-	failCount := map[string]int{} // key: "relFile\truleID"
-
 	for round := 1; round <= cfg.MaxRounds; round++ {
 		// 1. Detect + Parse + Validate
 		diags, err := runValidate(cfg.SpecsDir)
@@ -65,12 +62,6 @@ func Run(w io.Writer, cfg Config) error {
 
 		roundFixed := 0
 		for _, g := range groups {
-			// Check convergence: skip file if same (file, ruleID) failed 3+ times
-			if shouldSkip(g, failCount) {
-				fmt.Fprintf(w, "  skipped: %s (convergence limit)\n", g.relFile)
-				continue
-			}
-
 			l := classifyFile(g.relFile)
 
 			// Extract operationId and feature desc
@@ -119,16 +110,17 @@ func Run(w io.Writer, cfg Config) error {
 				continue
 			}
 
-			ruleIDs := diagRuleIDs(g.diags)
-			fmt.Fprintf(w, "  fixed: %s (%s)\n", g.relFile, strings.Join(ruleIDs, ", "))
+			hint := g.relFile
+			if len(g.diags) > 0 {
+				msg := g.diags[0].Message
+				if len(msg) > 60 {
+					msg = msg[:60] + "..."
+				}
+				hint = g.relFile + " — " + msg
+			}
+			fmt.Fprintf(w, "  fixed: %s\n", hint)
 			roundFixed++
 			totalFixed++
-
-			// Update fail counts
-			for _, rid := range ruleIDs {
-				key := g.relFile + "\t" + rid
-				failCount[key]++
-			}
 		}
 
 		if roundFixed == 0 {
@@ -251,62 +243,6 @@ func diagMessages(diags []diagnostic.Diagnostic) []string {
 		msgs[i] = d.Message
 	}
 	return msgs
-}
-
-// diagRuleIDs extracts unique rule IDs from diagnostics.
-func diagRuleIDs(diags []diagnostic.Diagnostic) []string {
-	seen := map[string]bool{}
-	var ids []string
-	for _, d := range diags {
-		rid := extractRuleID(d.Message)
-		if rid != "" && !seen[rid] {
-			seen[rid] = true
-			ids = append(ids, rid)
-		}
-	}
-	return ids
-}
-
-// extractRuleID extracts the rule ID from a diagnostic message.
-// Handles both "[S-74] ..." and "S-74: ..." formats.
-func extractRuleID(msg string) string {
-	// Try bracket format first: [S-74]
-	if strings.HasPrefix(msg, "[") {
-		end := strings.Index(msg, "]")
-		if end > 1 && end <= 20 {
-			return msg[1:end]
-		}
-	}
-	// Try colon format: S-74:
-	idx := strings.Index(msg, ":")
-	if idx > 0 && idx <= 20 {
-		candidate := strings.TrimSpace(msg[:idx])
-		if len(candidate) >= 2 && len(candidate) <= 15 {
-			return candidate
-		}
-	}
-	return ""
-}
-
-// shouldSkip returns true if all diagnostics in a group have failed 3+ consecutive rounds.
-func shouldSkip(g fileGroup, failCount map[string]int) bool {
-	hasTrackable := false
-	for _, d := range g.diags {
-		rid := extractRuleID(d.Message)
-		if rid == "" {
-			continue
-		}
-		hasTrackable = true
-		key := g.relFile + "\t" + rid
-		if failCount[key] < 3 {
-			return false
-		}
-	}
-	// If no trackable rule IDs found, don't skip
-	if !hasTrackable {
-		return false
-	}
-	return true
 }
 
 // loadFeatureLookup builds a map from operationId to Feature.

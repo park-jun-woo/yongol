@@ -41,7 +41,7 @@ func agentCmd() *cobra.Command {
 
 	cmd.Flags().StringVar(&modelFlag, "model", "ollama:gemma4:e4b",
 		"LLM backend and model (format: ollama:<name>, xai:<name>, gemini:<name>)")
-	cmd.Flags().IntVar(&maxRoundsFlag, "max-rounds", 20,
+	cmd.Flags().IntVar(&maxRoundsFlag, "max-rounds", 10,
 		"maximum validate-fix rounds")
 
 	return cmd
