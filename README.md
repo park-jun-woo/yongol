@@ -15,6 +15,8 @@ The keel of your AI-coded SaaS.
 
 Vibe coding hits a wall around 200 endpoints: the AI loses the global picture, patterns drift, and the 201st feature costs 10× the 21st. yongol shifts the AI workload from generated code to declarative SSOTs (10 specialized specs, ~10× context compression) and catches cross-layer drift before it compiles.
 
+**Harness with reins** — not a bigger model, but a tighter harness. Deterministic validators judge every output, ratchets enforce progress, and the machine decides when it's done.
+
 ---
 
 ## Benchmark: ZenFlow (multi-tenant workflow automation SaaS)
