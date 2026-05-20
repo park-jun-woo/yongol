@@ -249,6 +249,7 @@ Cross-consistency between OpenAPI operations/responses and SSaC functions / `@re
 | XOS-22 | ERROR | SSaC has `@response` but OpenAPI has no 2xx response defined | `pkg/validate/openapi_ssac/xos_22_response_no_2xx.go` |
 | XOS-66 | ERROR | Fields used in SSaC must be included in OpenAPI `required` | `pkg/validate/openapi_ssac/xos_66_used_fields_required.go` |
 | XOS-67 | ERROR | Value type in `@response {key: value}` must be compatible with the expected OpenAPI response schema type | `pkg/validate/openapi_ssac/xos_67_response_field_type.go` |
+| XOS-69 | WARNING | SSaC `@response` binds 0 fields but OpenAPI 200 response schema has properties | `pkg/validate/openapi_ssac/xos_69_response_empty_binding.go` |
 | XSO-16 | ERROR | OpenAPI operationId must be used as a SSaC function (coverage) | `pkg/validate/openapi_ssac/xso_16_op_id_to_func.go` |
 | XSO-18 | ERROR | OpenAPI response field must be used in a SSaC `@response` (coverage) | `pkg/validate/openapi_ssac/xso_18_response_field_used.go` |
 | XSO-20 | ERROR | OpenAPI response field must be used in a shorthand `@response` (coverage) | `pkg/validate/openapi_ssac/xso_20_shorthand_field_used.go` |

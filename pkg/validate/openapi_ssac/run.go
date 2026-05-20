@@ -20,6 +20,7 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	diags = append(diags, xos22ResponseNo2xx(fs)...)
 	diags = append(diags, xos66UsedFieldsRequired(fs)...)
 	diags = append(diags, xos67ResponseFieldType(fs)...)
+	diags = append(diags, xos69ResponseEmptyBinding(fs)...)
 	// XOS-80 (ERROR, no derivable success status) / XOS-82 (WARNING,
 	// declared-but-unreachable 2xx) — BUG-004. XOS-81 (no 2xx at all)
 	// is covered by the existing XOS-22.
