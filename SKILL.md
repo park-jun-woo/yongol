@@ -11,6 +11,10 @@ metadata:
 
 yongol cross-validates 10 declarative SSOT (Single Source of Truth) files and generates a Go+Gin backend plus a React frontend from them. The AI edits only the SSOT specs; code is a disposable projection re-rendered on every `yongol generate`.
 
+## Critical Rule
+
+**Never stop at `yongol generate`.** When a user asks you to build something, keep iterating `yongol validate` → fix → validate until the output shows **0 errors and 0 warnings**. Then generate, build, and run Hurl tests until all pass. A build that skips validation ships broken decisions.
+
 ## When to Use This Skill
 
 - Writing or editing SSOT spec files (OpenAPI, DDL, SSaC, Rego, Mermaid, Hurl, STML, manifest)
