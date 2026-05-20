@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -85,8 +86,43 @@ func Run(w io.Writer, cfg Config) error {
 				continue
 			}
 
-			// Build prompts
 			messages := diagMessages(g.diags)
+
+			// Split-based fix for OpenAPI, Rego, Hurl
+			if l == layerOpenAPI || l == layerRego || l == layerHurl {
+				opIDs := extractOperationIDs(g.diags)
+				if len(opIDs) == 0 {
+					fmt.Fprintf(w, "  skipped: %s (no operationId in diagnostics)\n", g.relFile)
+					continue
+				}
+
+				fileContent := string(content)
+				blockFixed := 0
+				for _, opID := range opIDs {
+					opMsgs := filterMessagesByOp(messages, opID)
+					if len(opMsgs) == 0 {
+						opMsgs = messages
+					}
+
+					ok := fixSingleBlock(w, cfg, l, g.relFile, absPath, &fileContent, opID, desc, path, opMsgs)
+					if ok {
+						blockFixed++
+					}
+				}
+
+				if blockFixed > 0 {
+					if err := os.WriteFile(absPath, []byte(fileContent), 0644); err != nil {
+						fmt.Fprintf(w, "  skipped: %s (write error: %v)\n", g.relFile, err)
+						continue
+					}
+					fmt.Fprintf(w, "  fixed: %s — %d block(s)\n", g.relFile, blockFixed)
+					roundFixed++
+					totalFixed++
+				}
+				continue
+			}
+
+			// Default: whole-file fix for other layers (SSaC, DDL, etc.)
 			systemPrompt := buildSystemPrompt(l, messages)
 			userPrompt := buildUserPrompt(desc, path, filepath.Base(g.relFile), string(content), messages)
 
@@ -303,4 +339,119 @@ func chainResolve(specsDir, relPath string, lookup map[string]features.Feature) 
 		}
 	}
 	return "", ""
+}
+
+// reOperationID matches operationId references in diagnostic messages.
+// Patterns: "operationId X", "operationId: X", "operationId \"X\"",
+// "operationId 'X'", "func X", "action == \"X\"", "# X" comment refs.
+var reOperationID = regexp.MustCompile(
+	`(?:operationId[:\s]+\"?([A-Z][A-Za-z0-9]+)\"?` +
+		`|SSaC func ([A-Z][A-Za-z0-9]+)` +
+		`|input\.action == "([A-Z][A-Za-z0-9]+)"` +
+		`|# ([A-Z][A-Za-z0-9]+))`,
+)
+
+// extractOperationIDs extracts unique operationIds from diagnostic messages.
+func extractOperationIDs(diags []diagnostic.Diagnostic) []string {
+	seen := map[string]struct{}{}
+	var result []string
+	for _, d := range diags {
+		matches := reOperationID.FindAllStringSubmatch(d.Message, -1)
+		for _, m := range matches {
+			for _, g := range m[1:] {
+				if g != "" {
+					if _, ok := seen[g]; !ok {
+						seen[g] = struct{}{}
+						result = append(result, g)
+					}
+				}
+			}
+		}
+	}
+	return result
+}
+
+// filterMessagesByOp returns diagnostic messages that mention the given operationId.
+func filterMessagesByOp(messages []string, opID string) []string {
+	var filtered []string
+	for _, m := range messages {
+		if strings.Contains(m, opID) {
+			filtered = append(filtered, m)
+		}
+	}
+	return filtered
+}
+
+// fixSingleBlock extracts a block for an operationId, sends it to LLM, and merges
+// the result back into fileContent. Returns true if the block was fixed.
+func fixSingleBlock(w io.Writer, cfg Config, l layer, relFile, absPath string, fileContent *string, opID, desc, path string, diagMsgs []string) bool {
+	var block string
+	var startLine, endLine int
+	var err error
+
+	switch l {
+	case layerOpenAPI:
+		block, startLine, endLine, err = extractOpenAPIBlock(*fileContent, opID)
+	case layerRego:
+		block, startLine, endLine, err = extractRegoBlock(*fileContent, opID)
+	case layerHurl:
+		block, startLine, endLine, err = extractHurlBlock(*fileContent, opID)
+	default:
+		return false
+	}
+
+	if err != nil {
+		fmt.Fprintf(w, "  skipped block: %s/%s (%v)\n", relFile, opID, err)
+		return false
+	}
+
+	// Build prompts with block only
+	systemPrompt := buildSystemPrompt(l, diagMsgs)
+	userPrompt := buildBlockUserPrompt(desc, path, filepath.Base(relFile), opID, block, diagMsgs)
+
+	reply, err := llmCall(cfg.Backend, cfg.Model, systemPrompt, userPrompt)
+	if err != nil {
+		fmt.Fprintf(w, "  skipped block: %s/%s (LLM error: %v)\n", relFile, opID, err)
+		return false
+	}
+
+	fixedBlock := stripMarkdownFences(reply)
+	if fixedBlock == "" {
+		fmt.Fprintf(w, "  skipped block: %s/%s (empty LLM response)\n", relFile, opID)
+		return false
+	}
+
+	// Merge the fixed block back
+	var merged string
+	switch l {
+	case layerOpenAPI:
+		merged, err = mergeOpenAPIBlock(*fileContent, startLine, endLine, fixedBlock)
+	case layerRego:
+		merged, err = mergeRegoBlock(*fileContent, startLine, endLine, fixedBlock)
+	case layerHurl:
+		merged, err = mergeHurlBlock(*fileContent, startLine, endLine, fixedBlock)
+	}
+
+	if err != nil {
+		fmt.Fprintf(w, "  skipped block: %s/%s (merge error: %v)\n", relFile, opID, err)
+		return false
+	}
+
+	*fileContent = merged
+	return true
+}
+
+// buildBlockUserPrompt assembles the user prompt for a single block fix.
+func buildBlockUserPrompt(desc, path, filename, opID, block string, messages []string) string {
+	var b strings.Builder
+	if desc != "" {
+		fmt.Fprintf(&b, "Feature: %s\nPath: %s\n\n", desc, path)
+	}
+	fmt.Fprintf(&b, "OperationId: %s\nFile: %s\n\nCurrent block:\n%s\n\nValidate errors:\n", opID, filename, block)
+	for _, m := range messages {
+		b.WriteString(m)
+		b.WriteByte('\n')
+	}
+	b.WriteString("\nFix ONLY this block. Output ONLY the corrected block content. Do not add surrounding file content.")
+	return b.String()
 }
