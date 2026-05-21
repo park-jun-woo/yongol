@@ -49,7 +49,7 @@ func scaffoldSSaC(specsDir string, ff *features.FeaturesFile, openapiContent str
 		pathBlock := extractPathBlockForOp(openapiContent, feat.Op)
 		userPrompt := buildSSaCUserPrompt(feat, ddlContent, queryNames, pathBlock)
 
-		numCtx := int(float64(len(systemPrompt)+len(userPrompt))/4*1.5) + 2048
+		numCtx := len(systemPrompt) + len(userPrompt) + 2048
 
 		reply, err := llmCallWithNumCtx(cfg.Backend, cfg.Model, systemPrompt, userPrompt, numCtx)
 		if err != nil {

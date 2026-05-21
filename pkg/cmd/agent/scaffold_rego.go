@@ -59,7 +59,7 @@ func scaffoldRego(specsDir string, ff *features.FeaturesFile, llmFn LLMCallFunc,
 		batch := nonPublic[i:end]
 
 		userPrompt := buildRegoUserPrompt(batch)
-		numCtx := int(float64(len(systemPrompt)+len(userPrompt))/4*1.5) + 2048
+		numCtx := len(systemPrompt) + len(userPrompt) + 2048
 
 		reply, err := llmCallWithNumCtx(cfg.Backend, cfg.Model, systemPrompt, userPrompt, numCtx)
 		if err != nil {

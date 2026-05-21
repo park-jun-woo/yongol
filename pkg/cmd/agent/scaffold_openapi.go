@@ -64,7 +64,7 @@ func scaffoldOpenAPI(specsDir string, ff *features.FeaturesFile, llmFn LLMCallFu
 		ddlContent := readDDLForTable(specsDir, feat.Table)
 		userPrompt := buildOpenAPIUserPrompt(feat, ddlContent)
 
-		numCtx := int(float64(len(systemPrompt)+len(userPrompt))/4*1.5) + 2048
+		numCtx := len(systemPrompt) + len(userPrompt) + 2048
 
 		reply, err := llmCallWithNumCtx(cfg.Backend, cfg.Model, systemPrompt, userPrompt, numCtx)
 		if err != nil {
@@ -121,7 +121,7 @@ func scaffoldOpenAPI(specsDir string, ff *features.FeaturesFile, llmFn LLMCallFu
 			ddlContent := readDDLForTable(specsDir, feat.Table)
 			userPrompt := buildRetryPrompt(feat, ddlContent, verifyErr.Error())
 
-			numCtx := int(float64(len(systemPrompt)+len(userPrompt))/4*1.5) + 2048
+			numCtx := len(systemPrompt) + len(userPrompt) + 2048
 
 			reply, err := llmCallWithNumCtx(cfg.Backend, cfg.Model, systemPrompt, userPrompt, numCtx)
 			if err != nil {

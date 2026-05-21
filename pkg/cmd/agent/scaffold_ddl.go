@@ -50,8 +50,7 @@ func scaffoldDDL(specsDir string, ff *features.FeaturesFile, llmFn LLMCallFunc, 
 		td := ff.Tables[tableName]
 		userPrompt := buildDDLUserPrompt(tableName, td, tableFeatMap[tableName])
 
-		// Dynamic num_ctx: (len(system+user) / 4) * 1.5 + 2048
-		numCtx := int(float64(len(systemPrompt)+len(userPrompt))/4*1.5) + 2048
+		numCtx := len(systemPrompt) + len(userPrompt) + 2048
 
 		reply, err := llmCallWithNumCtx(cfg.Backend, cfg.Model, systemPrompt, userPrompt, numCtx)
 		if err != nil {
