@@ -188,7 +188,21 @@ func generateSplitPathBlock(feat features.Feature, ddlContent string, cfg Config
 	var paramsParsed []any
 	if params != "none" && strings.TrimSpace(params) != "" {
 		if err := yaml.Unmarshal([]byte(params), &paramsParsed); err != nil {
-			return nil, fmt.Errorf("parse parameters YAML: %w", err)
+			// LLM may wrap the array in a "parameters:" key — unwrap it.
+			var wrapped map[string]any
+			if err2 := yaml.Unmarshal([]byte(params), &wrapped); err2 == nil {
+				if inner, ok := wrapped["parameters"]; ok {
+					if arr, ok := inner.([]any); ok {
+						paramsParsed = arr
+					} else {
+						return nil, fmt.Errorf("parse parameters YAML: %w", err)
+					}
+				} else {
+					return nil, fmt.Errorf("parse parameters YAML: %w", err)
+				}
+			} else {
+				return nil, fmt.Errorf("parse parameters YAML: %w", err)
+			}
 		}
 	}
 
@@ -204,6 +218,12 @@ func generateSplitPathBlock(feat features.Feature, ddlContent string, cfg Config
 			if err := yaml.Unmarshal([]byte(reqBodyRaw), &reqBodyParsed); err != nil {
 				return nil, fmt.Errorf("parse requestBody YAML: %w", err)
 			}
+			// LLM may wrap the object in a "requestBody:" key — unwrap it.
+			if inner, ok := reqBodyParsed["requestBody"]; ok && len(reqBodyParsed) == 1 {
+				if m, ok := inner.(map[string]any); ok {
+					reqBodyParsed = m
+				}
+			}
 		}
 	}
 
@@ -215,6 +235,12 @@ func generateSplitPathBlock(feat features.Feature, ddlContent string, cfg Config
 	var schema200Parsed map[string]any
 	if err := yaml.Unmarshal([]byte(schema200Raw), &schema200Parsed); err != nil {
 		return nil, fmt.Errorf("parse schema200 YAML: %w", err)
+	}
+	// LLM may wrap the object in a "schema:" key — unwrap it.
+	if inner, ok := schema200Parsed["schema"]; ok && len(schema200Parsed) == 1 {
+		if m, ok := inner.(map[string]any); ok {
+			schema200Parsed = m
+		}
 	}
 
 	// Step 4: error responses (mechanical)
