@@ -42,14 +42,15 @@ func verifyOpenAPI(yamlData []byte) error {
 //
 // Strategy:
 //  1. YAML line errors ("yaml: line N:") — map N to an offset range.
-//  2. $ref errors containing "#/components/schemas/..." — match schema name
-//     to feature op/path.
+//  2. $ref errors containing "#/components/schemas/..." — exact match to op.
 //  3. Path key errors containing a path like "/resources/{id}" — match to offset.
+//  4. Quoted keyword grep — search keywords in YAML content and map to ops.
 //
-// Returns an empty slice when the error cannot be attributed to a specific op.
-func extractErrorOps(err error, offsets []pathOffset, feats []features.Feature) []string {
+// Returns matched ops and a map of op → relative line within the op's block
+// (populated only by strategy 4; nil when no grep matches).
+func extractErrorOps(err error, offsets []pathOffset, feats []features.Feature, yamlContent string) ([]string, map[string]int) {
 	if err == nil {
-		return nil
+		return nil, nil
 	}
 	msg := err.Error()
 	seen := make(map[string]bool)
@@ -75,11 +76,20 @@ func extractErrorOps(err error, offsets []pathOffset, feats []features.Feature) 
 		}
 	}
 
+	// --- strategy 4: keyword grep in YAML content ---
+	var relativeLines map[string]int
+	if grepOps, rl := matchByGrep(msg, yamlContent, offsets); len(grepOps) > 0 {
+		relativeLines = rl
+		for _, op := range grepOps {
+			seen[op] = true
+		}
+	}
+
 	out := make([]string, 0, len(seen))
 	for op := range seen {
 		out = append(out, op)
 	}
-	return out
+	return out, relativeLines
 }
 
 // reYAMLLine matches "yaml: line 15:" or "line 15:" patterns.
@@ -110,9 +120,8 @@ func matchByLine(msg string, offsets []pathOffset) []string {
 // reSchemaRef matches #/components/schemas/SomeName
 var reSchemaRef = regexp.MustCompile(`#/components/schemas/(\w+)`)
 
-// matchBySchema finds schema names in the error and tries to match them to
-// feature ops. Matching: the schema name (lowered) is a prefix/substring of
-// the op or path, or the feature table name appears in the schema name.
+// matchBySchema finds schema names in the error and matches them to feature
+// ops by exact (case-insensitive) equality only.
 func matchBySchema(msg string, offsets []pathOffset, feats []features.Feature) []string {
 	refs := reSchemaRef.FindAllStringSubmatch(msg, -1)
 	if len(refs) == 0 {
@@ -122,13 +131,7 @@ func matchBySchema(msg string, offsets []pathOffset, feats []features.Feature) [
 	for _, ref := range refs {
 		schema := strings.ToLower(ref[1])
 		for _, feat := range feats {
-			table := strings.ToLower(feat.Table)
-			op := strings.ToLower(feat.Op)
-			if table != "" && strings.Contains(schema, table) {
-				ops = append(ops, feat.Op)
-				break
-			}
-			if strings.Contains(schema, op) || strings.Contains(op, schema) {
+			if schema == strings.ToLower(feat.Op) {
 				ops = append(ops, feat.Op)
 				break
 			}
@@ -149,9 +152,70 @@ func matchByPath(msg string, offsets []pathOffset) []string {
 	return ops
 }
 
+// reQuotedKeyword matches single- or double-quoted words in error messages.
+var reQuotedKeyword = regexp.MustCompile(`["'](\w+)["']`)
+
+//ff:func feature=agent type=adapter control=sequence
+//ff:what matchByGrep — 에러 메시지 키워드를 YAML 본문에서 grep하여 op 특정
+
+// matchByGrep extracts quoted keywords from the error message, searches them
+// in the assembled YAML content, and maps matching lines to ops via the offset
+// table. Returns the matched ops and a map of op → relative line number within
+// the op's path block.
+func matchByGrep(msg string, yamlContent string, offsets []pathOffset) ([]string, map[string]int) {
+	keywords := reQuotedKeyword.FindAllStringSubmatch(msg, -1)
+	if len(keywords) == 0 {
+		return nil, nil
+	}
+
+	// Deduplicate keywords.
+	kwSet := make(map[string]bool, len(keywords))
+	for _, m := range keywords {
+		kwSet[m[1]] = true
+	}
+
+	// Search YAML content line by line for keyword hits.
+	lines := strings.Split(yamlContent, "\n")
+	var hitLines []int
+	for i, line := range lines {
+		for kw := range kwSet {
+			if strings.Contains(line, kw) {
+				hitLines = append(hitLines, i+1) // 1-based
+				break
+			}
+		}
+	}
+
+	if len(hitLines) == 0 {
+		return nil, nil
+	}
+
+	// Map hit lines to ops via offset ranges.
+	seen := make(map[string]bool)
+	relativeLines := make(map[string]int)
+	for _, lineNo := range hitLines {
+		for _, off := range offsets {
+			if lineNo >= off.StartLine && lineNo <= off.EndLine {
+				if !seen[off.Op] {
+					seen[off.Op] = true
+					relativeLines[off.Op] = lineNo - off.StartLine
+				}
+				break
+			}
+		}
+	}
+
+	ops := make([]string, 0, len(seen))
+	for op := range seen {
+		ops = append(ops, op)
+	}
+	return ops, relativeLines
+}
+
 // buildRetryPrompt builds the user prompt for retrying a single op's path
-// block after a kin-openapi validation failure.
-func buildRetryPrompt(feat features.Feature, ddlContent, prevError string) string {
+// block after a kin-openapi validation failure. If relativeLine >= 0, it is
+// included to pinpoint the error location within the op's block.
+func buildRetryPrompt(feat features.Feature, ddlContent, prevError string, relativeLine int) string {
 	var b strings.Builder
 
 	fmt.Fprintf(&b, "Feature:\n")
@@ -166,6 +230,9 @@ func buildRetryPrompt(feat features.Feature, ddlContent, prevError string) strin
 	}
 
 	fmt.Fprintf(&b, "\nPrevious attempt had this error:\n%s\n", prevError)
+	if relativeLine >= 0 {
+		fmt.Fprintf(&b, "\nThe error is near line %d of your path block.\n", relativeLine)
+	}
 	b.WriteString("\nWrite the corrected OpenAPI path block.")
 	b.WriteString("\nThe output must be a valid YAML fragment starting with the path key (e.g. /resources/{id}:).")
 	b.WriteString("\nInclude operationId, request/response schemas.")

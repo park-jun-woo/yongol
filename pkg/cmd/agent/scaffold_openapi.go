@@ -102,7 +102,7 @@ func scaffoldOpenAPI(specsDir string, ff *features.FeaturesFile, llmFn LLMCallFu
 		}
 
 		// Identify failing ops
-		failedOps := extractErrorOps(verifyErr, offsets, ff.Features)
+		failedOps, relativeLines := extractErrorOps(verifyErr, offsets, ff.Features, yamlDoc)
 		if len(failedOps) == 0 {
 			// Cannot attribute error — log and break to save as-is
 			fmt.Fprintf(out, "  scaffold openapi: verify error (cannot attribute): %v\n", verifyErr)
@@ -119,7 +119,13 @@ func scaffoldOpenAPI(specsDir string, ff *features.FeaturesFile, llmFn LLMCallFu
 				continue
 			}
 			ddlContent := readDDLForTable(specsDir, feat.Table)
-			userPrompt := buildRetryPrompt(feat, ddlContent, verifyErr.Error())
+			rl := -1
+			if relativeLines != nil {
+				if v, ok := relativeLines[opName]; ok {
+					rl = v
+				}
+			}
+			userPrompt := buildRetryPrompt(feat, ddlContent, verifyErr.Error(), rl)
 
 			numCtx := len(systemPrompt) + len(userPrompt) + 2048
 
@@ -155,7 +161,7 @@ func scaffoldOpenAPI(specsDir string, ff *features.FeaturesFile, llmFn LLMCallFu
 	// Final verify after all retries
 	if verifyErr := verifyOpenAPI([]byte(yamlDoc)); verifyErr != nil {
 		// Remove failing ops and save the rest
-		failedOps := extractErrorOps(verifyErr, offsets, ff.Features)
+		failedOps, _ := extractErrorOps(verifyErr, offsets, ff.Features, yamlDoc)
 		if len(failedOps) > 0 {
 			for _, opName := range failedOps {
 				if p, ok := opToPath[opName]; ok {
