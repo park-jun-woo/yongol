@@ -25,7 +25,7 @@ func Run(out, errOut io.Writer, opts Options) error {
 	}
 
 	// Parse features.yaml early to fail fast before any disk writes.
-	feats, err := loadFeatures(opts.FeaturesPath)
+	ff, err := loadFeatures(opts.FeaturesPath)
 	if err != nil {
 		return err
 	}
@@ -62,16 +62,16 @@ func Run(out, errOut io.Writer, opts Options) error {
 
 	// Features-driven stubs: overwrite the template-based openapi and rego
 	// with feature-aware versions, and generate SSaC + Hurl stubs.
-	if err := generateOpenAPIFromFeatures(opts.Dir, data, feats); err != nil {
+	if err := generateOpenAPIFromFeatures(opts.Dir, data, ff.Features); err != nil {
 		return err
 	}
-	if err := generateSSaCFromFeatures(opts.Dir, feats); err != nil {
+	if err := generateSSaCFromFeatures(opts.Dir, ff.Features); err != nil {
 		return err
 	}
-	if err := generateRegoFromFeatures(opts.Dir, feats); err != nil {
+	if err := generateRegoFromFeatures(opts.Dir, ff.Features); err != nil {
 		return err
 	}
-	if err := generateHurlFromFeatures(opts.Dir, feats); err != nil {
+	if err := generateHurlFromFeatures(opts.Dir, ff.Features); err != nil {
 		return err
 	}
 	if err := copyFeaturesYAML(opts.Dir, opts.FeaturesPath); err != nil {
@@ -81,7 +81,7 @@ func Run(out, errOut io.Writer, opts Options) error {
 		return err
 	}
 
-	fmt.Fprintf(out, "yongol init: created %s (%d features)\n", opts.Dir, len(feats))
+	fmt.Fprintf(out, "yongol init: created %s (%d features)\n", opts.Dir, len(ff.Features))
 	fmt.Fprintf(out, "  manifest.metadata.name = %s\n", data.ProjectIDNormalized)
 	fmt.Fprintf(out, "  backend.module         = %s\n", data.Module)
 	fmt.Fprintf(out, "\nNext: cd %s && yongol validate specs\n", opts.Dir)

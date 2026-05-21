@@ -1,5 +1,5 @@
 //ff:func feature=cli-hash type=command control=sequence
-//ff:what Run — reads features.yaml from specsDir, computes SHA-256, writes specsDir/.yongol
+//ff:what Run — features.yaml 검증 후 SHA-256 해시를 specsDir/.yongol에 기록
 
 package clihash
 
@@ -9,12 +9,37 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
+
+	"github.com/park-jun-woo/yongol/pkg/cmd/featcheck"
+	"github.com/park-jun-woo/yongol/pkg/diagnostic"
 )
 
-// Run reads features.yaml inside specsDir, computes its SHA-256 hash, and
-// writes (or overwrites) the hash lock file at specsDir/.yongol.
+// Run reads features.yaml inside specsDir, runs FT-* validation, computes
+// its SHA-256 hash, and writes (or overwrites) the hash lock file at
+// specsDir/.yongol. If validation produces ERROR-level diagnostics the
+// hash is not written and an error is returned. WARNINGs are printed to
+// out but do not block hash generation.
 func Run(out io.Writer, specsDir string) error {
 	featuresPath := filepath.Join(specsDir, "features.yaml")
+
+	_, diags, err := featcheck.Run(featuresPath)
+	if err != nil {
+		return fmt.Errorf("features check: %w", err)
+	}
+
+	var errs []string
+	for _, d := range diags {
+		if d.Level == diagnostic.LevelError {
+			errs = append(errs, d.Message)
+		} else if d.Level == diagnostic.LevelWarning {
+			fmt.Fprintf(out, "warning: %s\n", d.Message)
+		}
+	}
+	if len(errs) > 0 {
+		return fmt.Errorf("features validation failed:\n  %s", strings.Join(errs, "\n  "))
+	}
+
 	data, err := os.ReadFile(featuresPath)
 	if err != nil {
 		return fmt.Errorf("read features.yaml: %w", err)
