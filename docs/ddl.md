@@ -1,34 +1,17 @@
-# SQL DDL + sqlc — Database Layer
+# SQL DDL — Data Model Layer
 
-yongol does not generate SQL. The author writes DDL and queries; sqlc emits Go code; SSaC calls it. This doc covers yongol conventions layered on top of standard sqlc.
+yongol does not generate DDL. The author writes CREATE TABLE statements; yongol validates them against other SSOTs. This doc covers yongol conventions for DDL authoring.
+
+For sqlc queries, see [`docs/sqlc.md`](./sqlc.md).
 
 ## Location
 
 ```
 <project-root>/db/
-├── sqlc.yaml                 # required
+├── sqlc.yaml                 # required (see docs/sqlc.md)
 ├── *.sql                     # DDL (CREATE TABLE, CREATE INDEX)
-└── queries/*.sql             # sqlc queries (-- name: Method :cardinality)
+└── queries/*.sql             # sqlc queries (see docs/sqlc.md)
 ```
-
-Recommended `sqlc.yaml` `gen.go.out`: `../../artifacts/<project>/backend/internal/db`. `yongol generate` runs `sqlc generate --file db/sqlc.yaml` before handler codegen.
-
-**`sql_package: pgx/v5` is required** (Q-11). yongol's backend codegen (server bootstrap, handler transaction, convert functions, ErrNoRows handling) is unified on the pgx/v5 driver. `database/sql`, `pgx/v4`, `lib/pq`, or an absent `sql_package` field are rejected at `yongol validate` time.
-
-```yaml
-version: "2"
-sql:
-  - engine: "postgresql"
-    schema: "."
-    queries: "queries/"
-    gen:
-      go:
-        package: "db"
-        out: "../../artifacts/<project>/backend/internal/db"
-        sql_package: "pgx/v5"   # required
-```
-
-Rules: D-4 (sqlc.yaml required), D-5 (`sql[].schema` must cover `db/*.sql`), D-6 (`sql[].queries` must cover `db/queries/`), Q-11 (`sql_package` must be `pgx/v5`).
 
 ### sqlc Overrides for Non-Native PG Types (Q-12 ~ Q-18)
 
@@ -179,101 +162,6 @@ filters in `pkg/validate/query`, so a column declared as
 
 `DOUBLE PRECISION` and `TIMESTAMP WITH/WITHOUT TIME ZONE` were rejected by D-11 in earlier yongol revisions; they are now first-class via the alias matrix above.
 
-## sqlc Cardinality -> SSaC Type
-
-| Cardinality | SSaC Type | Go Return |
-|---|---|---|
-| `:one` | `*Type` | `(*T, error)` |
-| `:many` | `[]Type` | `([]T, error)` |
-| `:exec` | (none) | `error` |
-
-## Model Name Derivation
-
-Derived from the query file name:
-
-| File | Model | Rule |
-|---|---|---|
-| `courses.sql` | `Course` | strip trailing `s` |
-| `companies.sql` | `Company` | `ies` -> `y` |
-| `classes.sql` | `Class` | `sses` -> `ss` |
-| `boxes.sql` | `Box` | `xes` -> `x` |
-
-## ModelPrefix Stripping
-
-sqlc uses a global namespace, so `-- name:` values must be unique. Use a ModelPrefix matching the model name; SSaC strips it automatically.
-
-```sql
--- db/queries/users.sql
--- name: UserCreate :one
--- name: UserFindByID :one
-
--- db/queries/gigs.sql
--- name: GigCreate :one
--- name: GigFindByID :one
-```
-
-| sqlc name | Model | SSaC method |
-|---|---|---|
-| `UserCreate` | `User` | `Create` |
-| `GigFindByID` | `Gig` | `FindByID` |
-
-Prefix must equal the model name exactly, and the next character must be uppercase. `UserCreate` -> `Create`; `Usercreate` -> not stripped.
-
-```go
-// @post User user = User.Create({...})            // sqlc: UserCreate
-// @get Gig gig = Gig.FindByID({ID: request.id})   // sqlc: GigFindByID
-```
-
-## sqlc Parameter Rules
-
-Positional `$N` parameters are forbidden (D-7).
-
-| Position | Syntax |
-|---|---|
-| WHERE / SET / VALUES | `@name` (e.g. `WHERE org_id = @org_id`) |
-| LIMIT / OFFSET | `sqlc.arg(name)` (sqlc limitation — `@name` doesn't work here) |
-| Arithmetic cast | `sqlc.arg(name)::int` |
-
-**Name identity**: SSaC Input key = sqlc Params field = PascalCase of OpenAPI query parameter. All three connect under the same name.
-
-Filter columns use `@filter_<column>`:
-
-```sql
-WHERE org_id = @org_id
-  AND (@filter_action::varchar = '' OR action = @filter_action)
-```
-
-## Pagination Query Patterns
-
-### Offset
-
-```sql
--- name: AuditLogListByOrgIDPaged :many
-SELECT * FROM audit_logs
-WHERE org_id = @org_id
-  AND (@filter_action::varchar = '' OR action = @filter_action)
-ORDER BY
-  CASE WHEN @sort_by = 'created_at' AND @sort_dir = 'asc'  THEN created_at END ASC,
-  CASE WHEN @sort_by = 'created_at' AND @sort_dir = 'desc' THEN created_at END DESC
-LIMIT sqlc.arg(per_page) OFFSET (sqlc.arg(page)::int - 1) * sqlc.arg(per_page);
-
--- name: AuditLogCountByOrgIDFiltered :one
-SELECT COUNT(*) FROM audit_logs
-WHERE org_id = @org_id
-  AND (@filter_action::varchar = '' OR action = @filter_action);
-```
-
-### Cursor
-
-```sql
--- name: TemplateListCursor :many
-SELECT * FROM templates
-WHERE (@cursor::bigint = 0 OR id < @cursor)
-  AND (@filter_category::varchar = '' OR category = @filter_category)
-ORDER BY id DESC
-LIMIT sqlc.arg(per_page);
-```
-
 ## DDL Authoring
 
 ### Numeric Types — int64 Across the Stack (XDO-77)
@@ -416,14 +304,10 @@ Declares soft-delete. Rows whose value matches `@archived` are excluded from def
 | DDL column -> sqlc query reference | Existence |
 | DDL state column DEFAULT -> Mermaid `[*] --> X` | XDM-28 exact match |
 | DDL column -> Rego `@ownership table.column` | Existence |
-| sqlc `@name` -> SSaC Input key -> OpenAPI query parameter | All identical (PascalCase) |
-| sqlc cardinality -> SSaC `@get/@post/@put/@delete` return type | `:one`->`*T`, `:many`->`[]T`, `:exec`->none |
 
 ## Further Reading
 
-- [sqlc docs](https://docs.sqlc.dev/)
+- [docs/sqlc.md](./sqlc.md)
 - [docs/ssac.md](./ssac.md)
 - [docs/openapi.md](./openapi.md)
-- [docs/states.md](./states.md)
-- [docs/policy.md](./policy.md)
 - [rulebook.md](../rulebook.md)

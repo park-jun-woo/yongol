@@ -14,8 +14,10 @@ func layerDocFile(l layer) string {
 	switch l {
 	case layerSSaC:
 		return "ssac.md"
-	case layerDDL, layerSQLcQuery:
+	case layerDDL:
 		return "ddl.md"
+	case layerSQLcQuery:
+		return "sqlc.md"
 	case layerOpenAPI:
 		return "openapi.md"
 	case layerRego:
