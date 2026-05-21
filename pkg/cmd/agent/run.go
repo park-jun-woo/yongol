@@ -1,5 +1,5 @@
 //ff:func feature=agent type=command control=iteration dimension=1
-//ff:what Run — agent 메인 루프 (validate → group → fix → repeat)
+//ff:what Run — agent 메인 흐름 (scaffold → v2 validate loop)
 
 package agent
 
@@ -29,157 +29,24 @@ type Config struct {
 	MaxRounds int
 }
 
-// Run executes the agent loop: validate → group diagnostics → fix files → repeat.
+// Run executes the agent: scaffold SSOT files, then run the v2 validate loop.
 func Run(w io.Writer, cfg Config) error {
 	start := time.Now()
-	totalFixed := 0
 
-	absSpecs, err := filepath.Abs(cfg.SpecsDir)
-	if err != nil {
-		return fmt.Errorf("resolve specs dir: %w", err)
-	}
-
-	// Build feature lookup (op → Feature)
-	featureLookup := loadFeatureLookup(cfg.SpecsDir)
-
-	for round := 1; round <= cfg.MaxRounds; round++ {
-		// 1. Detect + Parse + Validate
-		diags, err := runValidate(cfg.SpecsDir)
-		if err != nil {
-			return fmt.Errorf("round %d: %w", round, err)
-		}
-
-		errorCount := countErrors(diags)
-		fmt.Fprintf(w, "\nyongol agent: round %d — %d errors\n", round, errorCount)
-
-		if errorCount == 0 {
-			fmt.Fprintf(w, "  %d files fixed in %d rounds (%.1fs)\n", totalFixed, round, time.Since(start).Seconds())
-			return nil
-		}
-
-		// 2. Group diagnostics by file, ordered by layer priority
-		groups := groupByFile(diags, absSpecs)
-		sortByLayerPriority(groups)
-
-		roundFixed := 0
-		for _, g := range groups {
-			l := classifyFile(g.relFile)
-
-			// Extract operationId and feature desc
-			desc, path := resolveFeature(g.relFile, l, featureLookup)
-
-			// For non-SSaC layers without chain resolution, skip
-			if l != layerSSaC && desc == "" {
-				// Try chain-based resolution
-				desc, path = chainResolve(cfg.SpecsDir, g.relFile, featureLookup)
-				if desc == "" {
-					fmt.Fprintf(w, "  skipped: %s (chain unavailable)\n", g.relFile)
-					continue
-				}
-			}
-
-			// Read current file content
-			absPath := filepath.Join(absSpecs, g.relFile)
-			content, err := os.ReadFile(absPath)
-			if err != nil {
-				fmt.Fprintf(w, "  skipped: %s (read error: %v)\n", g.relFile, err)
-				continue
-			}
-
-			messages := diagMessages(g.diags)
-
-			// Split-based fix for OpenAPI, Rego, Hurl
-			if l == layerOpenAPI || l == layerRego || l == layerHurl {
-				opIDs := extractOperationIDs(g.diags)
-				if len(opIDs) == 0 {
-					fmt.Fprintf(w, "  skipped: %s (no operationId in diagnostics)\n", g.relFile)
-					continue
-				}
-
-				fileContent := string(content)
-				blockFixed := 0
-				for _, opID := range opIDs {
-					opMsgs := filterMessagesByOp(messages, opID)
-					if len(opMsgs) == 0 {
-						opMsgs = messages
-					}
-
-					ok := fixSingleBlock(w, cfg, l, g.relFile, absPath, &fileContent, opID, desc, path, opMsgs)
-					if ok {
-						blockFixed++
-					}
-				}
-
-				if blockFixed > 0 {
-					if err := os.WriteFile(absPath, []byte(fileContent), 0644); err != nil {
-						fmt.Fprintf(w, "  skipped: %s (write error: %v)\n", g.relFile, err)
-						continue
-					}
-					fmt.Fprintf(w, "  fixed: %s — %d block(s)\n", g.relFile, blockFixed)
-					roundFixed++
-					totalFixed++
-				}
-				continue
-			}
-
-			// Default: whole-file fix for other layers (SSaC, DDL, etc.)
-			systemPrompt := buildSystemPrompt(l, messages)
-			userPrompt := buildUserPrompt(desc, path, filepath.Base(g.relFile), string(content), messages)
-
-			// Call LLM
-			reply, err := llmCall(cfg.Backend, cfg.Model, systemPrompt, userPrompt)
-			if err != nil {
-				fmt.Fprintf(w, "  skipped: %s (LLM error: %v)\n", g.relFile, err)
-				continue
-			}
-
-			// Strip markdown fences
-			fixed := stripMarkdownFences(reply)
-			if fixed == "" {
-				fmt.Fprintf(w, "  skipped: %s (empty LLM response)\n", g.relFile)
-				continue
-			}
-
-			// Write fixed content back
-			if err := os.WriteFile(absPath, []byte(fixed), 0644); err != nil {
-				fmt.Fprintf(w, "  skipped: %s (write error: %v)\n", g.relFile, err)
-				continue
-			}
-
-			hint := g.relFile
-			if len(g.diags) > 0 {
-				msg := g.diags[0].Message
-				if len(msg) > 60 {
-					msg = msg[:60] + "..."
-				}
-				hint = g.relFile + " — " + msg
-			}
-			fmt.Fprintf(w, "  fixed: %s\n", hint)
-			roundFixed++
-			totalFixed++
-		}
-
-		if roundFixed == 0 {
-			fmt.Fprintf(w, "  no files fixed this round — stopping early\n")
-			break
+	// Scaffold: generate SSOT files from features.yaml before validation
+	ff, _ := features.Load(cfg.SpecsDir)
+	if ff != nil {
+		if err := scaffold(cfg.SpecsDir, ff, llmCall, cfg, w); err != nil {
+			return fmt.Errorf("scaffold: %w", err)
 		}
 	}
-
-	// Final validation to report remaining errors
-	diags, _ := runValidate(cfg.SpecsDir)
-	remaining := countErrors(diags)
-	if remaining > 0 {
-		fmt.Fprintf(w, "\nyongol agent: %d errors remaining after %d rounds (%.1fs)\n", remaining, cfg.MaxRounds, time.Since(start).Seconds())
-		for _, d := range diags {
-			if d.Level == diagnostic.LevelError {
-				rel := rebaseFile(d.File, absSpecs)
-				fmt.Fprintf(w, "  %s:%d %s\n", rel, d.Line, d.Message)
-			}
-		}
-		return fmt.Errorf("%d errors remaining", remaining)
+	if cfg.MaxRounds == 0 {
+		fmt.Fprintf(w, "\nyongol agent: scaffold only (max-rounds=0), %.1fs\n", time.Since(start).Seconds())
+		return nil
 	}
-	fmt.Fprintf(w, "\nyongol agent: 0 errors — %d files fixed (%.1fs)\n", totalFixed, time.Since(start).Seconds())
-	return nil
+
+	// v2 validate loop: validate → filter immutable → fix per file → repeat.
+	return validateLoop(cfg.SpecsDir, ff, llmCall, cfg, w, os.Stderr, cfg.MaxRounds)
 }
 
 // runValidate runs DetectSSOTs → ParseAll → Validate and returns all diagnostics.

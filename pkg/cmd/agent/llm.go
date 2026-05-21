@@ -27,6 +27,18 @@ func llmCall(backend, model, systemPrompt, userPrompt string) (string, error) {
 	}
 }
 
+// LLMCallFunc is the signature for LLM call functions used by scaffold.
+type LLMCallFunc func(backend, model, system, user string) (string, error)
+
+// llmCallWithNumCtx calls the LLM with a custom num_ctx for ollama.
+// For non-ollama backends, numCtx is ignored and the standard call is used.
+func llmCallWithNumCtx(backend, model, system, user string, numCtx int) (string, error) {
+	if backend == "ollama" && numCtx > 0 {
+		return callOllamaWithCtx(model, system, user, numCtx)
+	}
+	return llmCall(backend, model, system, user)
+}
+
 // callOllama calls the local Ollama server.
 func callOllama(model, system, user string) (string, error) {
 	body := map[string]any{
@@ -39,6 +51,24 @@ func callOllama(model, system, user string) (string, error) {
 		"options": map[string]any{
 			"temperature": 0,
 			"num_predict": 2048,
+		},
+	}
+	return doOllamaRequest("http://localhost:11434/api/chat", body)
+}
+
+// callOllamaWithCtx calls the local Ollama server with a custom num_ctx.
+func callOllamaWithCtx(model, system, user string, numCtx int) (string, error) {
+	body := map[string]any{
+		"model": model,
+		"messages": []map[string]string{
+			{"role": "system", "content": system},
+			{"role": "user", "content": user},
+		},
+		"stream": false,
+		"options": map[string]any{
+			"temperature": 0,
+			"num_predict": 2048,
+			"num_ctx":     numCtx,
 		},
 	}
 	return doOllamaRequest("http://localhost:11434/api/chat", body)
@@ -146,7 +176,7 @@ func callGemini(model, system, user string) (string, error) {
 			},
 		},
 		"generationConfig": map[string]any{
-			"temperature":    0,
+			"temperature":     0,
 			"maxOutputTokens": 2048,
 		},
 	}
