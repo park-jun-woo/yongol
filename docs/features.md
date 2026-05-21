@@ -1,6 +1,6 @@
 # features.yaml — Feature Catalog
 
-Optional SSOT that lists every project feature as a flat YAML array keyed by `operationId`. Serves as a human-readable checklist and cross-validates bidirectionally against OpenAPI.
+Optional SSOT that lists every project feature as a flat YAML array keyed by `operationId`, with an optional `tables` section describing the data model topology. Serves as a human-readable checklist and cross-validates against OpenAPI, DDL, and stateDiagram.
 
 ## Location
 
@@ -23,13 +23,83 @@ features:
     desc: List workflows for the current org
 ```
 
-## Fields
+## Feature Fields
 
 | Field | Required | Description |
 |---|---|---|
 | `op` | Yes | `operationId` (PascalCase). Must match an OpenAPI `operationId`. |
 | `path` | Yes | HTTP method + URI pattern (e.g. `POST /workflows/{id}/activate`). |
 | `desc` | Yes | One-line human-readable description of the feature. |
+| `table` | No | The primary table this feature operates on. Must be defined in `tables`. |
+| `public` | No | `true` if the endpoint requires no authentication. Defaults to `false`. |
+
+## Tables Section (v1)
+
+The optional `tables` section declares the data model topology: which tables exist, their relationships, and stateful entities. Each key is a table name matching a DDL file (`db/<name>.sql`).
+
+```yaml
+tables:
+  workflows:
+    has_many:
+      - actions
+      - versions
+    states:
+      - draft
+      - active
+      - paused
+      - completed
+      - cancelled
+
+  actions:
+    belongs_to:
+      - workflows
+
+  versions:
+    belongs_to:
+      - workflows
+```
+
+### Table Definition Fields
+
+| Field | Type | Description |
+|---|---|---|
+| `has_many` | `[]string` | Child tables (one-to-many). Each must also be a key in `tables`. |
+| `belongs_to` | `[]string` | Parent tables (many-to-one). Each must also be a key in `tables`. The child DDL must contain a `<parent>_id` FK column. |
+| `states` | `[]string` | Valid state values for a stateful entity. Each must exist as a state in the corresponding `states/<table>.md` stateDiagram. |
+
+### V1 Format Example (features + tables)
+
+```yaml
+features:
+  - op: CreateWorkflow
+    path: POST /workflows
+    desc: Create a new workflow in draft state
+    table: workflows
+
+  - op: ActivateWorkflow
+    path: POST /workflows/{id}/activate
+    desc: Transition workflow to active
+    table: workflows
+    public: false
+
+  - op: ListWorkflows
+    path: GET /workflows
+    desc: List workflows for the current org
+    table: workflows
+
+tables:
+  workflows:
+    has_many:
+      - actions
+    states:
+      - draft
+      - active
+      - completed
+
+  actions:
+    belongs_to:
+      - workflows
+```
 
 ## Validation Rules
 
@@ -40,6 +110,10 @@ features:
 | FT-01 | ERROR | Duplicate `op` in features.yaml. |
 | FT-02 | ERROR | Duplicate `path` in features.yaml. |
 | FT-03 | ERROR | `specs/.yongol` missing or SHA-256 hash mismatch with features.yaml. |
+| FT-10 | ERROR | `has_many` references a table not defined in `tables`. |
+| FT-11 | ERROR | `belongs_to` references a table not defined in `tables`. |
+| FT-12 | WARNING | `has_many` without matching `belongs_to` on the child table. |
+| FT-13 | ERROR | Feature `table` references a table not defined in `tables`. |
 
 ### Cross-validation (features ↔ OpenAPI)
 
@@ -48,7 +122,20 @@ features:
 | XFO-01 | ERROR | `op` in features.yaml has no matching `operationId` in OpenAPI. The feature is declared but not implemented. |
 | XOF-01 | ERROR | `operationId` in OpenAPI is not listed in features.yaml. The endpoint exists but is not declared as a feature. |
 
-Both directions are ERROR level. When `features.yaml` is present, the feature list and OpenAPI must be in exact agreement.
+### Cross-validation (features ↔ DDL)
+
+| Rule | Level | Description |
+|---|---|---|
+| XFD-01 | ERROR | Table declared in `tables` has no corresponding DDL file (`db/<name>.sql`). |
+| XFD-02 | ERROR | `belongs_to` relationship has no `<parent>_id` FK column in the child DDL table. |
+
+### Cross-validation (features ↔ stateDiagram)
+
+| Rule | Level | Description |
+|---|---|---|
+| XFS-01 | ERROR | Table declares a state value not present in the corresponding stateDiagram. |
+
+All cross-validation rules are ERROR level. When `features.yaml` is present, the feature list, tables, OpenAPI, DDL, and stateDiagram must be in agreement.
 
 ## Hash Lock (`specs/.yongol`)
 

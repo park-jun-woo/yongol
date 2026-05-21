@@ -4,5 +4,6 @@ package features
 
 // FeaturesFile is the top-level structure of features.yaml.
 type FeaturesFile struct {
-	Features []Feature `yaml:"features"`
+	Tables   map[string]TableDef `yaml:"tables"`
+	Features []Feature           `yaml:"features"`
 }

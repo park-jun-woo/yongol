@@ -4,7 +4,7 @@ description: Full-stack SSOT orchestrator that validates the consistency of 10 d
 license: MIT
 metadata:
   author: park-jun-woo
-  version: "0.5.2"
+  version: "0.5.3"
 ---
 
 # yongol — Full-Stack SSOT Orchestrator
@@ -79,7 +79,7 @@ Requires Go 1.25+.
 
 | # | Source | File Pattern | Purpose |
 |---|---|---|---|
-| 1 | features.yaml | `features.yaml` | Feature catalog: op/path/desc list, cross-validates with OpenAPI |
+| 1 | features.yaml | `features.yaml` | Feature catalog: op/path/desc list + tables section (relationships, states), cross-validates with OpenAPI, DDL, stateDiagram |
 | 2 | manifest.yaml | `manifest.yaml` | Project config: auth, CORS, middleware, infra backends |
 | 3 | OpenAPI | `api/openapi.yaml` | API contract: endpoints, schemas, parameters, status codes |
 | 4 | SQL DDL | `db/*.sql` | Data model: tables, columns, types, constraints |
@@ -119,6 +119,9 @@ Requires Go 1.25+.
 | `Q-12~18` | DDL uses UUID/TIMESTAMPTZ without sqlc override | Add pgtype override to sqlc.yaml (validator prints exact YAML) |
 | `XFO-01` | features op not in OpenAPI | Add endpoint to OpenAPI |
 | `XOF-01` | OpenAPI operationId not in features | Add feature to features.yaml |
+| `XFD-01` | features table not in DDL | Create `db/<name>.sql` with CREATE TABLE |
+| `XFD-02` | belongs_to FK column missing in child DDL | Add `<parent>_id BIGINT NOT NULL REFERENCES <parent>(id)` column |
+| `XFS-01` | features state not in stateDiagram | Add state to `states/<table>.md` |
 | `XOH-*` | Hurl test drifted from OpenAPI | Align Hurl with current OpenAPI spec |
 | `C-6` | Missing `backend.auth` in manifest | Add JWT auth block (mandatory) |
 | `D-2` | Non-PK column missing NOT NULL | Add `NOT NULL` or `-- @nullable` |

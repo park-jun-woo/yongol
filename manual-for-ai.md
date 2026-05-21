@@ -96,22 +96,42 @@ Validation rule families: `CORS-*`, `SEC-*`, `OBS-*`.
 
 ## features.yaml
 
-Optional SSOT. A flat list of project features keyed by `operationId`.
-Human-readable feature catalog that cross-validates against OpenAPI.
+Optional SSOT. A list of project features keyed by `operationId`, with an optional `tables` section describing data model topology.
 
 ```yaml
 features:
   - op: CreateWorkflow
     path: POST /workflows
     desc: Create a new workflow in draft state
+    table: workflows
+    public: false
+
+tables:
+  workflows:
+    has_many:
+      - actions
+    states:
+      - draft
+      - active
+      - completed
+  actions:
+    belongs_to:
+      - workflows
 ```
 
-Fields (all required):
-- `op` — operationId (PascalCase). Must match an OpenAPI `operationId`.
-- `path` — HTTP method + URI pattern.
-- `desc` — one-line human description.
+Feature fields:
+- `op` (required) — operationId (PascalCase). Must match an OpenAPI `operationId`.
+- `path` (required) — HTTP method + URI pattern.
+- `desc` (required) — one-line human description.
+- `table` (optional) — primary table this feature operates on. Must be defined in `tables`.
+- `public` (optional) — `true` if no authentication required. Defaults to `false`.
 
-Validation rule families: `FT-*` (internal), `XFO-*` / `XOF-*` (cross with OpenAPI).
+Tables section fields (per table key):
+- `has_many` — child tables (one-to-many). Each must also be a key in `tables`.
+- `belongs_to` — parent tables (many-to-one). Child DDL must contain `<parent>_id` FK column.
+- `states` — valid state values. Each must exist in the corresponding stateDiagram.
+
+Validation rule families: `FT-*` (internal), `XFO-*` / `XOF-*` (cross with OpenAPI), `XFD-*` (cross with DDL), `XFS-*` (cross with stateDiagram).
 
 ## OpenAPI
 

@@ -11,7 +11,9 @@ import (
 	designvalidate "github.com/park-jun-woo/yongol/pkg/validate/design"
 	"github.com/park-jun-woo/yongol/pkg/validate/design_manifest"
 	featuresvalidate "github.com/park-jun-woo/yongol/pkg/validate/features"
+	"github.com/park-jun-woo/yongol/pkg/validate/features_ddl"
 	"github.com/park-jun-woo/yongol/pkg/validate/features_openapi"
+	"github.com/park-jun-woo/yongol/pkg/validate/features_statemachine"
 	"github.com/park-jun-woo/yongol/pkg/validate/domain_security"
 	"github.com/park-jun-woo/yongol/pkg/validate/funcspec"
 	"github.com/park-jun-woo/yongol/pkg/validate/hurl"
@@ -79,5 +81,7 @@ func allSteps() []step {
 		{Name: "domain_security", Kinds: []yongol.SSOTKind{yongol.KindConfig, yongol.KindOpenAPI}, Run: domain_security.Run},
 		{Name: "design_manifest", Kinds: []yongol.SSOTKind{yongol.KindConfig}, Run: design_manifest.Run},
 		{Name: "features_openapi", Kinds: []yongol.SSOTKind{yongol.KindFeatures, yongol.KindOpenAPI}, Run: features_openapi.Run},
+		{Name: "features_ddl", Kinds: []yongol.SSOTKind{yongol.KindFeatures, yongol.KindDDL}, Run: features_ddl.Run},
+		{Name: "features_statemachine", Kinds: []yongol.SSOTKind{yongol.KindFeatures, yongol.KindStates}, Run: features_statemachine.Run},
 	}
 }

@@ -523,6 +523,10 @@ Internal validation for `features.yaml`. Ensures no duplicate entries.
 | FT-01 | ERROR | Duplicate `op` in features.yaml | `pkg/validate/features/ft_01_duplicate_op.go` |
 | FT-02 | ERROR | Duplicate `path` in features.yaml | `pkg/validate/features/ft_02_duplicate_path.go` |
 | FT-03 | ERROR | features.yaml hash mismatch with specs/.yongol (or .yongol missing) | `pkg/validate/features/ft_03_hash_mismatch.go` |
+| FT-10 | ERROR | `has_many` references a table not defined in `tables` | `pkg/validate/features/ft_10_has_many_ref.go` |
+| FT-11 | ERROR | `belongs_to` references a table not defined in `tables` | `pkg/validate/features/ft_11_belongs_to_ref.go` |
+| FT-12 | WARNING | `has_many` without matching `belongs_to` on the child table | `pkg/validate/features/ft_12_bidirectional.go` |
+| FT-13 | ERROR | Feature `table` references a table not defined in `tables` | `pkg/validate/features/ft_13_feature_table_ref.go` |
 
 ## W. Features ↔ OpenAPI (`XFO-*` / `XOF-*`)
 
@@ -532,6 +536,23 @@ Cross-validation between `features.yaml` and the OpenAPI spec. Ensures that ever
 |---|---|---|---|
 | XFO-01 | ERROR | Features op has no matching OpenAPI operationId | `pkg/validate/features_openapi/xfo_01_op_not_in_openapi.go` |
 | XOF-01 | ERROR | OpenAPI operationId is not listed in features.yaml | `pkg/validate/features_openapi/xof_01_op_id_not_in_features.go` |
+
+## X. Features ↔ DDL (`XFD-*`)
+
+Cross-validation between `features.yaml` tables section and DDL. Ensures that declared tables and foreign-key relationships are backed by actual DDL definitions.
+
+| Rule ID | Level | Description | Source |
+|---|---|---|---|
+| XFD-01 | ERROR | Features table has no corresponding DDL file | `pkg/validate/features_ddl/xfd_01_table_exists.go` |
+| XFD-02 | ERROR | `belongs_to` relationship has no FK column in child DDL table | `pkg/validate/features_ddl/xfd_02_fk_exists.go` |
+
+## Y. Features ↔ StateMachine (`XFS-*`)
+
+Cross-validation between `features.yaml` tables section and Mermaid stateDiagram. Ensures that declared state values exist in the corresponding stateDiagram.
+
+| Rule ID | Level | Description | Source |
+|---|---|---|---|
+| XFS-01 | ERROR | Features table declares a state not present in stateDiagram | `pkg/validate/features_statemachine/xfs_01_states_in_diagram.go` |
 
 ---
 

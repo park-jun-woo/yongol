@@ -52,6 +52,7 @@ type Fullstack struct {
 	STMLPages           []stml.PageSpec
 	Layouts             []stml.LayoutSpec
 	Features            []features.Feature
+	FeatureTables       map[string]features.TableDef
 	DesignSpec          *design.DesignSpec
 	ParseDiagnostics    []diagnostic.Diagnostic   // All errors collected during the parser phase. Gated at the CLI level.
 	Presences           map[SSOTKind]SSOTPresence // Presence state (Absent/Declared/Populated) per SSOT kind.

@@ -16,7 +16,7 @@ import (
 var reYAMLLine = regexp.MustCompile(`line (\d+)`)
 
 // Load reads and parses features.yaml from the given specs directory root.
-func Load(specsDir string) ([]Feature, []diagnostic.Diagnostic) {
+func Load(specsDir string) (*FeaturesFile, []diagnostic.Diagnostic) {
 	path := filepath.Join(specsDir, "features.yaml")
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -84,5 +84,5 @@ func Load(specsDir string) ([]Feature, []diagnostic.Diagnostic) {
 	if len(diags) > 0 {
 		return nil, diags
 	}
-	return ff.Features, nil
+	return &ff, nil
 }

@@ -21,20 +21,23 @@ func TestLoad_Happy(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dir, "features.yaml"), []byte(data), 0644); err != nil {
 		t.Fatal(err)
 	}
-	feats, diags := Load(dir)
+	ff, diags := Load(dir)
 	if len(diags) > 0 {
 		t.Fatalf("unexpected diags: %v", diags)
 	}
-	if len(feats) != 2 {
-		t.Fatalf("want 2 features, got %d", len(feats))
+	if ff == nil {
+		t.Fatal("expected non-nil FeaturesFile")
 	}
-	if feats[0].Op != "CreateWorkflow" {
-		t.Errorf("want CreateWorkflow, got %s", feats[0].Op)
+	if len(ff.Features) != 2 {
+		t.Fatalf("want 2 features, got %d", len(ff.Features))
 	}
-	if feats[0].Line == 0 {
+	if ff.Features[0].Op != "CreateWorkflow" {
+		t.Errorf("want CreateWorkflow, got %s", ff.Features[0].Op)
+	}
+	if ff.Features[0].Line == 0 {
 		t.Error("expected non-zero line for first feature")
 	}
-	if feats[1].Path != "GET /workflows/{id}" {
-		t.Errorf("want GET /workflows/{id}, got %s", feats[1].Path)
+	if ff.Features[1].Path != "GET /workflows/{id}" {
+		t.Errorf("want GET /workflows/{id}, got %s", ff.Features[1].Path)
 	}
 }

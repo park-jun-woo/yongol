@@ -11,9 +11,10 @@ func parseFeaturesIfPresent(fs *Fullstack, root string, has map[SSOTKind]Detecte
 	if _, ok := has[KindFeatures]; !ok {
 		return
 	}
-	feats, diags := features.Load(root)
+	ff, diags := features.Load(root)
 	fs.ParseDiagnostics = append(fs.ParseDiagnostics, diags...)
-	if len(diags) == 0 {
-		fs.Features = feats
+	if len(diags) == 0 && ff != nil {
+		fs.Features = ff.Features
+		fs.FeatureTables = ff.Tables
 	}
 }

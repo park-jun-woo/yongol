@@ -4,8 +4,10 @@ package features
 
 // Feature represents a single entry in features.yaml.
 type Feature struct {
-	Op   string `yaml:"op"`
-	Path string `yaml:"path"`
-	Desc string `yaml:"desc"`
-	Line int    `yaml:"-"` // 1-based line number in the source file
+	Op     string `yaml:"op"`
+	Path   string `yaml:"path"`
+	Desc   string `yaml:"desc"`
+	Table  string `yaml:"table"`
+	Public bool   `yaml:"public"`
+	Line   int    `yaml:"-"` // 1-based line number in the source file
 }
