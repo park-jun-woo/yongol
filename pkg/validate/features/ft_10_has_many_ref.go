@@ -13,9 +13,6 @@ import (
 // ft10HasManyRef validates FT-10: every has_many reference must point to a
 // table defined in the tables section.
 func ft10HasManyRef(fs *yongol.Fullstack) []diagnostic.Diagnostic {
-	if fs.FeatureTables == nil {
-		return nil
-	}
 	var diags []diagnostic.Diagnostic
 	for parent, td := range fs.FeatureTables {
 		for _, child := range td.HasMany {

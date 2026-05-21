@@ -13,9 +13,11 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	diags = append(diags, ft01DuplicateOp(fs)...)
 	diags = append(diags, ft02DuplicatePath(fs)...)
 	diags = append(diags, ft03HashMismatch(fs)...)
+	diags = append(diags, ft16TablesRequired(fs)...)
 	diags = append(diags, ft10HasManyRef(fs)...)
 	diags = append(diags, ft11BelongsToRef(fs)...)
 	diags = append(diags, ft12Bidirectional(fs)...)
+	diags = append(diags, ft17FeatureTableRequired(fs)...)
 	diags = append(diags, ft13FeatureTableRef(fs)...)
 	return diags
 }

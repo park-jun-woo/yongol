@@ -48,35 +48,6 @@ func TestFT13_FeatureTableRef_NoFire(t *testing.T) {
 	}
 }
 
-func TestFT13_FeatureTableRef_EmptyTable(t *testing.T) {
-	// Empty table field should be skipped (backward compatibility).
-	fs := &yongol.Fullstack{
-		FeatureTables: map[string]featparser.TableDef{
-			"projects": {},
-		},
-		Features: []featparser.Feature{
-			{Op: "Health", Path: "GET /health", Desc: "Health check", Table: "", Line: 3},
-		},
-	}
-	diags := ft13FeatureTableRef(fs)
-	if len(diags) != 0 {
-		t.Fatalf("want 0 diags for empty table field, got %d", len(diags))
-	}
-}
-
-func TestFT13_FeatureTableRef_NilTables(t *testing.T) {
-	fs := &yongol.Fullstack{
-		FeatureTables: nil,
-		Features: []featparser.Feature{
-			{Op: "CreateTask", Path: "POST /tasks", Desc: "Create task", Table: "tasks", Line: 5},
-		},
-	}
-	diags := ft13FeatureTableRef(fs)
-	if len(diags) != 0 {
-		t.Fatalf("want 0 diags for nil tables, got %d", len(diags))
-	}
-}
-
 func TestFT13_FeatureTableRef_NilFeatures(t *testing.T) {
 	fs := &yongol.Fullstack{
 		FeatureTables: map[string]featparser.TableDef{

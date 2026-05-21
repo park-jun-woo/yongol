@@ -13,17 +13,11 @@ import (
 // ft13FeatureTableRef validates FT-13: when a feature specifies a table field,
 // that table must exist in the tables section.
 func ft13FeatureTableRef(fs *yongol.Fullstack) []diagnostic.Diagnostic {
-	if fs.FeatureTables == nil {
-		return nil
-	}
 	if fs.Features == nil {
 		return nil
 	}
 	var diags []diagnostic.Diagnostic
 	for _, f := range fs.Features {
-		if f.Table == "" {
-			continue
-		}
 		if _, ok := fs.FeatureTables[f.Table]; !ok {
 			diags = append(diags, diagnostic.Diagnostic{
 				File:    "features.yaml",

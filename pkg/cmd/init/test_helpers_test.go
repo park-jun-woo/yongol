@@ -9,16 +9,21 @@ import (
 	"testing"
 )
 
-const testFeaturesContent = `features:
+const testFeaturesContent = `tables:
+  workflows: {}
+features:
   - op: CreateWorkflow
     path: POST /workflows
     desc: Create a new workflow
+    table: workflows
   - op: GetWorkflow
     path: GET /workflows/{id}
     desc: Get workflow detail
+    table: workflows
   - op: ListWorkflows
     path: GET /workflows
     desc: List all workflows
+    table: workflows
 `
 
 // writeTempFeatures writes a minimal features.yaml in t.TempDir() and returns

@@ -41,13 +41,3 @@ func TestFT10_HasManyRef_NoFire(t *testing.T) {
 		t.Fatalf("want 0 diags, got %d", len(diags))
 	}
 }
-
-func TestFT10_HasManyRef_NilTables(t *testing.T) {
-	fs := &yongol.Fullstack{
-		FeatureTables: nil,
-	}
-	diags := ft10HasManyRef(fs)
-	if len(diags) != 0 {
-		t.Fatalf("want 0 diags for nil tables, got %d", len(diags))
-	}
-}

@@ -43,16 +43,6 @@ func TestFT12_Bidirectional_NoFire(t *testing.T) {
 	}
 }
 
-func TestFT12_Bidirectional_NilTables(t *testing.T) {
-	fs := &yongol.Fullstack{
-		FeatureTables: nil,
-	}
-	diags := ft12Bidirectional(fs)
-	if len(diags) != 0 {
-		t.Fatalf("want 0 diags for nil tables, got %d", len(diags))
-	}
-}
-
 func TestFT12_Bidirectional_ChildNotDefined(t *testing.T) {
 	// When child table is not defined, FT-10 catches it. FT-12 should skip.
 	fs := &yongol.Fullstack{

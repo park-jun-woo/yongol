@@ -40,13 +40,3 @@ func TestFT11_BelongsToRef_NoFire(t *testing.T) {
 		t.Fatalf("want 0 diags, got %d", len(diags))
 	}
 }
-
-func TestFT11_BelongsToRef_NilTables(t *testing.T) {
-	fs := &yongol.Fullstack{
-		FeatureTables: nil,
-	}
-	diags := ft11BelongsToRef(fs)
-	if len(diags) != 0 {
-		t.Fatalf("want 0 diags for nil tables, got %d", len(diags))
-	}
-}

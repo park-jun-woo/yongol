@@ -13,9 +13,6 @@ import (
 // ft11BelongsToRef validates FT-11: every belongs_to reference must point to a
 // table defined in the tables section.
 func ft11BelongsToRef(fs *yongol.Fullstack) []diagnostic.Diagnostic {
-	if fs.FeatureTables == nil {
-		return nil
-	}
 	var diags []diagnostic.Diagnostic
 	for child, td := range fs.FeatureTables {
 		for _, parent := range td.BelongsTo {

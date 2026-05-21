@@ -13,13 +13,17 @@ import (
 func TestRun_Happy(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "features.yaml")
-	content := `features:
+	content := `tables:
+  tasks: {}
+features:
   - op: CreateTask
     path: POST /tasks
     desc: Create a task
+    table: tasks
   - op: GetTask
     path: GET /tasks/{id}
     desc: Get a task
+    table: tasks
 `
 	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
 		t.Fatal(err)

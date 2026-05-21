@@ -10,10 +10,13 @@ import (
 
 func TestRun_WritesYongolHash(t *testing.T) {
 	dir := t.TempDir()
-	featContent := []byte(`features:
+	featContent := []byte(`tables:
+  tasks: {}
+features:
   - op: CreateTask
     path: POST /tasks
     desc: Create a task
+    table: tasks
 `)
 	if err := os.WriteFile(filepath.Join(dir, "features.yaml"), featContent, 0o644); err != nil {
 		t.Fatal(err)
@@ -54,13 +57,17 @@ func TestRun_MissingFeaturesYaml(t *testing.T) {
 
 func TestRun_DuplicateOp_ReturnsError(t *testing.T) {
 	dir := t.TempDir()
-	content := `features:
+	content := `tables:
+  tasks: {}
+features:
   - op: CreateTask
     path: POST /tasks
     desc: Create a task
+    table: tasks
   - op: CreateTask
     path: POST /tasks/v2
     desc: Create a task v2
+    table: tasks
 `
 	if err := os.WriteFile(filepath.Join(dir, "features.yaml"), []byte(content), 0o644); err != nil {
 		t.Fatal(err)

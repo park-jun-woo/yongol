@@ -13,9 +13,6 @@ import (
 // ft12Bidirectional validates FT-12: when table A has_many B, table B should
 // belongs_to A. Missing reverse direction emits a warning.
 func ft12Bidirectional(fs *yongol.Fullstack) []diagnostic.Diagnostic {
-	if fs.FeatureTables == nil {
-		return nil
-	}
 	var diags []diagnostic.Diagnostic
 	for parent, td := range fs.FeatureTables {
 		for _, child := range td.HasMany {

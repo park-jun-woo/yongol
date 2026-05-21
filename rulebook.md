@@ -527,6 +527,8 @@ Internal validation for `features.yaml`. Ensures no duplicate entries.
 | FT-11 | ERROR | `belongs_to` references a table not defined in `tables` | `pkg/validate/features/ft_11_belongs_to_ref.go` |
 | FT-12 | WARNING | `has_many` without matching `belongs_to` on the child table | `pkg/validate/features/ft_12_bidirectional.go` |
 | FT-13 | ERROR | Feature `table` references a table not defined in `tables` | `pkg/validate/features/ft_13_feature_table_ref.go` |
+| FT-16 | ERROR | `features.yaml` missing required `tables` section | `pkg/validate/features/ft_16_tables_required.go` |
+| FT-17 | ERROR | Feature missing required `table` field | `pkg/validate/features/ft_17_feature_table_required.go` |
 
 ## W. Features ↔ OpenAPI (`XFO-*` / `XOF-*`)
 
