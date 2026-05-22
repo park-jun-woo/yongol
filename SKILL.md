@@ -15,12 +15,16 @@ yongol cross-validates 10 declarative SSOT (Single Source of Truth) files and ge
 
 **Always start with `yongol init`.** Write `features.yaml` first, then run `yongol init` to scaffold SSOT stubs before writing any specs. Never create SSOT files by hand.
 
-**Never stop at `yongol generate`.** Run `yongol next specs/` — it shows one error at a time and tells you what to fix and what to run next. Keep going until all validations pass. Then generate, build, and run Hurl tests until all pass.
+**After changing features.yaml, run `yongol hash`.** Run `yongol hash <specs-dir>` after adding, removing, or editing features. Hash mismatch triggers `INI-01` error.
+
+**Use `yongol next` to fix errors.** Run `yongol next specs/` — it shows one error at a time and tells you what to fix and what to run next. Keep going until "All validations passed."
+
+**After `yongol generate`, you must verify.** Run `go build ./...`, `go test ./...`, and `hurl --test` against the running server. All three must pass. Never skip verification — generated code may expose spec mistakes that validation cannot catch.
 
 ## When to Use This Skill
 
 - Writing or editing SSOT spec files (OpenAPI, DDL, SSaC, Rego, Mermaid, Hurl, STML, manifest)
-- Running `yongol validate` and interpreting validation errors
+- Running `yongol next` to fix errors one at a time
 - Generating backend/frontend code with `yongol generate`
 - Scaffolding a new project with `yongol init`
 - Debugging cross-layer inconsistencies (e.g., DDL column type vs OpenAPI schema)
@@ -46,14 +50,15 @@ Requires Go 1.25+.
 
 ```
 1. Write features.yaml
-2. yongol init <id> <features.yaml>  → scaffold SSOT stubs + .yongol
+2. yongol init <id> <features.yaml>    → scaffold SSOT stubs + .yongol
 3. Write/edit SSOT specs in specs/
-4. yongol next specs/                → shows one error + what to fix
-5. Fix the error
-6. Repeat 4-5 until "All validations passed."
-7. yongol generate specs/ arts/      → deterministic code output
-8. go build ./... inside arts/backend
-9. hurl --test against the running server
+4. yongol next specs/                  → shows one error + what to fix
+5. Fix the error, then run yongol next again
+6. Repeat until "All validations passed."
+7. yongol generate specs/ arts/        → deterministic code output
+8. cd arts/backend && go build ./...   → must pass
+9. go test ./...                       → must pass
+10. hurl --test against running server → must pass
 ```
 
 ## Commands
@@ -61,7 +66,6 @@ Requires Go 1.25+.
 | Command | Purpose |
 |---|---|
 | `yongol next <specs>` | Show one error + fix instruction. Repeat until 0 errors. |
-| `yongol validate <specs>` | Cross-validate all SSOTs. Shows all errors at once. |
 | `yongol generate <specs> <arts>` | Generate backend + frontend + migrations |
 | `yongol init <id> <features.yaml> ["desc"]` | Scaffold SSOT stubs from features.yaml + hash lock |
 | `yongol features add <features.yaml>` | Add new features: SSaC stub gen + hash update |
