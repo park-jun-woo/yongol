@@ -28,12 +28,13 @@ func xos22ResponseNo2xx(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			continue
 		}
 		diags = append(diags, diagnostic.Diagnostic{
-			File:    fn.FileName,
-			Line:    fn.Line,
-			Phase:   diagnostic.PhaseValidate,
-			Level:   diagnostic.LevelError,
-			Message: "[XOS-22] SSaC " + fn.Name + " has @response but OpenAPI defines no explicit 2xx response",
-			Advice:  "Declare a 2xx response (200, 201, 204, etc.) in the OpenAPI " + fn.Name + " responses",
+			File:        fn.FileName,
+			Line:        fn.Line,
+			Phase:       diagnostic.PhaseValidate,
+			Level:       diagnostic.LevelError,
+			Message:     "[XOS-22] SSaC " + fn.Name + " has @response but OpenAPI defines no explicit 2xx response",
+			Advice:      "Declare a 2xx response (200, 201, 204, etc.) in the OpenAPI " + fn.Name + " responses",
+			OperationID: fn.Name,
 		})
 	}
 	return diags

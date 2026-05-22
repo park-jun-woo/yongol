@@ -57,6 +57,7 @@ func xfs73CallRequestParamType(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 							" ≠ " + funcName + "Request." + inputKey + " type " + reqType,
 						Advice: "Make the Func Request field " + inputKey +
 							" type match the OpenAPI param type (" + paramType + ")",
+						OperationID: fn.Name,
 					})
 				}
 			}

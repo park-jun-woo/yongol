@@ -36,12 +36,13 @@ func xas60AuthInputField(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					continue
 				}
 				diags = append(diags, diagnostic.Diagnostic{
-					File:    fn.FileName,
-					Line:    seq.Line,
-					Phase:   diagnostic.PhaseValidate,
-					Level:   diagnostic.LevelError,
-					Message: "[XAS-60] @auth input field " + strconv.Quote(key) + " missing in authz.CheckRequest",
-					Advice:  "Use only fields defined in authz.CheckRequest, or register a custom authz package in the manifest",
+					File:        fn.FileName,
+					Line:        seq.Line,
+					Phase:       diagnostic.PhaseValidate,
+					Level:       diagnostic.LevelError,
+					Message:     "[XAS-60] @auth input field " + strconv.Quote(key) + " missing in authz.CheckRequest",
+					Advice:      "Use only fields defined in authz.CheckRequest, or register a custom authz package in the manifest",
+					OperationID: fn.Name,
 				})
 			}
 		}

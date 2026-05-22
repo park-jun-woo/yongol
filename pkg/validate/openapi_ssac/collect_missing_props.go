@@ -28,12 +28,13 @@ func collectMissingProps(fn ssac.ServiceFunc, fields []string, opProps map[strin
 			advice = "Add @response field " + field + " to the OpenAPI response schema"
 		}
 		diags = append(diags, diagnostic.Diagnostic{
-			File:    fn.FileName,
-			Line:    fn.Line,
-			Phase:   diagnostic.PhaseValidate,
-			Level:   diagnostic.LevelError,
-			Message: "[" + ruleID + "] SSaC @response field " + field + " is not in OpenAPI " + fn.Name + " response schema",
-			Advice:  advice,
+			File:        fn.FileName,
+			Line:        fn.Line,
+			Phase:       diagnostic.PhaseValidate,
+			Level:       diagnostic.LevelError,
+			Message:     "[" + ruleID + "] SSaC @response field " + field + " is not in OpenAPI " + fn.Name + " response schema",
+			Advice:      advice,
+			OperationID: fn.Name,
 		})
 	}
 	return diags

@@ -15,7 +15,7 @@ func checkAuthInputType(g *rule.Ground, fn parsessac.ServiceFunc, seq parsessac.
 	var diags []diagnostic.Diagnostic
 	for inputKey, inputValue := range seq.Inputs {
 		sourceType := resolveInputType(g, fn.Name, inputValue)
-		d := makeAuthTypeDiag(fn.FileName, seq.Line, inputKey, sourceType)
+		d := makeAuthTypeDiag(fn.FileName, seq.Line, inputKey, sourceType, fn.Name)
 		if d != nil {
 			diags = append(diags, *d)
 		}

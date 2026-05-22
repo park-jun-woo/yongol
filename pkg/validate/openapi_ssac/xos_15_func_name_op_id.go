@@ -25,12 +25,13 @@ func xos15FuncNameOpID(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			continue
 		}
 		diags = append(diags, diagnostic.Diagnostic{
-			File:    fn.FileName,
-			Line:    fn.Line,
-			Phase:   diagnostic.PhaseValidate,
-			Level:   diagnostic.LevelError,
-			Message: "[XOS-15] SSaC func " + fn.Name + " has no matching OpenAPI operationId",
-			Advice:  "Align the SSaC function name with the OpenAPI operationId (operationId: " + fn.Name + ")",
+			File:        fn.FileName,
+			Line:        fn.Line,
+			Phase:       diagnostic.PhaseValidate,
+			Level:       diagnostic.LevelError,
+			Message:     "[XOS-15] SSaC func " + fn.Name + " has no matching OpenAPI operationId",
+			Advice:      "Align the SSaC function name with the OpenAPI operationId (operationId: " + fn.Name + ")",
+			OperationID: fn.Name,
 		})
 	}
 	return diags

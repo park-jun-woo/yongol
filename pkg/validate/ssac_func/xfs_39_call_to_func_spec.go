@@ -34,12 +34,13 @@ func xfs39CallToFuncSpec(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			key := normalizedCallKey(seq.Model)
 			if !specs[key] {
 				diags = append(diags, diagnostic.Diagnostic{
-					File:    fn.FileName,
-					Line:    seq.Line,
-					Phase:   diagnostic.PhaseValidate,
-					Level:   diagnostic.LevelError,
-					Message: "[XFS-39] @call references non-existent func spec " + seq.Model,
-					Advice:  "Define function " + seq.Model + " under pkg/",
+					File:        fn.FileName,
+					Line:        seq.Line,
+					Phase:       diagnostic.PhaseValidate,
+					Level:       diagnostic.LevelError,
+					Message:     "[XFS-39] @call references non-existent func spec " + seq.Model,
+					Advice:      "Define function " + seq.Model + " under pkg/",
+					OperationID: fn.Name,
 				})
 			}
 		}

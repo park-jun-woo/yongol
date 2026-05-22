@@ -25,12 +25,13 @@ func xof01OpIDNotInFeatures(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			continue
 		}
 		diags = append(diags, diagnostic.Diagnostic{
-			File:    "api/openapi.yaml",
-			Line:    fs.OpenAPILines.OperationLine(opID),
-			Phase:   diagnostic.PhaseValidate,
-			Level:   diagnostic.LevelError,
-			Message: "[XOF-01] OpenAPI operationId " + opID + " is not listed in features.yaml",
-			Advice:  "Add this operationId to features.yaml",
+			File:        "api/openapi.yaml",
+			Line:        fs.OpenAPILines.OperationLine(opID),
+			Phase:       diagnostic.PhaseValidate,
+			Level:       diagnostic.LevelError,
+			Message:     "[XOF-01] OpenAPI operationId " + opID + " is not listed in features.yaml",
+			Advice:      "Add this operationId to features.yaml",
+			OperationID: opID,
 		})
 	}
 	return diags

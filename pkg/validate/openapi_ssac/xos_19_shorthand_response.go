@@ -24,12 +24,13 @@ func xos19ShorthandResponse(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		}
 		if !varDeclaredInFunc(fn, varName) {
 			diags = append(diags, diagnostic.Diagnostic{
-				File:    fn.FileName,
-				Line:    fn.Line,
-				Phase:   diagnostic.PhaseValidate,
-				Level:   diagnostic.LevelError,
-				Message: "[XOS-19] shorthand response variable \"" + varName + "\" not declared in " + fn.Name,
-				Advice:  "Declare the shorthand @response variable " + varName + " with @get/@call or similar first",
+				File:        fn.FileName,
+				Line:        fn.Line,
+				Phase:       diagnostic.PhaseValidate,
+				Level:       diagnostic.LevelError,
+				Message:     "[XOS-19] shorthand response variable \"" + varName + "\" not declared in " + fn.Name,
+				Advice:      "Declare the shorthand @response variable " + varName + " with @get/@call or similar first",
+				OperationID: fn.Name,
 			})
 			continue
 		}

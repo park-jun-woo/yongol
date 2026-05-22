@@ -23,12 +23,13 @@ func xos66UsedFieldsRequired(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				continue
 			}
 			diags = append(diags, diagnostic.Diagnostic{
-				File:    fn.FileName,
-				Line:    fn.Line,
-				Phase:   diagnostic.PhaseValidate,
-				Level:   diagnostic.LevelError,
-				Message: "[XOS-66] field " + field + " is used in SSaC " + fn.Name + " but not marked required in OpenAPI requestBody",
-				Advice:  "Add field " + field + " used by SSaC to the required array of the OpenAPI requestBody",
+				File:        fn.FileName,
+				Line:        fn.Line,
+				Phase:       diagnostic.PhaseValidate,
+				Level:       diagnostic.LevelError,
+				Message:     "[XOS-66] field " + field + " is used in SSaC " + fn.Name + " but not marked required in OpenAPI requestBody",
+				Advice:      "Add field " + field + " used by SSaC to the required array of the OpenAPI requestBody",
+				OperationID: fn.Name,
 			})
 		}
 	}

@@ -34,6 +34,7 @@ func xos80CheckFunc(fn ssacparser.ServiceFunc, opMap map[string]OperationEntry) 
 		Message: fmt.Sprintf(
 			"[XOS-80] operation %s (%s) cannot derive a success status — declared 2xx: %v",
 			fn.Name, entry.Method, declared),
-		Advice: "Declare a conventional 2xx response for this method (POST→201, PUT/PATCH→200, DELETE→204, GET→200)",
+		Advice:      "Declare a conventional 2xx response for this method (POST→201, PUT/PATCH→200, DELETE→204, GET→200)",
+		OperationID: fn.Name,
 	}}
 }

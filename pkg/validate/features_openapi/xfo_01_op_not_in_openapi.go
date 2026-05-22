@@ -22,12 +22,13 @@ func xfo01OpNotInOpenAPI(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			continue
 		}
 		diags = append(diags, diagnostic.Diagnostic{
-			File:    "features.yaml",
-			Line:    f.Line,
-			Phase:   diagnostic.PhaseValidate,
-			Level:   diagnostic.LevelError,
-			Message: "[XFO-01] features op " + f.Op + " has no matching OpenAPI operationId",
-			Advice:  "Add operationId: " + f.Op + " to the OpenAPI spec, or remove this feature entry",
+			File:        "features.yaml",
+			Line:        f.Line,
+			Phase:       diagnostic.PhaseValidate,
+			Level:       diagnostic.LevelError,
+			Message:     "[XFO-01] features op " + f.Op + " has no matching OpenAPI operationId",
+			Advice:      "Add operationId: " + f.Op + " to the OpenAPI spec, or remove this feature entry",
+			OperationID: f.Op,
 		})
 	}
 	return diags

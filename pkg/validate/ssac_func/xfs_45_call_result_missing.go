@@ -28,12 +28,13 @@ func xfs45CallResultMissing(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			}
 			if len(spec.ResponseFields) == 0 {
 				diags = append(diags, diagnostic.Diagnostic{
-					File:    fn.FileName,
-					Line:    seq.Line,
-					Phase:   diagnostic.PhaseValidate,
-					Level:   diagnostic.LevelError,
-					Message: "[XFS-45] @call " + seq.Model + " binds @result but func has no Response fields",
-					Advice:  "Either remove the @result binding or add ResponseFields to the func spec",
+					File:        fn.FileName,
+					Line:        seq.Line,
+					Phase:       diagnostic.PhaseValidate,
+					Level:       diagnostic.LevelError,
+					Message:     "[XFS-45] @call " + seq.Model + " binds @result but func has no Response fields",
+					Advice:      "Either remove the @result binding or add ResponseFields to the func spec",
+					OperationID: fn.Name,
 				})
 			}
 		}

@@ -17,10 +17,11 @@ func xsp29MissingSSaCDiag(pair [2]string, ssacPairs map[[2]string]bool, pairLoc 
 	}
 	loc := pairLoc[pair]
 	return diagnostic.Diagnostic{
-		File:  loc.File,
-		Line:  loc.Line,
-		Phase: diagnostic.PhaseValidate,
-		Level: diagnostic.LevelError,
+		File:        loc.File,
+		Line:        loc.Line,
+		Phase:       diagnostic.PhaseValidate,
+		Level:       diagnostic.LevelError,
+		OperationID: pair[0],
 		Message: fmt.Sprintf(
 			"[XSP-29] Rego allow rule (%s, %s) has no matching SSaC @auth sequence",
 			pair[0], pair[1]),

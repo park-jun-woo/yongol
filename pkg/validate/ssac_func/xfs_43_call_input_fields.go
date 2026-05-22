@@ -37,12 +37,13 @@ func xfs43CallInputFields(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			for inputKey := range seq.Inputs {
 				if !reqSet[inputKey] {
 					diags = append(diags, diagnostic.Diagnostic{
-						File:    fn.FileName,
-						Line:    seq.Line,
-						Phase:   diagnostic.PhaseValidate,
-						Level:   diagnostic.LevelError,
-						Message: "[XFS-43] @call " + seq.Model + " input field " + inputKey + " not in " + funcName + "Request",
-						Advice:  "Add input key " + inputKey + " to the func Request struct, or remove it from the SSaC @call",
+						File:        fn.FileName,
+						Line:        seq.Line,
+						Phase:       diagnostic.PhaseValidate,
+						Level:       diagnostic.LevelError,
+						Message:     "[XFS-43] @call " + seq.Model + " input field " + inputKey + " not in " + funcName + "Request",
+						Advice:      "Add input key " + inputKey + " to the func Request struct, or remove it from the SSaC @call",
+						OperationID: fn.Name,
 					})
 				}
 			}

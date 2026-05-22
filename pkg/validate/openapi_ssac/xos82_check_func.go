@@ -42,5 +42,6 @@ func xos82CheckFunc(fn ssacparser.ServiceFunc, opMap map[string]OperationEntry) 
 			fn.Name, sortedKeys(declared), selected),
 		Advice: fmt.Sprintf("Either remove the unused 2xx declarations %v or extend SSaC to emit them",
 			sortedKeys(unreachable)),
+		OperationID: fn.Name,
 	}}
 }

@@ -29,12 +29,13 @@ func collectInvalidTransitions(fn ssac.ServiceFunc, diagramByID map[string]*stat
 			file = "ssac/" + fn.Name + ".ssac"
 		}
 		diags = append(diags, diagnostic.Diagnostic{
-			File:    file,
-			Line:    seq.Line,
-			Phase:   diagnostic.PhaseValidate,
-			Level:   diagnostic.LevelError,
-			Message: "[XMS-25] transition \"" + seq.Transition + "\" is not a valid event in diagram \"" + seq.DiagramID + "\"",
-			Advice:  "Define transition '" + seq.Transition + "' in the stateDiagram",
+			File:        file,
+			Line:        seq.Line,
+			Phase:       diagnostic.PhaseValidate,
+			Level:       diagnostic.LevelError,
+			Message:     "[XMS-25] transition \"" + seq.Transition + "\" is not a valid event in diagram \"" + seq.DiagramID + "\"",
+			Advice:      "Define transition '" + seq.Transition + "' in the stateDiagram",
+			OperationID: fn.Name,
 		})
 	}
 	return diags

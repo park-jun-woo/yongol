@@ -49,7 +49,8 @@ func xfs44CallInputType(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 						Level: diagnostic.LevelError,
 						Message: "[XFS-44] @call " + seq.Model + " input " + inputKey +
 							" type " + sourceType + " ≠ " + funcName + "Request." + inputKey + " type " + reqType,
-						Advice: "Make the @call input " + inputKey + " type match the " + inputKey + " field type in the func Request",
+						Advice:      "Make the @call input " + inputKey + " type match the " + inputKey + " field type in the func Request",
+						OperationID: fn.Name,
 					})
 				}
 			}

@@ -33,12 +33,13 @@ func xfs63CallFuncSignature(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				actual = "(" + joinReturnTypes(spec.ReturnTypes) + ")"
 			}
 			diags = append(diags, diagnostic.Diagnostic{
-				File:    fn.FileName,
-				Line:    seq.Line,
-				Phase:   diagnostic.PhaseValidate,
-				Level:   diagnostic.LevelError,
-				Message: fmt.Sprintf("[XFS-63] @call %s signature must return (Response, error), got %s", seq.Model, actual),
-				Advice:  fmt.Sprintf("func %s(req T) (Response, error) 형태로 수정하세요. side-effect 전용이면 빈 Response struct 를 사용하세요.", callFuncName(seq.Model)),
+				File:        fn.FileName,
+				Line:        seq.Line,
+				Phase:       diagnostic.PhaseValidate,
+				Level:       diagnostic.LevelError,
+				Message:     fmt.Sprintf("[XFS-63] @call %s signature must return (Response, error), got %s", seq.Model, actual),
+				Advice:      fmt.Sprintf("func %s(req T) (Response, error) 형태로 수정하세요. side-effect 전용이면 빈 Response struct 를 사용하세요.", callFuncName(seq.Model)),
+				OperationID: fn.Name,
 			})
 		}
 	}

@@ -27,12 +27,13 @@ func checkFuncErrStatus(file, funcName string, seqs []ssac.Sequence, op *openapi
 			continue
 		}
 		diags = append(diags, diagnostic.Diagnostic{
-			File:    file,
-			Line:    seq.Line,
-			Phase:   diagnostic.PhaseValidate,
-			Level:   diagnostic.LevelError,
-			Message: "[XOS-21] SSaC @" + seq.Type + " in " + funcName + " uses HTTP " + strconv.Itoa(status) + " but OpenAPI has no " + strconv.Itoa(status) + " response",
-			Advice:  "Add a " + strconv.Itoa(status) + " response to the OpenAPI " + funcName + " responses",
+			File:        file,
+			Line:        seq.Line,
+			Phase:       diagnostic.PhaseValidate,
+			Level:       diagnostic.LevelError,
+			Message:     "[XOS-21] SSaC @" + seq.Type + " in " + funcName + " uses HTTP " + strconv.Itoa(status) + " but OpenAPI has no " + strconv.Itoa(status) + " response",
+			Advice:      "Add a " + strconv.Itoa(status) + " response to the OpenAPI " + funcName + " responses",
+			OperationID: funcName,
 		})
 	}
 	return diags

@@ -9,7 +9,7 @@ import (
 
 // makeAuthTypeDiag returns a diagnostic if sourceType is non-empty and not
 // string-compatible, nil otherwise.
-func makeAuthTypeDiag(fileName string, line int, inputKey, sourceType string) *diagnostic.Diagnostic {
+func makeAuthTypeDiag(fileName string, line int, inputKey, sourceType, operationID string) *diagnostic.Diagnostic {
 	if sourceType == "" || TypesCompatible(sourceType, "string") {
 		return nil
 	}
@@ -23,5 +23,6 @@ func makeAuthTypeDiag(fileName string, line int, inputKey, sourceType string) *d
 			" (authz.CheckRequest." + inputKey + " is string)",
 		Advice: "Use a string-typed source (e.g. request.id for path params) " +
 			"instead of a DB row UUID field",
+		OperationID: operationID,
 	}
 }

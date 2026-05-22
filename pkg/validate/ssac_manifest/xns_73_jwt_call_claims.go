@@ -49,10 +49,11 @@ func xns73JwtCallClaims(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					continue
 				}
 				diags = append(diags, diagnostic.Diagnostic{
-					File:  fn.FileName,
-					Line:  seq.Line,
-					Phase: diagnostic.PhaseValidate,
-					Level: diagnostic.LevelError,
+					File:        fn.FileName,
+					Line:        seq.Line,
+					Phase:       diagnostic.PhaseValidate,
+					Level:       diagnostic.LevelError,
+					OperationID: fn.Name,
 					Message: fmt.Sprintf(
 						"[XNS-73] @call %s input %q is not a declared claim field (valid: %s)",
 						seq.Model, inputKey, sortedClaimFields(claims)),

@@ -25,12 +25,13 @@ func collectMissingDiagrams(fn ssac.ServiceFunc, diagramByID map[string]*statema
 			file = "ssac/" + fn.Name + ".ssac"
 		}
 		diags = append(diags, diagnostic.Diagnostic{
-			File:    file,
-			Line:    seq.Line,
-			Phase:   diagnostic.PhaseValidate,
-			Level:   diagnostic.LevelError,
-			Message: "[XMS-24] @state references diagram \"" + seq.DiagramID + "\" which does not exist",
-			Advice:  "Add the file specs/states/" + seq.DiagramID + ".mmd",
+			File:        file,
+			Line:        seq.Line,
+			Phase:       diagnostic.PhaseValidate,
+			Level:       diagnostic.LevelError,
+			Message:     "[XMS-24] @state references diagram \"" + seq.DiagramID + "\" which does not exist",
+			Advice:      "Add the file specs/states/" + seq.DiagramID + ".mmd",
+			OperationID: fn.Name,
 		})
 	}
 	return diags
