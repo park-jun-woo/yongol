@@ -4,7 +4,7 @@
   <img src="yongol.webp" alt="yongol — the keel of your AI-coded SaaS" width="480">
 </p>
 
-[![Version](https://img.shields.io/badge/version-v0.5.4-blue.svg)](https://github.com/park-jun-woo/yongol/releases)
+[![Version](https://img.shields.io/badge/version-v0.6.0-blue.svg)](https://github.com/park-jun-woo/yongol/releases)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![skills.sh](https://skills.sh/b/park-jun-woo/yongol)](https://skills.sh/park-jun-woo/yongol)
 
@@ -72,7 +72,7 @@ git clone https://github.com/park-jun-woo/yongol.git
 cd yongol && make install
 ```
 
-> 💬 *"Read yongol/manual-for-ai.md and build the spec in yongol/examples/zenflow/zenflow.md. Keep going until `yongol validate` shows 0 errors and 0 warnings, and all Hurl smoke tests pass."*
+> 💬 *"Read yongol/manual-for-ai.md and build the spec in yongol/examples/zenflow/zenflow.md. Run `yongol next specs/` and keep fixing until all validations pass."*
 
 ```
 ## Validation
@@ -129,7 +129,25 @@ yongol chain ExecuteWorkflow examples/zenflow
 
 ## Using it with AI
 
-The AI writes specs. `yongol validate` catches cross-layer inconsistencies the moment they appear. AI stays free within the rails; step off the rails and validation fails fast.
+Just run `yongol next specs/`. It shows one error at a time with the file location and tells the AI exactly what to fix and what to run next. The loop continues until all validations pass.
+
+```
+$ yongol next specs/
+
+[ERROR] DDL-003: users.id must be BIGINT, got INT
+  file: specs/db/users.sql:2
+  ▶ Fix this error. Then run `yongol next specs/`.
+```
+
+When all errors are resolved:
+
+```
+$ yongol next specs/
+
+✓ All validations passed. 0 errors.
+```
+
+Use `yongol validate specs/` to see all errors at once.
 
 ## The 10 SSOT Sources
 

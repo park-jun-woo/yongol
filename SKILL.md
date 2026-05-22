@@ -4,7 +4,7 @@ description: Full-stack SSOT orchestrator that validates the consistency of 10 d
 license: MIT
 metadata:
   author: park-jun-woo
-  version: "0.5.3"
+  version: "0.6.0"
 ---
 
 # yongol — Full-Stack SSOT Orchestrator
@@ -15,7 +15,7 @@ yongol cross-validates 10 declarative SSOT (Single Source of Truth) files and ge
 
 **Always start with `yongol init`.** Write `features.yaml` first, then run `yongol init` to scaffold SSOT stubs before writing any specs. Never create SSOT files by hand.
 
-**Never stop at `yongol generate`.** Keep iterating `yongol validate` → fix → validate until the output shows **0 errors and 0 warnings**. Then generate, build, and run Hurl tests until all pass. A build that skips validation ships broken decisions.
+**Never stop at `yongol generate`.** Run `yongol next specs/` — it shows one error at a time and tells you what to fix and what to run next. Keep going until all validations pass. Then generate, build, and run Hurl tests until all pass.
 
 ## When to Use This Skill
 
@@ -47,20 +47,21 @@ Requires Go 1.25+.
 ```
 1. Write features.yaml
 2. yongol init <id> <features.yaml>  → scaffold SSOT stubs + .yongol
-5. Write/edit SSOT specs in specs/
-6. yongol validate specs/            → catch cross-layer errors
-7. Fix errors (validator provides rule ID + advice)
-8. Repeat 6-7 until 0 errors
-9. yongol generate specs/ arts/      → deterministic code output
-10. go build ./... inside arts/backend
-11. hurl --test against the running server
+3. Write/edit SSOT specs in specs/
+4. yongol next specs/                → shows one error + what to fix
+5. Fix the error
+6. Repeat 4-5 until "All validations passed."
+7. yongol generate specs/ arts/      → deterministic code output
+8. go build ./... inside arts/backend
+9. hurl --test against the running server
 ```
 
 ## Commands
 
 | Command | Purpose |
 |---|---|
-| `yongol validate <specs>` | Cross-validate all SSOTs. Non-zero exit on ERROR. |
+| `yongol next <specs>` | Show one error + fix instruction. Repeat until 0 errors. |
+| `yongol validate <specs>` | Cross-validate all SSOTs. Shows all errors at once. |
 | `yongol generate <specs> <arts>` | Generate backend + frontend + migrations |
 | `yongol init <id> <features.yaml> ["desc"]` | Scaffold SSOT stubs from features.yaml + hash lock |
 | `yongol features add <features.yaml>` | Add new features: SSaC stub gen + hash update |
