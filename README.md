@@ -4,11 +4,11 @@
   <img src="yongol.webp" alt="yongol — the keel of your AI-coded SaaS" width="480">
 </p>
 
-[![Version](https://img.shields.io/badge/version-v0.5.3-blue.svg)](https://github.com/park-jun-woo/yongol/releases)
+[![Version](https://img.shields.io/badge/version-v0.5.4-blue.svg)](https://github.com/park-jun-woo/yongol/releases)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![skills.sh](https://skills.sh/b/park-jun-woo/yongol)](https://skills.sh/park-jun-woo/yongol)
 
-> **Recommended:** [Claude Code](https://claude.ai/code). Tested and optimized for Claude Code, but any AI coding agent can use yongol.
+> **Recommended:** [Claude Code](https://claude.ai/code). Tested and optimized for Claude Code.
 
 The keel of your AI-coded SaaS.
 
@@ -55,7 +55,7 @@ A full-stack SSOT orchestrator. Validates the consistency of 10 declarative sour
 npx skills add park-jun-woo/yongol
 ```
 
-> 💬 Ask your agent: *"Build a multi-tenant todo SaaS with auth and CRUD using yongol. Keep going until `yongol validate` shows 0 errors and 0 warnings, and all Hurl smoke tests pass."*
+> 💬 *"Build a multi-tenant todo SaaS with auth and CRUD using yongol. Keep going until `yongol validate` shows 0 errors and 0 warnings, and all Hurl smoke tests pass."*
 
 ```
 ## Validation
@@ -112,9 +112,7 @@ yongol chain ExecuteWorkflow examples/zenflow
 
 ## Using it with AI
 
-The benchmark above was measured with AI agents writing SSOTs while yongol validated them. Claude Code, Codex, Copilot, Cursor — any agent works.
-
-Start the agent, give it one prompt:
+Give Claude Code one prompt:
 
 ```
 Read yongol/manual-for-ai.md and build the spec in yongol/examples/zenflow/zenflow.md.
@@ -145,7 +143,7 @@ Every layer uses `operationId` as a keystone — a single PascalCase identifier 
 
 ## Why AI doesn't get lost
 
-Tell an agent "add a feature" and context collapses as the project grows. yongol sets up 8 SSOTs that reference each other, and `validate` surfaces every inconsistency on the spot. The AI writes freely; leaving the rails fails validation. Freedom on rails.
+Tell the AI "add a feature" and context collapses as the project grows. yongol sets up 8 SSOTs that reference each other, and `validate` surfaces every inconsistency on the spot. The AI writes freely; leaving the rails fails validation. Freedom on rails.
 
 ## Why SSOT + validate
 
@@ -192,7 +190,7 @@ The industry did not overlook this gap; the gap had no economic pressure to fill
 2. **Validation precision.** Because SSaC is small and purpose-built, cross-SSOT rules (SSaC ↔ DDL, SSaC ↔ Rego, SSaC ↔ OpenAPI, SSaC ↔ FuncSpec) resolve cleanly without static analysis. Borrowing a standard would immediately lose this precision.
 3. **Evolvability.** When SSaC lacks an annotation, adding one is a single PR. Standards do not allow that — you cannot inject `@yongol_auth` into the Temporal SDK.
 
-**The cost of custom.** SSaC is not free. The manual must be maintained, and every agent encountering SSaC for the first time pays an in-context learning cost. [`manual-for-ai.md`](manual-for-ai.md) exists to minimize that cost, and the cheatsheet below is designed so that an LLM absorbs the full vocabulary in a single pass.
+**The cost of custom.** SSaC is not free. The manual must be maintained, and every LLM encountering SSaC for the first time pays an in-context learning cost. [`manual-for-ai.md`](manual-for-ai.md) exists to minimize that cost, and the cheatsheet below is designed so that an LLM absorbs the full vocabulary in a single pass.
 
 ### SSaC Cheatsheet
 
@@ -293,16 +291,6 @@ shows the deletion plan and asks for confirmation.
 ```bash
 yongol features remove ExportWorkflow ImportWorkflow --yes
 ```
-
-### `yongol agent <specs-dir>`
-
-Auto-fix SSOT files by calling an LLM in a validate-fix loop until 0 errors.
-
-```bash
-yongol agent specs/ --model ollama:gemma4:e4b --max-rounds 20
-```
-
-Flags: `--model <backend:name>` (default `ollama:gemma4:e4b`; backends: `ollama`, `xai`, `gemini`), `--max-rounds <N>` (default 20).
 
 ### `yongol validate <specs-dir>`
 

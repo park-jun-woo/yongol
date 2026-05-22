@@ -46,9 +46,7 @@ Requires Go 1.25+.
 
 ```
 1. Write features.yaml
-2. Agent reviews features.yaml       → challenge if incomplete or ambiguous
-3. User confirms features.yaml
-4. yongol init <id> <features.yaml>  → scaffold SSOT stubs + .yongol
+2. yongol init <id> <features.yaml>  → scaffold SSOT stubs + .yongol
 5. Write/edit SSOT specs in specs/
 6. yongol validate specs/            → catch cross-layer errors
 7. Fix errors (validator provides rule ID + advice)
@@ -70,7 +68,6 @@ Requires Go 1.25+.
 | `yongol hash <specs-dir>` | Generate .yongol hash lock from features.yaml (for existing projects) |
 | `yongol chain <operationId> <specs>` | Trace one feature across all SSOT layers |
 | `yongol import <openapi> <out>` | Generate Go client from external OpenAPI |
-| `yongol agent <specs> [--model backend:name] [--max-rounds N]` | Auto-fix SSOT files until validate reports 0 errors |
 | `yongol status <specs>` | SSOT summary + drift dashboard |
 
 ## The 10 SSOT Sources

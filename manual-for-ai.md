@@ -667,10 +667,9 @@ hatch: `// nolint:prv-NN` (or `// nolint:panic` for PRV-10). Full spec:
 | `yongol status <specs-dir> [<arts-dir>]` | Read-only dashboard. With `<arts-dir>`, lists preserved files and PRV-01~17 drift. Never fails. |
 | `yongol chain <operationId> <specs-dir>` | Trace every SSOT node connected to one API operation. |
 | `yongol import <openapi-source> <output-dir>` | Generate a Go client package from an external OpenAPI; callable from SSaC via `@call <pkg>.<Func>(...)`. |
-| `yongol agent <specs-dir> [--model backend:name] [--max-rounds N]` | Auto-fix SSOT files via LLM until validate reports 0 errors. Backends: `ollama` (default), `xai`, `gemini`. |
 | `yongol version` | Print yongol version. |
 
-## Agent workflow
+## Workflow
 
 1. **Read this manual.** Do not copy from other projects' specs.
 2. **Author SSOTs** under `specs/<project>/` in this order: manifest →

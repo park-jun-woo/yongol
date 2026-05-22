@@ -23,6 +23,8 @@ func agentCmd() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			fmt.Fprintln(cmd.ErrOrStderr(), "⚠ yongol agent는 실험 버전입니다. 생성된 코드가 불완전할 수 있습니다.")
+
 			backend, model, err := parseModelFlag(modelFlag)
 			if err != nil {
 				return &usageError{err: err}
