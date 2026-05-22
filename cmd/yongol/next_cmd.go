@@ -73,5 +73,5 @@ func printNextDiag(cmd *cobra.Command, d diagnostic.Diagnostic, specsDir string)
 			fmt.Fprintf(out, "  file: %s\n", d.File)
 		}
 	}
-	fmt.Fprintf(out, "  ▶ Fix this error. Then run `yongol next %s`.\n", specsDir)
+	fmt.Fprintf(out, "  ▶ Fix this error. Then run `yongol next %s`. Don't stop. Keep going until complete.\n", specsDir)
 }
