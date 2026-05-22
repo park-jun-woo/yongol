@@ -36,7 +36,7 @@ func nextCmd() *cobra.Command {
 				return fmt.Errorf("parse failed")
 			}
 			report := validate.Validate(fs)
-			first, ok := firstError(report)
+			first, ok := firstIssue(report)
 			if !ok {
 				fmt.Fprintln(cmd.OutOrStdout(), "✓ All validations passed. 0 errors.")
 				return nil
@@ -49,14 +49,22 @@ func nextCmd() *cobra.Command {
 }
 
 //ff:func feature=cli type=helper control=selection dimension=1
-//ff:what firstError — Report에서 첫 번째 ERROR 레벨 diagnostic 반환
-func firstError(r *validate.Report) (diagnostic.Diagnostic, bool) {
+//ff:what firstIssue — Report에서 첫 번째 ERROR 또는 WARNING 반환 (ERROR 우선)
+func firstIssue(r *validate.Report) (diagnostic.Diagnostic, bool) {
+	var firstWarn *diagnostic.Diagnostic
 	for _, s := range r.Steps {
 		for _, d := range s.Diagnostics {
 			if d.Level == diagnostic.LevelError {
 				return d, true
 			}
+			if d.Level == diagnostic.LevelWarning && firstWarn == nil {
+				copy := d
+				firstWarn = &copy
+			}
 		}
+	}
+	if firstWarn != nil {
+		return *firstWarn, true
 	}
 	return diagnostic.Diagnostic{}, false
 }
