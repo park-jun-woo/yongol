@@ -662,7 +662,8 @@ hatch: `// nolint:prv-NN` (or `// nolint:panic` for PRV-10). Full spec:
 | `yongol features add <features.yaml>` | 신규 features.yaml 과 기존 specs/features.yaml 을 비교하여 신규 op 의 SSaC stub 생성 + features.yaml 교체 + `.yongol` 해시 갱신. |
 | `yongol features remove <operationId> [...] [--yes]` | 지정된 operationId 를 features.yaml 에서 삭제 + SSaC 파일 삭제 + `.yongol` 해시 갱신. `--yes` 없으면 확인 프롬프트. |
 | `yongol hash <specs-dir>` | Read `features.yaml` from `<specs-dir>`, compute SHA-256, and write `<specs-dir>/.yongol` hash lock. Use for existing projects where `yongol init` was not used. |
-| `yongol validate [-f md\|json\|sarif] <specs-dir>` | Per-SSOT + cross validation. Non-zero on any ERROR. |
+| `yongol next <specs-dir>` | Show one error (or one operationId group) + fix instruction. Repeat until 0 errors. |
+| `yongol validate [-f md\|json\|sarif] <specs-dir>` | Per-SSOT + cross validation. Shows all errors at once. |
 | `yongol generate [--backend go-gin] [--frontend react] <specs-dir> <artifacts-dir>` | Runs validate then emits code. Refuses on any ERROR or WARNING. |
 | `yongol status <specs-dir> [<arts-dir>]` | Read-only dashboard. With `<arts-dir>`, lists preserved files and PRV-01~17 drift. Never fails. |
 | `yongol chain <operationId> <specs-dir>` | Trace every SSOT node connected to one API operation. |
@@ -676,8 +677,7 @@ hatch: `// nolint:prv-NN` (or `// nolint:panic` for PRV-10). Full spec:
    DDL + sqlc.yaml + sqlc queries → OpenAPI → states → policy → SSaC
    → STML → Hurl (Func spec optional). Keep `operationId` consistent across
    all layers.
-3. **Validate:** `yongol validate specs/<project>`. Fix every ERROR and
-   WARNING.
+3. **Fix errors:** `yongol next specs/<project>`. Fix the error shown, then run `yongol next` again. Repeat until "All validations passed."
 4. **Generate:** `yongol generate specs/<project> artifacts/<project>`.
 5. **Build backend:** `cd artifacts/<project>/backend && go build -o server ./cmd/`.
    On failure, the cause is in the SSOTs or in yongol itself — never patch
