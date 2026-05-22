@@ -51,11 +51,28 @@ A full-stack SSOT orchestrator. Validates the consistency of 10 declarative sour
 
 ## Quick Start
 
+### Option 1: Install as a skill (recommended)
+
 ```bash
 npx skills add park-jun-woo/yongol
 ```
 
-> 💬 *"Build a multi-tenant todo SaaS with auth and CRUD using yongol. Keep going until `yongol validate` shows 0 errors and 0 warnings, and all Hurl smoke tests pass."*
+Then invoke the skill in Claude Code:
+
+```
+/yongol Build a multi-tenant todo SaaS with auth and CRUD.
+```
+
+The skill loads the manual automatically. No need to read files manually.
+
+### Option 2: Clone the repo
+
+```bash
+git clone https://github.com/park-jun-woo/yongol.git
+cd yongol && make install
+```
+
+> 💬 *"Read yongol/manual-for-ai.md and build the spec in yongol/examples/zenflow/zenflow.md. Keep going until `yongol validate` shows 0 errors and 0 warnings, and all Hurl smoke tests pass."*
 
 ```
 ## Validation
@@ -111,12 +128,6 @@ yongol chain ExecuteWorkflow examples/zenflow
 ```
 
 ## Using it with AI
-
-Give Claude Code one prompt:
-
-```
-Read yongol/manual-for-ai.md and build the spec in yongol/examples/zenflow/zenflow.md.
-```
 
 The AI writes specs. `yongol validate` catches cross-layer inconsistencies the moment they appear. AI stays free within the rails; step off the rails and validation fails fast.
 
