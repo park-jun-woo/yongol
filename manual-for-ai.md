@@ -203,6 +203,14 @@ Standard SQL DDL and sqlc. Details: [`docs/ddl.md`](docs/ddl.md).
   binding yet. `CREATE TYPE` user-defined ENUMs remain rejected; use
   inline `VARCHAR(N) + CHECK IN (...)` instead.
 - Recommended `gen.go.out`: `../../artifacts/<project>/backend/internal/db`.
+- **Query filename → model name mapping**: sqlc queries for a model must
+  live in `db/queries/<table_plural>.sql`. yongol derives the model name
+  from the query filename: singular + PascalCase
+  (`refresh_tokens.sql` → `RefreshToken`, `users.sql` → `User`,
+  `user_profiles.sql` → `UserProfile`). Placing a query in the wrong file
+  (e.g. `RefreshToken.FindByHash` in `auth.sql` instead of
+  `refresh_tokens.sql`) causes S-49 "method not found" because yongol maps
+  `auth.sql` → model `Auth`, not `RefreshToken`.
 - Queries use a **global sqlc namespace** — prefix each `-- name:` with the
   Model (`UserCreate`, `GigFindByID`). In SSaC the prefix is auto-stripped:
   `UserCreate` → `User.Create`. The character after the prefix must be

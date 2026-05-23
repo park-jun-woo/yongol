@@ -15,12 +15,15 @@ require (
 	github.com/ettle/strcase v0.2.0
 	github.com/getkin/kin-openapi v0.133.0
 	github.com/gosimple/slug v1.15.0
+	github.com/jackc/pgx/v5 v5.9.2
 	github.com/jinzhu/inflection v1.0.0
 	github.com/microcosm-cc/bluemonday v1.0.27
+	github.com/oapi-codegen/runtime v1.4.1
 	github.com/open-policy-agent/opa v1.14.1
 	github.com/park-jun-woo/toulmin v0.0.0-00010101000000-000000000000
 	github.com/pganalyze/pg_query_go/v5 v5.1.0
 	github.com/pquerna/otp v1.5.0
+	github.com/spf13/cobra v1.10.2
 	golang.org/x/crypto v0.48.0
 	golang.org/x/net v0.51.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -73,7 +76,6 @@ require (
 	github.com/segmentio/asm v1.2.1 // indirect
 	github.com/sirupsen/logrus v1.9.4 // indirect
 	github.com/smacker/go-tree-sitter v0.0.0-20240827094217-dd81d9e9be82 // indirect
-	github.com/spf13/cobra v1.10.2 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/tchap/go-patricia/v2 v2.3.3 // indirect
 	github.com/ugorji/go/codec v1.3.1 // indirect
