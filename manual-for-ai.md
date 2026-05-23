@@ -396,22 +396,27 @@ Runtime implementations live in the sibling repo
 `github.com/park-jun-woo/ssac` under `ssac/pkg/<pkg>/`. Custom funcs in
 `func/<pkg>/` override built-ins of the same name.
 
-| Package | Purpose | manifest backend |
+| Package | SSaC @call functions | manifest backend |
 |---|---|---|
-| `auth` | bcrypt, JWT issue/verify/refresh, password reset token | — |
-| `session` | Set/Get/Delete with TTL | `session.backend` |
-| `cache` | Key-value cache with TTL | `cache.backend` |
-| `file` | Upload/download/delete (preferred for file ops) | `file.backend` |
-| `storage` | S3 low-level (presigned URLs, direct client) | S3 only |
-| `crypto` | AES-256-GCM, TOTP | — |
-| `mail` | SMTP sendEmail / template email | env-based |
-| `pgtypex` | OpenAPI ↔ pgtype bridge (ToPg*/FromPg*/IsNilPg*) | — |
-| `text` | `generateSlug`, `sanitizeHTML`, `truncateText` | — |
-| `image` | `ogImage` (1200×630), `thumbnail` (200×200) | — |
+| `auth` | `HashPassword`, `VerifyPassword`, `GenerateResetToken`, `RefreshRotate`, `Logout` + `IssueToken`\*, `VerifyToken`\*, `RefreshToken`\* | — |
+| `session` | `Set`, `Get`, `Delete` | `session.backend` |
+| `cache` | `Set`, `Get`, `Delete` | `cache.backend` |
+| `file` | `Upload`, `Download`, `Delete` | `file.backend` |
+| `storage` | `UploadFile`, `DeleteFile`, `PresignURL` | S3 only |
+| `crypto` | `Encrypt`, `Decrypt`, `GenerateOTP`, `VerifyOTP` | — |
+| `mail` | `SendEmail`, `SendTemplateEmail` | env-based |
+| `text` | `GenerateSlug`, `SanitizeHTML`, `TruncateText` | — |
+| `image` | `OgImage`, `Thumbnail` | — |
 
-`auth.IssueToken` / `VerifyToken` / `RefreshToken` are generated from
-`backend.auth.claims` — their request/response field names mirror claim names.
+\* `auth.IssueToken` / `VerifyToken` / `RefreshToken` are conditionally
+available when `backend.auth.claims` is declared in manifest.yaml — their
+request/response field names mirror claim names.
+
 SSaC imports `auth` via full path: `import "github.com/park-jun-woo/ssac/pkg/auth"`.
+
+`yongol validate` checks every `@call` against this list (XFS-39). Calling a
+non-existent builtin function (e.g. `auth.IssueTokenFromClaims`) emits an
+ERROR with the available function names for that package.
 
 ### Built-in models
 

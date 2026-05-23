@@ -44,6 +44,7 @@ func TestKindPresent(t *testing.T) {
 		{name: "scenario_files", fs: &yongol.Fullstack{HurlFiles: []string{}}, kind: yongol.KindScenario, want: true},
 		{name: "func_nil", fs: &yongol.Fullstack{}, kind: yongol.KindFunc, want: false},
 		{name: "func_present", fs: &yongol.Fullstack{ProjectFuncSpecs: []funcspec.FuncSpec{}}, kind: yongol.KindFunc, want: true},
+		{name: "func_builtin_only", fs: &yongol.Fullstack{YongolPkgSpecs: []funcspec.FuncSpec{{Package: "auth", Name: "issueToken"}}}, kind: yongol.KindFunc, want: true},
 		{name: "stml_nil", fs: &yongol.Fullstack{}, kind: yongol.KindSTML, want: false},
 		{name: "stml_present", fs: &yongol.Fullstack{STMLPages: []stml.PageSpec{}}, kind: yongol.KindSTML, want: true},
 		{name: "design_nil", fs: &yongol.Fullstack{}, kind: yongol.KindDesign, want: false},

@@ -22,7 +22,7 @@ func kindPresent(fs *yongol.Fullstack, k yongol.SSOTKind) bool {
 		// A Declared state (directory present + 0 files) must still run the validator so H-2 can fire
 		return fs.HurlEntries != nil || fs.HurlFiles != nil || fs.PresenceOf(yongol.KindScenario) != yongol.SSOTAbsent
 	case yongol.KindFunc:
-		return fs.ProjectFuncSpecs != nil
+		return fs.ProjectFuncSpecs != nil || len(fs.YongolPkgSpecs) > 0
 	case yongol.KindSTML:
 		return fs.STMLPages != nil
 	case yongol.KindDesign:
