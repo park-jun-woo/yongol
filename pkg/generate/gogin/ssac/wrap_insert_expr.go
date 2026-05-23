@@ -1,11 +1,10 @@
-//ff:func feature=gen-gogin type=util control=sequence
+//ff:func feature=gen-gogin type=util control=iteration dimension=1
 //ff:what wrapInsertExpr — sqlc INSERT 인자를 InsertExpr 템플릿으로 래핑 (pgtypex bridge + Ptr/non-Ptr 분기 + 정수 캐스트)
 
 package ssac
 
 import (
 	"strings"
-	"unicode"
 
 	"github.com/park-jun-woo/yongol/pkg/generate/gogin/types"
 )
@@ -69,100 +68,4 @@ func (g *methodGen) wrapInsertExpr(inputKey, rendered string, alreadyPgtype bool
 		}
 	}
 	return wrapped, imports
-}
-
-// isNonPointerInput returns true when the SSaC value resolves to a Go
-// value type (not a pointer). Used to select between Ptr and non-Ptr
-// pgtypex bridge variants.
-//
-//   - Literals (true, false, numbers, quoted strings) → non-pointer
-//   - request.* path params → non-pointer (oapi-codegen value types)
-//   - request.* required body fields → non-pointer
-//   - request.* optional body fields → pointer (*string, *int64)
-//   - request.* query params → depends on IsRequired
-//   - Other expressions (row.Field, var.Field) → assumed pointer-capable
-//     (already pgtype), but those are filtered by alreadyPgtype before
-//     reaching this function
-func (g *methodGen) isNonPointerInput(ssacValue string) bool {
-	// Literals are always non-pointer values.
-	if isLiteral(ssacValue) {
-		return true
-	}
-
-	if !strings.HasPrefix(ssacValue, "request.") {
-		return false
-	}
-
-	field := ssacValue[len("request."):]
-
-	// Path params are always value types in oapi-codegen.
-	if g.PathParams[field] {
-		return true
-	}
-
-	// Query params: required = value type, optional = pointer.
-	if qp, isQuery := g.QueryParams[field]; isQuery {
-		return qp.IsRequired
-	}
-
-	// Body field: required fields are value types, optional are pointers.
-	return g.BodyRequiredFields[field]
-}
-
-// castIntegerLiteral adds a Go type cast to an integer literal so it
-// matches the pgtypex bridge function's expected parameter type.
-// e.g. "1" → "int64(1)" for a BIGINT column.
-//
-// Only applies when rendered is a plain integer literal (digits with
-// optional leading minus). Non-integer literals and expressions pass
-// through unchanged.
-func (g *methodGen) castIntegerLiteral(rendered string, binding types.GoTypeBinding) string {
-	if !isIntegerLiteralStr(rendered) {
-		return rendered
-	}
-	goType := goIntTypeFromSqlcType(binding.SqlcGoType)
-	if goType == "" {
-		return rendered
-	}
-	return goType + "(" + rendered + ")"
-}
-
-// isIntegerLiteralStr returns true when s is a plain integer literal
-// (optional leading minus followed by digits only).
-func isIntegerLiteralStr(s string) bool {
-	if len(s) == 0 {
-		return false
-	}
-	start := 0
-	if s[0] == '-' {
-		start = 1
-	}
-	if start >= len(s) {
-		return false
-	}
-	for i := start; i < len(s); i++ {
-		if !unicode.IsDigit(rune(s[i])) {
-			return false
-		}
-	}
-	return true
-}
-
-// goIntTypeFromSqlcType returns the Go integer primitive corresponding to
-// a pgtype sqlc type. Returns empty string for non-integer types.
-func goIntTypeFromSqlcType(sqlcGoType string) string {
-	switch sqlcGoType {
-	case "pgtype.Int8":
-		return "int64"
-	case "pgtype.Int4":
-		return "int32"
-	case "pgtype.Int2":
-		return "int16"
-	case "int64":
-		return "int64"
-	case "int32":
-		return "int32"
-	default:
-		return ""
-	}
 }

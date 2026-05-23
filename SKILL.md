@@ -4,7 +4,7 @@ description: Full-stack SSOT orchestrator that validates the consistency of 10 d
 license: MIT
 metadata:
   author: park-jun-woo
-  version: "0.6.2"
+  version: "0.6.3"
 ---
 
 # yongol — Full-Stack SSOT Orchestrator
@@ -129,7 +129,8 @@ Requires Go 1.25+.
 | `D-2` | Non-PK column missing NOT NULL | Add `NOT NULL` or `-- @nullable` |
 | `D-15` | FK column is nullable | Add `NOT NULL` (use sentinel pattern) or `-- @nullable` if intentional |
 | `XOE-01` | ErrorResponse.code not in `required` | Add `code` to ErrorResponse `required` list |
-| `XOS-69` | `@response` binds 0 fields but OpenAPI 200 has properties | Bind response fields or remove OpenAPI properties |
+| `XOS-67` | `@response` field type ≠ OpenAPI response type | DDL TIMESTAMPTZ maps to OpenAPI `{ type: string, format: date-time }`. SSaC `@response` binds it as a string field. |
+| `XOS-69` | `@response` binds 0 fields but OpenAPI 200 has properties | Use `@response { field: var.Field }` with braces. Do NOT write `@response var` when OpenAPI expects fields. |
 | `INI-01` | Project not initialized (`.yongol` missing) | Run `yongol init` or `yongol hash` |
 
 ## Key Conventions

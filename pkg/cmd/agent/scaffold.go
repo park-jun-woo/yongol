@@ -64,16 +64,7 @@ func scaffold(specsDir string, ff *features.FeaturesFile, llmFn LLMCallFunc, cfg
 		return fmt.Errorf("scaffold stateDiagram: %w", err)
 	}
 
-	// Count sqlc query files
-	nQueries := 0
-	queriesDir := filepath.Join(specsDir, "db", "queries")
-	if entries, err := os.ReadDir(queriesDir); err == nil {
-		for _, e := range entries {
-			if !e.IsDir() {
-				nQueries++
-			}
-		}
-	}
+	nQueries := countQueryFiles(specsDir)
 
 	fmt.Fprintf(out, "yongol agent: scaffold complete (%d tables, %d queries, %d paths, %d ssac, 1 rego, %d states)\n",
 		nTables, nQueries, nPaths, nSSaC, nStates)

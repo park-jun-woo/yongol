@@ -1,4 +1,4 @@
-//ff:func feature=validate type=rule control=guard topic=features-structural
+//ff:func feature=validate type=rule control=sequence topic=features-structural
 //ff:what FT-16 — features.yaml에 tables 섹션이 없으면 ERROR
 
 package features

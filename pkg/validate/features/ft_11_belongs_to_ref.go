@@ -1,4 +1,4 @@
-//ff:func feature=validate type=rule control=iteration dimension=1 topic=features-structural
+//ff:func feature=validate type=rule control=iteration dimension=2 topic=features-structural
 //ff:what FT-11 — belongs_to가 참조하는 테이블이 tables에 정의되지 않으면 ERROR
 
 package features

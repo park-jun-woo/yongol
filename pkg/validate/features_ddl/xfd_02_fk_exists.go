@@ -4,7 +4,6 @@ package features_ddl
 
 import (
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
-	"github.com/park-jun-woo/yongol/pkg/parser/ddl"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
@@ -37,13 +36,4 @@ func xfd02FKExists(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		}
 	}
 	return diags
-}
-
-// buildDDLTableMap creates a lookup map from table name to ddl.Table.
-func buildDDLTableMap(tables []ddl.Table) map[string]*ddl.Table {
-	m := make(map[string]*ddl.Table, len(tables))
-	for i := range tables {
-		m[tables[i].Name] = &tables[i]
-	}
-	return m
 }

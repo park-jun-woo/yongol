@@ -7,7 +7,6 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/park-jun-woo/yongol/pkg/diagnostic"
 	"github.com/park-jun-woo/yongol/pkg/validate"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
@@ -60,19 +59,4 @@ func validateCmd() *cobra.Command {
 	cmd.Flags().StringVarP(&formatFlag, "format", "f", formatMD,
 		"output format: md (GitHub Flavored Markdown, default) | json (flat snake_case) | sarif (SARIF 2.1.0 full catalog)")
 	return cmd
-}
-
-//ff:func feature=cli type=helper
-//ff:what wrapParseAsReport — parse diagnostics를 validate.Report 한 step("parse")으로 감싸 JSON 렌더링 가능하게 반환
-func wrapParseAsReport(diags []diagnostic.Diagnostic) *validate.Report {
-	return &validate.Report{
-		Steps: []validate.StepResult{
-			{
-				Name:        "parse",
-				Status:      validate.StatusFail,
-				Summary:     fmt.Sprintf("%d parse error(s)", len(diags)),
-				Diagnostics: diags,
-			},
-		},
-	}
 }

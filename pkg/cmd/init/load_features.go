@@ -1,4 +1,4 @@
-//ff:func feature=cli-init type=loader control=sequence
+//ff:func feature=cli-init type=loader control=iteration dimension=1
 //ff:what loadFeatures — reads features.yaml, runs featcheck, returns FeaturesFile or error
 
 package cliinit

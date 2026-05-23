@@ -1,4 +1,4 @@
-//ff:func feature=agent type=helper control=pure
+//ff:func feature=agent type=helper control=iteration dimension=2
 //ff:what topoSortTables — belongs_to 기반 위상 정렬 (순환 시 끊고 반환)
 
 package agent

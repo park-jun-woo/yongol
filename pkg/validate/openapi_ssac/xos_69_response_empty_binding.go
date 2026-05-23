@@ -1,4 +1,4 @@
-//ff:func feature=validate type=rule control=iteration dimension=2 topic=openapi-ssac
+//ff:func feature=validate type=rule control=iteration dimension=3 topic=openapi-ssac
 //ff:what XOS-69 — @response binds 0 fields but OpenAPI 200 response schema has properties
 
 package openapi_ssac
@@ -50,7 +50,9 @@ func xos69ResponseEmptyBinding(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				Phase:       diagnostic.PhaseValidate,
 				Level:       diagnostic.LevelWarning,
 				Message:     fmt.Sprintf("[XOS-69] %s — @response binds 0 fields but OpenAPI 200 schema has properties", fn.Name),
-				Advice:      "Bind response fields or remove properties from the OpenAPI 200 response schema",
+				Advice: "@response requires explicit field binding with braces. " +
+						"Example: @response { id: todo.ID, title: todo.Title, created_at: todo.CreatedAt }. " +
+						"Do NOT write @response todo — that binds 0 fields.",
 				OperationID: fn.Name,
 			})
 		}

@@ -1,4 +1,4 @@
-//ff:func feature=cli-init type=util control=sequence
+//ff:func feature=cli-init type=util control=selection
 //ff:what parseHTTPPath — splits "POST /workflows/{id}" into method and URI
 
 package cliinit
@@ -7,12 +7,6 @@ import (
 	"fmt"
 	"strings"
 )
-
-// httpRoute holds the parsed method and URI from a features.yaml path field.
-type httpRoute struct {
-	Method string // lowercase: "get", "post", "put", "patch", "delete"
-	URI    string // e.g. "/workflows/{id}"
-}
 
 // parseHTTPPath splits a path like "POST /workflows/{id}" into method and URI.
 func parseHTTPPath(path string) (httpRoute, error) {

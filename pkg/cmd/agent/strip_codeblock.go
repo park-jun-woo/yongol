@@ -1,4 +1,4 @@
-//ff:func feature=agent type=helper control=pure
+//ff:func feature=agent type=helper control=sequence
 //ff:what stripCodeBlock — LLM 응답에서 markdown 코드블록 울타리 제거
 
 package agent

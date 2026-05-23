@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=sequence
+//ff:func feature=gen-gogin type=util control=selection
 //ff:what methodGen.buildResponse — @response 시퀀스 빌더 (convert 헬퍼 경유 + JSONB unmarshal 에러 전파)
 
 package ssac
@@ -24,12 +24,7 @@ func (g *methodGen) buildResponse(seq ssacparser.Sequence) []string {
 	// @response target — direct variable (scalar or list).
 	if seq.Target != "" {
 		if model := g.VarTypes[seq.Target]; model != "" {
-			return []string{
-				fmt.Sprintf("converted, err := convert%s(%s)", model, seq.Target),
-				"if err != nil { return nil, err }",
-				fmt.Sprintf("return api.%s%dJSONResponse(*converted), nil",
-					g.FuncName, g.SuccessStatus),
-			}
+			return g.buildResponseConvert(model, seq.Target)
 		}
 		// No known model type (e.g. @response with a raw expression that
 		// wasn't produced by a sqlc result binding). Keep the legacy

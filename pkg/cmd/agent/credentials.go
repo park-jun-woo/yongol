@@ -45,15 +45,3 @@ func loadAPIKey(backend string) (string, error) {
 	}
 	return key, nil
 }
-
-// backendEnvVar returns the environment variable name for a backend.
-func backendEnvVar(backend string) string {
-	switch backend {
-	case "xai":
-		return "XAI_API_KEY"
-	case "gemini":
-		return "GEMINI_API_KEY"
-	default:
-		return ""
-	}
-}

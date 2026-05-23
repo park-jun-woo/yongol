@@ -70,7 +70,11 @@ func d02NullableColumn(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Message: fmt.Sprintf(
 						"[D-2] table %q column %q — NOT NULL is missing",
 						blk.tableName, colName),
-					Advice: fmt.Sprintf("Add a NOT NULL constraint to %s.%s, or if intentional add a -- @nullable comment", blk.tableName, colName),
+					Advice: fmt.Sprintf("Add a NOT NULL constraint to %s.%s, or if intentional add a -- @nullable comment. ", blk.tableName, colName) +
+						"Append annotations at the END of the column line, in a single comment. " +
+						"Example: email VARCHAR(255) NOT NULL -- @sensitive. " +
+						"Multiple: token_hash VARCHAR(255) NOT NULL -- @sensitive @archived. " +
+						"Do NOT write on a separate line. Do NOT write -- @a -- @b.",
 				})
 			}
 		}

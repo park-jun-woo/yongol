@@ -1,4 +1,4 @@
-//ff:func feature=validate type=test-helper control=iteration dimension=1 topic=features-ddl
+//ff:func feature=validate type=test-helper control=sequence topic=features-ddl
 //ff:what buildFSForXFD — XFD 테스트용 Fullstack 빌더 (FeatureTables + DDLTables)
 package features_ddl
 

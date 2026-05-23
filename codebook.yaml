@@ -59,6 +59,9 @@ required:
     cli-init: "yongol init 서브커맨드 (신규 프로젝트 스캐폴드 / 모듈 감지 / 프로젝트 ID 정규화)"
     ssacmeta: "SSaC 패키지 interface.yaml 메타 로드 및 when 조건 평가"
     features: "features.yaml 파서 — op/path/desc 슬라이스 로드 및 라인 번호 추출"
+    agent: "yongol agent 서브커맨드 — LLM 기반 SSOT 스캐폴드/검증 루프"
+    cli-featcheck: "yongol featcheck 서브커맨드 — 피처 변경 감지"
+    cli-hash: "yongol hash 서브커맨드 — 해시 계산"
   type:
     command: "CLI 명령 엔트리포인트"
     rule: "검증 규칙"
@@ -76,6 +79,8 @@ required:
     emitter: "검증 결과 직렬화 포맷터 (JSON / SARIF 등 출력 에미터)"
     logger: "slog 기반 구조화 로그 헬퍼"
     validator: "경로·설정·입력값 등 코드 생성 전 사전 검증기"
+    helper: "보조 함수"
+    adapter: "외부 인터페이스 어댑터"
 
 optional:
   topic:
@@ -191,6 +196,9 @@ optional:
     manifest-infra: "manifest backend.{auth,cache,queue,session} 구성 시 sqlc/DDL 요구 검증 (XNA/XNC/XNQ/XNS-90)"
     # --- query ↔ rego pair topics ---
     query-rego: "sqlc 쿼리 ↔ Rego 정책 교차 검증 (XQP-30 owner lookup)"
+    features-ddl: "features.yaml ↔ DDL 교차 검증 (XFD-*)"
+    features-statemachine: "features.yaml ↔ stateDiagram 교차 검증 (XFS-*)"
+    init-check: "yongol init 사전 조건 검증 (INI-*)"
     # --- pgtype mapping topics (Phase001) ---
     pgtype-matrix: "pkg/generate/gogin/types/ — DDL Column → GoTypeBinding 단일 출처 (17 PG family × 3 nullability × 4 emit). 3 emit 사이트 (convert/insert/response) 가 공유"
     pgtypex: "ssac/pkg/pgtypex/ — OpenAPI ↔ pgtype 양방향 변환 런타임 라이브러리. yongol SSaC emit 이 import 하여 bridge 함수 호출 (ToPg*/FromPg*/IsNilPg*). pkg/generate/gogin/types/ 매트릭스의 ConvertExpr/InsertExpr/ResponseExpr/NilCheckExpr 가 pgtypex.* 를 참조"

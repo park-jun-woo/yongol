@@ -7,12 +7,6 @@ import (
 	featparser "github.com/park-jun-woo/yongol/pkg/parser/features"
 )
 
-// DiffResult holds the result of comparing two feature sets.
-type DiffResult struct {
-	Added   []featparser.Feature // ops in newFeats but not in oldFeats
-	Removed []featparser.Feature // ops in oldFeats but not in newFeats
-}
-
 // DiffOps compares two feature slices by operationId and returns added/removed.
 func DiffOps(oldFeats, newFeats []featparser.Feature) DiffResult {
 	oldSet := make(map[string]featparser.Feature, len(oldFeats))

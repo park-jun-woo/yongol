@@ -5,8 +5,6 @@ package ssac
 import (
 	"sort"
 	"strings"
-
-	"github.com/park-jun-woo/yongol/pkg/generate/gogin/types"
 )
 
 // Validate (XQS-14/16) guarantees key matches sqlc field name. Use as-is.
@@ -37,57 +35,4 @@ func (g *methodGen) sqlcArgsMulti(method string, inputs map[string]string) (prea
 
 	sort.Strings(fields)
 	return preamble, "ctx, db." + method + "Params{" + strings.Join(fields, ", ") + "}", imports
-}
-
-// fillMissingNullableParams finds sqlc Params fields that the SSaC Inputs
-// do not provide and, when the underlying DDL column is nullable (pgtype
-// family), emits a zero-value literal (e.g. "pgtype.Int8{}"). This
-// prevents Go compile errors where the struct literal would otherwise
-// leave a pgtype field at its Go zero value via omission — which is
-// actually valid Go, but when an upstream transform inserts explicit nil
-// for missing fields the result is "cannot use nil as pgtype.XXX value".
-// Emitting the explicit zero value is always safe: pgtype zero = SQL NULL.
-func (g *methodGen) fillMissingNullableParams(method string, inputs map[string]string) ([]string, []string) {
-	// Find the QuerySpec matching this method name.
-	var params []string
-	for _, q := range g.SQLcQueries {
-		if q.Name == method {
-			params = q.Params
-			break
-		}
-	}
-	if len(params) == 0 {
-		return nil, nil
-	}
-
-	model := g.modelForSQLCMethod(method)
-	if model == "" {
-		return nil, nil
-	}
-
-	var fields []string
-	var imports []string
-	needPgtype := false
-
-	for _, param := range params {
-		if _, provided := inputs[param]; provided {
-			continue
-		}
-		col := lookupDDLColumn(g.DDLTables, model, param)
-		if col == nil {
-			continue
-		}
-		binding := types.MapPGType(*col)
-		if binding.Kind != types.KindPgtype {
-			continue
-		}
-		// Emit explicit zero value: pgtype.Int8{}, pgtype.Text{}, etc.
-		fields = append(fields, param+": "+binding.SqlcGoType+"{}")
-		needPgtype = true
-	}
-
-	if needPgtype {
-		imports = append(imports, `"github.com/jackc/pgx/v5/pgtype"`)
-	}
-	return fields, imports
 }

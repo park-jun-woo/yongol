@@ -1,4 +1,4 @@
-//ff:func feature=cli-hash type=command control=sequence
+//ff:func feature=cli-hash type=command control=iteration dimension=1
 //ff:what Run — features.yaml 검증 후 SHA-256 해시를 specsDir/.yongol에 기록
 
 package clihash

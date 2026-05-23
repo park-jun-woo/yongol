@@ -246,6 +246,31 @@ Standard SQL DDL and sqlc. Details: [`docs/ddl.md`](docs/ddl.md).
 Patterns such as `password`, `secret`, `hash`, `token` without `@sensitive`
 emit a WARNING.
 
+**Annotation placement**: all DDL annotations go at the **end** of the column
+line, in a **single** `--` comment. Multiple annotations are space-separated
+inside that comment. Never place annotations on a separate line, and never
+write multiple `--` on the same line.
+
+```sql
+-- Correct:
+email     VARCHAR(255) NOT NULL -- @sensitive
+token_hash VARCHAR(255) NOT NULL -- @sensitive @archived
+revoked_at TIMESTAMPTZ           -- @nullable
+
+-- Wrong (separate line):
+email     VARCHAR(255) NOT NULL
+-- @sensitive
+
+-- Wrong (double comment):
+token_hash VARCHAR(255) NOT NULL -- @sensitive -- @archived
+```
+
+### DDL → OpenAPI type mapping (common pitfall)
+
+| DDL type | OpenAPI | Note |
+|---|---|---|
+| `TIMESTAMPTZ` | `type: string, format: date-time` | SSaC `@response` binds it as a string field. |
+
 ## SSaC
 
 Custom DSL embedded in Go-comment form (`.ssac` extension, excluded from Go
@@ -278,6 +303,18 @@ build). Full reference: [`docs/ssac.md`](docs/ssac.md).
 | `@verify-password` | Timing-safe login check | `<Model>.<emailCol>=<emailExpr> <Model>.<hashCol> vs <pwExpr> -> <var> <status> "<message>"` | — |
 
 Append `!` to suppress WARNINGs (`@delete!`, `@response!`).
+
+**`@response` syntax** — always use braces for field binding:
+```
+// Correct: explicit field binding
+@response { id: todo.ID, title: todo.Title, created_at: todo.CreatedAt }
+
+// Correct: direct variable (slice or scalar, no field mapping)
+@response todos
+
+// Wrong: @response <varName> when OpenAPI 200 schema has properties
+// → XOS-69 "binds 0 fields". Use braces instead.
+```
 
 Function-level annotations (placed above `func`): `// @no-pagination` exempts
 list endpoints from S-63; `// @state-neutral` declares that the operation is

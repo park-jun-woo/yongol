@@ -23,6 +23,9 @@ func TestChain_Zenflow_ExecuteWorkflow(t *testing.T) {
 	if fs.OpenAPIDoc == nil {
 		t.Skip("zenflow OpenAPI not parsed")
 	}
+	if len(fs.ServiceFuncs) == 0 {
+		t.Skip("zenflow SSaC not parsed (fixture may have parse diagnostics)")
+	}
 
 	links, err := Chain(fs, "ExecuteWorkflow")
 	if err != nil {

@@ -12,6 +12,23 @@
 - Response `required` must include all fields that are NOT NULL in DDL.
 - Response schemas must be inline. Do NOT use `$ref` for response schemas. Only `$ref: '#/components/schemas/Error'` is allowed (for error responses).
 
+## DDL → OpenAPI type mapping
+
+| DDL type | OpenAPI type | OpenAPI format |
+|---|---|---|
+| `BIGINT` | `integer` | `int64` |
+| `BOOLEAN` | `boolean` | — |
+| `VARCHAR(N)` / `TEXT` | `string` | — |
+| `UUID` | `string` | `uuid` |
+| `TIMESTAMPTZ` | `string` | `date-time` |
+| `TIMESTAMP` | `string` | `date-time` |
+| `DATE` | `string` | `date` |
+| `NUMERIC` / `DECIMAL` | `string` | — |
+| `JSONB` | `object` | — |
+
+`TIMESTAMPTZ` is the most common mapping pitfall. SSaC `@response` binds it as
+a string field.
+
 ## Error Schema
 
 ```yaml

@@ -25,6 +25,9 @@ func xsd55DDLToModelRef(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		if isPkgModelTable(fs, t.Name) {
 			continue
 		}
+		if isAuthRequiredTable(fs, t.Name) {
+			continue
+		}
 		diags = append(diags, diagnostic.Diagnostic{
 			File:    t.File,
 			Line:    t.Line,

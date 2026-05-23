@@ -1,4 +1,4 @@
-//ff:func feature=agent type=helper control=pure
+//ff:func feature=agent type=helper control=iteration dimension=1
 //ff:what spliceLines — 라인 범위 교체 공통 유틸
 
 package agent

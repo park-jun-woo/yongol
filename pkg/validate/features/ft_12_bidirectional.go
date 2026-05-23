@@ -1,4 +1,4 @@
-//ff:func feature=validate type=rule control=iteration dimension=1 topic=features-structural
+//ff:func feature=validate type=rule control=iteration dimension=2 topic=features-structural
 //ff:what FT-12 — has_many 관계에 대응하는 belongs_to가 없으면 WARN
 
 package features
@@ -34,14 +34,4 @@ func ft12Bidirectional(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		}
 	}
 	return diags
-}
-
-// containsStr returns true if slice contains the target string.
-func containsStr(slice []string, target string) bool {
-	for _, s := range slice {
-		if s == target {
-			return true
-		}
-	}
-	return false
 }

@@ -1,4 +1,4 @@
-//ff:func feature=features type=command control=sequence
+//ff:func feature=features type=command control=iteration dimension=2
 //ff:what RunRemove — features.yaml 에서 operationId 삭제 + SSaC 파일 삭제 + 해시 갱신
 
 package features

@@ -1,4 +1,4 @@
-//ff:func feature=cli-featcheck type=command control=sequence
+//ff:func feature=cli-featcheck type=command control=iteration dimension=1
 //ff:what Run — features.yaml 파싱 + 필수 필드 확인 + FT-* 내부 검증 실행
 
 package featcheck

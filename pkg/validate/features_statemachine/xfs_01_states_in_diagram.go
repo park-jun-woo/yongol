@@ -4,7 +4,6 @@ package features_statemachine
 
 import (
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
-	"github.com/park-jun-woo/yongol/pkg/parser/statemachine"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
@@ -35,17 +34,4 @@ func xfs01StatesInDiagram(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		}
 	}
 	return diags
-}
-
-// buildDiagramStateMap creates a lookup: diagram ID → set of state names.
-func buildDiagramStateMap(diagrams []*statemachine.StateDiagram) map[string]map[string]bool {
-	m := make(map[string]map[string]bool, len(diagrams))
-	for _, d := range diagrams {
-		set := make(map[string]bool, len(d.States))
-		for _, s := range d.States {
-			set[s] = true
-		}
-		m[d.ID] = set
-	}
-	return m
 }

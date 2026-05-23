@@ -1,4 +1,4 @@
-//ff:func feature=agent type=helper control=sequence
+//ff:func feature=agent type=helper control=iteration dimension=3
 //ff:what searchDocs — diagnostic 메시지에서 rule_id/keyword 매칭으로 docs 섹션 핀포인트 추출
 
 package agent
@@ -8,32 +8,6 @@ import (
 
 	"github.com/park-jun-woo/yongol/docs"
 )
-
-// layerDocFile maps a layer to its docs filename.
-func layerDocFile(l layer) string {
-	switch l {
-	case layerSSaC:
-		return "ssac.md"
-	case layerDDL:
-		return "ddl.md"
-	case layerSQLcQuery:
-		return "sqlc.md"
-	case layerOpenAPI:
-		return "openapi.md"
-	case layerRego:
-		return "policy.md"
-	case layerStateDiagram:
-		return "states.md"
-	case layerHurl:
-		return "scenario.md"
-	case layerManifest:
-		return "manifest.md"
-	case layerFuncSpec:
-		return "func.md"
-	default:
-		return ""
-	}
-}
 
 // docKeywords lists keywords to match in diagnostic messages for section lookup.
 var docKeywords = []string{
@@ -87,7 +61,6 @@ func searchDocs(l layer, diagMessages []string) string {
 
 	// Phase 2: if no rule_id match, try keyword match
 	if len(matched) == 0 {
-		// Collect keywords present in diagnostic messages
 		var activeKWs []string
 		joined := strings.Join(diagMessages, "\n")
 		for _, kw := range docKeywords {
@@ -117,51 +90,4 @@ func searchDocs(l layer, diagMessages []string) string {
 		result = result[:2048]
 	}
 	return result
-}
-
-// extractRuleID extracts the rule ID from a diagnostic message.
-// Handles both "[S-74] ..." and "S-74: ..." formats.
-func extractRuleID(msg string) string {
-	// Try bracket format first: [S-74]
-	if strings.HasPrefix(msg, "[") {
-		end := strings.Index(msg, "]")
-		if end > 1 && end <= 20 {
-			return msg[1:end]
-		}
-	}
-	// Try colon format: S-74:
-	idx := strings.Index(msg, ":")
-	if idx > 0 && idx <= 20 {
-		candidate := strings.TrimSpace(msg[:idx])
-		if len(candidate) >= 2 && len(candidate) <= 15 {
-			return candidate
-		}
-	}
-	return ""
-}
-
-// splitSections splits markdown content by "## " headings into sections.
-// Each section includes its heading line.
-func splitSections(content string) []string {
-	lines := strings.Split(content, "\n")
-	var sections []string
-	var current []string
-
-	for _, line := range lines {
-		if strings.HasPrefix(line, "## ") {
-			if len(current) > 0 {
-				sections = append(sections, strings.Join(current, "\n"))
-			}
-			current = []string{line}
-		} else {
-			if len(current) > 0 {
-				current = append(current, line)
-			}
-			// Lines before first ## are ignored (usually just the # title)
-		}
-	}
-	if len(current) > 0 {
-		sections = append(sections, strings.Join(current, "\n"))
-	}
-	return sections
 }

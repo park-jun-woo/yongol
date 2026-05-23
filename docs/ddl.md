@@ -210,6 +210,26 @@ CREATE TABLE users (
 );
 ```
 
+### Annotation placement rules
+
+All DDL annotations go at the **end** of the column line, inside a **single**
+`--` comment. Multiple annotations are space-separated within that comment.
+
+```sql
+-- Correct: single annotation
+email VARCHAR(255) NOT NULL -- @sensitive
+
+-- Correct: multiple annotations in one comment
+token_hash VARCHAR(255) NOT NULL -- @sensitive @archived
+
+-- Wrong: annotation on a separate line (parser ignores it)
+email VARCHAR(255) NOT NULL
+-- @sensitive
+
+-- Wrong: two -- comments on one line (only the first is parsed)
+token_hash VARCHAR(255) NOT NULL -- @sensitive -- @archived
+```
+
 ### Sentinel FK (DEFAULT 0)
 
 Avoid nullable FKs by using `NOT NULL DEFAULT 0` + an id=0 row in the referenced table. Without the sentinel, INSERT fails on the FK constraint; `yongol validate` raises a WARNING when the pattern is detected but no sentinel INSERT is present.

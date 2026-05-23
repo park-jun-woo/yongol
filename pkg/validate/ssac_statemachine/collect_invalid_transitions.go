@@ -14,29 +14,9 @@ import (
 func collectInvalidTransitions(fn ssac.ServiceFunc, diagramByID map[string]*statemachine.StateDiagram) []diagnostic.Diagnostic {
 	var diags []diagnostic.Diagnostic
 	for _, seq := range fn.Sequences {
-		if seq.Type != "state" {
-			continue
+		if d, ok := checkTransitionValidity(fn, seq, diagramByID); ok {
+			diags = append(diags, d)
 		}
-		d, ok := diagramByID[seq.DiagramID]
-		if !ok {
-			continue
-		}
-		if len(d.ValidFromStates(seq.Transition)) > 0 {
-			continue
-		}
-		file := fn.FileName
-		if file == "" {
-			file = "ssac/" + fn.Name + ".ssac"
-		}
-		diags = append(diags, diagnostic.Diagnostic{
-			File:        file,
-			Line:        seq.Line,
-			Phase:       diagnostic.PhaseValidate,
-			Level:       diagnostic.LevelError,
-			Message:     "[XMS-25] transition \"" + seq.Transition + "\" is not a valid event in diagram \"" + seq.DiagramID + "\"",
-			Advice:      "Define transition '" + seq.Transition + "' in the stateDiagram",
-			OperationID: fn.Name,
-		})
 	}
 	return diags
 }

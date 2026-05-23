@@ -51,7 +51,10 @@ func xdd61SensitiveNoAnnotation(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Message: fmt.Sprintf(
 						"[XDD-61] table %q column %q — matches sensitive pattern %q but has no -- @sensitive annotation",
 						blk.tableName, colName, match),
-					Advice: "Append -- @sensitive or -- @nosensitive to the column line (without it the value may appear in JSON responses)",
+					Advice: "Append annotations at the END of the column line, in a single comment. " +
+						"Example: email VARCHAR(255) NOT NULL -- @sensitive. " +
+						"Multiple: token_hash VARCHAR(255) NOT NULL -- @sensitive @archived. " +
+						"Do NOT write on a separate line. Do NOT write -- @a -- @b.",
 				})
 			}
 		}

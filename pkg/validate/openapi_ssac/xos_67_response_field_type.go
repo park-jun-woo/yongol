@@ -53,7 +53,9 @@ func xos67ResponseFieldType(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Level: diagnostic.LevelError,
 					Message: fmt.Sprintf("[XOS-67] %s seq[%d] — @response field %q = %q: type %s ≠ OpenAPI response %q expected type %s",
 						fn.Name, seqIdx, key, value, actual, key, expected),
-					Advice:      "Correct the value type so that it is compatible with the OpenAPI schema",
+					Advice: "Correct the value type so that it is compatible with the OpenAPI schema. " +
+						"DDL TIMESTAMPTZ maps to OpenAPI { type: string, format: date-time }. " +
+						"SSaC @response binds it as a string field.",
 					OperationID: fn.Name,
 				})
 			}

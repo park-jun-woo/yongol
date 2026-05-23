@@ -1,4 +1,4 @@
-//ff:func feature=validate type=test-helper control=iteration dimension=1 topic=features-statemachine
+//ff:func feature=validate type=test-helper control=sequence topic=features-statemachine
 //ff:what buildFSForXFS — XFS 테스트용 Fullstack 빌더 (FeatureTables + StateDiagrams)
 package features_statemachine
 

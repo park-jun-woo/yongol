@@ -16,11 +16,6 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// yongolFile represents the structure of specs/.yongol.
-type yongolFile struct {
-	Hashes map[string]string `yaml:"hashes"`
-}
-
 // ft03HashMismatch validates FT-03: when features.yaml exists, specs/.yongol
 // must also exist and the SHA-256 hash must match. This detects unintended
 // modifications to features.yaml after the baseline was established by
