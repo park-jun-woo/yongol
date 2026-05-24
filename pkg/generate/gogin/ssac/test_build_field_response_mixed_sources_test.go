@@ -24,7 +24,7 @@ func TestBuildFieldResponse_MixedSources(t *testing.T) {
 		"summary":  "summary",
 		"workflow": "wf",
 	}
-	lines := g.buildFieldResponse(fields)
+	lines, _ := g.buildFieldResponse(fields)
 	body := strings.Join(lines, "\n")
 
 	// DB model field "workflow" must go through converter

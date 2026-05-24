@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=1 topic=query-structural
-//ff:what Q-02 — cardinality (:one / :many / :exec / :execrows) is required
+//ff:what Q-02 — cardinality (:one / :many / :exec / :execrows / :execresult) is required
 
 package query
 
@@ -9,11 +9,12 @@ import (
 )
 
 var validCardinalities = map[string]bool{
-	"one":      true,
-	"many":     true,
-	"exec":     true,
-	"execrows": true,
+	"one":        true,
+	"many":       true,
+	"exec":       true,
+	"execrows":   true,
 	"execlastid": true,
+	"execresult": true,
 }
 
 // q02Cardinality validates Q-02: every `-- name:` must declare a valid
@@ -31,7 +32,7 @@ func q02Cardinality(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			Phase:   diagnostic.PhaseValidate,
 			Level:   diagnostic.LevelError,
 			Message: "[Q-02] query " + q.Name + " has missing or invalid cardinality (" + q.Cardinality + ")",
-			Advice:  "Specify one of :one / :many / :exec / :execrows, e.g. `-- name: " + q.Name + " :one`",
+			Advice:  "Specify one of :one / :many / :exec / :execrows / :execresult, e.g. `-- name: " + q.Name + " :one`",
 		})
 	}
 	return diags

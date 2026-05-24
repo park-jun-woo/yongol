@@ -40,6 +40,17 @@ func xdo77PropDiag(fs *yongol.Fullstack, schemaName, tableName, propName string,
 	if !typeMismatch && !formatMismatch {
 		return diagnostic.Diagnostic{}, false
 	}
+
+	line := fs.OpenAPILines.SchemaPropertyLine(schemaName, propName)
+	if line == 0 {
+		line = fs.OpenAPILines.SchemaLine(schemaName)
+	}
+
+	// UUID-specific diagnostic: clearer message + targeted hint.
+	if ddlGoType == "uuid" && !typeMismatch {
+		return xdo77UUIDFormatDiag(tableName, colName, line), true
+	}
+
 	oaDisplay := actualType
 	if actualFormat != "" {
 		oaDisplay = actualType + "/" + actualFormat
@@ -47,10 +58,6 @@ func xdo77PropDiag(fs *yongol.Fullstack, schemaName, tableName, propName string,
 	ddlDisplay := compat.oType
 	if compat.oFormat != "" {
 		ddlDisplay = compat.oType + "/" + compat.oFormat
-	}
-	line := fs.OpenAPILines.SchemaPropertyLine(schemaName, propName)
-	if line == 0 {
-		line = fs.OpenAPILines.SchemaLine(schemaName)
 	}
 	return diagnostic.Diagnostic{
 		File:  "api/openapi.yaml",

@@ -9,3 +9,7 @@ UPDATE users SET email = @email WHERE id = @id;
 
 -- name: ListUsers :many
 SELECT id FROM users ORDER BY id DESC LIMIT @per_page;
+
+-- name: UpsertUser :execresult
+INSERT INTO users (id, email) VALUES (@id, @email)
+ON CONFLICT (id) DO UPDATE SET email = EXCLUDED.email;

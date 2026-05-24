@@ -19,5 +19,9 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	diags = append(diags, xqs20ReturnTypeMatch(fs)...)
 	diags = append(diags, xqs21VerifyPasswordQuery(fs)...)
 	diags = append(diags, xqs72QueryParamIntWidth(fs)...)
+	diags = append(diags, xqs73PartialSelectField(fs)...)
+	diags = append(diags, xqs74EmptyNonIntegerPK(fs)...)
+	diags = append(diags, xqs75PutDeleteExecCardinality(fs)...)
+	diags = append(diags, xqs76GetPostExecCardinality(fs)...)
 	return diags
 }

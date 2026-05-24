@@ -20,6 +20,7 @@ Complete catalog of rules executed by `yongol validate`. The manual (`manual-for
 | `H-` | Hurl scenarios |
 | `Q-` | sqlc queries |
 | `CORS-` | manifest CORS block |
+| `V-` | DESIGN.md (design token spec) |
 | `TM-` | STML ↔ OpenAPI cross-validation |
 | `INI-` | Init check (project initialization) |
 
@@ -34,7 +35,7 @@ Complete catalog of rules executed by `yongol validate`. The manual (`manual-for
 | Rego | `P` | Manifest | `N` |
 | Hurl | `H` | Func | `F` |
 | Authz | `A` | sqlc | `Q` |
-| STML | `T` | | |
+| STML | `T` | Design | `V` |
 
 Example: SSaC → OpenAPI (SSaC is the claim, OpenAPI is the ground truth) → `XOS-`.
 ## Level
@@ -117,6 +118,7 @@ SSaC self-consistency — required fields, variable flow, model references, @sub
 | S-57 | ERROR | `@call` input type must match FuncRequest field type | `pkg/validate/ssac/s_57_func_request_type.go` |
 | S-58 | ERROR | Use of IANA-unregistered HTTP status codes is forbidden | `pkg/validate/ssac/s_58_invalid_err_status.go` |
 | S-59 | ERROR | Dotted field reference format validation | `pkg/validate/ssac/s_59_dotted_field.go` |
+| S-60 | ERROR | `request.<field>` references in SSaC must exist case-exactly in the OpenAPI operation's request schema | `pkg/validate/ssac/s_60_request_field_exact.go` |
 | S-61 | ERROR | Result variable names must not collide with codegen reserved names (`server`, `ctx`, `err`, etc.) | `pkg/validate/ssac/s_61_codegen_reserved_var.go` |
 | S-62 | ERROR | Result variable is unreferenced in subsequent sequences | `pkg/validate/ssac/s_62_unused_result_var.go` |
 | S-63 | WARNING | `@get []T` list endpoint has no pagination params and no `// @no-pagination` | `pkg/validate/ssac/s_63_list_no_pagination.go` |
@@ -135,6 +137,7 @@ SSaC self-consistency — required fields, variable flow, model references, @sub
 | XSS-57 | ERROR | `@publish` topic must have a matching `@subscribe` | `pkg/validate/ssac/xss_57_publish_to_subscribe.go` |
 | XSS-58 | ERROR | `@subscribe` topic must have a matching `@publish` | `pkg/validate/ssac/xss_58_subscribe_to_publish.go` |
 | XSS-59 | ERROR | `@subscribe` message fields must match `@publish` payload | `pkg/validate/ssac/xss_59_subscribe_fields.go` |
+| XSS-60 | WARNING | `@subscribe` message field type must be compatible with `@publish` payload inferred type | `pkg/validate/ssac/xss_60_subscribe_field_types.go` |
 
 ## B. Manifest
 
@@ -253,6 +256,9 @@ Cross-consistency between OpenAPI operations/responses and SSaC functions / `@re
 | XSO-16 | ERROR | OpenAPI operationId must be used as a SSaC function (coverage) | `pkg/validate/openapi_ssac/xso_16_op_id_to_func.go` |
 | XSO-18 | ERROR | OpenAPI response field must be used in a SSaC `@response` (coverage) | `pkg/validate/openapi_ssac/xso_18_response_field_used.go` |
 | XSO-20 | ERROR | OpenAPI response field must be used in a shorthand `@response` (coverage) | `pkg/validate/openapi_ssac/xso_20_shorthand_field_used.go` |
+| XOS-70 | ERROR | `@response` integer literal mapped to optional integer field requires `format: int64` in OpenAPI response schema | `pkg/validate/openapi_ssac/xos_70_response_literal_int_format.go` |
+| XOS-80 | ERROR | HTTP-method-conventional success status (POST→201, PUT→200, DELETE→204, GET→200) is not declared in OpenAPI responses — codegen cannot derive the success status | `pkg/validate/openapi_ssac/xos_80_success_status_mismatch.go` |
+| XOS-82 | WARNING | OpenAPI operation declares multiple 2xx responses but only the one selected by `DeriveSuccessStatus` is reachable from SSaC | `pkg/validate/openapi_ssac/xos_82_unreachable_success_status.go` |
 
 ## H. SSaC ↔ Func
 
@@ -327,6 +333,13 @@ Cross-consistency between SSaC `currentUser` / `@publish` / `@subscribe` / JWT `
 | XNS-56 | ERROR | Use of `@publish`/`@subscribe` requires `queue.backend` configuration in manifest | `pkg/validate/ssac_manifest/xns_56_queue_required.go` |
 | XNS-57 | WARNING | `queue.backend: memory` combined with `@publish` attached to `@post/@put/@delete` (tx-bound publish) — the memory backend does not support `PublishTx`, causing runtime failure | `pkg/validate/ssac_manifest/xns_57_memory_tx_publish.go` |
 | XNS-73 | ERROR | JWT `@call` input field must exist in manifest claims fields | `pkg/validate/ssac_manifest/xns_73_jwt_call_claims.go` |
+| XSA-70 | ERROR | SSaC uses `session.*` built-ins but `manifest.session.backend` is not declared | `pkg/validate/ssac_manifest/xsa_70_session_backend_required.go` |
+| XSA-71 | ERROR | SSaC uses `cache.*` built-ins but `manifest.cache.backend` is not declared | `pkg/validate/ssac_manifest/xsa_71_cache_backend_required.go` |
+| XSA-72 | ERROR | SSaC uses `file.*` / `storage.*` built-ins but `manifest.file.backend` is not declared | `pkg/validate/ssac_manifest/xsa_72_file_backend_required.go` |
+| XSA-74 | WARNING | `manifest.session.backend` is declared but no SSaC function uses `session.*` | `pkg/validate/ssac_manifest/xsa_74_session_backend_unused.go` |
+| XSA-75 | WARNING | `manifest.cache.backend` is declared but no SSaC function uses `cache.*` | `pkg/validate/ssac_manifest/xsa_75_cache_backend_unused.go` |
+| XSA-76 | WARNING | `manifest.file.backend` is declared but no SSaC function uses `file.*` / `storage.*` | `pkg/validate/ssac_manifest/xsa_76_file_backend_unused.go` |
+| XSA-77 | WARNING | `manifest.queue.backend` is declared but no SSaC function uses `@publish` / `@subscribe` | `pkg/validate/ssac_manifest/xsa_77_queue_backend_unused.go` |
 | XAS-60 | ERROR | `@auth` input field must exist on the Authz `CheckRequest` struct | `pkg/validate/ssac_authz/xas_60_auth_input_field.go` |
 
 ## N. OpenAPI ↔ Manifest
@@ -369,6 +382,10 @@ Validates that the names, case, and count of SSaC Input keys match sqlc Params e
 | XQS-20 | ERROR | SSaC declared return type must match sqlc query RETURNING shape (Model ↔ full RETURNING, `<QueryName>Row` ↔ partial RETURNING) | `pkg/validate/ssac_sqlc/xqs_20_return_type_match.go` |
 | XQS-21 | ERROR | `@verify-password` requires the sqlc query `<Model>FindBy<Col>` to exist | `pkg/validate/ssac_sqlc/xqs_21_verify_password_query.go` |
 | XQS-72 | ERROR | OpenAPI query param int width must match sqlc param int width | `pkg/validate/ssac_sqlc/xqs_72_query_param_int_width.go` |
+| XQS-73 | ERROR | SSaC field reference on partial SELECT query result must exist in SELECT column list | `pkg/validate/ssac_sqlc/xqs_73_partial_select_field.go` |
+| XQS-74 | ERROR | `@empty` / `@exists` guard target model's DDL primary key must be an integer type (codegen emits `var.ID == 0`) | `pkg/validate/ssac_sqlc/xqs_74_empty_non_integer_pk.go` |
+| XQS-75 | ERROR | `@put` / `@delete` expects `:exec` sqlc query but references a `:one` / `:many` query (assignment mismatch) | `pkg/validate/ssac_sqlc/xqs_75_put_delete_exec_cardinality.go` |
+| XQS-76 | ERROR | `@get` / `@post` expects `:one` / `:many` sqlc query but references a `:exec` / `:execrows` / `:execresult` query (assignment mismatch) | `pkg/validate/ssac_sqlc/xqs_76_get_post_exec_cardinality.go` |
 
 ## P. SSaC ↔ DDL
 
@@ -454,6 +471,59 @@ All Hurl files under `specs/tests/` are user-authored. yongol does not emit any 
 | XDM-27 | ERROR | `@state` field must exist as a DDL column | `pkg/validate/ddl_statemachine/xdm_27_state_field_column.go` |
 | XDM-28 | ERROR | stateDiagram `[*] → X` initial transition must match DDL `DEFAULT 'X'` | `pkg/validate/ddl_statemachine/xdm_28_default_initial_state.go` |
 
+## Z1. Design Internal (`V-*`)
+
+DESIGN.md self-consistency — name, colors, typography, dimensions, token references, headings, and component properties.
+
+| Rule ID | Level | Description | Source |
+|---|---|---|---|
+| V-01 | ERROR | `name` field is required in DESIGN.md | `pkg/validate/design/v_01_name_required.go` |
+| V-02 | ERROR | Color value must be a valid hex code (`#` followed by 3, 4, 6, or 8 hex digits) | `pkg/validate/design/v_02_hex_valid.go` |
+| V-03 | ERROR | Typography token must have `fontFamily`, `fontSize`, and `fontWeight` fields | `pkg/validate/design/v_03_typography_required.go` |
+| V-04 | ERROR | `rounded` / `spacing` values must be valid dimensions (number optionally followed by `px`, `em`, or `rem`) | `pkg/validate/design/v_04_dimension_valid.go` |
+| V-05 | ERROR | `{group.token}` references in component props must resolve to actual tokens in the same DESIGN.md | `pkg/validate/design/v_05_token_ref_resolve.go` |
+| V-06 | ERROR | Duplicate `##` section heading in DESIGN.md body | `pkg/validate/design/v_06_duplicate_heading.go` |
+| V-07 | WARNING | Component property name is not in the known set (possible typo or unknown prop) | `pkg/validate/design/v_07_unknown_prop.go` |
+
+## Z2. Design ↔ Manifest (`XNV-*`)
+
+Cross-consistency between `manifest.yaml` `frontend.design` and DESIGN.md file existence.
+
+| Rule ID | Level | Description | Source |
+|---|---|---|---|
+| XNV-01 | ERROR | `manifest.frontend.design` path does not resolve to an existing file | `pkg/validate/design_manifest/xnv_01_path_exists.go` |
+| XNV-02 | WARNING | DESIGN.md (or `*.design.md`) file exists under `specs/frontend/` but is not declared in `manifest.frontend.design` | `pkg/validate/design_manifest/xnv_02_undeclared.go` |
+
+## Z3. STML ↔ Design (`XVM-*`, `XMV-*`)
+
+Cross-validation between STML template classes/attributes and DESIGN.md design tokens. `XVM-*` rules check STML → Design (claim direction), `XMV-*` rules check Design → STML (coverage direction, dead tokens).
+
+| Rule ID | Level | Description | Source |
+|---|---|---|---|
+| XVM-01 | WARNING | Color token name used in STML class is not defined in DESIGN.md `colors` | `pkg/validate/stml_design/xvm_01_color.go` |
+| XVM-02 | WARNING | Rounded token name used in STML class is not defined in DESIGN.md `rounded` | `pkg/validate/stml_design/xvm_02_rounded.go` |
+| XVM-03 | WARNING | Spacing token name used in STML class is not defined in DESIGN.md `spacing` | `pkg/validate/stml_design/xvm_03_spacing.go` |
+| XVM-04 | WARNING | Font name used in STML class does not match any `fontFamily` in DESIGN.md `typography` (case-insensitive) | `pkg/validate/stml_design/xvm_04_font.go` |
+| XVM-05 | WARNING | Inline `style` attribute contains a hardcoded hex color that matches a DESIGN.md color token value — use the token instead | `pkg/validate/stml_design/xvm_05_inline.go` |
+| XVM-06 | ERROR | `data-component` used in STML but not defined in DESIGN.md `components` | `pkg/validate/stml_design/xvm_06_component_design_required.go` |
+| XMV-10 | WARNING | DESIGN.md color token is defined but not referenced in any STML page (dead token) | `pkg/validate/stml_design/xmv_10_dead_color.go` |
+| XMV-11 | WARNING | DESIGN.md typography token's `fontFamily` is defined but not referenced in any STML page (dead token) | `pkg/validate/stml_design/xmv_11_dead_typography.go` |
+| XMV-12 | WARNING | DESIGN.md component token is defined but not referenced by any STML `data-component` (dead token) | `pkg/validate/stml_design/xmv_12_dead_component.go` |
+
+## Z4. Domain Security (`XDO-90`, `XDS-80/81/82`, `XMO-20/21/22`)
+
+Multi-domain OpenAPI security rules. Applies only when `manifest.yaml` declares multiple domain configurations (e.g. `public`, `admin`, `internal`). Validates operationId uniqueness across domains, domain-specific access control, and STML consumption coverage per domain.
+
+| Rule ID | Level | Description | Source |
+|---|---|---|---|
+| XDO-90 | ERROR | operationId is declared in more than one domain's OpenAPI spec (cross-domain duplicate) | `pkg/validate/domain_security/xdo_90.go` |
+| XDS-80 | ERROR | Admin domain endpoint allows public access via `security: []` | `pkg/validate/domain_security/xds_80.go` |
+| XDS-81 | WARNING | Internal domain endpoint has explicit security declarations (typically unnecessary for service-to-service calls) | `pkg/validate/domain_security/xds_81.go` |
+| XDS-82 | ERROR | Public domain DELETE operation has no corresponding admin Rego allow rule with `delete` action | `pkg/validate/domain_security/xds_82.go` |
+| XMO-20 | ERROR | Public domain OpenAPI operationId is not consumed by any STML page in the public frontend directory | `pkg/validate/domain_security/xmo_20.go` |
+| XMO-21 | ERROR | Admin domain OpenAPI operationId is not consumed by any STML page in the admin frontend directory (only when admin frontend is configured) | `pkg/validate/domain_security/xmo_21.go` |
+| XMO-22 | WARNING | STML page calls an operationId belonging to a different domain's OpenAPI spec (domain boundary violation) | `pkg/validate/domain_security/xmo_22.go` |
+
 ## S. Preserve (`PRV-*`) — Preserved file contract / runtime safety guards
 
 Applies only to `.go` files whose `//ff:checked hash` no longer matches (i.e., the user has edited them). Runs only when the arts directory is provided, as in `yongol validate <specs> <arts>`.
@@ -513,6 +583,11 @@ Cross-validation between STML template attributes (`data-fetch`, `data-action`, 
 | TM-07 | ERROR | `data-each` field is not in the OpenAPI operation's response schema | `pkg/validate/stml_openapi/tm_0708_each.go` |
 | TM-08 | ERROR | `data-each` field exists in the response schema but is not an array type | `pkg/validate/stml_openapi/tm_0708_each.go` |
 | TM-09 | ERROR | `data-component` references a `.tsx` file that does not exist | `pkg/validate/stml_openapi/tm_09_component_not_found.go` |
+| TM-10 | ERROR | STML element uses a `class` attribute directly — use `<!-- @override class="..." -->` comment instead | `pkg/validate/stml_openapi/tm_10_class_prohibited.go` |
+| TM-11 | ERROR | `data-layout` value on a page does not match any layout defined in `layouts/` | `pkg/validate/stml_openapi/tm_11_layout_not_found.go` |
+| TM-12 | ERROR | `manifest.frontend.defaultLayout` value does not match any layout defined in `layouts/` | `pkg/validate/stml_openapi/tm_12_default_layout_not_found.go` |
+| TM-13 | WARNING | Layout defined in `layouts/` is not referenced by any page's `data-layout` or `manifest.frontend.defaultLayout` | `pkg/validate/stml_openapi/tm_13_unused_layout.go` |
+| XMO-10 | WARNING | OpenAPI operationId is not consumed by any STML `data-fetch` or `data-action` (auth endpoints excluded) | `pkg/validate/stml_openapi/xmo_10_unconsumed.go` |
 
 ## V. Features Internal (`FT-*`)
 

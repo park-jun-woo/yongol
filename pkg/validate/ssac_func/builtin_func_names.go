@@ -21,15 +21,3 @@ func builtinFuncNames(pkg string, specs []funcspec.FuncSpec) []string {
 	}
 	return names
 }
-
-// ucFirst upper-cases the first byte of s. ASCII-only (sufficient for Go
-// identifier names).
-func ucFirst(s string) string {
-	if s == "" {
-		return s
-	}
-	if s[0] >= 'a' && s[0] <= 'z' {
-		return string(s[0]-32) + s[1:]
-	}
-	return s
-}

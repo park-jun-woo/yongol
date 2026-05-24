@@ -57,7 +57,8 @@ func (g *methodGen) buildSequence(seq ssacparser.Sequence, next *ssacparser.Sequ
 		l, imp := g.buildPublish(seq)
 		return l, imp, false, nil
 	case "response":
-		return g.buildResponse(seq), nil, false, nil
+		l, imp := g.buildResponse(seq)
+		return l, imp, false, nil
 	default:
 		return nil, nil, false, fmt.Errorf(
 			"unhandled SSaC sequence type: %q (file=%s, line=%d, func=%s)",

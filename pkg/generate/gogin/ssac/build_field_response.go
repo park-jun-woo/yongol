@@ -1,5 +1,5 @@
 //ff:func feature=gen-gogin type=util control=iteration dimension=1
-//ff:what methodGen.buildFieldResponse — 필드 맵을 typed response (db→api 변환 포함) 로 렌더링
+//ff:what methodGen.buildFieldResponse — 필드 맵을 typed response (db→api 변환 포함, pgtype 자동 변환) 로 렌더링
 
 package ssac
 
@@ -16,8 +16,16 @@ import (
 // have their conversion hoisted to local variables before the struct
 // literal and any error is propagated as nil,err from the handler
 // (BUG-003 / BUG-005 response direction).
-func (g *methodGen) buildFieldResponse(fields map[string]string) []string {
+//
+// PhaseG02 — when a dotted expression (e.g. user.Name) accesses a column
+// whose DDL type maps to a pgtype wrapper (pgtype.Text, pgtype.Int8,
+// pgtype.Timestamptz, etc.), the mapped expression is replaced with the
+// pgtypex bridge call so the generated assignment compiles against the
+// oapi-codegen response struct. Required imports are collected and
+// returned alongside the lines.
+func (g *methodGen) buildFieldResponse(fields map[string]string) ([]string, []string) {
 	var lines []string
+	var imports []string
 
 	// 필드 값을 Go 표현식으로 변환 (request.id → request.Id 등)
 	mapped := make(map[string]string, len(fields))
@@ -30,6 +38,21 @@ func (g *methodGen) buildFieldResponse(fields map[string]string) []string {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
+
+	// PhaseG02: resolve pgtype conversions for dotted field accesses.
+	// When varExpr is e.g. "user.Name" and the underlying DDL column is
+	// pgtype.Text (nullable TEXT), replace the expression with
+	// pgtypex.FromPgTextPtr(user.Name) and collect imports. The converted
+	// expression is stored in pgtypeConverted so renderResponseFieldHoisted
+	// can use it for correct struct literal assignment.
+	pgtypeConverted := make(map[string]string)
+	for _, jsonName := range keys {
+		varExpr := mapped[jsonName]
+		if convExpr, convImports := g.resolvePgtypeFieldExpr(varExpr); convExpr != "" {
+			pgtypeConverted[jsonName] = convExpr
+			imports = append(imports, convImports...)
+		}
+	}
 
 	// Pre-pass: hoist any $ref convert<Type>/convert<Type>List call into
 	// a local variable so the per-call error is reachable. scalarLocal
@@ -64,8 +87,13 @@ func (g *methodGen) buildFieldResponse(fields map[string]string) []string {
 		g.FuncName, g.SuccessStatus))
 
 	for _, jsonName := range keys {
-		lines = append(lines, g.renderResponseFieldHoisted(jsonName, mapped[jsonName], scalarLocal, listLocal))
+		varExpr := mapped[jsonName]
+		if conv, ok := pgtypeConverted[jsonName]; ok {
+			lines = append(lines, g.renderPgtypeField(jsonName, varExpr, conv))
+			continue
+		}
+		lines = append(lines, g.renderResponseFieldHoisted(jsonName, varExpr, scalarLocal, listLocal))
 	}
 	lines = append(lines, "}, nil")
-	return lines
+	return lines, imports
 }

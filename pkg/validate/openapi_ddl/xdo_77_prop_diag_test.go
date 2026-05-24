@@ -1,5 +1,5 @@
 //ff:func feature=validate type=test control=sequence topic=openapi-ddl
-//ff:what xdo77PropDiag — nil/미존재 컬럼/타입 일치/불일치 검증
+//ff:what TestXdo77PropDiag — nil/미존재 컬럼/타입 일치/불일치 검증
 
 package openapi_ddl
 
@@ -14,8 +14,8 @@ import (
 
 func TestXdo77PropDiag(t *testing.T) {
 	cols := map[string]string{
-		"id":    "int64",
-		"email": "string",
+		"id":     "int64",
+		"email":  "string",
 		"active": "bool",
 	}
 	fs := &yongol.Fullstack{

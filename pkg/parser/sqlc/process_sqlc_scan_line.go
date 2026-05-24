@@ -2,8 +2,6 @@
 //ff:what processSQLCScanLine — sqlc 파일 한 줄을 해석해 QuerySpec 전이 및 named param/Body 수집을 처리
 package sqlc
 
-import "strings"
-
 // processSQLCScanLine handles a single line of a sqlc source file during the
 // streaming scan. It may open a new QuerySpec (flushing the previous one into
 // specs) or accumulate the line into the current spec's Body and named params.
@@ -22,8 +20,7 @@ func processSQLCScanLine(
 	if spec, ok := parseSQLCLine(line, model, path, lineNo); ok {
 		// Flush previous query
 		if current != nil {
-			current.Params = sortedKeys(paramSet)
-			current.Body = strings.TrimRight(current.Body, " \t\r\n")
+			finalizeQuerySpec(current, paramSet)
 			*specs = append(*specs, *current)
 		}
 		newSpec := spec

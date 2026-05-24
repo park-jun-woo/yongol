@@ -15,7 +15,11 @@ func xdo77BuildTableIndex(fs *yongol.Fullstack) map[string]map[string]string {
 	for _, t := range fs.DDLTables {
 		cols := make(map[string]string, len(t.Columns))
 		for col, c := range t.Columns {
-			cols[col] = types.GoTypeOf(c)
+			goType := types.GoTypeOf(c)
+			if goType == "string" && isUUIDRawType(c) {
+				goType = "uuid"
+			}
+			cols[col] = goType
 		}
 		tableIndex[t.Name] = cols
 	}

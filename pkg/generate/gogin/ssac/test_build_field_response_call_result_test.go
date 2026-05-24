@@ -22,7 +22,7 @@ func TestBuildFieldResponse_CallResultUsesConverter(t *testing.T) {
 	fields := map[string]string{
 		"summary": "summary",
 	}
-	lines := g.buildFieldResponse(fields)
+	lines, _ := g.buildFieldResponse(fields)
 	body := strings.Join(lines, "\n")
 
 	if !strings.Contains(body, "convertSummarizeResponse(summary)") {

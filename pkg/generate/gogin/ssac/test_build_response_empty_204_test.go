@@ -24,7 +24,7 @@ func TestBuildResponse_Empty204(t *testing.T) {
 		Type:         "response",
 		SuppressWarn: true,
 	}
-	lines := g.buildResponse(seq)
+	lines, _ := g.buildResponse(seq)
 	body := strings.Join(lines, "\n")
 
 	want := "return api.DeleteWebhook204Response{}, nil"

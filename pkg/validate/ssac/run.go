@@ -81,5 +81,6 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	diags = append(diags, xss57PublishToSubscribe(fs)...)
 	diags = append(diags, xss58SubscribeToPublish(fs)...)
 	diags = append(diags, xss59SubscribeFields(fs)...)
+	diags = append(diags, xss60SubscribeFieldTypes(fs)...)
 	return diags
 }

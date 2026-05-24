@@ -19,6 +19,7 @@ var ddlGoTypeToOpenAPI = map[string]openAPITypeCompat{
 	"float64":         {oType: "number", oFormat: ""},
 	"float32":         {oType: "number", oFormat: ""},
 	"json.RawMessage": {oType: "object", oFormat: ""},
+	"uuid":            {oType: "string", oFormat: "uuid"},
 }
 
 // xdo77ColumnTypeMismatch validates XDO-77: for every components/schemas property

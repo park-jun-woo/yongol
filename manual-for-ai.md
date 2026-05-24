@@ -221,6 +221,10 @@ Standard SQL DDL and sqlc. Details: [`docs/ddl.md`](docs/ddl.md).
 - `page`/`per_page` query param `format` must match the sqlc LIMIT/OFFSET
   type (XQS-72). sqlc defaults to `int32`. If using `format: int64`, add
   `::bigint` cast in the sqlc query, or use `format: int32` consistently.
+- Partial SELECT queries (not `SELECT *`) must include all columns that
+  SSaC references (XQS-73). `@empty`/`@exists` always access the PK
+  column (`id`). `@response { field: var.Field }` accesses specific
+  fields. `@response var` accesses all model fields via convert.
 - Avoid Go-reserved column names (`type`, `range`, `select`, `map`, …) — rename
   to `tx_type`, `date_range`, etc.
 - **FK 컬럼은 NOT NULL 필수** (D-15). nullable FK는 codegen 타입 에러를

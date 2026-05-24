@@ -20,6 +20,11 @@ package sqlc
 //               Comment lines are preserved as-is (the body is the raw text
 //               between `-- name:` markers). Consumers downstream extract the
 //               RETURNING clause from this string (see XQS-20).
+// SelectStar  : true when the query uses SELECT * (all columns).
+// SelectCols  : populated when SelectStar is false and the query is a SELECT
+//               with an explicit column list. Contains snake_case column names
+//               as written in the SQL. Empty for non-SELECT queries or SELECT *.
+//               PhaseG03 — validate uses this to verify SSaC field references.
 type QuerySpec struct {
 	Name        string
 	Model       string
@@ -30,4 +35,6 @@ type QuerySpec struct {
 	File        string
 	Line        int
 	Body        string
+	SelectStar  bool
+	SelectCols  []string
 }

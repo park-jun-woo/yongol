@@ -22,7 +22,7 @@ func TestBuildResponse_Empty200StillUsesJSONResponse(t *testing.T) {
 	seq := ssacparser.Sequence{
 		Type: "response",
 	}
-	lines := g.buildResponse(seq)
+	lines, _ := g.buildResponse(seq)
 	body := strings.Join(lines, "\n")
 
 	want := "return api.GetHealth200JSONResponse{}, nil"

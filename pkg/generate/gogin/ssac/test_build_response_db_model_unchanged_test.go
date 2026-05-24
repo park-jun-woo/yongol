@@ -24,7 +24,7 @@ func TestBuildResponse_DBModelUnchanged(t *testing.T) {
 		Type:   "response",
 		Target: "workflow",
 	}
-	lines := g.buildResponse(seq)
+	lines, _ := g.buildResponse(seq)
 	body := strings.Join(lines, "\n")
 
 	if !strings.Contains(body, "convertWorkflow(workflow)") {
