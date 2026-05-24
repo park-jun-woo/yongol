@@ -1,4 +1,4 @@
-//ff:func feature=validate type=test control=iteration dimension=2 topic=query-structural
+//ff:func feature=validate type=test control=sequence topic=query-structural
 //ff:what ddlHasMatchingColumn — nil filter/empty tables/no match/match 검증
 
 package query

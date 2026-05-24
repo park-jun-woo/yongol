@@ -2,7 +2,7 @@
   "project": "/home/parkjunwoo/.clari/repos/fullend/yongol",
   "lang": "go",
   "checked_at": "2026-05-19T10:43:43.507969379+09:00",
-  "current_index": 2258,
+  "current_index": 2325,
   "functions": [
     {
       "qualified_name": "cmd/yongol.chainCmd",
@@ -21099,7 +21099,10 @@
       "start_line": 12,
       "end_line": 32,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/diagnose_override_gaps_test.go",
+      "test_mtime": "2026-05-24T21:13:26+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.diagnoseSqlcPackageEntry",
@@ -21108,7 +21111,10 @@
       "start_line": 16,
       "end_line": 41,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/diagnose_sqlc_package_entry_test.go",
+      "test_mtime": "2026-05-24T21:13:49+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.headTokenEquals",
@@ -21117,7 +21123,10 @@
       "start_line": 19,
       "end_line": 29,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/head_token_equals_test.go",
+      "test_mtime": "2026-05-24T21:14:36+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.isDateColumn",
@@ -21126,7 +21135,10 @@
       "start_line": 8,
       "end_line": 10,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/is_date_column_test.go",
+      "test_mtime": "2026-05-24T21:14:59+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.isInetColumn",
@@ -21135,7 +21147,10 @@
       "start_line": 8,
       "end_line": 10,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/is_inet_column_test.go",
+      "test_mtime": "2026-05-24T21:15:25+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.isIntervalColumn",
@@ -21144,7 +21159,10 @@
       "start_line": 8,
       "end_line": 10,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/is_interval_column_test.go",
+      "test_mtime": "2026-05-24T21:15:52+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.isNumericColumn",
@@ -21153,7 +21171,10 @@
       "start_line": 10,
       "end_line": 12,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/is_numeric_column_test.go",
+      "test_mtime": "2026-05-24T21:16:15+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.isPgtypeOverrideFor",
@@ -21162,7 +21183,10 @@
       "start_line": 17,
       "end_line": 28,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/is_pgtype_override_for_test.go",
+      "test_mtime": "2026-05-24T21:16:54+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.isTimestampColumn",
@@ -21171,7 +21195,10 @@
       "start_line": 8,
       "end_line": 10,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/is_timestamp_column_test.go",
+      "test_mtime": "2026-05-24T21:17:13+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.isTimestamptzColumn",
@@ -21180,7 +21207,10 @@
       "start_line": 8,
       "end_line": 10,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/is_timestamptz_column_test.go",
+      "test_mtime": "2026-05-24T21:17:39+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.isUUIDColumn",
@@ -21189,7 +21219,10 @@
       "start_line": 11,
       "end_line": 13,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/is_uuid_column_test.go",
+      "test_mtime": "2026-05-24T21:18:03+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.q01ScanForMissingName",
@@ -21198,7 +21231,10 @@
       "start_line": 16,
       "end_line": 51,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/q01_scan_for_missing_name_test.go",
+      "test_mtime": "2026-05-24T21:18:51+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.q04CheckManyLimit",
@@ -21207,7 +21243,10 @@
       "start_line": 15,
       "end_line": 38,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/q04_check_many_limit_test.go",
+      "test_mtime": "2026-05-24T21:19:54+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.q05CheckDeleteWhere",
@@ -21216,7 +21255,11 @@
       "start_line": 16,
       "end_line": 40,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/q05_check_delete_where_test.go",
+      "test_mtime": "2026-05-24T21:22:21+09:00",
+      "status": "pass",
+      "coverage_pct": 100,
+      "attempt": 1
     },
     {
       "qualified_name": "pkg/validate/query.q06CheckUpdateWhere",
@@ -21225,7 +21268,10 @@
       "start_line": 16,
       "end_line": 40,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/q06_check_update_where_test.go",
+      "test_mtime": "2026-05-24T21:22:56+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.q09CheckSelectOnExec",
@@ -21234,7 +21280,10 @@
       "start_line": 15,
       "end_line": 37,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/q09_check_select_on_exec_test.go",
+      "test_mtime": "2026-05-24T21:23:42+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.q01NameRequired",
@@ -21243,7 +21292,10 @@
       "start_line": 16,
       "end_line": 41,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/q_01_name_required_test.go",
+      "test_mtime": "2026-05-24T21:24:25+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.q02Cardinality",
@@ -21252,7 +21304,10 @@
       "start_line": 22,
       "end_line": 38,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/q_02_cardinality_test.go",
+      "test_mtime": "2026-05-24T21:25:01+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.q03NamePascalCase",
@@ -21261,7 +21316,10 @@
       "start_line": 16,
       "end_line": 37,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/q_03_name_pascalcase_test.go",
+      "test_mtime": "2026-05-24T21:25:29+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.q04ManyLimit",
@@ -21270,7 +21328,10 @@
       "start_line": 15,
       "end_line": 23,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/q_04_many_limit_test.go",
+      "test_mtime": "2026-05-24T21:25:54+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.q05DeleteWhere",
@@ -21279,7 +21340,10 @@
       "start_line": 18,
       "end_line": 26,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/q_05_delete_where_test.go",
+      "test_mtime": "2026-05-24T21:26:19+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.q06UpdateWhere",
@@ -21288,7 +21352,10 @@
       "start_line": 18,
       "end_line": 26,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/q_06_update_where_test.go",
+      "test_mtime": "2026-05-24T21:27:08+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.q07SelectStarSensitive",
@@ -21297,7 +21364,11 @@
       "start_line": 22,
       "end_line": 54,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/q_07_select_star_sensitive_test.go",
+      "test_mtime": "2026-05-24T21:28:16+09:00",
+      "status": "pass",
+      "coverage_pct": 100,
+      "attempt": 1
     },
     {
       "qualified_name": "pkg/validate/query.q08UnusedParam",
@@ -21306,7 +21377,10 @@
       "start_line": 22,
       "end_line": 57,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/q_08_unused_param_test.go",
+      "test_mtime": "2026-05-24T21:28:52+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.q09SelectOnExec",
@@ -21315,7 +21389,10 @@
       "start_line": 22,
       "end_line": 30,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/q_09_select_on_exec_test.go",
+      "test_mtime": "2026-05-24T21:29:29+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.q11SqlPackagePgxV5",
@@ -21324,7 +21401,10 @@
       "start_line": 27,
       "end_line": 48,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/q_11_sql_package_pgx_v5_test.go",
+      "test_mtime": "2026-05-24T21:30:11+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.q12PgtypeUuidOverride",
@@ -21333,7 +21413,10 @@
       "start_line": 22,
       "end_line": 42,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/q_12_pgtype_uuid_override_test.go",
+      "test_mtime": "2026-05-24T21:31:42+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.q13PgtypeNumericOverride",
@@ -21342,7 +21425,10 @@
       "start_line": 16,
       "end_line": 36,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/q_13_pgtype_numeric_override_test.go",
+      "test_mtime": "2026-05-24T21:32:16+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.q14PgtypeTimestamptzOverride",
@@ -21351,7 +21437,10 @@
       "start_line": 15,
       "end_line": 34,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/q_14_pgtype_timestamptz_override_test.go",
+      "test_mtime": "2026-05-24T21:33:08+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.q15PgtypeTimestampOverride",
@@ -21360,7 +21449,10 @@
       "start_line": 14,
       "end_line": 33,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/q_15_pgtype_timestamp_override_test.go",
+      "test_mtime": "2026-05-24T21:33:15+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.q16PgtypeDateOverride",
@@ -21369,7 +21461,10 @@
       "start_line": 14,
       "end_line": 33,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/q_16_pgtype_date_override_test.go",
+      "test_mtime": "2026-05-24T21:33:22+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.q17PgtypeInetOverride",
@@ -21378,7 +21473,10 @@
       "start_line": 14,
       "end_line": 34,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/q_17_pgtype_inet_override_test.go",
+      "test_mtime": "2026-05-24T21:33:30+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.q18PgtypeIntervalOverride",
@@ -21387,7 +21485,10 @@
       "start_line": 15,
       "end_line": 34,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/q_18_pgtype_interval_override_test.go",
+      "test_mtime": "2026-05-24T21:33:36+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.readQueryBody",
@@ -21396,7 +21497,10 @@
       "start_line": 16,
       "end_line": 36,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/read_query_body_test.go",
+      "test_mtime": "2026-05-24T21:34:39+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.readQueryBodyStep",
@@ -21405,7 +21509,10 @@
       "start_line": 14,
       "end_line": 37,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/read_query_body_step_test.go",
+      "test_mtime": "2026-05-24T21:35:14+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.registerQueryBodyEscapes",
@@ -21414,7 +21521,10 @@
       "start_line": 16,
       "end_line": 23,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/register_query_body_escapes_test.go",
+      "test_mtime": "2026-05-24T21:35:44+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.Run",
@@ -21423,7 +21533,10 @@
       "start_line": 14,
       "end_line": 34,
       "exported": true,
-      "status": "todo"
+      "test_file": "pkg/validate/query/run_test.go",
+      "test_mtime": "2026-05-24T21:36:35+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query.scanOverridesFor",
@@ -21432,7 +21545,10 @@
       "start_line": 12,
       "end_line": 26,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query/scan_overrides_for_test.go",
+      "test_mtime": "2026-05-24T21:37:25+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query_rego.buildAdvice",
@@ -21441,7 +21557,10 @@
       "start_line": 10,
       "end_line": 23,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query_rego/build_advice_test.go",
+      "test_mtime": "2026-05-24T21:38:01+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query_rego.checkOwnershipMapping",
@@ -21450,7 +21569,10 @@
       "start_line": 18,
       "end_line": 41,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query_rego/check_ownership_mapping_test.go",
+      "test_mtime": "2026-05-24T21:39:06+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query_rego.ownerLookupName",
@@ -21459,7 +21581,10 @@
       "start_line": 12,
       "end_line": 26,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query_rego/owner_lookup_name_test.go",
+      "test_mtime": "2026-05-24T21:39:28+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query_rego.Run",
@@ -21468,7 +21593,10 @@
       "start_line": 11,
       "end_line": 15,
       "exported": true,
-      "status": "todo"
+      "test_file": "pkg/validate/query_rego/run_test.go",
+      "test_mtime": "2026-05-24T21:39:54+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/query_rego.xqp30OwnerLookupQuery",
@@ -21477,7 +21605,10 @@
       "start_line": 14,
       "end_line": 32,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/query_rego/xqp_30_owner_lookup_query_test.go",
+      "test_mtime": "2026-05-24T21:40:37+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/rego.p01Parse",
@@ -21486,7 +21617,11 @@
       "start_line": 16,
       "end_line": 27,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/rego/p_01_parse_test.go",
+      "test_mtime": "2026-05-24T21:41:52+09:00",
+      "status": "pass",
+      "coverage_pct": 100,
+      "attempt": 1
     },
     {
       "qualified_name": "pkg/validate/rego.Run",
@@ -21495,7 +21630,10 @@
       "start_line": 11,
       "end_line": 16,
       "exported": true,
-      "status": "todo"
+      "test_file": "pkg/validate/rego/run_test.go",
+      "test_mtime": "2026-05-24T21:42:21+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/rego.usesResourceOwner",
@@ -21504,7 +21642,10 @@
       "start_line": 8,
       "end_line": 15,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/rego/uses_resource_owner_test.go",
+      "test_mtime": "2026-05-24T21:42:42+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/rego.xpp30OwnershipNoAnnotation",
@@ -21513,7 +21654,10 @@
       "start_line": 13,
       "end_line": 30,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/rego/xpp_30_ownership_no_annotation_test.go",
+      "test_mtime": "2026-05-24T21:43:23+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/rego_manifest.Run",
@@ -21522,7 +21666,10 @@
       "start_line": 11,
       "end_line": 18,
       "exported": true,
-      "status": "todo"
+      "test_file": "pkg/validate/rego_manifest/run_test.go",
+      "test_mtime": "2026-05-24T21:43:52+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/rego_manifest.xnp53InputClaimsValues",
@@ -21531,7 +21678,11 @@
       "start_line": 16,
       "end_line": 51,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/rego_manifest/xnp_53_input_claims_values_test.go",
+      "test_mtime": "2026-05-24T21:45:42+09:00",
+      "status": "pass",
+      "coverage_pct": 100,
+      "attempt": 1
     },
     {
       "qualified_name": "pkg/validate/rego_manifest.xnp63RoleManifest",
@@ -21540,7 +21691,10 @@
       "start_line": 15,
       "end_line": 63,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/rego_manifest/xnp_63_role_manifest_test.go",
+      "test_mtime": "2026-05-24T21:46:55+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/rego_manifest.xpn54ClaimsToRego",
@@ -21549,7 +21703,11 @@
       "start_line": 19,
       "end_line": 64,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/rego_manifest/xpn_54_claims_to_rego_test.go",
+      "test_mtime": "2026-05-24T21:48:16+09:00",
+      "status": "pass",
+      "coverage_pct": 100,
+      "attempt": 1
     },
     {
       "qualified_name": "pkg/validate/rego_manifest.xpn64RolesToRego",
@@ -21558,7 +21716,10 @@
       "start_line": 16,
       "end_line": 50,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/rego_manifest/xpn_64_roles_to_rego_test.go",
+      "test_mtime": "2026-05-24T21:49:05+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate.Report.HasFailure",
@@ -21567,7 +21728,10 @@
       "start_line": 6,
       "end_line": 13,
       "exported": true,
-      "status": "todo"
+      "test_file": "pkg/validate/report_has_failure_test.go",
+      "test_mtime": "2026-05-24T21:50:00+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.containsField",
@@ -21576,7 +21740,10 @@
       "start_line": 7,
       "end_line": 14,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/contains_field_test.go",
+      "test_mtime": "2026-05-24T21:51:12+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.crudType",
@@ -21585,7 +21752,10 @@
       "start_line": 11,
       "end_line": 17,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/crud_type_test.go",
+      "test_mtime": "2026-05-24T21:51:42+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.declaredVars",
@@ -21594,7 +21764,10 @@
       "start_line": 13,
       "end_line": 25,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/declared_vars_test.go",
+      "test_mtime": "2026-05-24T21:52:58+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.extractMethod",
@@ -21603,7 +21776,10 @@
       "start_line": 13,
       "end_line": 18,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/extract_method_test.go",
+      "test_mtime": "2026-05-24T21:53:31+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.extractModel",
@@ -21612,7 +21788,10 @@
       "start_line": 13,
       "end_line": 18,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/extract_model_test.go",
+      "test_mtime": "2026-05-24T21:54:06+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.hasEmptyGuardAfter",
@@ -21621,7 +21800,10 @@
       "start_line": 14,
       "end_line": 21,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/has_empty_guard_after_test.go",
+      "test_mtime": "2026-05-24T21:54:33+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.hasFKRef",
@@ -21630,7 +21812,11 @@
       "start_line": 14,
       "end_line": 34,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/has_fk_ref_test.go",
+      "test_mtime": "2026-05-24T21:56:13+09:00",
+      "status": "pass",
+      "coverage_pct": 100,
+      "attempt": 1
     },
     {
       "qualified_name": "pkg/validate/ssac.hasPaginationKey",
@@ -21639,7 +21825,10 @@
       "start_line": 7,
       "end_line": 14,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/has_pagination_key_test.go",
+      "test_mtime": "2026-05-24T21:57:05+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.inputValueRefBase",
@@ -21648,7 +21837,10 @@
       "start_line": 14,
       "end_line": 22,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/input_value_ref_base_test.go",
+      "test_mtime": "2026-05-24T21:57:33+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.isBoolPredicateSignature",
@@ -21657,7 +21849,10 @@
       "start_line": 10,
       "end_line": 12,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/is_bool_predicate_signature_test.go",
+      "test_mtime": "2026-05-24T21:58:08+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.isImplicitVar",
@@ -21666,7 +21861,10 @@
       "start_line": 11,
       "end_line": 17,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/is_implicit_var_test.go",
+      "test_mtime": "2026-05-24T21:58:25+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.isModelType",
@@ -21675,7 +21873,10 @@
       "start_line": 16,
       "end_line": 32,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/is_model_type_test.go",
+      "test_mtime": "2026-05-24T21:59:33+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.joinTypes",
@@ -21684,7 +21885,10 @@
       "start_line": 8,
       "end_line": 17,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/join_types_test.go",
+      "test_mtime": "2026-05-24T22:00:04+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.lcFirstEval",
@@ -21693,7 +21897,10 @@
       "start_line": 9,
       "end_line": 18,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/lc_first_eval_test.go",
+      "test_mtime": "2026-05-24T22:00:36+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.lookupEvalSpec",
@@ -25064,8 +25271,8 @@
   ],
   "summary": {
     "total": 2699,
-    "pass": 241,
+    "pass": 308,
     "done": 5,
-    "todo": 2453
+    "todo": 2386
   }
 }

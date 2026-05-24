@@ -1,0 +1,34 @@
+//ff:func feature=validate type=test control=iteration dimension=1 topic=query-structural
+//ff:what isUUIDColumn — UUID 타입 판정 (매칭/비매칭/대소문자/배열) 검증
+
+package query
+
+import (
+	"testing"
+
+	"github.com/park-jun-woo/yongol/pkg/parser/ddl"
+)
+
+func TestIsUUIDColumn(t *testing.T) {
+	cases := []struct {
+		name    string
+		rawType string
+		want    bool
+	}{
+		{name: "UUID", rawType: "UUID", want: true},
+		{name: "uuid_lower", rawType: "uuid", want: true},
+		{name: "uuid_array", rawType: "UUID[]", want: true},
+		{name: "not_uuid_bigint", rawType: "BIGINT", want: false},
+		{name: "not_uuid_text", rawType: "TEXT", want: false},
+		{name: "empty", rawType: "", want: false},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			col := ddl.Column{RawType: c.rawType}
+			got := isUUIDColumn(col)
+			if got != c.want {
+				t.Errorf("isUUIDColumn(%q) = %v, want %v", c.rawType, got, c.want)
+			}
+		})
+	}
+}
