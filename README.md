@@ -4,7 +4,7 @@
   <img src="yongol.webp" alt="yongol — the keel of your AI-coded SaaS" width="480">
 </p>
 
-[![Version](https://img.shields.io/badge/version-v0.6.8-blue.svg)](https://github.com/park-jun-woo/yongol/releases)
+[![Version](https://img.shields.io/badge/version-v0.6.9-blue.svg)](https://github.com/park-jun-woo/yongol/releases)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![skills.sh](https://skills.sh/b/park-jun-woo/yongol)](https://skills.sh/park-jun-woo/yongol)
 
@@ -410,7 +410,7 @@ Individual tools (SSaC, STML) validate their own layer. yongol catches inconsist
 - **Policy ↔ SSaC** — `@auth` (action, resource) pairs match Rego allow rules
 - **Policy ↔ DDL** — `@ownership` table/column references exist
 - **Policy ↔ States** — state transitions with `@auth` have Rego rules
-- **Hurl ↔ OpenAPI** — URL/method/status/request+response fields (XOH-01~04, XOH-08~09)
+- **Hurl ↔ OpenAPI** — URL/method/status/request+response fields (XOH-01~04, XOH-08~09), status code coverage (XOH-12), SSaC guard error path + happy path coverage (XOH-13)
 - **Hurl ↔ State Machine** — call order vs declared transitions (XOH-05)
 - **Hurl ↔ Manifest** — auth precondition + CSRF headers (XOH-06~07)
 - **Queue** — `@publish` topics match `@subscribe` functions, payload fields agree

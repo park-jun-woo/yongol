@@ -579,7 +579,8 @@ Standard Hurl — [`docs/scenario.md`](docs/scenario.md). yongol adds no DSL.
   status (XOH-02, ERROR), request body field (XOH-03, ERROR), assert
   jsonpath (XOH-04, ERROR), state order (XOH-05, WARNING), auth
   precondition (XOH-06, WARNING), CSRF on mutation (XOH-07, WARNING),
-  capture jsonpath (XOH-08, ERROR), unused capture (XOH-09, WARNING).
+  capture jsonpath (XOH-08, ERROR), unused capture (XOH-09, WARNING),
+  status code coverage (XOH-12, WARNING), SSaC guard+happy path coverage (XOH-13, WARNING).
 
 ### Authoring quick-start
 

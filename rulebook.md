@@ -444,6 +444,8 @@ All Hurl files under `specs/tests/` are user-authored. yongol does not emit any 
 | XOH-09 | WARNING | Hurl captured variable is referenced later in the file | `pkg/validate/hurl_openapi/xoh_09_unused_capture.go` |
 | XOH-10 | ERROR | smoke.hurl is required in specs/tests/ | `pkg/validate/hurl_openapi/xoh_10_smoke_required.go` |
 | XOH-11 | ERROR | smoke.hurl must cover all OpenAPI operationIds | `pkg/validate/hurl_openapi/xoh_11_smoke_coverage.go` |
+| XOH-12 | WARNING | OpenAPI declared status codes covered by hurl tests (5xx excluded) | `pkg/validate/hurl_openapi/xoh_12_status_coverage.go` |
+| XOH-13 | WARNING | SSaC guard ErrStatus + @response happy path covered by hurl tests | `pkg/validate/hurl_openapi/xoh_13_guard_coverage.go` |
 
 ## R3. Hurl ↔ State Machine
 
