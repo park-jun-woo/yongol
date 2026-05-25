@@ -15,11 +15,11 @@ import (
 // the earlier global r.Use(BearerAuth) pattern so per-op security opt-out
 // (OpenAPI `security: []`) is honored.
 //
-// Application-layer rate limiting was retired in favour of CDN/WAF/Gateway
-// enforcement (see plans/deprecated/Phase006-DeprecateAppLayerRateLimit.md).
-// Phase009 also removed the /auth/refresh hardcoded FixedRateLimit guard
-// when the route itself moved onto openapi+SSaC; a rate-limit heuristic on
-// auth endpoints remains as an Open Question.
+// Generic application-layer rate limiting was retired in favour of
+// CDN/WAF/Gateway enforcement (see plans/deprecated/Phase006).
+// Phase003 (BUG-089) re-introduced auth-scoped rate limiting: manifest
+// backend.rate_limit is mandatory when backend.auth exists, and codegen
+// wires RouteRateLimit middleware via blockRateLimit.
 func blockRegisterHandlers(fs *yongol.Fullstack, modulePath string) MainBlock {
 	imports := []string{fmt.Sprintf(`"%s/internal/api"`, modulePath)}
 	var lines []string

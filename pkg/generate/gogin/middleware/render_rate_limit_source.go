@@ -7,7 +7,9 @@ package middleware
 // the rate-limit middleware split into 1-file-1-func.
 func renderRateLimitSources() map[string]string {
 	return map[string]string{
-		"fixed_rate_limit.go":     rateLimitFixedSource,
-		"fixed_rate_limit_key.go": rateLimitKeySource,
+		"fixed_rate_limit.go":      rateLimitFixedSource,
+		"fixed_rate_limit_key.go":  rateLimitKeySource,
+		"route_rate_limit.go":      routeRateLimitSource,
+		"route_rate_limit_key.go":  routeRateLimitKeySource,
 	}
 }

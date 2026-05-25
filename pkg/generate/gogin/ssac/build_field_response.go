@@ -6,6 +6,9 @@ package ssac
 import (
 	"fmt"
 	"sort"
+	"strings"
+
+	"github.com/park-jun-woo/yongol/pkg/parser/manifest"
 )
 
 // buildFieldResponse generates typed response with db→api conversion.
@@ -31,6 +34,22 @@ func (g *methodGen) buildFieldResponse(fields map[string]string) ([]string, []st
 	mapped := make(map[string]string, len(fields))
 	for k, v := range fields {
 		mapped[k] = g.mapValue(v)
+	}
+
+	// Phase002-ManifestRef: resolve manifest.* references to Go literals.
+	// "manifest.auth.accessTokenTTL" → "900" (int64 seconds from "15m").
+	// mapValue does not touch manifest.* because its prefix is not "request",
+	// so the original SSaC value is preserved in mapped[k]. We resolve here
+	// and replace with the Go literal so downstream rendering treats it as
+	// a numeric literal (isLiteral → true, isIntegerLiteralStr → true).
+	for k, v := range fields {
+		if !strings.HasPrefix(v, "manifest.") {
+			continue
+		}
+		refPath := strings.TrimPrefix(v, "manifest.")
+		if rv, ok := manifest.ResolveRef(g.Manifest, refPath); ok {
+			mapped[k] = rv.GoLit
+		}
 	}
 
 	keys := make([]string, 0, len(fields))

@@ -31,5 +31,6 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	diags = append(diags, xsa75CacheBackendUnused(fs)...)
 	diags = append(diags, xsa76FileBackendUnused(fs)...)
 	diags = append(diags, xsa77QueueBackendUnused(fs)...)
+	diags = append(diags, xns80ManifestRef(fs)...)
 	return diags
 }

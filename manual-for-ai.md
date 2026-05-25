@@ -326,6 +326,12 @@ Append `!` to suppress WARNINGs (`@delete!`, `@response!`).
 
 // Wrong: @response <varName> when OpenAPI 200 schema has properties
 // → XOS-69 "binds 0 fields". Use braces instead.
+
+// manifest.* reference — reads a manifest.yaml value at codegen time.
+// Duration values are converted to seconds (int64).
+@response { access_token: token.AccessToken, expires_in: manifest.auth.accessTokenTTL }
+// Supported paths: manifest.auth.accessTokenTTL, manifest.auth.refreshTokenTTL
+// Validated by XNS-80.
 ```
 
 Function-level annotations (placed above `func`): `// @no-pagination` exempts

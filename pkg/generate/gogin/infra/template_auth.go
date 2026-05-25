@@ -73,8 +73,8 @@ func (s *postgresRefreshStore) Create(ctx context.Context, token string, claims 
 `
 
 // authWrapperConsumeTemplate emits postgres_consume.go.
-// %[1]s = modulePath, %[2]s = FindByHashPort, %[3]s = RevokePort.
-var authWrapperConsumeTemplate = authWrapperMethodHeader("Consume", "postgresRefreshStore — Consume: one-time-use rotation (SELECT+UPDATE)") + `
+// %[1]s = modulePath, %[2]s = ConsumePort, %[3]s = CheckReusePort.
+var authWrapperConsumeTemplate = authWrapperMethodHeader("Consume", "postgresRefreshStore — Consume: atomic one-time-use rotation (CTE)") + `
 
 package auth
 
@@ -82,33 +82,32 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/park-jun-woo/ssac/pkg/auth"
 )
 
-// Consume implements one-time-use rotation as a SELECT+UPDATE pair.
+// Consume atomically revokes a refresh token and returns its claims.
+// A single CTE UPDATE … RETURNING ensures no race between read and write.
 // interface.yaml ports: %[2]s, %[3]s.
 func (s *postgresRefreshStore) Consume(ctx context.Context, token string) (json.RawMessage, error) {
 	hash := auth.HashRefreshToken(token)
-	row, err := s.q.%[2]s(ctx, hash)
-	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, auth.ErrRefreshTokenNotFound
-		}
+
+	// Atomic consume: UPDATE + RETURNING in a single CTE.
+	claims, err := s.q.%[2]s(ctx, hash)
+	if err == nil {
+		return claims, nil
+	}
+	if !errors.Is(err, pgx.ErrNoRows) {
 		return nil, err
 	}
-	if row.RevokedAt.Valid {
-		return row.Claims, auth.ErrRefreshTokenReused
+
+	// ErrNoRows: distinguish "not found" from "already consumed" (reuse).
+	reusedClaims, reuseErr := s.q.%[3]s(ctx, hash)
+	if reuseErr == nil {
+		return reusedClaims, auth.ErrRefreshTokenReused
 	}
-	if row.ExpiresAt.Valid && time.Now().After(row.ExpiresAt.Time) {
-		return nil, auth.ErrRefreshTokenNotFound
-	}
-	if err := s.q.%[3]s(ctx, hash); err != nil {
-		return nil, err
-	}
-	return row.Claims, nil
+	return nil, auth.ErrRefreshTokenNotFound
 }
 `
 

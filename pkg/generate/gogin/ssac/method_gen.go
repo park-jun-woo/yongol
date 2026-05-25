@@ -6,6 +6,7 @@ package ssac
 import (
 	"github.com/park-jun-woo/yongol/pkg/parser/ddl"
 	"github.com/park-jun-woo/yongol/pkg/parser/funcspec"
+	"github.com/park-jun-woo/yongol/pkg/parser/manifest"
 	"github.com/park-jun-woo/yongol/pkg/parser/rego"
 	sqlcparser "github.com/park-jun-woo/yongol/pkg/parser/sqlc"
 )
@@ -116,4 +117,9 @@ type methodGen struct {
 	// set to choose between Ptr and non-Ptr pgtypex bridge variants
 	// (BUG-072 Pattern 2).
 	BodyRequiredFields map[string]bool
+	// Manifest holds the parsed manifest.yaml project config. Used by
+	// buildFieldResponse to resolve manifest.* references in @response
+	// fields to Go literals (Phase002-ManifestRef). Nil when manifest is
+	// absent — callers must nil-guard before use.
+	Manifest *manifest.ProjectConfig
 }

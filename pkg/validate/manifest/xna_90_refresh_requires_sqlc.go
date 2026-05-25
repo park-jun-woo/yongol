@@ -17,8 +17,8 @@ import (
 // Required entities (from ssac/pkg/auth/interface.yaml):
 //
 //   - DDL table: refresh_tokens
-//   - sqlc queries: RefreshTokenInsert / RefreshTokenFindByHash /
-//     RefreshTokenRevoke / RefreshTokenRevokeAll
+//   - sqlc queries: RefreshTokenInsert / RefreshTokenConsume /
+//     RefreshTokenCheckReuse / RefreshTokenRevoke / RefreshTokenRevokeAll
 //
 // LoginLookup is also declared in interface.yaml but is NOT enforced by
 // this rule — it is a user-facing port that lives alongside the user's
@@ -39,7 +39,8 @@ func xna90RefreshRequiresSQLC(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		RequireDDL: "refresh_tokens",
 		RequireQueries: []string{
 			"RefreshTokenInsert",
-			"RefreshTokenFindByHash",
+			"RefreshTokenConsume",
+			"RefreshTokenCheckReuse",
 			"RefreshTokenRevoke",
 			"RefreshTokenRevokeAll",
 		},

@@ -10,6 +10,7 @@ import (
 
 	"github.com/park-jun-woo/yongol/pkg/parser/ddl"
 	"github.com/park-jun-woo/yongol/pkg/parser/funcspec"
+	"github.com/park-jun-woo/yongol/pkg/parser/manifest"
 	"github.com/park-jun-woo/yongol/pkg/parser/rego"
 	sqlcparser "github.com/park-jun-woo/yongol/pkg/parser/sqlc"
 	ssacparser "github.com/park-jun-woo/yongol/pkg/parser/ssac"
@@ -26,7 +27,7 @@ import (
 // flattens them into a `DiagramID → Symbol` lookup so build_state can
 // emit `statemachine.<Symbol>CanTransition(...)` even when the source
 // .md file was authored in lowercase (BUG-002).
-func newMethodGen(doc *openapi3.T, sf ssacparser.ServiceFunc, modulePath string, useTx bool, projectFuncs, builtinFuncs []funcspec.FuncSpec, wrapCalls bool, diagrams []*statemachine.StateDiagram, ownerships []rego.OwnershipMapping, ddlTables []ddl.Table, sqlcQueries []sqlcparser.QuerySpec) *methodGen {
+func newMethodGen(doc *openapi3.T, sf ssacparser.ServiceFunc, modulePath string, useTx bool, projectFuncs, builtinFuncs []funcspec.FuncSpec, wrapCalls bool, diagrams []*statemachine.StateDiagram, ownerships []rego.OwnershipMapping, ddlTables []ddl.Table, sqlcQueries []sqlcparser.QuerySpec, mf *manifest.ProjectConfig) *methodGen {
 	symbols := make(map[string]string, len(diagrams))
 	for _, d := range diagrams {
 		if d == nil {
@@ -71,6 +72,7 @@ func newMethodGen(doc *openapi3.T, sf ssacparser.ServiceFunc, modulePath string,
 		SQLcQueries:   sqlcQueries,
 		DeclaredVars:       make(map[string]bool),
 		BodyRequiredFields: make(map[string]bool),
+		Manifest:           mf,
 	}
 	if doc != nil {
 		g.extractFromOpenAPI(doc, sf.Name)

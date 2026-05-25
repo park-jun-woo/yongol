@@ -19,5 +19,5 @@ import "github.com/park-jun-woo/yongol/pkg/ssacmeta"
 //   - []byte → string  (UTF-8 cast on Get-family)
 //   - ttl → expires_at (time.Now().Add on Set-family)
 //   - pgx.Tx assert    (queue.PublishTx)
-//   - SELECT+UPDATE    (auth.RefreshStore.Consume is not a single query)
+//   - CTE consume      (auth.RefreshStore.Consume + CheckReuse)
 type packageEmitter func(iface *ssacmeta.PackageInterface, active []ssacmeta.Port, modulePath, artifactsDir string) error

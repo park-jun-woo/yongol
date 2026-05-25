@@ -16,11 +16,12 @@ import (
 // with one file per method (filefunc F3) plus the type + constructor file.
 func emitAuthWrapper(iface *ssacmeta.PackageInterface, active []ssacmeta.Port, modulePath, artifactsDir string) error {
 	insertPort := portByName(active, "RefreshTokenInsert")
-	findPort := portByName(active, "RefreshTokenFindByHash")
+	consumePort := portByName(active, "RefreshTokenConsume")
+	checkReusePort := portByName(active, "RefreshTokenCheckReuse")
 	revokePort := portByName(active, "RefreshTokenRevoke")
 	revokeAllPort := portByName(active, "RefreshTokenRevokeAll")
-	if insertPort == nil || findPort == nil || revokePort == nil || revokeAllPort == nil {
-		return fmt.Errorf("auth: interface.yaml missing one of RefreshTokenInsert/FindByHash/Revoke/RevokeAll (active ports: %d)", len(active))
+	if insertPort == nil || consumePort == nil || checkReusePort == nil || revokePort == nil || revokeAllPort == nil {
+		return fmt.Errorf("auth: interface.yaml missing one of RefreshTokenInsert/Consume/CheckReuse/Revoke/RevokeAll (active ports: %d)", len(active))
 	}
 
 	dir := filepath.Join(artifactsDir, "backend", "internal", "infra", iface.Package)
@@ -32,7 +33,7 @@ func emitAuthWrapper(iface *ssacmeta.PackageInterface, active []ssacmeta.Port, m
 		"postgres.go":            fmt.Sprintf(authWrapperTypeTemplate, modulePath),
 		"postgres_new.go":        fmt.Sprintf(authWrapperNewPostgresTemplate, modulePath),
 		"postgres_create.go":     fmt.Sprintf(authWrapperCreateTemplate, modulePath, insertPort.Name),
-		"postgres_consume.go":    fmt.Sprintf(authWrapperConsumeTemplate, modulePath, findPort.Name, revokePort.Name),
+		"postgres_consume.go":    fmt.Sprintf(authWrapperConsumeTemplate, modulePath, consumePort.Name, checkReusePort.Name),
 		"postgres_revoke.go":     fmt.Sprintf(authWrapperRevokeTemplate, modulePath, revokePort.Name),
 		"postgres_revoke_all.go": fmt.Sprintf(authWrapperRevokeAllTemplate, modulePath, revokeAllPort.Name),
 	}

@@ -150,6 +150,8 @@ SSaC self-consistency — required fields, variable flow, model references, @sub
 | C-4 | ERROR | `metadata.name` is required (empty value forbidden) | `pkg/validate/manifest/c_04_metadata_name.go` |
 | C-5 | ERROR | `backend.module` is required (empty value forbidden) | `pkg/validate/manifest/c_05_backend_module.go` |
 | C-6 | ERROR | `backend.auth` is required — yongol does not support auth-free backends (use a static site generator + CDN for public dynamic content) | `pkg/validate/manifest/c_06_backend_auth_required.go` |
+| C-7 | ERROR | `backend.auth` requires `backend.rate_limit` — brute-force defense is mandatory | `pkg/validate/manifest/c_07_auth_requires_rate_limit.go` |
+| C-8 | ERROR | `backend.rate_limit` requires a `Login` entry (primary brute-force target) | `pkg/validate/manifest/c_08_rate_limit_login_required.go` |
 | CORS-01 | ERROR | `allow_origins=["*"]` combined with `allow_credentials=true` is forbidden | `pkg/validate/manifest/cors_01_wildcard_credentials.go` |
 | OBS-001 | ERROR | `backend.observability.metrics.path` must be an absolute path starting with `/` | `pkg/validate/manifest/obs_01_metrics_path.go` |
 | OBS-002 | ERROR | `backend.observability.metrics.path` must not collide with an OpenAPI path | `pkg/validate/manifest/obs_02_metrics_path_not_openapi.go` |
@@ -333,6 +335,7 @@ Cross-consistency between SSaC `currentUser` / `@publish` / `@subscribe` / JWT `
 | XNS-56 | ERROR | Use of `@publish`/`@subscribe` requires `queue.backend` configuration in manifest | `pkg/validate/ssac_manifest/xns_56_queue_required.go` |
 | XNS-57 | WARNING | `queue.backend: memory` combined with `@publish` attached to `@post/@put/@delete` (tx-bound publish) — the memory backend does not support `PublishTx`, causing runtime failure | `pkg/validate/ssac_manifest/xns_57_memory_tx_publish.go` |
 | XNS-73 | ERROR | JWT `@call` input field must exist in manifest claims fields | `pkg/validate/ssac_manifest/xns_73_jwt_call_claims.go` |
+| XNS-80 | ERROR | `@response` field `manifest.*` reference must resolve to an existing manifest.yaml value | `pkg/validate/ssac_manifest/xns_80_manifest_ref.go` |
 | XSA-70 | ERROR | SSaC uses `session.*` built-ins but `manifest.session.backend` is not declared | `pkg/validate/ssac_manifest/xsa_70_session_backend_required.go` |
 | XSA-71 | ERROR | SSaC uses `cache.*` built-ins but `manifest.cache.backend` is not declared | `pkg/validate/ssac_manifest/xsa_71_cache_backend_required.go` |
 | XSA-72 | ERROR | SSaC uses `file.*` / `storage.*` built-ins but `manifest.file.backend` is not declared | `pkg/validate/ssac_manifest/xsa_72_file_backend_required.go` |
@@ -669,7 +672,7 @@ Rules that have already been removed from the code or are scheduled for removal.
 | M-1 | `model/` directory and `*.go` files exist | `model/` SSOT and `@dto` fully retired — the sqlc-synthesized row type takes over the model role. |
 | M-2 | `model/*.go` struct type matches either a `@dto` or a DDL table | Same as above. |
 | XNS-77 | manifest `auth.claims` present but no `auth.IssueToken` call in SSaC (WARNING) | A missing login is rarely a true positive and produces false positives in verifier-only microservices. It surfaces immediately on the first runtime login attempt, so the static check has little value. |
-| SEC-03 | The `<key>` of `backend.rate_limit.endpoints.<key>` must exist as an OpenAPI operationId (ERROR) | Application-layer rate_limit retired altogether — responsibility shifted to the CDN/WAF/Gateway layer. Only the hardcoded `FixedRateLimit` guard (/auth/refresh) is kept. |
+| SEC-03 | The `<key>` of `backend.rate_limit.endpoints.<key>` must exist as an OpenAPI operationId (ERROR) | Original application-layer rate_limit retired. Replaced by C-7/C-8 (auth-scoped rate_limit mandatory) + codegen `RouteRateLimit` wiring (Phase003). |
 | XOH-35 | Hurl path → OpenAPI path exists | Merged into XOH-01 on 2026-04-24 (hurl_openapi re-org); path + method are judged together. |
 | XOH-36 | Hurl method → OpenAPI method exists | Merged into XOH-01 on 2026-04-24 — a single diagnostic covers both path and method. |
 | XOH-37 | Hurl status code → OpenAPI responses | Moved to XOH-02 on 2026-04-24 and upgraded from WARNING to ERROR. |
