@@ -67,6 +67,8 @@ The skill loads the manual automatically. No need to read files manually.
 
 ### Option 2: Clone the repo
 
+Requires **Go 1.25+** and **gcc** (cgo dependency: `pg_query_go` links `libpg_query` for DDL parsing).
+
 ```bash
 git clone https://github.com/park-jun-woo/yongol.git
 cd yongol && make install
