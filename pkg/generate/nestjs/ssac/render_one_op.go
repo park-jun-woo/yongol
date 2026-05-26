@@ -1,0 +1,42 @@
+//ff:func feature=gen-nestjs type=util control=selection
+//ff:what renderOneOp — 단일 Op → TypeScript 문장 렌더링 (OpKind 분기)
+
+package ssac
+
+import (
+	"strings"
+
+	"github.com/park-jun-woo/yongol/pkg/generate/ir"
+)
+
+// renderOneOp dispatches rendering for a single Op to the type-specific renderer.
+func renderOneOp(b *strings.Builder, op ir.Op, indent, prismaRef string) {
+	switch op.Kind {
+	case ir.OpGet:
+		renderGetOp(b, op.Get, indent, prismaRef)
+	case ir.OpPost:
+		renderPostOp(b, op.Post, indent, prismaRef)
+	case ir.OpPut:
+		renderPutOp(b, op.Put, indent, prismaRef)
+	case ir.OpDelete:
+		renderDeleteOp(b, op.Delete, indent, prismaRef)
+	case ir.OpEmpty:
+		renderEmptyOp(b, op.Empty, indent)
+	case ir.OpExists:
+		renderExistsOp(b, op.Exists, indent)
+	case ir.OpAuth:
+		renderAuthOp(b, op.Auth, indent)
+	case ir.OpState:
+		renderStateOp(b, op.State, indent)
+	case ir.OpCall:
+		renderCallOp(b, op.Call, indent)
+	case ir.OpEval:
+		renderEvalOp(b, op.Eval, indent)
+	case ir.OpPublish:
+		renderPublishOp(b, op.Publish, indent)
+	case ir.OpVerifyPassword:
+		renderVerifyPasswordOp(b, op.VerifyPW, indent, prismaRef)
+	case ir.OpResponse:
+		renderResponseOp(b, op.Response, indent)
+	}
+}
