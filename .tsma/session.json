@@ -2,7 +2,7 @@
   "project": "/home/parkjunwoo/.clari/repos/fullend/yongol",
   "lang": "go",
   "checked_at": "2026-05-19T10:43:43.507969379+09:00",
-  "current_index": 2325,
+  "current_index": 2414,
   "functions": [
     {
       "qualified_name": "cmd/yongol.chainCmd",
@@ -21909,7 +21909,10 @@
       "start_line": 13,
       "end_line": 30,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/lookup_eval_spec_test.go",
+      "test_mtime": "2026-05-27T01:22:56+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.missingRequestField",
@@ -21918,7 +21921,10 @@
       "start_line": 15,
       "end_line": 24,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/missing_request_field_test.go",
+      "test_mtime": "2026-05-27T01:23:27+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.parseDottedValue",
@@ -21927,7 +21933,10 @@
       "start_line": 8,
       "end_line": 15,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/parse_dotted_value_test.go",
+      "test_mtime": "2026-05-27T01:23:46+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.Run",
@@ -21936,7 +21945,10 @@
       "start_line": 11,
       "end_line": 85,
       "exported": true,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/run_test.go",
+      "test_mtime": "2026-05-27T01:24:30+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s62prefix",
@@ -21945,7 +21957,10 @@
       "start_line": 11,
       "end_line": 16,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s62_prefix_test.go",
+      "test_mtime": "2026-05-27T01:24:48+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s62unusedInSubsequent",
@@ -21954,7 +21969,10 @@
       "start_line": 12,
       "end_line": 29,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s62_unused_in_subsequent_test.go",
+      "test_mtime": "2026-05-27T01:25:07+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s01GetModel",
@@ -21963,7 +21981,10 @@
       "start_line": 12,
       "end_line": 32,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_01_get_model_test.go",
+      "test_mtime": "2026-05-27T01:26:20+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s02GetResult",
@@ -21972,7 +21993,11 @@
       "start_line": 12,
       "end_line": 32,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_02_get_result_test.go",
+      "test_mtime": "2026-05-27T01:29:29+09:00",
+      "status": "pass",
+      "coverage_pct": 100,
+      "attempt": 1
     },
     {
       "qualified_name": "pkg/validate/ssac.s03PostModel",
@@ -21981,7 +22006,11 @@
       "start_line": 12,
       "end_line": 32,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_03_post_model_test.go",
+      "test_mtime": "2026-05-27T01:29:55+09:00",
+      "status": "pass",
+      "coverage_pct": 100,
+      "attempt": 1
     },
     {
       "qualified_name": "pkg/validate/ssac.s04PostResult",
@@ -21990,7 +22019,10 @@
       "start_line": 12,
       "end_line": 32,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_04_post_result_test.go",
+      "test_mtime": "2026-05-27T01:30:00+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s05PostInputs",
@@ -21999,7 +22031,10 @@
       "start_line": 12,
       "end_line": 32,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_05_post_inputs_test.go",
+      "test_mtime": "2026-05-27T01:30:04+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s06PutModel",
@@ -22008,7 +22043,10 @@
       "start_line": 12,
       "end_line": 32,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_06_put_model_test.go",
+      "test_mtime": "2026-05-27T01:30:09+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s07PutResult",
@@ -22017,7 +22055,10 @@
       "start_line": 12,
       "end_line": 32,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_07_put_result_test.go",
+      "test_mtime": "2026-05-27T01:30:14+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s08PutInputs",
@@ -22026,7 +22067,10 @@
       "start_line": 12,
       "end_line": 32,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_08_put_inputs_test.go",
+      "test_mtime": "2026-05-27T01:30:19+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s09DeleteModel",
@@ -22035,7 +22079,10 @@
       "start_line": 12,
       "end_line": 32,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_09_delete_model_test.go",
+      "test_mtime": "2026-05-27T01:30:23+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s10DeleteResult",
@@ -22044,7 +22091,10 @@
       "start_line": 12,
       "end_line": 32,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_10_delete_result_test.go",
+      "test_mtime": "2026-05-27T01:30:28+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s11DeleteNoInputs",
@@ -22053,7 +22103,11 @@
       "start_line": 12,
       "end_line": 36,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_11_delete_no_inputs_test.go",
+      "test_mtime": "2026-05-27T01:31:40+09:00",
+      "status": "pass",
+      "coverage_pct": 100,
+      "attempt": 1
     },
     {
       "qualified_name": "pkg/validate/ssac.s12EmptyTarget",
@@ -22062,7 +22116,10 @@
       "start_line": 12,
       "end_line": 32,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_12_empty_target_test.go",
+      "test_mtime": "2026-05-27T01:30:37+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s13EmptyMessage",
@@ -22071,7 +22128,10 @@
       "start_line": 12,
       "end_line": 32,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_13_empty_message_test.go",
+      "test_mtime": "2026-05-27T01:30:42+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s14StateDiagramID",
@@ -22080,7 +22140,10 @@
       "start_line": 12,
       "end_line": 32,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_14_state_diagram_id_test.go",
+      "test_mtime": "2026-05-27T01:30:46+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s15StateInputs",
@@ -22089,7 +22152,10 @@
       "start_line": 12,
       "end_line": 32,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_15_state_inputs_test.go",
+      "test_mtime": "2026-05-27T01:30:51+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s16StateTransition",
@@ -22098,7 +22164,10 @@
       "start_line": 12,
       "end_line": 32,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_16_state_transition_test.go",
+      "test_mtime": "2026-05-27T01:30:55+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s17StateMessage",
@@ -22107,7 +22176,10 @@
       "start_line": 12,
       "end_line": 32,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_17_state_message_test.go",
+      "test_mtime": "2026-05-27T01:30:59+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s18AuthAction",
@@ -22116,7 +22188,10 @@
       "start_line": 12,
       "end_line": 32,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_18_auth_action_test.go",
+      "test_mtime": "2026-05-27T01:32:12+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s19AuthResource",
@@ -22125,7 +22200,10 @@
       "start_line": 12,
       "end_line": 32,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_19_auth_resource_test.go",
+      "test_mtime": "2026-05-27T01:32:20+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s20AuthMessage",
@@ -22134,7 +22212,10 @@
       "start_line": 12,
       "end_line": 32,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_20_auth_message_test.go",
+      "test_mtime": "2026-05-27T01:32:28+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s21CallModel",
@@ -22143,7 +22224,10 @@
       "start_line": 12,
       "end_line": 32,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_21_call_model_test.go",
+      "test_mtime": "2026-05-27T01:32:39+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s23PublishTopic",
@@ -22152,7 +22236,10 @@
       "start_line": 12,
       "end_line": 32,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_23_publish_topic_test.go",
+      "test_mtime": "2026-05-27T01:32:50+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s24PublishPayload",
@@ -22161,7 +22248,10 @@
       "start_line": 12,
       "end_line": 32,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_24_publish_payload_test.go",
+      "test_mtime": "2026-05-27T01:33:02+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s25UnknownSeqType",
@@ -22170,7 +22260,10 @@
       "start_line": 14,
       "end_line": 32,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_25_unknown_seq_type_test.go",
+      "test_mtime": "2026-05-27T01:33:17+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s26DotMethod",
@@ -22179,7 +22272,10 @@
       "start_line": 15,
       "end_line": 39,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_26_dot_method_test.go",
+      "test_mtime": "2026-05-27T01:33:30+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s27VarDeclared",
@@ -22188,7 +22284,10 @@
       "start_line": 15,
       "end_line": 37,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_27_var_declared_test.go",
+      "test_mtime": "2026-05-27T01:34:27+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s28TargetDeclared",
@@ -22197,7 +22296,11 @@
       "start_line": 15,
       "end_line": 41,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_28_target_declared_test.go",
+      "test_mtime": "2026-05-27T01:36:02+09:00",
+      "status": "pass",
+      "coverage_pct": 100,
+      "attempt": 1
     },
     {
       "qualified_name": "pkg/validate/ssac.s29InputDeclared",
@@ -22206,7 +22309,10 @@
       "start_line": 14,
       "end_line": 39,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_29_input_declared_test.go",
+      "test_mtime": "2026-05-27T01:34:44+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s30MessageDeclared",
@@ -22215,7 +22321,10 @@
       "start_line": 14,
       "end_line": 39,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_30_message_declared_test.go",
+      "test_mtime": "2026-05-27T01:34:53+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s31ConfigPrefixForbidden",
@@ -22224,7 +22333,10 @@
       "start_line": 14,
       "end_line": 34,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_31_config_prefix_forbidden_test.go",
+      "test_mtime": "2026-05-27T01:35:01+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s32PublishForbidden",
@@ -22233,7 +22345,10 @@
       "start_line": 12,
       "end_line": 34,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_32_publish_forbidden_test.go",
+      "test_mtime": "2026-05-27T01:35:10+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s33ReservedSource",
@@ -22242,7 +22357,10 @@
       "start_line": 15,
       "end_line": 36,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_33_reserved_source_test.go",
+      "test_mtime": "2026-05-27T01:35:19+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s34GoReservedWord",
@@ -22251,7 +22369,10 @@
       "start_line": 14,
       "end_line": 35,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_34_go_reserved_word_test.go",
+      "test_mtime": "2026-05-27T01:35:27+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s35GoReservedWordModel",
@@ -22260,7 +22381,10 @@
       "start_line": 14,
       "end_line": 36,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_35_go_reserved_word_model_test.go",
+      "test_mtime": "2026-05-27T01:35:39+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s36CheckResponseStale",
@@ -22269,7 +22393,10 @@
       "start_line": 15,
       "end_line": 35,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_36_check_response_stale_test.go",
+      "test_mtime": "2026-05-27T01:36:34+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s36MarkStaleAfterMutation",
@@ -22278,7 +22405,10 @@
       "start_line": 10,
       "end_line": 23,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_36_mark_stale_after_mutation_test.go",
+      "test_mtime": "2026-05-27T01:36:44+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s36StaleResponse",
@@ -22287,7 +22417,10 @@
       "start_line": 20,
       "end_line": 32,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_36_stale_response_test.go",
+      "test_mtime": "2026-05-27T01:36:54+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s36TrackAssignment",
@@ -22296,7 +22429,10 @@
       "start_line": 11,
       "end_line": 18,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_36_track_assignment_test.go",
+      "test_mtime": "2026-05-27T01:37:04+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s37FKReferenceGuard",
@@ -22305,7 +22441,11 @@
       "start_line": 16,
       "end_line": 47,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_37_fk_reference_guard_test.go",
+      "test_mtime": "2026-05-27T01:54:38+09:00",
+      "status": "pass",
+      "coverage_pct": 100,
+      "attempt": 1
     },
     {
       "qualified_name": "pkg/validate/ssac.s38SubscribeNoHTTPInputs",
@@ -22314,7 +22454,10 @@
       "start_line": 16,
       "end_line": 40,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_38_subscribe_no_http_inputs_test.go",
+      "test_mtime": "2026-05-27T01:55:06+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s39SubscribeMessageRequired",
@@ -22323,7 +22466,10 @@
       "start_line": 15,
       "end_line": 41,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_39_subscribe_message_required_test.go",
+      "test_mtime": "2026-05-27T01:55:52+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s40SubscribeSingleParam",
@@ -22332,7 +22478,10 @@
       "start_line": 13,
       "end_line": 31,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_40_subscribe_single_param_test.go",
+      "test_mtime": "2026-05-27T01:56:20+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s41SubscribeNoCurrentUser",
@@ -22341,7 +22490,10 @@
       "start_line": 12,
       "end_line": 34,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_41_subscribe_no_currentuser_test.go",
+      "test_mtime": "2026-05-27T01:56:43+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s42SubscribeForbiddenRequest",
@@ -22350,7 +22502,10 @@
       "start_line": 12,
       "end_line": 34,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_42_subscribe_forbidden_request_test.go",
+      "test_mtime": "2026-05-27T01:57:06+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s43SubscribeForbiddenQuery",
@@ -22359,7 +22514,10 @@
       "start_line": 12,
       "end_line": 34,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_43_subscribe_forbidden_query_test.go",
+      "test_mtime": "2026-05-27T01:57:29+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s44HTTPForbiddenMessage",
@@ -22368,7 +22526,10 @@
       "start_line": 12,
       "end_line": 34,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_44_http_forbidden_message_test.go",
+      "test_mtime": "2026-05-27T01:57:51+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s45SubscribeNoResponse",
@@ -22377,7 +22538,10 @@
       "start_line": 12,
       "end_line": 33,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_45_subscribe_no_response_test.go",
+      "test_mtime": "2026-05-27T01:58:11+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s46UppercaseStart",
@@ -22386,7 +22550,11 @@
       "start_line": 14,
       "end_line": 43,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_46_uppercase_start_test.go",
+      "test_mtime": "2026-05-27T01:59:03+09:00",
+      "status": "pass",
+      "coverage_pct": 100,
+      "attempt": 1
     },
     {
       "qualified_name": "pkg/validate/ssac.s47NoDotPrefix",
@@ -22395,7 +22563,10 @@
       "start_line": 16,
       "end_line": 37,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_47_no_dot_prefix_test.go",
+      "test_mtime": "2026-05-27T01:59:34+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s48SymbolTableModel",
@@ -22404,7 +22575,10 @@
       "start_line": 15,
       "end_line": 48,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_48_symbol_table_model_test.go",
+      "test_mtime": "2026-05-27T02:00:18+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s49SymbolTableMethod",
@@ -22413,7 +22587,11 @@
       "start_line": 15,
       "end_line": 49,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_49_symbol_table_method_test.go",
+      "test_mtime": "2026-05-27T02:01:08+09:00",
+      "status": "pass",
+      "coverage_pct": 100,
+      "attempt": 1
     },
     {
       "qualified_name": "pkg/validate/ssac.s50OpenAPIRequest",
@@ -22422,7 +22600,10 @@
       "start_line": 21,
       "end_line": 55,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_50_openapi_request_test.go",
+      "test_mtime": "2026-05-27T02:01:40+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s51RequestUsage",
@@ -22431,7 +22612,11 @@
       "start_line": 16,
       "end_line": 78,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_51_request_usage_test.go",
+      "test_mtime": "2026-05-27T02:14:22+09:00",
+      "status": "pass",
+      "coverage_pct": 100,
+      "attempt": 1
     },
     {
       "qualified_name": "pkg/validate/ssac.s57FuncRequestType",
@@ -22440,7 +22625,10 @@
       "start_line": 15,
       "end_line": 58,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_57_func_request_type_test.go",
+      "test_mtime": "2026-05-27T02:15:40+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s58InvalidErrStatus",
@@ -22449,7 +22637,10 @@
       "start_line": 14,
       "end_line": 35,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_58_invalid_err_status_test.go",
+      "test_mtime": "2026-05-27T02:16:55+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s59DottedField",
@@ -22458,7 +22649,11 @@
       "start_line": 22,
       "end_line": 76,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_59_dotted_field_test.go",
+      "test_mtime": "2026-05-27T02:18:21+09:00",
+      "status": "pass",
+      "coverage_pct": 100,
+      "attempt": 1
     },
     {
       "qualified_name": "pkg/validate/ssac.s60RequestFieldExact",
@@ -22467,7 +22662,10 @@
       "start_line": 20,
       "end_line": 67,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_60_request_field_exact_test.go",
+      "test_mtime": "2026-05-27T02:18:55+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s61CodegenReservedVar",
@@ -22476,7 +22674,10 @@
       "start_line": 16,
       "end_line": 38,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_61_codegen_reserved_var_test.go",
+      "test_mtime": "2026-05-27T02:19:23+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s62UnusedResultVar",
@@ -22485,7 +22686,10 @@
       "start_line": 16,
       "end_line": 41,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_62_unused_result_var_test.go",
+      "test_mtime": "2026-05-27T02:20:01+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s63ListNoPagination",
@@ -22494,7 +22698,10 @@
       "start_line": 24,
       "end_line": 55,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_63_list_no_pagination_test.go",
+      "test_mtime": "2026-05-27T02:20:36+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s64EmptyExistsModelOnly",
@@ -22503,7 +22710,11 @@
       "start_line": 26,
       "end_line": 80,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_64_empty_exists_model_only_test.go",
+      "test_mtime": "2026-05-27T02:21:57+09:00",
+      "status": "done",
+      "coverage_pct": 95,
+      "attempt": 1
     },
     {
       "qualified_name": "pkg/validate/ssac.s67EvalFuncSignature",
@@ -22512,7 +22723,10 @@
       "start_line": 17,
       "end_line": 47,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_67_eval_func_signature_test.go",
+      "test_mtime": "2026-05-27T02:22:39+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s68EvalStatusRequired",
@@ -22521,7 +22735,10 @@
       "start_line": 15,
       "end_line": 36,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_68_eval_status_required_test.go",
+      "test_mtime": "2026-05-27T02:23:00+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s69EvalFuncExists",
@@ -22530,7 +22747,10 @@
       "start_line": 16,
       "end_line": 37,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_69_eval_func_exists_test.go",
+      "test_mtime": "2026-05-27T02:23:24+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s70PostPutBlobInputForbidden",
@@ -22539,7 +22759,10 @@
       "start_line": 19,
       "end_line": 42,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_70_post_put_blob_input_forbidden_test.go",
+      "test_mtime": "2026-04-25T18:31:39+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s71BuildScope",
@@ -22548,7 +22771,10 @@
       "start_line": 10,
       "end_line": 25,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_71_build_scope_test.go",
+      "test_mtime": "2026-05-27T02:24:40+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s71CollectRefs",
@@ -22557,7 +22783,10 @@
       "start_line": 10,
       "end_line": 28,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_71_collect_refs_test.go",
+      "test_mtime": "2026-05-27T02:24:56+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s71ExtractPrefix",
@@ -22566,7 +22795,10 @@
       "start_line": 12,
       "end_line": 23,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_71_extract_prefix_test.go",
+      "test_mtime": "2026-05-27T02:25:06+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s71ScopeList",
@@ -22575,7 +22807,10 @@
       "start_line": 11,
       "end_line": 18,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_71_scope_list_test.go",
+      "test_mtime": "2026-05-27T02:25:18+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s71UnknownVariable",
@@ -22584,7 +22819,10 @@
       "start_line": 13,
       "end_line": 35,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_71_unknown_variable_test.go",
+      "test_mtime": "2026-05-27T02:25:46+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s72CallEvalImportRequired",
@@ -22593,7 +22831,10 @@
       "start_line": 20,
       "end_line": 54,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_72_call_eval_import_required_test.go",
+      "test_mtime": "2026-05-27T02:26:12+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.s73ImportMustBeFullPath",
@@ -22602,7 +22843,10 @@
       "start_line": 18,
       "end_line": 36,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/s_73_import_must_be_full_path_test.go",
+      "test_mtime": "2026-05-27T02:26:29+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.splitEvalModel",
@@ -22611,7 +22855,10 @@
       "start_line": 10,
       "end_line": 16,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/split_eval_model_test.go",
+      "test_mtime": "2026-05-27T02:26:43+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.stripTypePrefix",
@@ -22620,7 +22867,10 @@
       "start_line": 9,
       "end_line": 15,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/strip_type_prefix_test.go",
+      "test_mtime": "2026-05-27T02:26:55+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.varTypes",
@@ -22629,7 +22879,10 @@
       "start_line": 11,
       "end_line": 19,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/var_types_test.go",
+      "test_mtime": "2026-05-27T02:27:10+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.xss11PluralResultType",
@@ -22638,7 +22891,11 @@
       "start_line": 21,
       "end_line": 57,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/xss_11_plural_result_type_test.go",
+      "test_mtime": "2026-05-27T03:03:39+09:00",
+      "status": "pass",
+      "coverage_pct": 100,
+      "attempt": 1
     },
     {
       "qualified_name": "pkg/validate/ssac.xss38CallFuncLowercase",
@@ -22647,7 +22904,10 @@
       "start_line": 15,
       "end_line": 41,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/xss_38_call_func_lowercase_test.go",
+      "test_mtime": "2026-05-27T03:04:17+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.xss47CallSourceVarUndefined",
@@ -22656,7 +22916,10 @@
       "start_line": 15,
       "end_line": 40,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/xss_47_call_source_var_undefined_test.go",
+      "test_mtime": "2026-05-27T03:05:09+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.xss57PublishToSubscribe",
@@ -22665,7 +22928,10 @@
       "start_line": 15,
       "end_line": 42,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/xss_57_publish_to_subscribe_test.go",
+      "test_mtime": "2026-05-27T03:05:41+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.xss58SubscribeToPublish",
@@ -22674,7 +22940,10 @@
       "start_line": 15,
       "end_line": 42,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/xss_58_subscribe_to_publish_test.go",
+      "test_mtime": "2026-05-27T03:06:04+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac.xss59SubscribeFields",
@@ -22683,7 +22952,11 @@
       "start_line": 16,
       "end_line": 71,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac/xss_59_subscribe_fields_test.go",
+      "test_mtime": "2026-05-27T03:07:13+09:00",
+      "status": "pass",
+      "coverage_pct": 100,
+      "attempt": 1
     },
     {
       "qualified_name": "pkg/validate/ssac_authz.Run",
@@ -22692,7 +22965,10 @@
       "start_line": 11,
       "end_line": 15,
       "exported": true,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac_authz/run_test.go",
+      "test_mtime": "2026-05-27T03:07:35+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac_authz.xas60AuthInputField",
@@ -22701,7 +22977,10 @@
       "start_line": 18,
       "end_line": 50,
       "exported": false,
-      "status": "todo"
+      "test_file": "pkg/validate/ssac_authz/xas_60_auth_input_field_test.go",
+      "test_mtime": "2026-05-27T03:08:17+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "pkg/validate/ssac_ddl.buildReferencedTables",
@@ -25271,8 +25550,8 @@
   ],
   "summary": {
     "total": 2699,
-    "pass": 308,
-    "done": 5,
-    "todo": 2386
+    "pass": 396,
+    "done": 6,
+    "todo": 2297
   }
 }

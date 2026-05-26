@@ -39,6 +39,11 @@ func BuildServicePlan(sf *ssac.ServiceFunc, fs *yongol.Fullstack) (*ServicePlan,
 		plan.Ops = append(plan.Ops, op)
 	}
 
+	// Annotate @get ops with lookahead guard info. When a @get is followed
+	// by @empty or @exists targeting the same result variable, the renderer
+	// must emit ErrNoRows tolerance instead of plain error propagation.
+	annotateGetGuards(plan.Ops)
+
 	// Determine transaction requirement.
 	plan.UsesTransaction = planNeedsTransaction(plan.Ops)
 

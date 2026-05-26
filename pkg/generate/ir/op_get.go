@@ -23,4 +23,11 @@ type GetOp struct {
 
 	// IsList is true when the query returns a slice.
 	IsList bool
+
+	// FollowedByGuard is the OpKind of the immediately following @empty or
+	// @exists guard that targets this GetOp's VarName. When set (OpEmpty or
+	// OpExists), the Go renderer emits errors.Is(err, pgx.ErrNoRows) instead
+	// of a plain error propagation so the guard logic can check the zero
+	// value. Zero value (OpGet) means no guard follows.
+	FollowedByGuard OpKind
 }
