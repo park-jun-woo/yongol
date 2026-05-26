@@ -1,41 +1,59 @@
 //ff:func feature=gen-gogin type=util control=selection
-//ff:what dispatchBinding — MapPGType 의 family 분기 (CheckEnum/multi-token/array/pgtype/native/unsupported)
+//ff:what dispatchBinding — MapPGType 의 family 분기 (typemap.ClassifyFamily 위임 → Go 바인딩 산출)
 
 package types
 
-import "github.com/park-jun-woo/yongol/pkg/parser/ddl"
+import (
+	"github.com/park-jun-woo/yongol/pkg/generate/typemap"
+	"github.com/park-jun-woo/yongol/pkg/parser/ddl"
+)
 
 // dispatchBinding routes a parsed column to the appropriate family
-// constructor in priority order:
+// constructor by delegating family classification to
+// typemap.ClassifyFamily and then mapping the resulting PGFamily to the
+// Go-specific binding.
 //
-//  1. CheckEnum present → enum binding
-//  2. Array marker → arrayBinding
-//  3. pgtype family → mapPgtypeFamily
-//  4. Native family → mapNativeFamily
-//  5. Otherwise → unsupported (multi-word PG type not in the alias
-//     matrix, or a CREATE TYPE user-defined ENUM)
-//
-// Multi-word PostgreSQL type names are no longer rejected up-front —
-// parseRawType normalises recognised forms ("DOUBLE PRECISION" →
-// "FLOAT8", "TIMESTAMP WITH TIME ZONE" → "TIMESTAMPTZ") so they reach
-// the family matrices keyed by the single-token alias. Forms that do
-// not appear in pgHeadAliases fall through to the final
-// unsupportedBinding, which keeps D-11 firing on truly unknown heads.
+// Multi-word PostgreSQL type names are normalised by typemap.ParseRawType
+// ("DOUBLE PRECISION" → "FLOAT8", "TIMESTAMP WITH TIME ZONE" →
+// "TIMESTAMPTZ") so the downstream binding functions receive the
+// single-token alias.
 //
 // Extracted from MapPGType so each func stays inside the F1 line budget
 // and the priority ladder is testable independently.
 func dispatchBinding(col ddl.Column, info rawTypeInfo, notNull bool, def string) GoTypeBinding {
-	switch {
-	case len(col.CheckEnum) > 0:
+	family := typemap.ClassifyFamily(columnAdapter{col})
+	switch family {
+	case typemap.FamilyEnum:
 		return enumBinding(notNull, def)
-	case info.IsArray:
+	case typemap.FamilyArray:
 		return arrayBinding(info.Head, def)
+	case typemap.FamilyUUID:
+		return pgtypeUUID(notNull, def)
+	case typemap.FamilyNumeric:
+		return pgtypeNumeric(notNull, def)
+	case typemap.FamilyTimestampTZ:
+		return pgtypeTimestamp("TIMESTAMPTZ", notNull, def)
+	case typemap.FamilyTimestamp:
+		return pgtypeTimestamp("TIMESTAMP", notNull, def)
+	case typemap.FamilyDate:
+		return pgtypeTimestamp("DATE", notNull, def)
+	case typemap.FamilyInet:
+		return pgtypeInet(notNull, def)
+	case typemap.FamilyInterval:
+		return pgtypeInterval(notNull, def)
+	case typemap.FamilyJSONB:
+		return jsonbBinding(notNull, def)
+	case typemap.FamilyBytea:
+		return byteaBinding(notNull, def)
+	case typemap.FamilyInteger:
+		return nativeInteger(notNull, def)
+	case typemap.FamilyFloat:
+		return nativeFloatWithHead(info.Head, notNull, def)
+	case typemap.FamilyString:
+		return nativeString(notNull, def)
+	case typemap.FamilyBoolean:
+		return nativeBoolean(notNull, def)
+	default:
+		return unsupportedBinding("PG type " + info.Head + " is not recognised (likely a CREATE TYPE user-defined ENUM, or a multi-word PG type without a registered single-token alias)")
 	}
-	if b, ok := mapPgtypeFamily(info.Head, notNull, def); ok {
-		return b
-	}
-	if b, ok := mapNativeFamily(info.Head, notNull, def); ok {
-		return b
-	}
-	return unsupportedBinding("PG type " + info.Head + " is not recognised (likely a CREATE TYPE user-defined ENUM, or a multi-word PG type without a registered single-token alias)")
 }

@@ -6,5 +6,7 @@ package generate
 type BackendType string
 
 const (
-	GoGin BackendType = "go-gin"
+	GoGin   BackendType = "go-gin"
+	NestJS  BackendType = "nestjs"
+	FastAPI BackendType = "fastapi"
 )

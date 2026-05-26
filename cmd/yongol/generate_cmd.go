@@ -8,9 +8,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/generate"
 	"github.com/park-jun-woo/yongol/pkg/validate"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // generateCmd wires `yongol generate <specs-dir> <artifacts-dir>`. Flow:
@@ -52,6 +52,20 @@ func generateCmd() *cobra.Command {
 				return fmt.Errorf("generate refused: %d warnings must be resolved first", warns)
 			}
 			backend := generate.BackendType(backendFlag)
+			switch backend {
+			case generate.GoGin, generate.NestJS, generate.FastAPI:
+				// valid
+			default:
+				if fs.Manifest != nil && fs.Manifest.Backend.Lang != "" {
+					var err error
+					backend, err = generate.ResolveBackendType(fs.Manifest.Backend.Lang, fs.Manifest.Backend.Framework)
+					if err != nil {
+						return fmt.Errorf("resolve backend from manifest: %w", err)
+					}
+				} else {
+					return fmt.Errorf("unknown --backend value %q; valid: go-gin, nestjs, fastapi", backendFlag)
+				}
+			}
 			frontend := generate.FrontendType(frontendFlag)
 			migHook := generate.WithMigration(generate.MigrationHook{
 				Version: Version,
@@ -65,7 +79,7 @@ func generateCmd() *cobra.Command {
 			return nil
 		},
 	}
-	cmd.Flags().StringVar(&backendFlag, "backend", string(generate.GoGin), "backend code generator (go-gin)")
+	cmd.Flags().StringVar(&backendFlag, "backend", string(generate.GoGin), "backend framework: go-gin (default), nestjs, fastapi")
 	cmd.Flags().StringVar(&frontendFlag, "frontend", string(generate.React), "frontend code generator (react)")
 	return cmd
 }

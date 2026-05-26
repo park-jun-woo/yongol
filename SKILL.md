@@ -44,7 +44,7 @@ yongol separates these concerns:
 go install github.com/park-jun-woo/yongol/cmd/yongol@latest
 ```
 
-Requires Go 1.25+ and gcc (cgo dependency: `pg_query_go` links `libpg_query` for DDL parsing).
+**Prerequisites:** Go 1.25+ and gcc (cgo required). `pg_query_go` links `libpg_query` via cgo for DDL parsing — without gcc the build fails.
 
 ## Workflow
 
