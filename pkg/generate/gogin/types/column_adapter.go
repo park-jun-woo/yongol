@@ -7,6 +7,3 @@ import "github.com/park-jun-woo/yongol/pkg/parser/ddl"
 
 // columnAdapter wraps ddl.Column to satisfy typemap.ColumnMeta.
 type columnAdapter struct{ col ddl.Column }
-
-func (a columnAdapter) RawType() string     { return a.col.RawType }
-func (a columnAdapter) CheckEnum() []string { return a.col.CheckEnum }

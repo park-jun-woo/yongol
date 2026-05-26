@@ -38,11 +38,7 @@ func TestS62UnusedInSubsequent(t *testing.T) {
 			if c.name == "empty seqs" {
 				input = nil
 			}
-			got := s62unusedInSubsequent(c.varName, input, c.start)
-			if got != c.want {
-				t.Errorf("s62unusedInSubsequent(%q, seqs, %d) = %v, want %v",
-					c.varName, c.start, got, c.want)
-			}
+			assertUnusedInSubsequent(t, c.varName, input, c.start, c.want)
 		})
 	}
 }

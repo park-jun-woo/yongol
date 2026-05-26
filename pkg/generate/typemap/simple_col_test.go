@@ -8,6 +8,3 @@ type simpleCol struct {
 	raw   string
 	enums []string
 }
-
-func (c simpleCol) RawType() string     { return c.raw }
-func (c simpleCol) CheckEnum() []string { return c.enums }

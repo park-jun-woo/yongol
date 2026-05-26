@@ -26,19 +26,7 @@ func TestParseRawType(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			got := ParseRawType(c.raw)
-			if got.Head != c.wantHead {
-				t.Errorf("Head = %q, want %q", got.Head, c.wantHead)
-			}
-			if got.Param != c.wantParam {
-				t.Errorf("Param = %q, want %q", got.Param, c.wantParam)
-			}
-			if got.IsArray != c.wantArray {
-				t.Errorf("IsArray = %v, want %v", got.IsArray, c.wantArray)
-			}
-			if got.MultiToken != c.wantMulti {
-				t.Errorf("MultiToken = %v, want %v", got.MultiToken, c.wantMulti)
-			}
+			assertRawType(t, c.raw, c.wantHead, c.wantParam, c.wantArray, c.wantMulti)
 		})
 	}
 }
