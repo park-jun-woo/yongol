@@ -1,5 +1,5 @@
 //ff:type feature=gen-fastapi type=adapter
-//ff:what FastAPITypeRegistry — ir.TypeRegistry 의 FastAPI 스켈레톤 구현 (미구현: Supported=false)
+//ff:what FastAPITypeRegistry — ir.TypeRegistry 의 FastAPI 구현 (PGFamily + BindOpts → Python/SQLAlchemy TypeBinding)
 
 package types
 
@@ -9,19 +9,14 @@ import (
 )
 
 // FastAPITypeRegistry implements ir.TypeRegistry for the FastAPI (Python
-// + SQLAlchemy) backend. This is a skeleton — all families return
-// Supported=false until the FastAPI backend is fully implemented.
+// + SQLAlchemy + Pydantic) backend. Each PGFamily maps to a SQLAlchemy
+// column type (DBType), a Python/Pydantic API type (APIType), and the
+// conversion expressions between DB and API layers.
 type FastAPITypeRegistry struct{}
 
-// Bind always returns an unsupported TypeBinding. The FastAPI backend type
-// mappings (Python type names, SQLAlchemy column types, Py↔DB conversion
-// expressions) will be filled in when the FastAPI code generator is built.
+// Bind maps a PGFamily + BindOpts to an ir.TypeBinding containing
+// SQLAlchemy column type, Python/Pydantic API type, and Py↔DB conversion
+// expressions.
 func (r *FastAPITypeRegistry) Bind(family typemap.PGFamily, opts ir.BindOpts) ir.TypeBinding {
-	return ir.TypeBinding{
-		Family:    family,
-		NotNull:   opts.NotNull,
-		DBType:    "/* fastapi: not yet implemented */",
-		APIType:   "/* fastapi: not yet implemented */",
-		Supported: false,
-	}
+	return bindFastAPI(family, opts)
 }

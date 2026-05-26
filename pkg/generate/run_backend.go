@@ -5,6 +5,7 @@ package generate
 import (
 	"fmt"
 
+	"github.com/park-jun-woo/yongol/pkg/generate/fastapi"
 	"github.com/park-jun-woo/yongol/pkg/generate/gogin"
 	"github.com/park-jun-woo/yongol/pkg/generate/nestjs"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
@@ -17,7 +18,7 @@ func runBackend(fs *yongol.Fullstack, artifactsDir string, backend BackendType) 
 	case NestJS:
 		return nestjs.Generate(fs, artifactsDir)
 	case FastAPI:
-		return fmt.Errorf("fastapi backend: not yet implemented")
+		return fastapi.Generate(fs, artifactsDir)
 	default:
 		return fmt.Errorf("unknown backend %q", backend)
 	}
