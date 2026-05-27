@@ -17,5 +17,8 @@ import { VerifyOrgAddressService } from './verifyOrgAddress.service';
   providers: [
     VerifyOrgAddressService,
   ],
+  exports: [
+    VerifyOrgAddressService,
+  ],
 })
 export class OrganizationModule {}

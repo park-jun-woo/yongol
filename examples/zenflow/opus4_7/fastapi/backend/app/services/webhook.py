@@ -30,7 +30,6 @@ async def delete_webhook(session: AsyncSession, id: int, current_user: dict | No
             current_user,
             action="DeleteWebhook",
             resource="webhook",
-            resource_id=id,
             resource_id=str(id),
             owners={"webhooks": {"org_id": owner}},
         )
@@ -55,6 +54,7 @@ async def list_webhooks(session: AsyncSession, current_user: dict | None = None)
 
 
 async def on_workflow_executed(session: AsyncSession, payload: dict):
-    await webhookdelivery.deliver(message.status, "simulated")
+    message = payload
+    await deliver(message.status, "simulated")
 
 

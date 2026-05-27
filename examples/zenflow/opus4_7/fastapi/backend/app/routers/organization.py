@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.dependencies.database import get_session
 from app.dependencies.auth import get_current_user
 from app.services import organization as svc
+from app.schemas.organization import VerifyOrgAddressRequest
 
 router = APIRouter(prefix="/organization", tags=["organization"])
 

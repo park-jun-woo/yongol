@@ -15,7 +15,6 @@ async def verify_org_address(session: AsyncSession, id: int, body: VerifyOrgAddr
             current_user,
             action="VerifyOrgAddress",
             resource="organization",
-            resource_id=id,
             resource_id=str(id),
             owners={"organizations": {"id": owner}},
         )
@@ -23,7 +22,7 @@ async def verify_org_address(session: AsyncSession, id: int, body: VerifyOrgAddr
         org = result.scalars().first()
         if not org:
             raise HTTPException(status_code=404, detail="Organization not found")
-        geo = await geocoding.geocode(body.address)
+        geo = await geocode(body.address)
         await session.execute(
             update(Organization).where(Organization.id == org.id).values(address_verified=geo.address_verified, latitude=geo.latitude, longitude=geo.longitude)
         )

@@ -21,5 +21,9 @@ import { GetExecutionReportService } from './getExecutionReport.service';
     GetExecutionDetailService,
     GetExecutionReportService,
   ],
+  exports: [
+    GetExecutionDetailService,
+    GetExecutionReportService,
+  ],
 })
 export class ExecutionModule {}

@@ -3,7 +3,6 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.models import Organization
 from app.dependencies.authz import authz_check
-from app.services.dashboard import summarize
 
 async def get_dashboard(session: AsyncSession, current_user: dict | None = None):
     await authz_check(
@@ -15,7 +14,7 @@ async def get_dashboard(session: AsyncSession, current_user: dict | None = None)
     org = result.scalars().first()
     if not org:
         raise HTTPException(status_code=404, detail="Organization not found")
-    summary = await dashboard.summarize(org.credits_balance, org.name, org.plan_type)
+    summary = await summarize(org.credits_balance, org.name, org.plan_type)
     return {
         "summary": summary,
     }

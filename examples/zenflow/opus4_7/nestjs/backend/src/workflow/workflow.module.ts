@@ -75,5 +75,21 @@ import { SaveWorkflowActionsService } from './saveWorkflowActions.service';
     PauseWorkflowService,
     SaveWorkflowActionsService,
   ],
+  exports: [
+    ActivateWorkflowService,
+    AddActionService,
+    ArchiveWorkflowService,
+    AutoAssignWorkflowService,
+    CreateWorkflowService,
+    CreateWorkflowVersionService,
+    ExecuteWithReportService,
+    ExecuteWorkflowService,
+    GetWorkflowService,
+    ListExecutionLogsService,
+    ListWorkflowVersionsService,
+    ListWorkflowsService,
+    PauseWorkflowService,
+    SaveWorkflowActionsService,
+  ],
 })
 export class WorkflowModule {}

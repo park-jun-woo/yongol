@@ -13,7 +13,6 @@ async def get_audit_log(session: AsyncSession, id: int, current_user: dict | Non
         current_user,
         action="GetAuditLog",
         resource="audit_log",
-        resource_id=id,
         resource_id=str(id),
         owners={"audit_logs": {"org_id": owner}},
     )

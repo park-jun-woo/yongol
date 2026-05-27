@@ -7,53 +7,12 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Action {
-  id                   Int @id @default(autoincrement())
-  workflow_id          Int
-  action_type          String
-  config               String
-  sequence_order       Int
-  workflow             Workflow @relation(fields: [workflow_id], references: [id])
-  @@index([workflow_id])
-  @@map("actions")
-}
-
-model AuditLog {
-  id                   Int @id @default(autoincrement())
-  org_id               Int
-  actor_id             Int
-  action               String
-  resource_type        String
-  resource_id          String
-  detail               String
-  created_at           DateTime
-  org                  Organization @relation(fields: [org_id], references: [id])
-  actor                User @relation(fields: [actor_id], references: [id])
-  @@index([org_id])
-  @@index([created_at])
-  @@index([action])
-  @@map("audit_logs")
-}
-
-model FullendCache {
+model FullendSession {
   key                  String @id
   value                Bytes
   expires_at           DateTime
   @@index([expires_at])
-  @@map("fullend_cache")
-}
-
-model FullendQueue {
-  id                   Int @id @default(autoincrement())
-  topic                String
-  payload              Json
-  priority             String @default("normal")
-  status               String @default("pending")
-  created_at           DateTime
-  deliver_at           DateTime
-  processed_at         DateTime?
-  traceparent          String
-  @@map("fullend_queue")
+  @@map("fullend_sessions")
 }
 
 model Template {
@@ -84,6 +43,37 @@ model User {
   @@map("users")
 }
 
+model Workflow {
+  id                   Int @id @default(autoincrement())
+  org_id               Int
+  title                String
+  trigger_event        String
+  status               String @default("draft")
+  version              Int
+  root_workflow_id     Int
+  assigned_to          Int
+  assignment_confidence String @default("none")
+  created_at           DateTime
+  org                  Organization @relation(fields: [org_id], references: [id])
+  templates            Template[]
+  actions              Action[]
+  execution_logs       ExecutionLog[]
+  @@index([org_id])
+  @@index([status])
+  @@map("workflows")
+}
+
+model Action {
+  id                   Int @id @default(autoincrement())
+  workflow_id          Int
+  action_type          String
+  config               String
+  sequence_order       Int
+  workflow             Workflow @relation(fields: [workflow_id], references: [id])
+  @@index([workflow_id])
+  @@map("actions")
+}
+
 model RefreshToken {
   token_hash           String @id
   claims               Json
@@ -92,6 +82,52 @@ model RefreshToken {
   created_at           DateTime
   @@index([claims])
   @@map("refresh_tokens")
+}
+
+model Organization {
+  id                   Int @id @default(autoincrement())
+  name                 String
+  plan_type            String @default("free")
+  credits_balance      Int
+  latitude             String
+  longitude            String
+  address_verified     Boolean
+  created_at           DateTime
+  templates            Template[]
+  users                User[]
+  workflows            Workflow[]
+  webhooks             Webhook[]
+  audit_logs           AuditLog[]
+  execution_logs       ExecutionLog[]
+  @@map("organizations")
+}
+
+model Webhook {
+  id                   Int @id @default(autoincrement())
+  org_id               Int
+  url                  String
+  event_type           String
+  created_at           DateTime
+  org                  Organization @relation(fields: [org_id], references: [id])
+  @@index([org_id])
+  @@map("webhooks")
+}
+
+model AuditLog {
+  id                   Int @id @default(autoincrement())
+  org_id               Int
+  actor_id             Int
+  action               String
+  resource_type        String
+  resource_id          String
+  detail               String
+  created_at           DateTime
+  org                  Organization @relation(fields: [org_id], references: [id])
+  actor                User @relation(fields: [actor_id], references: [id])
+  @@index([org_id])
+  @@index([created_at])
+  @@index([action])
+  @@map("audit_logs")
 }
 
 model ExecutionLog {
@@ -109,59 +145,23 @@ model ExecutionLog {
   @@map("execution_logs")
 }
 
-model FullendSession {
+model FullendCache {
   key                  String @id
   value                Bytes
   expires_at           DateTime
   @@index([expires_at])
-  @@map("fullend_sessions")
+  @@map("fullend_cache")
 }
 
-model Organization {
+model FullendQueue {
   id                   Int @id @default(autoincrement())
-  name                 String
-  plan_type            String @default("free")
-  credits_balance      Int
-  latitude             String
-  longitude            String
-  address_verified     Boolean
+  topic                String
+  payload              Json
+  priority             String @default("normal")
+  status               String @default("pending")
   created_at           DateTime
-  audit_logs           AuditLog[]
-  templates            Template[]
-  users                User[]
-  execution_logs       ExecutionLog[]
-  webhooks             Webhook[]
-  workflows            Workflow[]
-  @@map("organizations")
-}
-
-model Webhook {
-  id                   Int @id @default(autoincrement())
-  org_id               Int
-  url                  String
-  event_type           String
-  created_at           DateTime
-  org                  Organization @relation(fields: [org_id], references: [id])
-  @@index([org_id])
-  @@map("webhooks")
-}
-
-model Workflow {
-  id                   Int @id @default(autoincrement())
-  org_id               Int
-  title                String
-  trigger_event        String
-  status               String @default("draft")
-  version              Int
-  root_workflow_id     Int
-  assigned_to          Int
-  assignment_confidence String @default("none")
-  created_at           DateTime
-  org                  Organization @relation(fields: [org_id], references: [id])
-  actions              Action[]
-  templates            Template[]
-  execution_logs       ExecutionLog[]
-  @@index([org_id])
-  @@index([status])
-  @@map("workflows")
+  deliver_at           DateTime
+  processed_at         DateTime?
+  traceparent          String
+  @@map("fullend_queue")
 }

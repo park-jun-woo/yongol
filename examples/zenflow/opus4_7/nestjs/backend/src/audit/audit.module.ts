@@ -23,5 +23,10 @@ import { ListAuditLogsService } from './listAuditLogs.service';
     GetRecentAuditLogsService,
     ListAuditLogsService,
   ],
+  exports: [
+    GetAuditLogService,
+    GetRecentAuditLogsService,
+    ListAuditLogsService,
+  ],
 })
 export class AuditModule {}

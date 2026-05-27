@@ -31,7 +31,7 @@ export class GetScheduleService {
     const keyResult = await this.scheduleService.buildKey(params.id);
     const sessionResult = await this.sessionService.get(keyResult.key);
     return {
-      cron: sessionResult.Value,
+      cron: sessionResult.value,
     };
   }
 }

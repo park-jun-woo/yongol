@@ -19,7 +19,7 @@ export class GetExecutionReportService {
       throw new HttpException('Execution log not found', HttpStatus.NOT_FOUND);
     }
     return {
-      report_key: log.ReportKey,
+      report_key: log.reportKey,
     };
   }
 }

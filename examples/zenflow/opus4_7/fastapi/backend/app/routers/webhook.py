@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.dependencies.database import get_session
 from app.dependencies.auth import get_current_user
 from app.services import webhook as svc
+from app.schemas.webhook import CreateWebhookRequest
 
 router = APIRouter(prefix="/webhook", tags=["webhook"])
 

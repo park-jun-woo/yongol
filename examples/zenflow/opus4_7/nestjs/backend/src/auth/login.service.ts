@@ -15,9 +15,9 @@ export class LoginService {
       throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
     }
     // TODO: bcrypt.compare(body.password, user_result.password_hash)
-    const token = await this.authService.issueToken(user.email, user.id, user.org_id, user.role);
+    const token = await this.authService.issueToken(user_result.email, user_result.id, user_result.org_id, user_result.role);
     return {
-      access_token: token.AccessToken,
+      access_token: token.accessToken,
     };
   }
 }

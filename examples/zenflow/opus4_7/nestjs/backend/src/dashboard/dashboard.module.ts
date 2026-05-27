@@ -15,5 +15,8 @@ import { GetDashboardService } from './getDashboard.service';
   providers: [
     GetDashboardService,
   ],
+  exports: [
+    GetDashboardService,
+  ],
 })
 export class DashboardModule {}

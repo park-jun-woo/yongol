@@ -15,19 +15,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.database import Base
 
 
-class FullendCache(Base):
-    __tablename__ = "fullend_cache"
-
-    key: Mapped[str] = mapped_column(Text, primary_key=True)
-    value: Mapped[bytes] = mapped_column(LargeBinary)
-    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-
-    __table_args__ = (
-        Index("idx_fullend_cache_expires", "expires_at"),
-    )
-
-
-class Webhooks(Base):
+class Webhook(Base):
     __tablename__ = "webhooks"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -41,7 +29,62 @@ class Webhooks(Base):
     )
 
 
-class Workflows(Base):
+class RefreshToken(Base):
+    __tablename__ = "refresh_tokens"
+
+    token_hash: Mapped[str] = mapped_column(Text, primary_key=True)
+    claims: Mapped[dict[str, Any]] = mapped_column(JSONB)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+    __table_args__ = (
+        Index("refresh_tokens_claims_idx", "claims"),
+    )
+
+
+class FullendCache(Base):
+    __tablename__ = "fullend_cache"
+
+    key: Mapped[str] = mapped_column(Text, primary_key=True)
+    value: Mapped[bytes] = mapped_column(LargeBinary)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+    __table_args__ = (
+        Index("idx_fullend_cache_expires", "expires_at"),
+    )
+
+
+class Organization(Base):
+    __tablename__ = "organizations"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(Text)
+    plan_type: Mapped[str] = mapped_column(String, default="free")
+    credits_balance: Mapped[int] = mapped_column(Integer)
+    latitude: Mapped[str] = mapped_column(Text)
+    longitude: Mapped[str] = mapped_column(Text)
+    address_verified: Mapped[bool] = mapped_column(Boolean)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    org_id: Mapped[int] = mapped_column(Integer, ForeignKey("organizations.id"))
+    email: Mapped[str] = mapped_column(String)
+    password_hash: Mapped[str] = mapped_column(String)
+    role: Mapped[str] = mapped_column(String)
+    claims: Mapped[dict[str, Any]] = mapped_column(JSONB, default="{}")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+    __table_args__ = (
+        UniqueConstraint("email", name="email_unique"),
+    )
+
+
+class Workflow(Base):
     __tablename__ = "workflows"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -61,7 +104,7 @@ class Workflows(Base):
     )
 
 
-class Actions(Base):
+class Action(Base):
     __tablename__ = "actions"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -75,7 +118,7 @@ class Actions(Base):
     )
 
 
-class AuditLogs(Base):
+class AuditLog(Base):
     __tablename__ = "audit_logs"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -94,7 +137,7 @@ class AuditLogs(Base):
     )
 
 
-class ExecutionLogs(Base):
+class ExecutionLog(Base):
     __tablename__ = "execution_logs"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -125,7 +168,7 @@ class FullendQueue(Base):
     traceparent: Mapped[str] = mapped_column(Text)
 
 
-class FullendSessions(Base):
+class FullendSession(Base):
     __tablename__ = "fullend_sessions"
 
     key: Mapped[str] = mapped_column(Text, primary_key=True)
@@ -137,20 +180,7 @@ class FullendSessions(Base):
     )
 
 
-class Organizations(Base):
-    __tablename__ = "organizations"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    name: Mapped[str] = mapped_column(Text)
-    plan_type: Mapped[str] = mapped_column(String, default="free")
-    credits_balance: Mapped[int] = mapped_column(Integer)
-    latitude: Mapped[str] = mapped_column(Text)
-    longitude: Mapped[str] = mapped_column(Text)
-    address_verified: Mapped[bool] = mapped_column(Boolean)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-
-
-class Templates(Base):
+class Template(Base):
     __tablename__ = "templates"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -165,35 +195,5 @@ class Templates(Base):
     __table_args__ = (
         UniqueConstraint("source_workflow_id", name="idx_templates_source"),
         Index("idx_templates_org_id", "org_id"),
-    )
-
-
-class Users(Base):
-    __tablename__ = "users"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    org_id: Mapped[int] = mapped_column(Integer, ForeignKey("organizations.id"))
-    email: Mapped[str] = mapped_column(String)
-    password_hash: Mapped[str] = mapped_column(String)
-    role: Mapped[str] = mapped_column(String)
-    claims: Mapped[dict[str, Any]] = mapped_column(JSONB, default="{}")
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-
-    __table_args__ = (
-        UniqueConstraint("email", name="email_unique"),
-    )
-
-
-class RefreshTokens(Base):
-    __tablename__ = "refresh_tokens"
-
-    token_hash: Mapped[str] = mapped_column(Text, primary_key=True)
-    claims: Mapped[dict[str, Any]] = mapped_column(JSONB)
-    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-
-    __table_args__ = (
-        Index("refresh_tokens_claims_idx", "claims"),
     )
 

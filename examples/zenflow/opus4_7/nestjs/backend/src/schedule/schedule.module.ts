@@ -25,5 +25,10 @@ import { SetScheduleService } from './setSchedule.service';
     GetScheduleService,
     SetScheduleService,
   ],
+  exports: [
+    DeleteScheduleService,
+    GetScheduleService,
+    SetScheduleService,
+  ],
 })
 export class ScheduleModule {}

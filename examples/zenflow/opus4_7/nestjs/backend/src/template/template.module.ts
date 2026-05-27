@@ -27,5 +27,11 @@ import { PublishTemplateService } from './publishTemplate.service';
     ListTemplatesService,
     PublishTemplateService,
   ],
+  exports: [
+    CloneTemplateService,
+    GetTemplateService,
+    ListTemplatesService,
+    PublishTemplateService,
+  ],
 })
 export class TemplateModule {}

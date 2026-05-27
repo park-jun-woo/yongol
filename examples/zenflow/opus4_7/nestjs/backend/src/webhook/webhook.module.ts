@@ -29,5 +29,11 @@ import { OnWorkflowExecutedService } from './onWorkflowExecuted.service';
     ListWebhooksService,
     OnWorkflowExecutedService,
   ],
+  exports: [
+    CreateWebhookService,
+    DeleteWebhookService,
+    ListWebhooksService,
+    OnWorkflowExecutedService,
+  ],
 })
 export class WebhookModule {}

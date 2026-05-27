@@ -14,7 +14,6 @@ async def clone_template(session: AsyncSession, id: int, current_user: dict | No
             current_user,
             action="CloneTemplate",
             resource="template",
-            resource_id=id,
             resource_id=str(id),
             owners={"templates": {"org_id": owner}},
         )

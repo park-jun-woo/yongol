@@ -14,7 +14,6 @@ async def get_execution_detail(session: AsyncSession, id: int, current_user: dic
         current_user,
         action="GetExecutionDetail",
         resource="execution_log",
-        resource_id=id,
         resource_id=str(id),
         owners={"execution_logs": {"org_id": owner}},
     )
@@ -30,7 +29,7 @@ async def get_execution_detail(session: AsyncSession, id: int, current_user: dic
     org = result.scalars().first()
     if not org:
         raise HTTPException(status_code=404, detail="Organization not found")
-    detail = await dashboard.build_execution_detail(log.credits_spent, "now", "now", "now", org.name, log.status, "now", wf.title)
+    detail = await build_execution_detail(log.credits_spent, "now", "now", "now", org.name, log.status, "now", wf.title)
     return {
         "detail": detail,
     }

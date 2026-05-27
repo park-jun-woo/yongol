@@ -8,7 +8,6 @@ from app.services.billing import is_zero_balance
 from app.services.report import generate_report
 from app.services.version import next_version, resolve_root_id
 from app.services.worker import process_action
-from app.services.workflow import match_member
 
 async def activate_workflow(session: AsyncSession, id: int, current_user: dict | None = None):
     async with session.begin():
@@ -20,7 +19,6 @@ async def activate_workflow(session: AsyncSession, id: int, current_user: dict |
             current_user,
             action="ActivateWorkflow",
             resource="workflow",
-            resource_id=id,
             resource_id=str(id),
             owners={"workflows": {"org_id": owner}},
         )
@@ -32,7 +30,7 @@ async def activate_workflow(session: AsyncSession, id: int, current_user: dict |
         org = result.scalars().first()
         if not org:
             raise HTTPException(status_code=404, detail="Organization not found")
-        if billing.is_zero_balance(org.credits_balance):
+        if is_zero_balance(org.credits_balance):
             raise HTTPException(status_code=402, detail="Insufficient credits")
         # @state workflows.ActivateWorkflow — transition guard
         allowed_activate_workflow: dict[str, bool] = {
@@ -61,7 +59,6 @@ async def add_action(session: AsyncSession, id: int, body: AddActionRequest, cur
             current_user,
             action="AddAction",
             resource="workflow",
-            resource_id=id,
             resource_id=str(id),
             owners={"workflows": {"org_id": owner}},
         )
@@ -87,7 +84,6 @@ async def archive_workflow(session: AsyncSession, id: int, current_user: dict | 
             current_user,
             action="ArchiveWorkflow",
             resource="workflow",
-            resource_id=id,
             resource_id=str(id),
             owners={"workflows": {"org_id": owner}},
         )
@@ -121,7 +117,6 @@ async def auto_assign_workflow(session: AsyncSession, id: int, current_user: dic
             current_user,
             action="AutoAssignWorkflow",
             resource="workflow",
-            resource_id=id,
             resource_id=str(id),
             owners={"workflows": {"org_id": owner}},
         )
@@ -131,7 +126,7 @@ async def auto_assign_workflow(session: AsyncSession, id: int, current_user: dic
             raise HTTPException(status_code=404, detail="Workflow not found")
         result = await session.execute(select(User).where(User.org_id == wf.org_id))
         memberCount = result.scalars().first()
-        match = await workflow.match_member(memberCount, wf.trigger_event)
+        match = await match_member(memberCount, wf.trigger_event)
         await session.execute(
             update(Workflow).where(Workflow.id == wf.id).values(confidence=match.confidence, member_id=match.member_id)
         )
@@ -169,7 +164,6 @@ async def create_workflow_version(session: AsyncSession, id: int, current_user: 
             current_user,
             action="CreateWorkflowVersion",
             resource="workflow",
-            resource_id=id,
             resource_id=str(id),
             owners={"workflows": {"org_id": owner}},
         )
@@ -177,8 +171,8 @@ async def create_workflow_version(session: AsyncSession, id: int, current_user: 
         wf = result.scalars().first()
         if not wf:
             raise HTTPException(status_code=404, detail="Workflow not found")
-        rootResult = await version.resolve_root_id(wf.root_workflow_id, wf.id)
-        versionResult = await version.next_version(wf.version)
+        rootResult = await resolve_root_id(wf.root_workflow_id, wf.id)
+        versionResult = await next_version(wf.version)
         newWf = Workflow(org_id=wf.org_id, root_workflow_id=rootResult.root_workflow_id, title=wf.title, trigger_event=wf.trigger_event, version=versionResult.version)
         session.add(newWf)
         await session.flush()
@@ -200,7 +194,6 @@ async def execute_with_report(session: AsyncSession, id: int, current_user: dict
             current_user,
             action="ExecuteWorkflow",
             resource="workflow",
-            resource_id=id,
             resource_id=str(id),
             owners={"workflows": {"org_id": owner}},
         )
@@ -218,13 +211,13 @@ async def execute_with_report(session: AsyncSession, id: int, current_user: dict
         org = result.scalars().first()
         if not org:
             raise HTTPException(status_code=404, detail="Organization not found")
-        if billing.is_zero_balance(org.credits_balance):
+        if is_zero_balance(org.credits_balance):
             raise HTTPException(status_code=402, detail="Insufficient credits")
-        actionResult = await worker.process_action(wf.trigger_event, params)
+        actionResult = await process_action(wf.trigger_event, params)
         await session.execute(
             update(Organization).where(Organization.id == org.id).values(amount=1)
         )
-        reportResult = await report.generate_report(1, "completed", wf.title)
+        reportResult = await generate_report(1, "completed", wf.title)
         log = ExecutionLog(credits_spent=1, org_id=wf.org_id, report_key=reportResult.report_key, status="completed", workflow_id=wf.workflow_id)
         session.add(log)
         await session.flush()
@@ -245,7 +238,6 @@ async def execute_workflow(session: AsyncSession, id: int, current_user: dict | 
             current_user,
             action="ExecuteWorkflow",
             resource="workflow",
-            resource_id=id,
             resource_id=str(id),
             owners={"workflows": {"org_id": owner}},
         )
@@ -263,9 +255,9 @@ async def execute_workflow(session: AsyncSession, id: int, current_user: dict | 
         org = result.scalars().first()
         if not org:
             raise HTTPException(status_code=404, detail="Organization not found")
-        if billing.is_zero_balance(org.credits_balance):
+        if is_zero_balance(org.credits_balance):
             raise HTTPException(status_code=402, detail="Insufficient credits")
-        actionResult = await worker.process_action(wf.trigger_event, params)
+        actionResult = await process_action(wf.trigger_event, params)
         await session.execute(
             update(Organization).where(Organization.id == org.id).values(amount=1)
         )
@@ -292,7 +284,6 @@ async def get_workflow(session: AsyncSession, id: int, current_user: dict | None
         current_user,
         action="GetWorkflow",
         resource="workflow",
-        resource_id=id,
         resource_id=str(id),
         owners={"workflows": {"org_id": owner}},
     )
@@ -314,7 +305,6 @@ async def list_execution_logs(session: AsyncSession, id: int, current_user: dict
         current_user,
         action="ListExecutionLogs",
         resource="workflow",
-        resource_id=id,
         resource_id=str(id),
         owners={"workflows": {"org_id": owner}},
     )
@@ -338,7 +328,6 @@ async def list_workflow_versions(session: AsyncSession, id: int, current_user: d
         current_user,
         action="ListWorkflowVersions",
         resource="workflow",
-        resource_id=id,
         resource_id=str(id),
         owners={"workflows": {"org_id": owner}},
     )
@@ -376,7 +365,6 @@ async def pause_workflow(session: AsyncSession, id: int, current_user: dict | No
             current_user,
             action="PauseWorkflow",
             resource="workflow",
-            resource_id=id,
             resource_id=str(id),
             owners={"workflows": {"org_id": owner}},
         )
@@ -410,7 +398,6 @@ async def save_workflow_actions(session: AsyncSession, id: int, body: SaveWorkfl
             current_user,
             action="SaveWorkflowActions",
             resource="workflow",
-            resource_id=id,
             resource_id=str(id),
             owners={"workflows": {"org_id": owner}},
         )
