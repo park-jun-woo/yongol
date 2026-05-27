@@ -3,7 +3,7 @@ package service
 // @auth "ArchiveWorkflow" "workflow" {ResourceID: request.id} "Forbidden" 403
 // @get Workflow wf = Workflow.FindByID({ID: request.id})
 // @empty wf "Workflow not found" 404
-// @state workflow {status: wf.Status} "ArchiveWorkflow" "Cannot archive workflow" 409
+// @state workflows {status: wf.Status} "ArchiveWorkflow" "Cannot archive workflow" 409
 // @put Workflow.UpdateStatus({ID: wf.ID, Status: "archived"})
 // @get Workflow updated = Workflow.FindByID({ID: wf.ID})
 // @response { workflow: updated }

@@ -36,7 +36,7 @@ func buildActiveBlocks(fs *yongol.Fullstack, ps *prepared.State) []BootBlock {
 		{Name: "router", Active: true},
 		{Name: "request-id", Active: true},
 		{Name: "error-envelope", Active: true},
-		{Name: "cors", Active: corsActive},
+		{Name: "cors", Active: corsActive, Config: buildCORSConfig(fs)},
 		{Name: "prometheus", Active: promActive},
 		{Name: "security-headers", Active: secHeadersActive},
 		{Name: "csrf", Active: csrfActive},

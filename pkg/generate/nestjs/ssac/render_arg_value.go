@@ -11,6 +11,10 @@ import (
 )
 
 // renderArgValue produces a TypeScript expression for a FieldArg.
+// SSaC source references are mapped to NestJS parameter names:
+//   - request.{field} → params.{field} (path parameter) or body.{field}
+//   - request.Params.{field} → query.{field}
+//   - currentUser.{field} → user.{field}
 func renderArgValue(a ir.FieldArg) string {
 	if a.Literal != "" {
 		if a.IsQuoted {
@@ -24,7 +28,7 @@ func renderArgValue(a ir.FieldArg) string {
 	}
 	field := strings.TrimPrefix(a.Field, ".")
 	if field == "" {
-		return source
+		return mapSource(source)
 	}
-	return fmt.Sprintf("%s.%s", source, lcFirst(field))
+	return renderSourceField(source, field)
 }

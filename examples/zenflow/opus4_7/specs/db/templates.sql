@@ -1,7 +1,7 @@
 CREATE TABLE templates (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    source_workflow_id UUID NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000' REFERENCES workflows(id),
-    org_id UUID NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000' REFERENCES organizations(id),
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    source_workflow_id BIGINT NOT NULL DEFAULT 0 REFERENCES workflows(id),
+    org_id BIGINT NOT NULL DEFAULT 0 REFERENCES organizations(id),
     title TEXT NOT NULL,
     description TEXT NOT NULL DEFAULT '',
     category VARCHAR(100) NOT NULL DEFAULT '',

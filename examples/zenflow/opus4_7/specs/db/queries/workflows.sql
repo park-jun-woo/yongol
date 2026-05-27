@@ -24,7 +24,7 @@ SELECT * FROM workflows WHERE (root_workflow_id = @root_id OR id = @root_id) AND
 
 -- name: WorkflowAutoAssign :exec
 UPDATE workflows
-SET assigned_to = sqlc.arg(member_id)::text::uuid,
+SET assigned_to = sqlc.arg(member_id)::bigint,
     assignment_confidence = @confidence
 WHERE id = @id;
 

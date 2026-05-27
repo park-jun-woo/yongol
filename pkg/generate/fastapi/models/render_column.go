@@ -1,5 +1,5 @@
 //ff:func feature=gen-fastapi type=util control=sequence
-//ff:what renderColumn — 단일 DDL Column → SQLAlchemy mapped_column 한 줄 렌더링
+//ff:what renderColumn — 단일 DDL Column → SQLAlchemy mapped_column 한 줄 렌더링 (ForeignKey 포함)
 
 package models
 
@@ -11,12 +11,20 @@ import (
 )
 
 // renderColumn writes a single mapped_column line for a DDL column.
-func renderColumn(b *strings.Builder, col ddl.Column, colName string, primaryKey []string) {
+// When the column has a foreign key reference, ForeignKey("table.col") is
+// included in the mapped_column arguments.
+func renderColumn(b *strings.Builder, col ddl.Column, colName string, primaryKey []string, fks []ddl.ForeignKey) {
 	saType := mapPGToSA(col.RawType)
 	pyType := mapPGToPython(col.RawType, col.NotNull)
 
 	var attrs []string
 	attrs = append(attrs, saType)
+
+	// ForeignKey if this column references another table.
+	fkAttr := findForeignKeyAttr(fks, colName)
+	if fkAttr != "" {
+		attrs = append(attrs, fkAttr)
+	}
 
 	if isPrimaryKey(colName, primaryKey) {
 		attrs = append(attrs, "primary_key=True")

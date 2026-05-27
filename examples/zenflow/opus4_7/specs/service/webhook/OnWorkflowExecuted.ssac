@@ -3,8 +3,8 @@ package service
 import "github.com/park-jun-woo/zenflow/internal/webhookdelivery"
 
 type WorkflowExecutedMessage struct {
-	WorkflowID string
-	OrgID      string
+	WorkflowID int64
+	OrgID      int64
 	Status     string
 }
 

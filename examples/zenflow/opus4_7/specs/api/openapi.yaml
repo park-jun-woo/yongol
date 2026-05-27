@@ -23,7 +23,7 @@ components:
     Organization:
       type: object
       properties:
-        id: { type: string, format: uuid }
+        id: { type: integer, format: int64 }
         name: { type: string }
         plan_type: { type: string }
         credits_balance: { type: integer, format: int64 }
@@ -34,38 +34,38 @@ components:
     User:
       type: object
       properties:
-        id: { type: string, format: uuid }
-        org_id: { type: string, format: uuid }
+        id: { type: integer, format: int64 }
+        org_id: { type: integer, format: int64 }
         email: { type: string }
         role: { type: string }
         created_at: { type: string, format: date-time }
     Workflow:
       type: object
       properties:
-        id: { type: string, format: uuid }
-        org_id: { type: string, format: uuid }
+        id: { type: integer, format: int64 }
+        org_id: { type: integer, format: int64 }
         title: { type: string }
         trigger_event: { type: string }
         status: { type: string }
         version: { type: integer, format: int64 }
-        root_workflow_id: { type: string, format: uuid }
-        assigned_to: { type: string, format: uuid }
+        root_workflow_id: { type: integer, format: int64 }
+        assigned_to: { type: integer, format: int64 }
         assignment_confidence: { type: string }
         created_at: { type: string, format: date-time }
     Action:
       type: object
       properties:
-        id: { type: string, format: uuid }
-        workflow_id: { type: string, format: uuid }
+        id: { type: integer, format: int64 }
+        workflow_id: { type: integer, format: int64 }
         action_type: { type: string }
         config: { type: string }
         sequence_order: { type: integer, format: int64 }
     ExecutionLog:
       type: object
       properties:
-        id: { type: string, format: uuid }
-        workflow_id: { type: string, format: uuid }
-        org_id: { type: string, format: uuid }
+        id: { type: integer, format: int64 }
+        workflow_id: { type: integer, format: int64 }
+        org_id: { type: integer, format: int64 }
         status: { type: string }
         credits_spent: { type: integer, format: int64 }
         report_key: { type: string }
@@ -73,9 +73,9 @@ components:
     AuditLog:
       type: object
       properties:
-        id: { type: string, format: uuid }
-        org_id: { type: string, format: uuid }
-        actor_id: { type: string, format: uuid }
+        id: { type: integer, format: int64 }
+        org_id: { type: integer, format: int64 }
+        actor_id: { type: integer, format: int64 }
         action: { type: string, maxLength: 100 }
         resource_type: { type: string, maxLength: 50 }
         resource_id: { type: string }
@@ -115,9 +115,9 @@ components:
     Template:
       type: object
       properties:
-        id: { type: string, format: uuid }
-        source_workflow_id: { type: string, format: uuid }
-        org_id: { type: string, format: uuid }
+        id: { type: integer, format: int64 }
+        source_workflow_id: { type: integer, format: int64 }
+        org_id: { type: integer, format: int64 }
         title: { type: string }
         description: { type: string }
         category: { type: string, maxLength: 100 }
@@ -126,8 +126,8 @@ components:
     Webhook:
       type: object
       properties:
-        id: { type: string, format: uuid }
-        org_id: { type: string, format: uuid }
+        id: { type: integer, format: int64 }
+        org_id: { type: integer, format: int64 }
         url: { type: string }
         event_type: { type: string }
         created_at: { type: string, format: date-time }
@@ -227,7 +227,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: string, format: uuid }
+          schema: { type: integer, format: int64 }
       responses:
         '200':
           description: OK
@@ -257,7 +257,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: string, format: uuid }
+          schema: { type: integer, format: int64 }
       requestBody:
         required: true
         content:
@@ -296,7 +296,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: string, format: uuid }
+          schema: { type: integer, format: int64 }
       requestBody:
         required: true
         content:
@@ -340,7 +340,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: string, format: uuid }
+          schema: { type: integer, format: int64 }
       responses:
         '200':
           description: OK
@@ -380,7 +380,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: string, format: uuid }
+          schema: { type: integer, format: int64 }
       responses:
         '200':
           description: OK
@@ -415,7 +415,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: string, format: uuid }
+          schema: { type: integer, format: int64 }
       responses:
         '200':
           description: OK
@@ -450,7 +450,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: string, format: uuid }
+          schema: { type: integer, format: int64 }
       responses:
         '200':
           description: OK
@@ -496,7 +496,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: string, format: uuid }
+          schema: { type: integer, format: int64 }
       responses:
         '200':
           description: OK
@@ -528,7 +528,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: string, format: uuid }
+          schema: { type: integer, format: int64 }
       responses:
         '201':
           description: Created
@@ -563,7 +563,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: string, format: uuid }
+          schema: { type: integer, format: int64 }
       responses:
         '200':
           description: OK
@@ -645,7 +645,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: string, format: uuid }
+          schema: { type: integer, format: int64 }
       responses:
         '204':
           description: No Content
@@ -673,7 +673,7 @@ paths:
               type: object
               required: [source_workflow_id, title, description, category]
               properties:
-                source_workflow_id: { type: string, format: uuid }
+                source_workflow_id: { type: integer, format: int64 }
                 title: { type: string }
                 description: { type: string }
                 category: { type: string, maxLength: 100 }
@@ -726,7 +726,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: string, format: uuid }
+          schema: { type: integer, format: int64 }
       responses:
         '200':
           description: OK
@@ -751,7 +751,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: string, format: uuid }
+          schema: { type: integer, format: int64 }
       responses:
         '201':
           description: Created
@@ -781,7 +781,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: string, format: uuid }
+          schema: { type: integer, format: int64 }
       responses:
         '200':
           description: OK
@@ -828,7 +828,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: string, format: uuid }
+          schema: { type: integer, format: int64 }
       responses:
         '200':
           description: OK
@@ -858,7 +858,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: string, format: uuid }
+          schema: { type: integer, format: int64 }
       requestBody:
         required: true
         content:
@@ -900,7 +900,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: string, format: uuid }
+          schema: { type: integer, format: int64 }
       responses:
         '200':
           description: OK
@@ -933,7 +933,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: string, format: uuid }
+          schema: { type: integer, format: int64 }
       responses:
         '204':
           description: No Content
@@ -1042,7 +1042,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: string, format: uuid }
+          schema: { type: integer, format: int64 }
       responses:
         '200':
           description: OK
@@ -1072,7 +1072,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: string, format: uuid }
+          schema: { type: integer, format: int64 }
       responses:
         '200':
           description: OK
@@ -1107,7 +1107,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: string, format: uuid }
+          schema: { type: integer, format: int64 }
       responses:
         '200':
           description: OK
@@ -1142,7 +1142,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: string, format: uuid }
+          schema: { type: integer, format: int64 }
       requestBody:
         required: true
         content:

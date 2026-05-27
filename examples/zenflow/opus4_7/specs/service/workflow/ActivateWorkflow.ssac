@@ -8,7 +8,7 @@ import "github.com/park-jun-woo/zenflow/internal/billing"
 // @get Organization org = Organization.FindByID({ID: wf.OrgID})
 // @empty org "Organization not found" 404
 // @eval billing.IsZeroBalance({Balance: org.CreditsBalance}) "Insufficient credits" 402
-// @state workflow {status: wf.Status} "ActivateWorkflow" "Cannot activate workflow" 409
+// @state workflows {status: wf.Status} "ActivateWorkflow" "Cannot activate workflow" 409
 // @put Workflow.UpdateStatus({ID: wf.ID, Status: "active"})
 // @get Workflow updated = Workflow.FindByID({ID: wf.ID})
 // @response { workflow: updated }

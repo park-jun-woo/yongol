@@ -1,128 +1,175 @@
+tables:
+  organizations: {}
+  users: {}
+  workflows:
+    states:
+    - draft
+    - active
+    - paused
+    - archived
+  actions: {}
+  execution_logs: {}
+  webhooks: {}
+  templates: {}
+  audit_logs: {}
 features:
   - op: Login
     path: POST /auth/login
     desc: Authenticate user and issue JWT token
+    table: users
+    public: true
 
   - op: CreateWorkflow
     path: POST /workflows
     desc: Create a new workflow in draft state
+    table: workflows
 
   - op: ListWorkflows
     path: GET /workflows
     desc: List workflows for the current org
+    table: workflows
 
   - op: GetWorkflow
     path: GET /workflows/{id}
     desc: Get workflow detail
+    table: workflows
 
   - op: AddAction
     path: POST /workflows/{id}/actions
     desc: Add an action to a workflow
+    table: actions
 
   - op: ActivateWorkflow
     path: POST /workflows/{id}/activate
     desc: Transition workflow to active (requires credits > 0)
+    table: workflows
 
   - op: PauseWorkflow
     path: POST /workflows/{id}/pause
     desc: Pause an active workflow
+    table: workflows
 
   - op: ArchiveWorkflow
     path: POST /workflows/{id}/archive
     desc: Archive an active workflow
+    table: workflows
 
   - op: ExecuteWorkflow
     path: POST /workflows/{id}/execute
     desc: Run all actions, deduct credit, log result
+    table: workflows
 
   - op: ListExecutionLogs
     path: GET /workflows/{id}/execution-logs
     desc: List execution logs for a workflow
+    table: execution_logs
 
   - op: CreateWorkflowVersion
     path: POST /workflows/{id}/new-version
     desc: Clone workflow into a new draft version with copied actions
+    table: workflows
 
   - op: ListWorkflowVersions
     path: GET /workflows/{id}/versions
     desc: List all versions by root_workflow_id
+    table: workflows
 
   - op: CreateWebhook
     path: POST /webhooks
     desc: Register a webhook URL for the org
+    table: webhooks
 
   - op: ListWebhooks
     path: GET /webhooks
     desc: List org webhooks
+    table: webhooks
 
   - op: DeleteWebhook
     path: DELETE /webhooks/{id}
     desc: Delete a webhook
+    table: webhooks
 
   - op: PublishTemplate
     path: POST /templates
     desc: Publish a workflow as a public template
+    table: templates
 
   - op: ListTemplates
     path: GET /templates
     desc: Cursor-paginated template search with category filter
+    table: templates
 
   - op: GetTemplate
     path: GET /templates/{id}
     desc: Template detail
+    table: templates
 
   - op: CloneTemplate
     path: POST /templates/{id}/clone
     desc: Clone a template into caller org as a new workflow
+    table: templates
 
   - op: ExecuteWithReport
     path: POST /workflows/{id}/execute-with-report
     desc: Execute workflow and generate/upload report file
+    table: execution_logs
 
   - op: GetExecutionReport
     path: GET /execution-logs/{id}/report
     desc: Download the report file linked to an execution log
+    table: execution_logs
 
   - op: SetSchedule
     path: POST /workflows/{id}/schedule
     desc: Register a cron schedule for a workflow
+    table: workflows
 
   - op: GetSchedule
     path: GET /workflows/{id}/schedule
     desc: Read current schedule from session
+    table: workflows
 
   - op: DeleteSchedule
     path: DELETE /workflows/{id}/schedule
     desc: Clear schedule from session
+    table: workflows
 
   - op: ListAuditLogs
     path: GET /audit-logs
     desc: Offset-paginated audit logs with sort and filter
+    table: audit_logs
 
   - op: GetRecentAuditLogs
     path: GET /audit-logs/recent
     desc: Cache-backed recent entries for dashboard
+    table: audit_logs
 
   - op: SaveWorkflowActions
     path: PUT /workflows/{id}/actions
     desc: Replace all actions of a workflow via batch insert
+    table: actions
 
   - op: GetDashboard
     path: GET /dashboard
     desc: Org dashboard summary with credits and plan info
+    table: organizations
 
   - op: GetAuditLog
     path: GET /audit-logs/{id}
     desc: Get audit log detail by ID
+    table: audit_logs
 
   - op: AutoAssignWorkflow
     path: POST /workflows/{id}/auto-assign
     desc: Auto-assign workflow to best-matching team member
+    table: workflows
 
   - op: VerifyOrgAddress
     path: POST /organizations/{id}/verify-address
     desc: Verify and geocode an organization address
+    table: organizations
 
   - op: GetExecutionDetail
     path: GET /execution-logs/{id}/detail
     desc: Enriched execution log detail with workflow and org info
+    table: execution_logs

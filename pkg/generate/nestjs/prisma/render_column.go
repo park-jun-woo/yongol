@@ -11,13 +11,21 @@ import (
 )
 
 // renderColumn writes a single Prisma field line for a DDL column.
-func renderColumn(b *strings.Builder, col ddl.Column, colName string, primaryKey []string) {
+func renderColumn(b *strings.Builder, col ddl.Column, colName string, primaryKey []string, indexes ...[]ddl.Index) {
 	prismaType := pgToPrismaType(col.RawType)
 	optional := ""
 	if !col.NotNull && !isPrimaryKey(colName, primaryKey) {
 		optional = "?"
 	}
 	attrs := columnAttributes(col, colName, primaryKey)
+	// Check single-column unique indexes.
+	if len(indexes) > 0 && isColumnUnique(colName, indexes[0]) {
+		if attrs != "" {
+			attrs += " @unique"
+		} else {
+			attrs = "@unique"
+		}
+	}
 	if attrs != "" {
 		attrs = " " + attrs
 	}

@@ -19,9 +19,10 @@ import (
 //  1. Build IR plans (ServicePlan, BootPlan, MiddlewarePlan, InfraPlan)
 //  2. Render scaffold (pyproject.toml, requirements.txt, .env.example)
 //  3. Render SQLAlchemy models from DDL tables
-//  4. For each service func, render router + service
-//  5. Render main.py + config.py + database.py
-//  6. Write all files to dir
+//  4. Generate infrastructure stubs (event_bus, authz, external packages)
+//  5. For each service func, render router + service
+//  6. Render main.py + config.py + database.py
+//  7. Write all files to dir
 func Generate(fs *yongol.Fullstack, dir string) error {
 	psVal := prepared.New(fs)
 	ps := &psVal
@@ -49,6 +50,29 @@ func Generate(fs *yongol.Fullstack, dir string) error {
 	if err := writeDependencies(appDir); err != nil {
 		return fmt.Errorf("dependencies: %w", err)
 	}
+
+	// Generate event bus infrastructure when @publish exists.
+	if hasPublishPlans(plansByFeature) {
+		if err := writeEventBus(appDir); err != nil {
+			return fmt.Errorf("event bus: %w", err)
+		}
+	}
+
+	// Generate authz infrastructure when @auth exists.
+	if hasAuthPlans(plansByFeature) {
+		if err := writeAuthz(appDir); err != nil {
+			return fmt.Errorf("authz: %w", err)
+		}
+	}
+
+	// Generate stub modules for external packages referenced by @call/@eval.
+	extPkgs := collectExternalPackages(plansByFeature)
+	if len(extPkgs) > 0 {
+		if err := writeFuncStubs(appDir, extPkgs); err != nil {
+			return fmt.Errorf("func stubs: %w", err)
+		}
+	}
+
 	featureNames, err := writeFeatureModules(plansByFeature, appDir, reg)
 	if err != nil {
 		return err

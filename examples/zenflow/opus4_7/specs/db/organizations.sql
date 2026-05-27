@@ -1,5 +1,5 @@
 CREATE TABLE organizations (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name TEXT NOT NULL,
     plan_type VARCHAR(20) NOT NULL DEFAULT 'free' CHECK (plan_type IN ('free', 'pro', 'enterprise')),
     credits_balance BIGINT NOT NULL DEFAULT 0,
@@ -11,5 +11,6 @@ CREATE TABLE organizations (
 
 -- @sentinel
 INSERT INTO organizations (id, name, plan_type, credits_balance)
-VALUES ('00000000-0000-0000-0000-000000000000', 'system', 'free', 0)
+OVERRIDING SYSTEM VALUE
+VALUES (0, 'system', 'free', 0)
 ON CONFLICT DO NOTHING;

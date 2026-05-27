@@ -12,7 +12,7 @@ SELECT * FROM templates WHERE source_workflow_id = @source_workflow_id;
 -- name: TemplateListCursor :many
 SELECT * FROM templates
 WHERE (@category::text = '' OR category = @category)
-AND (@cursor::text = '' OR id < @cursor::uuid)
+AND (@cursor::bigint = 0 OR id < @cursor::bigint)
 ORDER BY id DESC
 LIMIT sqlc.arg(per_page)::bigint;
 

@@ -20,7 +20,10 @@ func writeOneFeature(feature string, plans []*ir.ServicePlan, appDir string, reg
 		return fmt.Errorf("mkdir services: %w", err)
 	}
 
+	// Write consolidated imports once, then each function body.
+	imports := ssac.WriteFeatureImports(plans)
 	var svcContent string
+	svcContent += imports
 	for _, plan := range plans {
 		content, err := ssac.RenderService(plan, reg)
 		if err != nil {

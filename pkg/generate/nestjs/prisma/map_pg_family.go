@@ -7,7 +7,7 @@ package prisma
 func mapPGFamily(upper string) string {
 	switch upper {
 	case "BIGINT", "BIGSERIAL":
-		return "BigInt"
+		return "Int"
 	case "INTEGER", "INT", "SERIAL", "INT4", "SMALLINT", "INT2":
 		return "Int"
 	case "TEXT", "VARCHAR", "CHAR", "CHARACTER VARYING", "CITEXT":

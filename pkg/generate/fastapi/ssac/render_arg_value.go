@@ -1,5 +1,5 @@
 //ff:func feature=gen-fastapi type=util control=sequence
-//ff:what renderArgValue — FieldArg → Python 식별자/리터럴 표현식 생성
+//ff:what renderArgValue — FieldArg → Python 식별자/리터럴 표현식 생성 (source 매핑 포함)
 
 package ssac
 
@@ -11,6 +11,11 @@ import (
 )
 
 // renderArgValue produces a Python expression for a FieldArg.
+// SSaC source references are mapped to Python parameter names:
+//   - request.{field} → params["{snake_field}"]
+//   - request.Params.{field} → params["{snake_field}"] (query params merged)
+//   - currentUser.{field} → user["{snake_field}"]
+//   - {varName}.{field} → {varName}["{snake_field}"] (result dict access)
 func renderArgValue(a ir.FieldArg) string {
 	if a.Literal != "" {
 		if a.IsQuoted {
@@ -24,7 +29,7 @@ func renderArgValue(a ir.FieldArg) string {
 	}
 	field := strings.TrimPrefix(a.Field, ".")
 	if field == "" {
-		return source
+		return mapSource(source)
 	}
-	return fmt.Sprintf("%s[\"%s\"]", source, field)
+	return renderSourceField(source, field)
 }

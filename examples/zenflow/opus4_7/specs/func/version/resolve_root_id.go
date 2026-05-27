@@ -1,22 +1,19 @@
 package version
 
-import "github.com/jackc/pgx/v5/pgtype"
-
 // @func resolveRootID
-// @description If root_workflow_id is zero UUID, return own ID; else return existing root
+// @description If root_workflow_id is zero, return own ID; else return existing root
 
 type ResolveRootIDRequest struct {
-	WorkflowID     pgtype.UUID
-	RootWorkflowID pgtype.UUID
+	WorkflowID     int64
+	RootWorkflowID int64
 }
 
 type ResolveRootIDResponse struct {
-	RootID pgtype.UUID
+	RootID int64
 }
 
 func ResolveRootID(req ResolveRootIDRequest) (ResolveRootIDResponse, error) {
-	zeroBytes := [16]byte{}
-	if !req.RootWorkflowID.Valid || req.RootWorkflowID.Bytes == zeroBytes {
+	if req.RootWorkflowID == 0 {
 		return ResolveRootIDResponse{RootID: req.WorkflowID}, nil
 	}
 	return ResolveRootIDResponse{RootID: req.RootWorkflowID}, nil

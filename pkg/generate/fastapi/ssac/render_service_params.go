@@ -6,10 +6,19 @@ package ssac
 import "github.com/park-jun-woo/yongol/pkg/generate/ir"
 
 // renderServiceParams produces the Python parameter list for the service
-// function based on the plan's trigger kind.
+// function based on the plan's trigger kind. Adds event_bus parameter when
+// the plan contains @publish operations.
 func renderServiceParams(plan *ir.ServicePlan) string {
 	if plan.TriggerKind == ir.TriggerSubscribe {
-		return "session: AsyncSession, payload: dict"
+		base := "session: AsyncSession, payload: dict"
+		if hasPublishOp(plan.Ops) {
+			base += ", event_bus: EventBus | None = None"
+		}
+		return base
 	}
-	return "session: AsyncSession, params: dict, body: dict, user: dict | None = None"
+	base := "session: AsyncSession, params: dict, body: dict, user: dict | None = None"
+	if hasPublishOp(plan.Ops) {
+		base += ", event_bus: EventBus | None = None"
+	}
+	return base
 }

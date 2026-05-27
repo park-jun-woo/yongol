@@ -1,12 +1,12 @@
 package schedule
 
-import openapi_types "github.com/oapi-codegen/runtime/types"
+import "fmt"
 
 // @func buildKey
 // @description Build a session key from workflow ID
 
 type BuildKeyRequest struct {
-	WorkflowID openapi_types.UUID
+	WorkflowID int64
 }
 
 type BuildKeyResponse struct {
@@ -14,5 +14,5 @@ type BuildKeyResponse struct {
 }
 
 func BuildKey(req BuildKeyRequest) (BuildKeyResponse, error) {
-	return BuildKeyResponse{Key: "schedule:" + req.WorkflowID.String()}, nil
+	return BuildKeyResponse{Key: fmt.Sprintf("schedule:%d", req.WorkflowID)}, nil
 }

@@ -1,8 +1,8 @@
 {
   "project": "/home/parkjunwoo/.clari/repos/fullend/yongol",
   "lang": "go",
-  "checked_at": "2026-05-27T07:24:49.144156828+09:00",
-  "current_index": 0,
+  "checked_at": "2026-05-27T13:50:14.753339671+09:00",
+  "current_index": 37,
   "functions": [
     {
       "qualified_name": "cmd/yongol.agentCmd",
@@ -11,7 +11,10 @@
       "start_line": 14,
       "end_line": 49,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/agent_cmd_test.go",
+      "test_mtime": "2026-05-27T13:41:16+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.chainCmd",
@@ -20,7 +23,11 @@
       "start_line": 14,
       "end_line": 41,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/chain_cmd_test.go",
+      "test_mtime": "2026-05-27T13:51:00+09:00",
+      "status": "done",
+      "coverage_pct": 88.88888888888889,
+      "attempt": 1
     },
     {
       "qualified_name": "cmd/yongol.classifyDiagnostics",
@@ -29,7 +36,10 @@
       "start_line": 7,
       "end_line": 17,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/classify_diagnostics_test.go",
+      "test_mtime": "2026-05-27T13:43:25+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.collectIssues",
@@ -38,7 +48,10 @@
       "start_line": 10,
       "end_line": 18,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/collect_issues_test.go",
+      "test_mtime": "2026-05-27T13:44:12+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.countBackendFiles",
@@ -47,7 +60,10 @@
       "start_line": 16,
       "end_line": 39,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/count_backend_files_test.go",
+      "test_mtime": "2026-05-27T13:44:41+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.countLevels",
@@ -56,7 +72,10 @@
       "start_line": 7,
       "end_line": 17,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/count_levels_test.go",
+      "test_mtime": "2026-05-27T13:44:57+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.countPreserved",
@@ -65,7 +84,10 @@
       "start_line": 15,
       "end_line": 25,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/count_preserved_test.go",
+      "test_mtime": "2026-05-27T13:46:01+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.featuresAddCmd",
@@ -74,7 +96,10 @@
       "start_line": 13,
       "end_line": 26,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/features_add_cmd_test.go",
+      "test_mtime": "2026-05-27T13:46:19+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.featuresCmd",
@@ -83,7 +108,10 @@
       "start_line": 12,
       "end_line": 22,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/features_cmd_test.go",
+      "test_mtime": "2026-05-27T13:46:24+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.featuresRemoveCmd",
@@ -92,7 +120,10 @@
       "start_line": 13,
       "end_line": 28,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/features_remove_cmd_test.go",
+      "test_mtime": "2026-05-27T13:47:05+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.formatLocation",
@@ -101,7 +132,10 @@
       "start_line": 9,
       "end_line": 17,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/format_location_test.go",
+      "test_mtime": "2026-05-27T13:47:24+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.formatStepLine",
@@ -110,7 +144,10 @@
       "start_line": 12,
       "end_line": 22,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/format_step_line_test.go",
+      "test_mtime": "2026-05-27T13:47:39+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.generateCmd",
@@ -119,7 +156,11 @@
       "start_line": 23,
       "end_line": 85,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/generate_cmd_test.go",
+      "test_mtime": "2026-05-27T13:51:49+09:00",
+      "status": "done",
+      "coverage_pct": 73.68421052631578,
+      "attempt": 1
     },
     {
       "qualified_name": "cmd/yongol.hashCmd",
@@ -128,7 +169,10 @@
       "start_line": 14,
       "end_line": 26,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/hash_cmd_test.go",
+      "test_mtime": "2026-05-27T13:48:59+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.importCmd",
@@ -137,7 +181,11 @@
       "start_line": 13,
       "end_line": 25,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/import_cmd_test.go",
+      "test_mtime": "2026-05-27T13:52:27+09:00",
+      "status": "pass",
+      "coverage_pct": 100,
+      "attempt": 1
     },
     {
       "qualified_name": "cmd/yongol.initCmd",
@@ -146,7 +194,11 @@
       "start_line": 15,
       "end_line": 47,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/init_cmd_test.go",
+      "test_mtime": "2026-05-27T13:52:52+09:00",
+      "status": "pass",
+      "coverage_pct": 100,
+      "attempt": 1
     },
     {
       "qualified_name": "cmd/yongol.latestSQLFileName",
@@ -155,7 +207,10 @@
       "start_line": 13,
       "end_line": 25,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/latest_sql_file_name_test.go",
+      "test_mtime": "2026-05-27T13:49:23+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.newRoot",
@@ -164,7 +219,10 @@
       "start_line": 13,
       "end_line": 39,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/new_root_test.go",
+      "test_mtime": "2026-05-27T13:53:14+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.nextCmd",
@@ -173,7 +231,11 @@
       "start_line": 19,
       "end_line": 54,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/next_cmd_test.go",
+      "test_mtime": "2026-05-27T13:53:48+09:00",
+      "status": "done",
+      "coverage_pct": 91.66666666666666,
+      "attempt": 1
     },
     {
       "qualified_name": "cmd/yongol.parseModelFlag",
@@ -182,7 +244,10 @@
       "start_line": 13,
       "end_line": 30,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/parse_model_flag_test.go",
+      "test_mtime": "2026-05-27T13:54:04+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.printArtifactsSummary",
@@ -191,7 +256,10 @@
       "start_line": 17,
       "end_line": 27,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/print_artifacts_summary_test.go",
+      "test_mtime": "2026-05-27T14:16:34+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.printDiagFile",
@@ -200,7 +268,10 @@
       "start_line": 12,
       "end_line": 21,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/print_diag_file_test.go",
+      "test_mtime": "2026-05-27T14:17:13+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.printDriftList",
@@ -209,7 +280,10 @@
       "start_line": 17,
       "end_line": 37,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/print_drift_list_test.go",
+      "test_mtime": "2026-05-27T14:17:33+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.printGroupedDiags",
@@ -218,7 +292,10 @@
       "start_line": 12,
       "end_line": 25,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/print_grouped_diags_test.go",
+      "test_mtime": "2026-05-27T14:18:00+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.printLevelDiags",
@@ -228,7 +305,10 @@
       "end_line": 36,
       "exported": false,
       "test_file": "cmd/yongol/print_level_diags_test.go",
-      "status": "todo"
+      "test_mtime": "2026-05-27T14:18:54+09:00",
+      "status": "pass",
+      "coverage_pct": 100,
+      "attempt": 1
     },
     {
       "qualified_name": "cmd/yongol.printMigrationLatestFile",
@@ -237,7 +317,10 @@
       "start_line": 17,
       "end_line": 31,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/print_migration_latest_file_test.go",
+      "test_mtime": "2026-05-27T14:19:26+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.printMigrationPendingDiff",
@@ -246,7 +329,11 @@
       "start_line": 16,
       "end_line": 41,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/print_migration_pending_diff_test.go",
+      "test_mtime": "2026-05-27T14:20:33+09:00",
+      "status": "pass",
+      "coverage_pct": 100,
+      "attempt": 1
     },
     {
       "qualified_name": "cmd/yongol.printMigrationSnapshotInfo",
@@ -255,7 +342,10 @@
       "start_line": 18,
       "end_line": 40,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/print_migration_snapshot_info_test.go",
+      "test_mtime": "2026-05-27T14:21:11+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.printMigrationStatus",
@@ -264,7 +354,11 @@
       "start_line": 16,
       "end_line": 28,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/print_migration_status_test.go",
+      "test_mtime": "2026-05-27T14:21:49+09:00",
+      "status": "pass",
+      "coverage_pct": 100,
+      "attempt": 1
     },
     {
       "qualified_name": "cmd/yongol.printNextDiag",
@@ -273,7 +367,10 @@
       "start_line": 13,
       "end_line": 24,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/print_next_diag_test.go",
+      "test_mtime": "2026-05-27T14:22:10+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.printParseErrors",
@@ -282,7 +379,10 @@
       "start_line": 14,
       "end_line": 29,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/print_parse_errors_test.go",
+      "test_mtime": "2026-05-27T14:22:38+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.printParseErrorsFile",
@@ -291,7 +391,10 @@
       "start_line": 13,
       "end_line": 22,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/print_parse_errors_file_test.go",
+      "test_mtime": "2026-05-27T14:22:53+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.printPreservedList",
@@ -300,7 +403,10 @@
       "start_line": 18,
       "end_line": 34,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/print_preserved_list_test.go",
+      "test_mtime": "2026-05-27T14:23:25+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.printReport",
@@ -309,7 +415,11 @@
       "start_line": 36,
       "end_line": 47,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/print_report_test.go",
+      "test_mtime": "2026-05-27T14:24:40+09:00",
+      "status": "pass",
+      "coverage_pct": 100,
+      "attempt": 1
     },
     {
       "qualified_name": "cmd/yongol.printReportErrDiag",
@@ -318,7 +428,10 @@
       "start_line": 11,
       "end_line": 19,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/print_report_err_diag_test.go",
+      "test_mtime": "2026-05-27T14:24:58+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.printReportJSON",
@@ -327,7 +440,11 @@
       "start_line": 21,
       "end_line": 54,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/print_report_json_test.go",
+      "test_mtime": "2026-05-27T14:25:36+09:00",
+      "status": "done",
+      "coverage_pct": 85.71428571428571,
+      "attempt": 1
     },
     {
       "qualified_name": "cmd/yongol.printReportMD",
@@ -336,7 +453,10 @@
       "start_line": 22,
       "end_line": 54,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/print_report_md_test.go",
+      "test_mtime": "2026-05-27T14:26:03+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.printReportSARIF",
@@ -345,7 +465,11 @@
       "start_line": 23,
       "end_line": 53,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/print_report_sarif_test.go",
+      "test_mtime": "2026-05-27T14:26:20+09:00",
+      "status": "todo",
+      "coverage_pct": 83.33333333333334,
+      "attempt": 1
     },
     {
       "qualified_name": "cmd/yongol.printReportWarnDiag",
@@ -2286,8 +2410,8 @@
       "qualified_name": "examples/zenflow/opus4_7/specs/func/version.ResolveRootID",
       "name": "ResolveRootID",
       "file": "examples/zenflow/opus4_7/specs/func/version/resolve_root_id.go",
-      "start_line": 17,
-      "end_line": 23,
+      "start_line": 15,
+      "end_line": 20,
       "exported": true,
       "status": "todo"
     },
@@ -11004,6 +11128,15 @@
       "status": "todo"
     },
     {
+      "qualified_name": "pkg/generate/ir.buildCORSConfig",
+      "name": "buildCORSConfig",
+      "file": "pkg/generate/ir/build_cors_config.go",
+      "start_line": 10,
+      "end_line": 19,
+      "exported": false,
+      "status": "todo"
+    },
+    {
       "qualified_name": "pkg/generate/ir.buildCSRFConfig",
       "name": "buildCSRFConfig",
       "file": "pkg/generate/ir/build_csrf_config.go",
@@ -11142,8 +11275,8 @@
       "qualified_name": "pkg/generate/ir.convertGet",
       "name": "convertGet",
       "file": "pkg/generate/ir/convert_get.go",
-      "start_line": 9,
-      "end_line": 22,
+      "start_line": 13,
+      "end_line": 26,
       "exported": false,
       "status": "todo"
     },
@@ -13659,6 +13792,24 @@
       "status": "todo"
     },
     {
+      "qualified_name": "pkg/generate/nestjs/authz.RenderAuthzModule",
+      "name": "RenderAuthzModule",
+      "file": "pkg/generate/nestjs/authz/render_authz_module.go",
+      "start_line": 7,
+      "end_line": 18,
+      "exported": true,
+      "status": "todo"
+    },
+    {
+      "qualified_name": "pkg/generate/nestjs/authz.RenderAuthzService",
+      "name": "RenderAuthzService",
+      "file": "pkg/generate/nestjs/authz/render_authz_service.go",
+      "start_line": 8,
+      "end_line": 28,
+      "exported": true,
+      "status": "todo"
+    },
+    {
       "qualified_name": "pkg/generate/nestjs/boot.hasActiveBlock",
       "name": "hasActiveBlock",
       "file": "pkg/generate/nestjs/boot/has_active_block.go",
@@ -13686,6 +13837,24 @@
       "status": "todo"
     },
     {
+      "qualified_name": "pkg/generate/nestjs/boot.renderCorsBlock",
+      "name": "renderCorsBlock",
+      "file": "pkg/generate/nestjs/boot/render_main.go",
+      "start_line": 52,
+      "end_line": 68,
+      "exported": false,
+      "status": "todo"
+    },
+    {
+      "qualified_name": "pkg/generate/nestjs/boot.extractCORSConfig",
+      "name": "extractCORSConfig",
+      "file": "pkg/generate/nestjs/boot/render_main.go",
+      "start_line": 72,
+      "end_line": 82,
+      "exported": false,
+      "status": "todo"
+    },
+    {
       "qualified_name": "pkg/generate/nestjs.buildPlansByFeature",
       "name": "buildPlansByFeature",
       "file": "pkg/generate/nestjs/build_plans_by_feature.go",
@@ -13695,12 +13864,57 @@
       "status": "todo"
     },
     {
+      "qualified_name": "pkg/generate/nestjs.collectExternalPackages",
+      "name": "collectExternalPackages",
+      "file": "pkg/generate/nestjs/collect_external_packages.go",
+      "start_line": 20,
+      "end_line": 57,
+      "exported": false,
+      "status": "todo"
+    },
+    {
+      "qualified_name": "pkg/generate/nestjs/func.RenderFuncModule",
+      "name": "RenderFuncModule",
+      "file": "pkg/generate/nestjs/func/render_func_module.go",
+      "start_line": 12,
+      "end_line": 27,
+      "exported": true,
+      "status": "todo"
+    },
+    {
+      "qualified_name": "pkg/generate/nestjs/func.RenderFuncService",
+      "name": "RenderFuncService",
+      "file": "pkg/generate/nestjs/func/render_func_service.go",
+      "start_line": 13,
+      "end_line": 32,
+      "exported": true,
+      "status": "todo"
+    },
+    {
       "qualified_name": "pkg/generate/nestjs.Generate",
       "name": "Generate",
       "file": "pkg/generate/nestjs/generate.go",
-      "start_line": 25,
-      "end_line": 57,
+      "start_line": 26,
+      "end_line": 81,
       "exported": true,
+      "status": "todo"
+    },
+    {
+      "qualified_name": "pkg/generate/nestjs.hasAuthPlans",
+      "name": "hasAuthPlans",
+      "file": "pkg/generate/nestjs/has_auth_plans.go",
+      "start_line": 10,
+      "end_line": 21,
+      "exported": false,
+      "status": "todo"
+    },
+    {
+      "qualified_name": "pkg/generate/nestjs.hasPublishPlans",
+      "name": "hasPublishPlans",
+      "file": "pkg/generate/nestjs/has_publish_plans.go",
+      "start_line": 10,
+      "end_line": 21,
+      "exported": false,
       "status": "todo"
     },
     {
@@ -13725,8 +13939,17 @@
       "qualified_name": "pkg/generate/nestjs/prisma.columnAttributes",
       "name": "columnAttributes",
       "file": "pkg/generate/nestjs/prisma/column_attributes.go",
-      "start_line": 13,
-      "end_line": 33,
+      "start_line": 14,
+      "end_line": 34,
+      "exported": false,
+      "status": "todo"
+    },
+    {
+      "qualified_name": "pkg/generate/nestjs/prisma.isColumnUnique",
+      "name": "isColumnUnique",
+      "file": "pkg/generate/nestjs/prisma/column_attributes.go",
+      "start_line": 37,
+      "end_line": 44,
       "exported": false,
       "status": "todo"
     },
@@ -13780,7 +14003,7 @@
       "name": "renderColumn",
       "file": "pkg/generate/nestjs/prisma/render_column.go",
       "start_line": 14,
-      "end_line": 25,
+      "end_line": 33,
       "exported": false,
       "status": "todo"
     },
@@ -13788,8 +14011,17 @@
       "qualified_name": "pkg/generate/nestjs/prisma.renderModel",
       "name": "renderModel",
       "file": "pkg/generate/nestjs/prisma/render_model.go",
-      "start_line": 14,
-      "end_line": 28,
+      "start_line": 16,
+      "end_line": 66,
+      "exported": false,
+      "status": "todo"
+    },
+    {
+      "qualified_name": "pkg/generate/nestjs/prisma.singularize",
+      "name": "singularize",
+      "file": "pkg/generate/nestjs/prisma/render_model.go",
+      "start_line": 69,
+      "end_line": 82,
       "exported": false,
       "status": "todo"
     },
@@ -13799,6 +14031,24 @@
       "file": "pkg/generate/nestjs/prisma/render_schema.go",
       "start_line": 15,
       "end_line": 37,
+      "exported": true,
+      "status": "todo"
+    },
+    {
+      "qualified_name": "pkg/generate/nestjs/queue.RenderQueueModule",
+      "name": "RenderQueueModule",
+      "file": "pkg/generate/nestjs/queue/render_queue_module.go",
+      "start_line": 7,
+      "end_line": 18,
+      "exported": true,
+      "status": "todo"
+    },
+    {
+      "qualified_name": "pkg/generate/nestjs/queue.RenderQueueService",
+      "name": "RenderQueueService",
+      "file": "pkg/generate/nestjs/queue/render_queue_service.go",
+      "start_line": 9,
+      "end_line": 22,
       "exported": true,
       "status": "todo"
     },
@@ -13897,7 +14147,7 @@
       "name": "httpStatusConst",
       "file": "pkg/generate/nestjs/ssac/http_status_const.go",
       "start_line": 9,
-      "end_line": 28,
+      "end_line": 38,
       "exported": false,
       "status": "todo"
     },
@@ -13932,8 +14182,26 @@
       "qualified_name": "pkg/generate/nestjs/ssac.renderArgValue",
       "name": "renderArgValue",
       "file": "pkg/generate/nestjs/ssac/render_arg_value.go",
-      "start_line": 14,
-      "end_line": 30,
+      "start_line": 18,
+      "end_line": 51,
+      "exported": false,
+      "status": "todo"
+    },
+    {
+      "qualified_name": "pkg/generate/nestjs/ssac.mapSource",
+      "name": "mapSource",
+      "file": "pkg/generate/nestjs/ssac/render_arg_value.go",
+      "start_line": 54,
+      "end_line": 63,
+      "exported": false,
+      "status": "todo"
+    },
+    {
+      "qualified_name": "pkg/generate/nestjs/ssac.toSnake",
+      "name": "toSnake",
+      "file": "pkg/generate/nestjs/ssac/render_arg_value.go",
+      "start_line": 67,
+      "end_line": 88,
       "exported": false,
       "status": "todo"
     },
@@ -13942,7 +14210,7 @@
       "name": "renderAuthOp",
       "file": "pkg/generate/nestjs/ssac/render_auth_op.go",
       "start_line": 14,
-      "end_line": 20,
+      "end_line": 25,
       "exported": false,
       "status": "todo"
     },
@@ -13959,8 +14227,17 @@
       "qualified_name": "pkg/generate/nestjs/ssac.renderCallOp",
       "name": "renderCallOp",
       "file": "pkg/generate/nestjs/ssac/render_call_op.go",
-      "start_line": 14,
-      "end_line": 30,
+      "start_line": 15,
+      "end_line": 28,
+      "exported": false,
+      "status": "todo"
+    },
+    {
+      "qualified_name": "pkg/generate/nestjs/ssac.formatCallTarget",
+      "name": "formatCallTarget",
+      "file": "pkg/generate/nestjs/ssac/render_call_op.go",
+      "start_line": 33,
+      "end_line": 39,
       "exported": false,
       "status": "todo"
     },
@@ -13977,8 +14254,17 @@
       "qualified_name": "pkg/generate/nestjs/ssac.renderDeleteOp",
       "name": "renderDeleteOp",
       "file": "pkg/generate/nestjs/ssac/render_delete_op.go",
-      "start_line": 14,
-      "end_line": 22,
+      "start_line": 15,
+      "end_line": 27,
+      "exported": false,
+      "status": "todo"
+    },
+    {
+      "qualified_name": "pkg/generate/nestjs/ssac.isDeleteByPK",
+      "name": "isDeleteByPK",
+      "file": "pkg/generate/nestjs/ssac/render_delete_op.go",
+      "start_line": 30,
+      "end_line": 41,
       "exported": false,
       "status": "todo"
     },
@@ -13995,8 +14281,8 @@
       "qualified_name": "pkg/generate/nestjs/ssac.renderEvalOp",
       "name": "renderEvalOp",
       "file": "pkg/generate/nestjs/ssac/render_eval_op.go",
-      "start_line": 14,
-      "end_line": 28,
+      "start_line": 15,
+      "end_line": 26,
       "exported": false,
       "status": "todo"
     },
@@ -14013,8 +14299,17 @@
       "qualified_name": "pkg/generate/nestjs/ssac.renderGetOp",
       "name": "renderGetOp",
       "file": "pkg/generate/nestjs/ssac/render_get_op.go",
-      "start_line": 14,
-      "end_line": 26,
+      "start_line": 16,
+      "end_line": 29,
+      "exported": false,
+      "status": "todo"
+    },
+    {
+      "qualified_name": "pkg/generate/nestjs/ssac.safeVarName",
+      "name": "safeVarName",
+      "file": "pkg/generate/nestjs/ssac/render_get_op.go",
+      "start_line": 43,
+      "end_line": 48,
       "exported": false,
       "status": "todo"
     },
@@ -14085,8 +14380,17 @@
       "qualified_name": "pkg/generate/nestjs/ssac.renderPutOp",
       "name": "renderPutOp",
       "file": "pkg/generate/nestjs/ssac/render_put_op.go",
-      "start_line": 14,
-      "end_line": 21,
+      "start_line": 15,
+      "end_line": 23,
+      "exported": false,
+      "status": "todo"
+    },
+    {
+      "qualified_name": "pkg/generate/nestjs/ssac.splitWhereData",
+      "name": "splitWhereData",
+      "file": "pkg/generate/nestjs/ssac/render_put_op.go",
+      "start_line": 27,
+      "end_line": 59,
       "exported": false,
       "status": "todo"
     },
@@ -14121,8 +14425,8 @@
       "qualified_name": "pkg/generate/nestjs/ssac.renderStateOp",
       "name": "renderStateOp",
       "file": "pkg/generate/nestjs/ssac/render_state_op.go",
-      "start_line": 14,
-      "end_line": 20,
+      "start_line": 15,
+      "end_line": 48,
       "exported": false,
       "status": "todo"
     },
@@ -14139,8 +14443,8 @@
       "qualified_name": "pkg/generate/nestjs/ssac.resolveArgKey",
       "name": "resolveArgKey",
       "file": "pkg/generate/nestjs/ssac/resolve_arg_key.go",
-      "start_line": 13,
-      "end_line": 22,
+      "start_line": 15,
+      "end_line": 24,
       "exported": false,
       "status": "todo"
     },
@@ -14148,8 +14452,8 @@
       "qualified_name": "pkg/generate/nestjs/ssac.resolveDataKey",
       "name": "resolveDataKey",
       "file": "pkg/generate/nestjs/ssac/resolve_data_key.go",
-      "start_line": 13,
-      "end_line": 18,
+      "start_line": 14,
+      "end_line": 23,
       "exported": false,
       "status": "todo"
     },
@@ -14184,8 +14488,26 @@
       "qualified_name": "pkg/generate/nestjs/ssac.writeServiceClass",
       "name": "writeServiceClass",
       "file": "pkg/generate/nestjs/ssac/write_service_class.go",
-      "start_line": 14,
-      "end_line": 39,
+      "start_line": 15,
+      "end_line": 48,
+      "exported": false,
+      "status": "todo"
+    },
+    {
+      "qualified_name": "pkg/generate/nestjs/ssac.hasAuthOp",
+      "name": "hasAuthOp",
+      "file": "pkg/generate/nestjs/ssac/write_service_class.go",
+      "start_line": 51,
+      "end_line": 58,
+      "exported": false,
+      "status": "todo"
+    },
+    {
+      "qualified_name": "pkg/generate/nestjs/ssac.collectExternalOpsPackages",
+      "name": "collectExternalOpsPackages",
+      "file": "pkg/generate/nestjs/ssac/write_service_class.go",
+      "start_line": 62,
+      "end_line": 82,
       "exported": false,
       "status": "todo"
     },
@@ -14193,8 +14515,8 @@
       "qualified_name": "pkg/generate/nestjs/ssac.writeServiceImports",
       "name": "writeServiceImports",
       "file": "pkg/generate/nestjs/ssac/write_service_imports.go",
-      "start_line": 13,
-      "end_line": 20,
+      "start_line": 14,
+      "end_line": 28,
       "exported": false,
       "status": "todo"
     },
@@ -14442,6 +14764,15 @@
       "status": "todo"
     },
     {
+      "qualified_name": "pkg/generate/nestjs.writeAuthzModule",
+      "name": "writeAuthzModule",
+      "file": "pkg/generate/nestjs/write_authz_module.go",
+      "start_line": 14,
+      "end_line": 23,
+      "exported": false,
+      "status": "todo"
+    },
+    {
       "qualified_name": "pkg/generate/nestjs.writeBootFiles",
       "name": "writeBootFiles",
       "file": "pkg/generate/nestjs/write_boot_files.go",
@@ -14456,6 +14787,15 @@
       "file": "pkg/generate/nestjs/write_feature_modules.go",
       "start_line": 12,
       "end_line": 21,
+      "exported": false,
+      "status": "todo"
+    },
+    {
+      "qualified_name": "pkg/generate/nestjs.writeFuncStubs",
+      "name": "writeFuncStubs",
+      "file": "pkg/generate/nestjs/write_func_stubs.go",
+      "start_line": 15,
+      "end_line": 31,
       "exported": false,
       "status": "todo"
     },
@@ -14483,6 +14823,15 @@
       "file": "pkg/generate/nestjs/write_prisma_schema.go",
       "start_line": 16,
       "end_line": 29,
+      "exported": false,
+      "status": "todo"
+    },
+    {
+      "qualified_name": "pkg/generate/nestjs.writeQueueModule",
+      "name": "writeQueueModule",
+      "file": "pkg/generate/nestjs/write_queue_module.go",
+      "start_line": 14,
+      "end_line": 23,
       "exported": false,
       "status": "todo"
     },
@@ -29613,9 +29962,9 @@
     }
   ],
   "summary": {
-    "total": 3244,
-    "pass": 0,
-    "done": 0,
-    "todo": 3244
+    "total": 3269,
+    "pass": 33,
+    "done": 4,
+    "todo": 3232
   }
 }

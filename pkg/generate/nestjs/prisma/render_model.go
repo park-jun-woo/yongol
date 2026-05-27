@@ -11,8 +11,11 @@ import (
 )
 
 // renderModel writes a single Prisma model block for a DDL table.
+// Model name is singular PascalCase with @@map to the original table name.
+// FK relations and indexes are rendered after columns.
 func renderModel(b *strings.Builder, table ddl.Table) error {
-	modelName := pascalCase(table.Name)
+	singularName := singularize(table.Name)
+	modelName := pascalCase(singularName)
 	b.WriteString(fmt.Sprintf("model %s {\n", modelName))
 
 	for _, colName := range table.ColumnOrder {
@@ -20,7 +23,42 @@ func renderModel(b *strings.Builder, table ddl.Table) error {
 		if !ok {
 			continue
 		}
-		renderColumn(b, col, colName, table.PrimaryKey)
+		renderColumn(b, col, colName, table.PrimaryKey, table.Indexes)
+	}
+
+	// Render @relation fields for foreign keys.
+	for _, fk := range table.ForeignKeys {
+		refModel := pascalCase(singularize(fk.RefTable))
+		relField := strings.TrimSuffix(fk.Column, "_id")
+		if relField == fk.Column {
+			relField = strings.TrimSuffix(fk.Column, "_ID")
+		}
+		b.WriteString(fmt.Sprintf("  %-20s %s @relation(fields: [%s], references: [%s])\n",
+			relField, refModel, fk.Column, fk.RefColumn))
+	}
+
+	// Render @@index for non-unique indexes.
+	for _, idx := range table.Indexes {
+		if idx.IsUnique {
+			continue
+		}
+		cols := strings.Join(idx.Columns, ", ")
+		b.WriteString(fmt.Sprintf("  @@index([%s])\n", cols))
+	}
+
+	// Render @@unique for composite unique indexes (single-column unique is
+	// handled by @unique on the column itself).
+	for _, idx := range table.Indexes {
+		if !idx.IsUnique || len(idx.Columns) <= 1 {
+			continue
+		}
+		cols := strings.Join(idx.Columns, ", ")
+		b.WriteString(fmt.Sprintf("  @@unique([%s])\n", cols))
+	}
+
+	// Map to the original DDL table name.
+	if singularName != table.Name {
+		b.WriteString(fmt.Sprintf("  @@map(\"%s\")\n", table.Name))
 	}
 
 	b.WriteString("}\n")

@@ -3,7 +3,11 @@
 
 package ir
 
-import "github.com/park-jun-woo/yongol/pkg/parser/ssac"
+import (
+	"strings"
+
+	"github.com/park-jun-woo/yongol/pkg/parser/ssac"
+)
 
 // convertGet converts a @get sequence to an IR Op.
 func convertGet(seq ssac.Sequence) Op {
@@ -16,7 +20,7 @@ func convertGet(seq ssac.Sequence) Op {
 	if seq.Result != nil {
 		op.VarName = seq.Result.Var
 		op.VarType = seq.Result.Type
-		op.IsList = seq.Result.Wrapper != ""
+		op.IsList = seq.Result.Wrapper != "" || strings.HasPrefix(seq.Result.Type, "[]")
 	}
 	return Op{Kind: OpGet, Get: &op}
 }

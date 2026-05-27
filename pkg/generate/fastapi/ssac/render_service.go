@@ -10,9 +10,9 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/generate/ir"
 )
 
-// RenderService takes a ServicePlan and produces a Python service module
-// file content. Each Op is rendered into the corresponding SQLAlchemy async
-// query, guard, or external call.
+// RenderService takes a ServicePlan and produces a Python service function
+// body (without imports). Imports are written separately by
+// WriteFeatureImports to avoid per-function duplication.
 func RenderService(plan *ir.ServicePlan, reg ir.TypeRegistry) (string, error) {
 	if plan == nil {
 		return "", fmt.Errorf("RenderService: nil plan")
@@ -20,7 +20,6 @@ func RenderService(plan *ir.ServicePlan, reg ir.TypeRegistry) (string, error) {
 	_ = reg // reserved for future type conversion use
 
 	var b strings.Builder
-	writeServiceImports(&b, plan)
 	writeServiceFunc(&b, plan)
 	return b.String(), nil
 }

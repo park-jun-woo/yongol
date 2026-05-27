@@ -35,7 +35,7 @@ func RenderMain(plan *ir.BootPlan) (string, error) {
 	b.WriteString("  );\n\n")
 
 	if hasActiveBlock(plan, "cors") {
-		b.WriteString("  app.enableCors();\n\n")
+		renderCorsBlock(&b, plan)
 	}
 
 	b.WriteString("  const port = process.env.PORT || 3000;\n")

@@ -20,8 +20,9 @@ import (
 //  2. Render scaffold (package.json, tsconfig.json, nest-cli.json)
 //  3. Render Prisma schema from DDL tables
 //  4. For each service func, render controller + service + module
-//  5. Render main.ts + app.module.ts
-//  6. Write all files to dir
+//  5. Generate infrastructure stubs (queue, authz, external packages)
+//  6. Render main.ts + app.module.ts
+//  7. Write all files to dir
 func Generate(fs *yongol.Fullstack, dir string) error {
 	psVal := prepared.New(fs)
 	ps := &psVal
@@ -49,6 +50,29 @@ func Generate(fs *yongol.Fullstack, dir string) error {
 	if err := writePrismaModule(srcDir); err != nil {
 		return fmt.Errorf("prisma module: %w", err)
 	}
+
+	// Generate queue infrastructure when @publish exists.
+	if hasPublishPlans(plansByFeature) {
+		if err := writeQueueModule(srcDir); err != nil {
+			return fmt.Errorf("queue module: %w", err)
+		}
+	}
+
+	// Generate authz infrastructure when @auth exists.
+	if hasAuthPlans(plansByFeature) {
+		if err := writeAuthzModule(srcDir); err != nil {
+			return fmt.Errorf("authz module: %w", err)
+		}
+	}
+
+	// Generate stub services for external packages referenced by @call/@eval.
+	extPkgs := collectExternalPackages(plansByFeature)
+	if len(extPkgs) > 0 {
+		if err := writeFuncStubs(srcDir, extPkgs); err != nil {
+			return fmt.Errorf("func stubs: %w", err)
+		}
+	}
+
 	featureNames, err := writeFeatureModules(plansByFeature, srcDir, reg)
 	if err != nil {
 		return err
