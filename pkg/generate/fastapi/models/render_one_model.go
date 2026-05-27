@@ -14,7 +14,7 @@ import (
 // Includes ForeignKey in column definitions and Index/UniqueConstraint in
 // __table_args__.
 func renderOneModel(b *strings.Builder, table ddl.Table) error {
-	className := pascalCase(table.Name)
+	className := pascalCase(singularize(table.Name))
 	b.WriteString(fmt.Sprintf("class %s(Base):\n", className))
 	b.WriteString(fmt.Sprintf("    __tablename__ = \"%s\"\n\n", table.Name))
 

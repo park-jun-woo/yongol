@@ -1,5 +1,5 @@
 //ff:func feature=gen-ir type=test control=sequence
-//ff:what TestVariableShadowing -- 동일 VarName 중복 선언 시 _result 접미사 자동 해소 검증
+//ff:what TestVariableShadowing -- 동일 VarName 중복 선언 시 _result 접미사 자동 해소 + 후속 Op Source 갱신 검증
 
 package ir
 
@@ -117,5 +117,131 @@ func TestVariableShadowingCallAndPost(t *testing.T) {
 	}
 	if plan.Ops[1].Call.ResultVar != "result_result" {
 		t.Errorf("Call.ResultVar = %q, want result_result", plan.Ops[1].Call.ResultVar)
+	}
+}
+
+// TestVariableShadowingReservedUserCallSource verifies that when "user" is a
+// reserved name, a VerifyPassword result "user" is renamed to "user_result"
+// and subsequent @call FieldArg.Source references are updated from "user" to
+// "user_result".
+func TestVariableShadowingReservedUserCallSource(t *testing.T) {
+	sf := &ssac.ServiceFunc{
+		Name:     "Login",
+		FileName: "login.ssac",
+		Sequences: []ssac.Sequence{
+			{
+				Type:         ssac.SeqVerifyPassword,
+				Model:        "User",
+				EmailCol:     "Email",
+				EmailExpr:    "request.Email",
+				HashCol:      "PasswordHash",
+				PasswordExpr: "request.Password",
+				Result:       &ssac.Result{Var: "user", Type: "User"},
+			},
+			{
+				Type:   ssac.SeqCall,
+				Model:  "auth.IssueToken",
+				Inputs: map[string]string{"Email": "user.Email", "Role": "user.Role"},
+				Result: &ssac.Result{Var: "token", Type: "TokenPair"},
+			},
+		},
+	}
+
+	plan, err := BuildServicePlan(sf, &yongol.Fullstack{})
+	if err != nil {
+		t.Fatalf("BuildServicePlan: %v", err)
+	}
+
+	// VerifyPassword result "user" should be renamed to "user_result"
+	// because "user" is a reserved name.
+	vpOp := plan.Ops[0]
+	if vpOp.Kind != OpVerifyPassword {
+		t.Fatalf("Ops[0].Kind = %d, want OpVerifyPassword", vpOp.Kind)
+	}
+	if vpOp.VerifyPW.ResultVar != "user_result" {
+		t.Errorf("VerifyPW.ResultVar = %q, want %q", vpOp.VerifyPW.ResultVar, "user_result")
+	}
+
+	// @call args should have Source updated from "user" to "user_result".
+	callOp := plan.Ops[1]
+	if callOp.Kind != OpCall {
+		t.Fatalf("Ops[1].Kind = %d, want OpCall", callOp.Kind)
+	}
+	emailArg := findArgByKey(callOp.Call.Args, "Email")
+	if emailArg == nil {
+		t.Fatal("missing Email arg")
+	}
+	if emailArg.Source != "user_result" {
+		t.Errorf("Email.Source = %q, want %q", emailArg.Source, "user_result")
+	}
+	roleArg := findArgByKey(callOp.Call.Args, "Role")
+	if roleArg == nil {
+		t.Fatal("missing Role arg")
+	}
+	if roleArg.Source != "user_result" {
+		t.Errorf("Role.Source = %q, want %q", roleArg.Source, "user_result")
+	}
+}
+
+// TestVariableShadowingResponseSourceUpdate verifies that ResponseField.Source
+// dot-notation references are updated after variable renaming.
+func TestVariableShadowingResponseSourceUpdate(t *testing.T) {
+	sf := &ssac.ServiceFunc{
+		Name:     "Login",
+		FileName: "login.ssac",
+		Sequences: []ssac.Sequence{
+			{
+				Type:         ssac.SeqVerifyPassword,
+				Model:        "User",
+				EmailCol:     "Email",
+				EmailExpr:    "request.Email",
+				HashCol:      "PasswordHash",
+				PasswordExpr: "request.Password",
+				Result:       &ssac.Result{Var: "user", Type: "User"},
+			},
+			{
+				Type:   ssac.SeqCall,
+				Model:  "auth.IssueToken",
+				Inputs: map[string]string{"Email": "user.Email"},
+				Result: &ssac.Result{Var: "token", Type: "TokenPair"},
+			},
+			{
+				Type: ssac.SeqResponse,
+				Fields: map[string]string{
+					"access_token":  "token.AccessToken",
+					"refresh_token": "token.RefreshToken",
+					"email":         "user.Email",
+				},
+			},
+		},
+	}
+
+	plan, err := BuildServicePlan(sf, &yongol.Fullstack{})
+	if err != nil {
+		t.Fatalf("BuildServicePlan: %v", err)
+	}
+
+	// Response op should have "user" references updated to "user_result".
+	respOp := plan.Ops[2]
+	if respOp.Kind != OpResponse {
+		t.Fatalf("Ops[2].Kind = %d, want OpResponse", respOp.Kind)
+	}
+
+	for _, f := range respOp.Response.Fields {
+		switch f.Name {
+		case "email":
+			if f.Source != "user_result.Email" {
+				t.Errorf("email.Source = %q, want %q", f.Source, "user_result.Email")
+			}
+		case "access_token":
+			// token is not renamed, so Source stays as-is.
+			if f.Source != "token.AccessToken" {
+				t.Errorf("access_token.Source = %q, want %q", f.Source, "token.AccessToken")
+			}
+		case "refresh_token":
+			if f.Source != "token.RefreshToken" {
+				t.Errorf("refresh_token.Source = %q, want %q", f.Source, "token.RefreshToken")
+			}
+		}
 	}
 }

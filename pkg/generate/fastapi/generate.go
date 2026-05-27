@@ -73,6 +73,10 @@ func Generate(fs *yongol.Fullstack, dir string) error {
 		}
 	}
 
+	if err := writeSchemas(plansByFeature, appDir); err != nil {
+		return fmt.Errorf("schemas: %w", err)
+	}
+
 	featureNames, err := writeFeatureModules(plansByFeature, appDir, reg)
 	if err != nil {
 		return err

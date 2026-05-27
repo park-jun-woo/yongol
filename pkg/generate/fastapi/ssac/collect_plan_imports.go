@@ -6,8 +6,9 @@ package ssac
 import "github.com/park-jun-woo/yongol/pkg/generate/ir"
 
 // collectPlanImports processes a single plan's ops into the importData.
-func collectPlanImports(d *importData, ops []ir.Op) {
+// currentFeature is forwarded to collectOpImport for self-import prevention.
+func collectPlanImports(d *importData, ops []ir.Op, currentFeature string) {
 	for _, op := range ops {
-		collectOpImport(d, op)
+		collectOpImport(d, op, currentFeature)
 	}
 }

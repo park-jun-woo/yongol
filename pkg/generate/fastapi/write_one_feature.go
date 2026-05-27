@@ -21,7 +21,7 @@ func writeOneFeature(feature string, plans []*ir.ServicePlan, appDir string, reg
 	}
 
 	// Write consolidated imports once, then each function body.
-	imports := ssac.WriteFeatureImports(plans)
+	imports := ssac.WriteFeatureImports(plans, feature)
 	var svcContent string
 	svcContent += imports
 	for _, plan := range plans {

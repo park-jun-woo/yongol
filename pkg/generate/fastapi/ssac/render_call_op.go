@@ -15,16 +15,14 @@ func renderCallOp(b *strings.Builder, op *ir.CallOp, indent string) {
 	if op == nil {
 		return
 	}
-	pkg := op.Package
-	if pkg != "" {
-		pkg += "."
-	}
+	// Python uses direct imports (from X import Y), so no package prefix.
+	funcName := snakeCase(op.Function)
 	args := renderCallArgs(op.Args)
 	if op.ResultVar != "" {
-		b.WriteString(fmt.Sprintf("%s%s = await %s%s(%s)\n",
-			indent, op.ResultVar, pkg, snakeCase(op.Function), args))
+		b.WriteString(fmt.Sprintf("%s%s = await %s(%s)\n",
+			indent, op.ResultVar, funcName, args))
 	} else {
-		b.WriteString(fmt.Sprintf("%sawait %s%s(%s)\n",
-			indent, pkg, snakeCase(op.Function), args))
+		b.WriteString(fmt.Sprintf("%sawait %s(%s)\n",
+			indent, funcName, args))
 	}
 }

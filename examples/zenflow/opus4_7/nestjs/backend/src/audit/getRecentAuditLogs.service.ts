@@ -10,17 +10,11 @@ export class GetRecentAuditLogsService {
   ) {}
 
   async getRecentAuditLogs(user?: any): Promise<any> {
-    const owner = await tx.audit_logs.findUnique({
-      where: { id: params.id },
-      select: { org_id: true },
-    });
     await this.authz.check({
       action: 'GetRecentAuditLogs',
       resource: 'audit_log',
-      resourceId: String(params.id),
-      owners: { audit_logs: { org_id: owner?.org_id } },
     });
-    const items = await this.prisma.auditLog.findMany({ where: { filter_action: '', org_id: user.org_id, page_offset: 0, per_page: 10 } });
+    const items = await this.prisma.auditLog.findMany({ where: { filter_action: params, org_id: user.org_id }, skip: 0, take: 10 });
     return {
       items: items,
     };

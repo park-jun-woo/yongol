@@ -10,6 +10,26 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/generate/ir"
 )
 
+// collectSchemaModels returns the list of Pydantic request model class names
+// needed by plans that have request body fields.
+func collectSchemaModels(plans []*ir.ServicePlan) []string {
+	var models []string
+	seen := make(map[string]bool)
+	for _, plan := range plans {
+		method := strings.ToUpper(plan.HTTPMethod)
+		hasBody := (method == "POST" || method == "PUT" || method == "PATCH") && len(plan.BodyFields) > 0
+		if !hasBody {
+			continue
+		}
+		name := pascalCase(plan.OperationID) + "Request"
+		if !seen[name] {
+			seen[name] = true
+			models = append(models, name)
+		}
+	}
+	return models
+}
+
 // RenderRouter produces a FastAPI router file for a given feature. Each
 // ServicePlan contributes one route handler decorated with the appropriate
 // HTTP method decorator. Parameters are typed using PathParams, QueryParams,
@@ -28,6 +48,13 @@ func RenderRouter(feature string, plans []*ir.ServicePlan) (string, error) {
 
 	// Import the service module
 	b.WriteString(fmt.Sprintf("from app.services import %s as svc\n", feature))
+
+	// Import Pydantic request models when plans have body fields.
+	schemaModels := collectSchemaModels(plans)
+	if len(schemaModels) > 0 {
+		b.WriteString(fmt.Sprintf("from app.schemas.%s import %s\n",
+			feature, strings.Join(schemaModels, ", ")))
+	}
 	b.WriteString("\n")
 
 	b.WriteString(fmt.Sprintf("router = APIRouter(prefix=\"/%s\", tags=[\"%s\"])\n\n", feature, feature))

@@ -12,8 +12,9 @@ import (
 // writeServiceImports writes the consolidated import statements for a feature
 // service file. It scans all plans to collect referenced model classes and
 // external package functions, emitting each import exactly once.
-func writeServiceImports(b *strings.Builder, plans []*ir.ServicePlan) {
-	d := collectImportData(plans)
+// currentFeature is used for self-import prevention.
+func writeServiceImports(b *strings.Builder, plans []*ir.ServicePlan, currentFeature string) {
+	d := collectImportData(plans, currentFeature)
 	b.WriteString("from fastapi import HTTPException\n")
 	emitSAImports(b, d)
 	b.WriteString("from sqlalchemy.ext.asyncio import AsyncSession\n")

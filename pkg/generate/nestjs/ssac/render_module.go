@@ -103,6 +103,13 @@ func RenderModule(feature string, plans []*ir.ServicePlan) (string, error) {
 		b.WriteString(fmt.Sprintf("    %sService,\n", p.OperationID))
 	}
 	b.WriteString("  ],\n")
+
+	// Exports — all services are exported so cross-module DI works.
+	b.WriteString("  exports: [\n")
+	for _, p := range plans {
+		b.WriteString(fmt.Sprintf("    %sService,\n", p.OperationID))
+	}
+	b.WriteString("  ],\n")
 	b.WriteString("})\n")
 	b.WriteString(fmt.Sprintf("export class %s {}\n", moduleName))
 

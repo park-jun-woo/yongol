@@ -42,6 +42,31 @@ func TestRenderAuthOpOwnership(t *testing.T) {
 		if !strings.Contains(got, "resource_id=str(id)") {
 			t.Errorf("expected resource_id, got: %s", got)
 		}
+		// Phase024-3a: ResourceID must NOT appear as a duplicate keyword
+		count := strings.Count(got, "resource_id=")
+		if count != 1 {
+			t.Errorf("expected exactly 1 resource_id=, got %d in: %s", count, got)
+		}
+	})
+
+	t.Run("WithoutOwnershipButResourceID", func(t *testing.T) {
+		op := &ir.AuthOp{
+			Action:   "GetWorkflow",
+			Resource: "workflow",
+			Inputs: []ir.FieldArg{
+				{Key: "ResourceID", Location: ir.LocPath, ColumnName: "id", Source: "request", Field: ".ID"},
+			},
+		}
+		var b strings.Builder
+		renderAuthOp(&b, op, "    ")
+		got := b.String()
+		if !strings.Contains(got, "resource_id=str(id)") {
+			t.Errorf("expected fallback resource_id, got: %s", got)
+		}
+		count := strings.Count(got, "resource_id=")
+		if count != 1 {
+			t.Errorf("expected exactly 1 resource_id=, got %d in: %s", count, got)
+		}
 	})
 
 	t.Run("WithoutOwnership", func(t *testing.T) {

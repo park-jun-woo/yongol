@@ -1,5 +1,5 @@
 //ff:func feature=gen-ir type=util control=iteration dimension=2
-//ff:what enrichFieldArgDDL -- DDL 테이블 컬럼 매칭으로 모든 FieldArg 의 ColumnName/IsPK 세팅
+//ff:what enrichFieldArgDDL -- Pass 1: 모든 Op 의 FieldArg.SourceColumn 세팅 / Pass 2: CRUD Op DDL 테이블 매칭으로 ColumnName/IsPK 세팅
 
 package ir
 
@@ -10,11 +10,30 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
-// enrichFieldArgDDL populates ColumnName and IsPK on every FieldArg by
-// looking up the argument's Key against the DDL table columns. The table
-// is resolved from the owning Op's Model field via the same singular
-// matching logic used by gogin's findDDLTableByModelName.
+// enrichFieldArgDDL runs two passes over all ops:
+//
+// Pass 1 sets SourceColumn on every FieldArg that has a Field accessor,
+// regardless of Op kind. This ensures @call/@eval/@auth ops get proper
+// snake_case source column names even without DDL table matching.
+//
+// Pass 2 enriches CRUD ops (get/post/put/delete) with DDL table metadata,
+// setting ColumnName and IsPK by matching the argument Key against DDL
+// table columns.
 func enrichFieldArgDDL(ops []Op, fs *yongol.Fullstack) {
+	// Pass 1: SourceColumn for ALL ops (DDL-independent).
+	for i := range ops {
+		for _, args := range collectFieldArgSlices(&ops[i]) {
+			for j := range *args {
+				fa := &(*args)[j]
+				if fa.Field != "" {
+					fa.SourceColumn = caseconv.PascalToSnake(
+						strings.TrimPrefix(fa.Field, "."))
+				}
+			}
+		}
+	}
+
+	// Pass 2: DDL table matching for CRUD ops (ColumnName/IsPK).
 	if fs == nil || len(fs.DDLTables) == 0 {
 		return
 	}
@@ -34,15 +53,10 @@ func enrichFieldArgDDL(ops []Op, fs *yongol.Fullstack) {
 		for _, args := range collectFieldArgSlices(&ops[i]) {
 			for j := range *args {
 				fa := &(*args)[j]
-				// Target column (for where key)
 				snake := caseconv.PascalToSnake(fa.Key)
 				if _, ok := tbl.Columns[snake]; ok {
 					fa.ColumnName = snake
 					fa.IsPK = pkSet[snake]
-				}
-				// Source column (for value expression on variable references)
-				if fa.Field != "" {
-					fa.SourceColumn = caseconv.PascalToSnake(strings.TrimPrefix(fa.Field, "."))
 				}
 			}
 		}

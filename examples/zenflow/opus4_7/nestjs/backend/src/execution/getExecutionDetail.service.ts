@@ -12,26 +12,25 @@ export class GetExecutionDetailService {
   ) {}
 
   async getExecutionDetail(params: any, user?: any): Promise<any> {
-    const owner = await tx.execution_logs.findUnique({
+    const owner = await this.prisma.execution_log.findUnique({
       where: { id: params.id },
       select: { org_id: true },
     });
     await this.authz.check({
       action: 'GetExecutionDetail',
       resource: 'execution_log',
-      ResourceID: params.id,
       resourceId: String(params.id),
-      owners: { execution_logs: { org_id: owner?.org_id } },
+      owners: { execution_log: { org_id: owner?.org_id } },
     });
     const log = await this.prisma.executionLog.findUnique({ where: { id: params.id } });
     if (!log) {
       throw new HttpException('Execution log not found', HttpStatus.NOT_FOUND);
     }
-    const wf = await this.prisma.workflow.findUnique({ where: { id: log.id } });
+    const wf = await this.prisma.workflow.findUnique({ where: { id: log.workflow_id } });
     if (!wf) {
       throw new HttpException('Workflow not found', HttpStatus.NOT_FOUND);
     }
-    const org = await this.prisma.organization.findUnique({ where: { id: log.id } });
+    const org = await this.prisma.organization.findUnique({ where: { id: log.org_id } });
     if (!org) {
       throw new HttpException('Organization not found', HttpStatus.NOT_FOUND);
     }

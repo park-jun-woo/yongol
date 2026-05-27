@@ -8,7 +8,7 @@ export class ListTemplatesService {
   ) {}
 
   async listTemplates(query: any, user?: any): Promise<any> {
-    const items = await this.prisma.template.findMany({ where: { category: query.category, cursor: query.cursor, per_page: query.per_page } });
+    const items = await this.prisma.template.findMany({ where: { category: query.category }, cursor: query.cursor ? { id: query.cursor } : undefined, take: query.per_page });
     return {
       items: items,
     };

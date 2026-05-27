@@ -10,9 +10,10 @@ import (
 )
 
 // WriteFeatureImports writes the consolidated import block for a feature's
-// service file, deduplicating across all plans.
-func WriteFeatureImports(plans []*ir.ServicePlan) string {
+// service file, deduplicating across all plans. currentFeature is used for
+// self-import prevention.
+func WriteFeatureImports(plans []*ir.ServicePlan, currentFeature string) string {
 	var b strings.Builder
-	writeServiceImports(&b, plans)
+	writeServiceImports(&b, plans, currentFeature)
 	return b.String()
 }

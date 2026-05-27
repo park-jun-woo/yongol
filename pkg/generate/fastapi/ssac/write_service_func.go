@@ -17,6 +17,12 @@ func writeServiceFunc(b *strings.Builder, plan *ir.ServicePlan) {
 
 	b.WriteString(fmt.Sprintf("async def %s(%s):\n", funcName, params))
 
+	// Subscribe handlers receive "payload" as the parameter but SSaC
+	// FieldArgs reference "message" as the source. Add an alias.
+	if plan.TriggerKind == ir.TriggerSubscribe {
+		b.WriteString("    message = payload\n")
+	}
+
 	if plan.UsesTransaction {
 		b.WriteString("    async with session.begin():\n")
 		renderOpsBody(b, plan.Ops, "        ", "session")

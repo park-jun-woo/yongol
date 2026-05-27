@@ -11,22 +11,21 @@ export class CloneTemplateService {
 
   async cloneTemplate(params: any, user?: any): Promise<any> {
     return this.prisma.$transaction(async (tx) => {
-      const owner = await tx.templates.findUnique({
+      const owner = await tx.template.findUnique({
         where: { id: params.id },
         select: { org_id: true },
       });
       await this.authz.check({
         action: 'CloneTemplate',
         resource: 'template',
-        ResourceID: params.id,
         resourceId: String(params.id),
-        owners: { templates: { org_id: owner?.org_id } },
+        owners: { template: { org_id: owner?.org_id } },
       });
       const tmpl = await tx.template.findUnique({ where: { id: params.id } });
       if (!tmpl) {
         throw new HttpException('Template not found', HttpStatus.NOT_FOUND);
       }
-      const sourceWf = await tx.workflow.findUnique({ where: { id: tmpl.id } });
+      const sourceWf = await tx.workflow.findUnique({ where: { id: tmpl.source_workflow_id } });
       if (!sourceWf) {
         throw new HttpException('Source workflow not found', HttpStatus.NOT_FOUND);
       }

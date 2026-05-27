@@ -12,15 +12,9 @@ export class GetDashboardService {
   ) {}
 
   async getDashboard(user?: any): Promise<any> {
-    const owner = await tx.organizations.findUnique({
-      where: { id: params.id },
-      select: { id: true },
-    });
     await this.authz.check({
       action: 'GetDashboard',
       resource: 'organization',
-      resourceId: String(params.id),
-      owners: { organizations: { id: owner?.id } },
     });
     const org = await this.prisma.organization.findUnique({ where: { id: user.id } });
     if (!org) {

@@ -2,6 +2,9 @@ import { Module } from '@nestjs/common';
 import { PrismaModule } from '../prisma/prisma.module';
 import { QueueModule } from '../queue/queue.module';
 import { AuthzModule } from '../authz/authz.module';
+import { ReportModule } from '../report/report.module';
+import { VersionModule } from '../version/version.module';
+import { WorkerModule } from '../worker/worker.module';
 import { ActivateWorkflowController } from './activateWorkflow.controller';
 import { ActivateWorkflowService } from './activateWorkflow.service';
 import { AddActionController } from './addAction.controller';
@@ -36,6 +39,9 @@ import { SaveWorkflowActionsService } from './saveWorkflowActions.service';
     PrismaModule,
     QueueModule,
     AuthzModule,
+    ReportModule,
+    VersionModule,
+    WorkerModule,
   ],
   controllers: [
     ActivateWorkflowController,

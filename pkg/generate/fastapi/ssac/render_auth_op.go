@@ -33,7 +33,11 @@ func renderAuthOp(b *strings.Builder, op *ir.AuthOp, indent string) {
 	b.WriteString(fmt.Sprintf("%s    current_user,\n", indent))
 	b.WriteString(fmt.Sprintf("%s    action=\"%s\",\n", indent, op.Action))
 	b.WriteString(fmt.Sprintf("%s    resource=\"%s\",\n", indent, op.Resource))
+	// Render inputs, skipping ResourceID (handled separately below).
 	for _, input := range op.Inputs {
+		if input.Key == "ResourceID" {
+			continue
+		}
 		b.WriteString(fmt.Sprintf("%s    %s=%s,\n", indent, resolveArgKey(input), renderArgValue(input)))
 	}
 	if op.Ownership != nil {
@@ -41,6 +45,13 @@ func renderAuthOp(b *strings.Builder, op *ir.AuthOp, indent string) {
 		b.WriteString(fmt.Sprintf("%s    resource_id=str(%s),\n", indent, ow.ResourcePK))
 		b.WriteString(fmt.Sprintf("%s    owners={\"%s\": {\"%s\": owner}},\n",
 			indent, ow.Table, ow.OwnerColumn))
+	} else {
+		// No ownership but ResourceID may still be present in inputs.
+		for _, input := range op.Inputs {
+			if input.Key == "ResourceID" {
+				b.WriteString(fmt.Sprintf("%s    resource_id=str(%s),\n", indent, renderArgValue(input)))
+			}
+		}
 	}
 	b.WriteString(fmt.Sprintf("%s)\n", indent))
 }

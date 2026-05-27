@@ -10,6 +10,7 @@ export class OnWorkflowExecutedService {
   ) {}
 
   async onWorkflowExecuted(payload: any): Promise<any> {
+    const message = payload;
     await this.webhookdeliveryService.deliver(message.status, 'simulated');
   }
 }

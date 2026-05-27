@@ -1,5 +1,5 @@
 //ff:func feature=gen-nestjs type=util control=iteration dimension=1
-//ff:what renderResponseOp — ResponseOp → return 문 렌더링
+//ff:what renderResponseOp — ResponseOp → return 문 렌더링 (tsSourceExpr 으로 PascalCase 필드를 camelCase 변환)
 
 package ssac
 
@@ -21,7 +21,19 @@ func renderResponseOp(b *strings.Builder, op *ir.ResponseOp, indent string) {
 	}
 	b.WriteString(fmt.Sprintf("%sreturn {\n", indent))
 	for _, f := range op.Fields {
-		b.WriteString(fmt.Sprintf("%s  %s: %s,\n", indent, f.Name, f.Source))
+		b.WriteString(fmt.Sprintf("%s  %s: %s,\n", indent, f.Name, tsSourceExpr(f.Source)))
 	}
 	b.WriteString(fmt.Sprintf("%s};\n", indent))
+}
+
+// tsSourceExpr converts a Go-style dotted access to camelCase TypeScript.
+// "token.AccessToken" → "token.accessToken", "user" → "user".
+func tsSourceExpr(source string) string {
+	dotIdx := strings.Index(source, ".")
+	if dotIdx < 0 {
+		return source
+	}
+	obj := source[:dotIdx]
+	field := source[dotIdx+1:]
+	return obj + "." + lcFirst(field)
 }

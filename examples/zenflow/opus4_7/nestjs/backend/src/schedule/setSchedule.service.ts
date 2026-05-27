@@ -14,16 +14,15 @@ export class SetScheduleService {
   ) {}
 
   async setSchedule(params: any, body: any, user?: any): Promise<any> {
-    const owner = await tx.workflows.findUnique({
+    const owner = await this.prisma.workflow.findUnique({
       where: { id: params.id },
       select: { org_id: true },
     });
     await this.authz.check({
       action: 'SetSchedule',
       resource: 'workflow',
-      ResourceID: params.id,
       resourceId: String(params.id),
-      owners: { workflows: { org_id: owner?.org_id } },
+      owners: { workflow: { org_id: owner?.org_id } },
     });
     const wf = await this.prisma.workflow.findUnique({ where: { id: params.id } });
     if (!wf) {

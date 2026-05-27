@@ -21,6 +21,19 @@ func renderServiceParams(plan *ir.ServicePlan) string {
 	hasQuery := len(plan.QueryParams) > 0
 	hasPath := len(plan.PathParams) > 0
 
+	// Defensive: SSaC Ops may reference body/path/query even when OpenAPI
+	// metadata is absent or incomplete. Force flags when Ops contain FieldArgs
+	// with the corresponding Location.
+	if !hasBody && opsReferenceBody(plan.Ops) {
+		hasBody = true
+	}
+	if !hasPath && opsReferencePath(plan.Ops) {
+		hasPath = true
+	}
+	if !hasQuery && opsReferenceQuery(plan.Ops) {
+		hasQuery = true
+	}
+
 	var params []string
 	if hasPath {
 		params = append(params, "params: any")

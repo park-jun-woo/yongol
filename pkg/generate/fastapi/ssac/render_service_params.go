@@ -25,6 +25,15 @@ func renderServiceParams(plan *ir.ServicePlan) string {
 	method := strings.ToUpper(plan.HTTPMethod)
 	hasBody := (method == "POST" || method == "PUT" || method == "PATCH") && len(plan.BodyFields) > 0
 
+	// Defensive: SSaC Ops may reference body/path/query even when OpenAPI
+	// metadata is absent or incomplete. Force body flag when Ops contain
+	// FieldArgs with LocBody.
+	bodyFallback := false
+	if !hasBody && opsReferenceBody(plan.Ops) {
+		hasBody = true
+		bodyFallback = true
+	}
+
 	var params []string
 	params = append(params, "session: AsyncSession")
 
@@ -35,8 +44,12 @@ func renderServiceParams(plan *ir.ServicePlan) string {
 
 	// Body parameter.
 	if hasBody {
-		reqModel := pascalCase(plan.OperationID) + "Request"
-		params = append(params, fmt.Sprintf("body: %s", reqModel))
+		if bodyFallback {
+			params = append(params, "body: dict")
+		} else {
+			reqModel := pascalCase(plan.OperationID) + "Request"
+			params = append(params, fmt.Sprintf("body: %s", reqModel))
+		}
 	}
 
 	// Query parameters.

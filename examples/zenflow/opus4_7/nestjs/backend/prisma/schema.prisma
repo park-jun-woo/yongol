@@ -7,6 +7,34 @@ generator client {
   provider = "prisma-client-js"
 }
 
+model Action {
+  id                   Int @id @default(autoincrement())
+  workflow_id          Int
+  action_type          String
+  config               String
+  sequence_order       Int
+  workflow             Workflow @relation(fields: [workflow_id], references: [id])
+  @@index([workflow_id])
+  @@map("actions")
+}
+
+model AuditLog {
+  id                   Int @id @default(autoincrement())
+  org_id               Int
+  actor_id             Int
+  action               String
+  resource_type        String
+  resource_id          String
+  detail               String
+  created_at           DateTime
+  org                  Organization @relation(fields: [org_id], references: [id])
+  actor                User @relation(fields: [actor_id], references: [id])
+  @@index([org_id])
+  @@index([created_at])
+  @@index([action])
+  @@map("audit_logs")
+}
+
 model FullendCache {
   key                  String @id
   value                Bytes
@@ -26,14 +54,6 @@ model FullendQueue {
   processed_at         DateTime?
   traceparent          String
   @@map("fullend_queue")
-}
-
-model FullendSession {
-  key                  String @id
-  value                Bytes
-  expires_at           DateTime
-  @@index([expires_at])
-  @@map("fullend_sessions")
 }
 
 model Template {
@@ -64,21 +84,37 @@ model User {
   @@map("users")
 }
 
-model AuditLog {
-  id                   Int @id @default(autoincrement())
-  org_id               Int
-  actor_id             Int
-  action               String
-  resource_type        String
-  resource_id          String
-  detail               String
+model RefreshToken {
+  token_hash           String @id
+  claims               Json
+  expires_at           DateTime
+  revoked_at           DateTime?
   created_at           DateTime
+  @@index([claims])
+  @@map("refresh_tokens")
+}
+
+model ExecutionLog {
+  id                   Int @id @default(autoincrement())
+  workflow_id          Int
+  org_id               Int
+  status               String
+  credits_spent        Int
+  report_key           String
+  executed_at          DateTime
+  workflow             Workflow @relation(fields: [workflow_id], references: [id])
   org                  Organization @relation(fields: [org_id], references: [id])
-  actor                User @relation(fields: [actor_id], references: [id])
+  @@index([workflow_id])
   @@index([org_id])
-  @@index([created_at])
-  @@index([action])
-  @@map("audit_logs")
+  @@map("execution_logs")
+}
+
+model FullendSession {
+  key                  String @id
+  value                Bytes
+  expires_at           DateTime
+  @@index([expires_at])
+  @@map("fullend_sessions")
 }
 
 model Organization {
@@ -90,12 +126,12 @@ model Organization {
   longitude            String
   address_verified     Boolean
   created_at           DateTime
+  audit_logs           AuditLog[]
   templates            Template[]
   users                User[]
-  audit_logs           AuditLog[]
+  execution_logs       ExecutionLog[]
   webhooks             Webhook[]
   workflows            Workflow[]
-  execution_logs       ExecutionLog[]
   @@map("organizations")
 }
 
@@ -122,46 +158,10 @@ model Workflow {
   assignment_confidence String @default("none")
   created_at           DateTime
   org                  Organization @relation(fields: [org_id], references: [id])
-  templates            Template[]
   actions              Action[]
+  templates            Template[]
   execution_logs       ExecutionLog[]
   @@index([org_id])
   @@index([status])
   @@map("workflows")
-}
-
-model Action {
-  id                   Int @id @default(autoincrement())
-  workflow_id          Int
-  action_type          String
-  config               String
-  sequence_order       Int
-  workflow             Workflow @relation(fields: [workflow_id], references: [id])
-  @@index([workflow_id])
-  @@map("actions")
-}
-
-model RefreshToken {
-  token_hash           String @id
-  claims               Json
-  expires_at           DateTime
-  revoked_at           DateTime?
-  created_at           DateTime
-  @@index([claims])
-  @@map("refresh_tokens")
-}
-
-model ExecutionLog {
-  id                   Int @id @default(autoincrement())
-  workflow_id          Int
-  org_id               Int
-  status               String
-  credits_spent        Int
-  report_key           String
-  executed_at          DateTime
-  workflow             Workflow @relation(fields: [workflow_id], references: [id])
-  org                  Organization @relation(fields: [org_id], references: [id])
-  @@index([workflow_id])
-  @@index([org_id])
-  @@map("execution_logs")
 }

@@ -13,22 +13,21 @@ export class ActivateWorkflowService {
 
   async activateWorkflow(params: any, user?: any): Promise<any> {
     return this.prisma.$transaction(async (tx) => {
-      const owner = await tx.workflows.findUnique({
+      const owner = await tx.workflow.findUnique({
         where: { id: params.id },
         select: { org_id: true },
       });
       await this.authz.check({
         action: 'ActivateWorkflow',
         resource: 'workflow',
-        ResourceID: params.id,
         resourceId: String(params.id),
-        owners: { workflows: { org_id: owner?.org_id } },
+        owners: { workflow: { org_id: owner?.org_id } },
       });
       const wf = await tx.workflow.findUnique({ where: { id: params.id } });
       if (!wf) {
         throw new HttpException('Workflow not found', HttpStatus.NOT_FOUND);
       }
-      const org = await tx.organization.findUnique({ where: { id: wf.id } });
+      const org = await tx.organization.findUnique({ where: { id: wf.org_id } });
       if (!org) {
         throw new HttpException('Organization not found', HttpStatus.NOT_FOUND);
       }

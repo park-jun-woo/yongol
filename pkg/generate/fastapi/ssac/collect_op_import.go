@@ -5,8 +5,9 @@ package ssac
 
 import "github.com/park-jun-woo/yongol/pkg/generate/ir"
 
-// collectOpImport processes a single op into the importData.
-func collectOpImport(d *importData, op ir.Op) {
+// collectOpImport processes a single op into the importData. currentFeature
+// is used to skip self-imports (e.g. auth.py importing from itself).
+func collectOpImport(d *importData, op ir.Op, currentFeature string) {
 	switch op.Kind {
 	case ir.OpGet:
 		d.UsesSelect = true
@@ -32,11 +33,11 @@ func collectOpImport(d *importData, op ir.Op) {
 	case ir.OpAuth:
 		d.HasAuth = true
 	case ir.OpCall:
-		if op.Call != nil && op.Call.Package != "" {
+		if op.Call != nil && op.Call.Package != "" && op.Call.Package != currentFeature {
 			addExtPkgRef(d, op.Call.Package, op.Call.Function)
 		}
 	case ir.OpEval:
-		if op.Eval != nil && op.Eval.Package != "" {
+		if op.Eval != nil && op.Eval.Package != "" && op.Eval.Package != currentFeature {
 			addExtPkgRef(d, op.Eval.Package, op.Eval.Function)
 		}
 	}

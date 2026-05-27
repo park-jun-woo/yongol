@@ -11,15 +11,9 @@ export class PublishTemplateService {
 
   async publishTemplate(body: any, user?: any): Promise<any> {
     return this.prisma.$transaction(async (tx) => {
-      const owner = await tx.templates.findUnique({
-        where: { id: params.id },
-        select: { org_id: true },
-      });
       await this.authz.check({
         action: 'PublishTemplate',
         resource: 'template',
-        resourceId: String(params.id),
-        owners: { templates: { org_id: owner?.org_id } },
       });
       const existing = await tx.template.findUnique({ where: { source_workflow_id: body.source_workflow_id } });
       if (existing) {

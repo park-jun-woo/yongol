@@ -15,13 +15,11 @@ func renderEvalOp(b *strings.Builder, op *ir.EvalOp, indent string) {
 	if op == nil {
 		return
 	}
-	pkg := op.Package
-	if pkg != "" {
-		pkg += "."
-	}
+	// Python uses direct imports (from X import Y), so no package prefix.
+	funcName := snakeCase(op.Function)
 	args := renderCallArgs(op.Args)
-	b.WriteString(fmt.Sprintf("%sif %s%s(%s):\n",
-		indent, pkg, snakeCase(op.Function), args))
+	b.WriteString(fmt.Sprintf("%sif %s(%s):\n",
+		indent, funcName, args))
 	b.WriteString(fmt.Sprintf("%s    raise HTTPException(status_code=%d, detail=\"%s\")\n",
 		indent, op.StatusCode, op.Message))
 }

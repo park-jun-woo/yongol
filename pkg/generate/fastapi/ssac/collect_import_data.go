@@ -6,14 +6,14 @@ package ssac
 import "github.com/park-jun-woo/yongol/pkg/generate/ir"
 
 // collectImportData scans all plans and returns the import metadata needed
-// for writeServiceImports.
-func collectImportData(plans []*ir.ServicePlan) importData {
+// for writeServiceImports. currentFeature is used for self-import prevention.
+func collectImportData(plans []*ir.ServicePlan, currentFeature string) importData {
 	d := importData{
 		Models:  make(map[string]bool),
 		ExtPkgs: make(map[string]map[string]bool),
 	}
 	for _, plan := range plans {
-		collectPlanImports(&d, plan.Ops)
+		collectPlanImports(&d, plan.Ops, currentFeature)
 	}
 	return d
 }
