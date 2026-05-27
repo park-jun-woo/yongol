@@ -27,7 +27,10 @@ func convertAuth(seq ssac.Sequence, fs *yongol.Fullstack) Op {
 	}
 
 	// Enrich with ownership info from Rego @ownership annotations.
-	if fs != nil {
+	// Only populate Ownership when ResourceID is present and non-zero in
+	// the sequence Inputs, mirroring gogin's ownership_lookup.go:23-25.
+	rawRID, hasRID := seq.Inputs["ResourceID"]
+	if fs != nil && hasRID && !isResourceIDZeroIR(rawRID) {
 		for _, p := range fs.ParsedPolicies {
 			for _, om := range p.Ownerships {
 				if om.Resource == seq.Resource {
@@ -50,6 +53,20 @@ func convertAuth(seq ssac.Sequence, fs *yongol.Fullstack) Op {
 	}
 
 	return Op{Kind: OpAuth, Auth: &op}
+}
+
+// isResourceIDZeroIR returns true when the raw ResourceID expression is a
+// static zero value. Mirrors gogin/ssac/isResourceIDZero.
+func isResourceIDZeroIR(expr string) bool {
+	s := strings.TrimSpace(expr)
+	if s == "" {
+		return true
+	}
+	switch strings.ToLower(s) {
+	case "0", `""`, "''", "nil", "null":
+		return true
+	}
+	return false
 }
 
 // findTablePK returns the first primary key column name for the given DDL

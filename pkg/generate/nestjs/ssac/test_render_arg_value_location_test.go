@@ -41,6 +41,11 @@ func TestRenderArgValueLocation(t *testing.T) {
 			want: "wf.id",
 		},
 		{
+			name: "LocVarSourceColumnDiffers",
+			arg:  ir.FieldArg{Location: ir.LocVar, Key: "ID", ColumnName: "id", SourceColumn: "org_id", Source: "wf", Field: ".OrgID"},
+			want: "wf.org_id",
+		},
+		{
 			name: "LocVarNoField",
 			arg:  ir.FieldArg{Location: ir.LocVar, Source: "wf"},
 			want: "wf",
@@ -58,7 +63,7 @@ func TestRenderArgValueLocation(t *testing.T) {
 		{
 			name: "FallbackNoLocation",
 			arg:  ir.FieldArg{Source: "request", Field: ".ID", ColumnName: "id"},
-			want: "params.id",
+			want: "body.id",
 		},
 		{
 			name: "FallbackCurrentUser",

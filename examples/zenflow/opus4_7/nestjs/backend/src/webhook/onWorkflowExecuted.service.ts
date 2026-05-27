@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { WebhookdeliveryService } from '../../webhookdelivery/webhookdelivery.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { WebhookdeliveryService } from '../webhookdelivery/webhookdelivery.service';
 
 @Injectable()
 export class OnWorkflowExecutedService {

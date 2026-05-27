@@ -5,6 +5,7 @@ package ssac
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/park-jun-woo/yongol/pkg/generate/ir"
@@ -25,6 +26,8 @@ func RenderModule(feature string, plans []*ir.ServicePlan) (string, error) {
 
 	needsQueue := false
 	needsAuthz := false
+	// Collect cross-feature @call dependencies.
+	callFeatures := make(map[string]bool)
 	for _, p := range plans {
 		if hasPublishOp(p.Ops) {
 			needsQueue = true
@@ -32,12 +35,30 @@ func RenderModule(feature string, plans []*ir.ServicePlan) (string, error) {
 		if hasAuthOp(p.Ops) {
 			needsAuthz = true
 		}
+		for _, op := range p.Ops {
+			if op.Kind == ir.OpCall && op.Call != nil && op.Call.TargetFeature != "" {
+				if op.Call.TargetFeature != strings.ToLower(feature) {
+					callFeatures[op.Call.TargetFeature] = true
+				}
+			}
+		}
 	}
 	if needsQueue {
 		b.WriteString("import { QueueModule } from '../queue/queue.module';\n")
 	}
 	if needsAuthz {
 		b.WriteString("import { AuthzModule } from '../authz/authz.module';\n")
+	}
+
+	// Import cross-feature modules.
+	sortedFeatures := make([]string, 0, len(callFeatures))
+	for cf := range callFeatures {
+		sortedFeatures = append(sortedFeatures, cf)
+	}
+	sort.Strings(sortedFeatures)
+	for _, cf := range sortedFeatures {
+		modName := strings.ToUpper(cf[:1]) + cf[1:] + "Module"
+		b.WriteString(fmt.Sprintf("import { %s } from '../%s/%s.module';\n", modName, cf, cf))
 	}
 
 	// Import each controller and service
@@ -62,6 +83,10 @@ func RenderModule(feature string, plans []*ir.ServicePlan) (string, error) {
 	}
 	if needsAuthz {
 		b.WriteString("    AuthzModule,\n")
+	}
+	for _, cf := range sortedFeatures {
+		modName := strings.ToUpper(cf[:1]) + cf[1:] + "Module"
+		b.WriteString(fmt.Sprintf("    %s,\n", modName))
 	}
 	b.WriteString("  ],\n")
 

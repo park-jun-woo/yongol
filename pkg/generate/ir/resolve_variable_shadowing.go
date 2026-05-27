@@ -8,8 +8,15 @@ package ir
 // earlier op already declared the same variable name — SSaC author's
 // chosen names are preserved on first use. This resolves shadowing at
 // build time so renderers need not handle it.
-func resolveVariableShadowing(ops []Op) {
+//
+// reservedNames seeds the declared set with names that are already taken by
+// method parameters (e.g. "params", "body", "query", "user", "payload") so
+// that op result variables do not shadow them.
+func resolveVariableShadowing(ops []Op, reservedNames ...string) {
 	declared := make(map[string]bool)
+	for _, n := range reservedNames {
+		declared[n] = true
+	}
 	for i := range ops {
 		switch ops[i].Kind {
 		case OpGet:

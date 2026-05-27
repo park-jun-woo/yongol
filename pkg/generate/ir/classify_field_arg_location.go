@@ -6,7 +6,7 @@ package ir
 // classifyFieldArgLocation sets Location on a single FieldArg based on its
 // Source and the OpenAPI param maps.
 func classifyFieldArgLocation(fa *FieldArg, pathParams, queryParams map[string]bool) {
-	if fa.IsQuoted || (fa.Literal != "" && fa.Source == "") {
+	if fa.Literal != "" {
 		fa.Location = LocLiteral
 		return
 	}

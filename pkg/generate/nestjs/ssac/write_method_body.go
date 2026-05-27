@@ -11,6 +11,12 @@ import (
 
 // writeMethodBody writes the service method body with optional transaction.
 func writeMethodBody(b *strings.Builder, plan *ir.ServicePlan) {
+	// Subscribe handlers receive "payload" as the parameter but SSaC
+	// FieldArgs reference "message" as the source. Add an alias.
+	if plan.TriggerKind == ir.TriggerSubscribe {
+		b.WriteString("    const message = payload;\n")
+	}
+
 	if plan.UsesTransaction {
 		b.WriteString("    return this.prisma.$transaction(async (tx) => {\n")
 		renderOpsBody(b, plan.Ops, "      ", "tx")

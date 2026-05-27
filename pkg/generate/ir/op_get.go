@@ -31,6 +31,10 @@ type GetOp struct {
 	// value. Zero value (OpGet) means no guard follows.
 	FollowedByGuard OpKind
 
+	// IsCount is true when the result type is a scalar integer (int64, int32,
+	// int), indicating a COUNT query rather than a row query.
+	IsCount bool
+
 	// PaginationArgs holds pagination-specific arguments (cursor, per_page,
 	// page_offset, page, limit, offset) separated from the where-clause Args.
 	// Renderers targeting ORMs (Prisma, SQLAlchemy) use this to emit

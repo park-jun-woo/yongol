@@ -2,7 +2,6 @@ import {
   Controller,
   Post,
   Param,
-  Body,
   Req,
 } from '@nestjs/common';
 import { ArchiveWorkflowService } from './archiveWorkflow.service';
@@ -15,8 +14,7 @@ export class ArchiveWorkflowController {
   async archiveWorkflow(
     @Req() req: any,
     @Param() params: any,
-    @Body() body: any,
   ) {
-    return this.service.archiveWorkflow(params, body, req.user);
+    return this.service.archiveWorkflow(params, req.user);
   }
 }

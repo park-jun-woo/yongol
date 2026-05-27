@@ -2,7 +2,6 @@ import {
   Controller,
   Post,
   Param,
-  Body,
   Req,
 } from '@nestjs/common';
 import { ExecuteWithReportService } from './executeWithReport.service';
@@ -15,8 +14,7 @@ export class ExecuteWithReportController {
   async executeWithReport(
     @Req() req: any,
     @Param() params: any,
-    @Body() body: any,
   ) {
-    return this.service.executeWithReport(params, body, req.user);
+    return this.service.executeWithReport(params, req.user);
   }
 }

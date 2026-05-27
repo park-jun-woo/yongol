@@ -1,8 +1,7 @@
 import {
   Controller,
   Get,
-  Param,
-  Body,
+  Query,
   Req,
 } from '@nestjs/common';
 import { ListTemplatesService } from './listTemplates.service';
@@ -14,9 +13,8 @@ export class ListTemplatesController {
   @Get('')
   async listTemplates(
     @Req() req: any,
-    @Param() params: any,
-    @Body() body: any,
+    @Query() query: any,
   ) {
-    return this.service.listTemplates(params, body, req.user);
+    return this.service.listTemplates(query, req.user);
   }
 }

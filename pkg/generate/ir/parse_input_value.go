@@ -17,6 +17,12 @@ func parseInputValue(key, value string) FieldArg {
 		return fa
 	}
 
+	// Check for numeric literal before dotted reference (handles "1.5" etc.)
+	if isNumericLiteral(value) {
+		fa.Literal = value
+		return fa
+	}
+
 	// Check for dotted reference: "source.Field"
 	if dotIdx := strings.IndexByte(value, '.'); dotIdx >= 0 {
 		fa.Source = value[:dotIdx]
@@ -24,7 +30,33 @@ func parseInputValue(key, value string) FieldArg {
 		return fa
 	}
 
-	// Plain variable name or literal
+	// Plain variable name
 	fa.Source = value
 	return fa
+}
+
+// isNumericLiteral returns true when s is a numeric literal: optional leading
+// minus, one or more digits, optional single decimal point with digits.
+func isNumericLiteral(s string) bool {
+	if len(s) == 0 {
+		return false
+	}
+	start := 0
+	if s[0] == '-' {
+		start = 1
+	}
+	if start >= len(s) {
+		return false
+	}
+	hasDot := false
+	for i := start; i < len(s); i++ {
+		if s[i] == '.' && !hasDot {
+			hasDot = true
+			continue
+		}
+		if s[i] < '0' || s[i] > '9' {
+			return false
+		}
+	}
+	return true
 }

@@ -1,7 +1,6 @@
 import {
   Controller,
   Post,
-  Param,
   Body,
   Req,
 } from '@nestjs/common';
@@ -14,9 +13,8 @@ export class CreateWorkflowController {
   @Post('')
   async createWorkflow(
     @Req() req: any,
-    @Param() params: any,
     @Body() body: any,
   ) {
-    return this.service.createWorkflow(params, body, req.user);
+    return this.service.createWorkflow(body, req.user);
   }
 }

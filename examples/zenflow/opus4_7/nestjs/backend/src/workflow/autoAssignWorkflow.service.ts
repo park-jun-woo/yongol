@@ -1,7 +1,7 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { AuthzService } from '../../authz/authz.service';
-import { WorkflowService } from '../../workflow/workflow.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { AuthzService } from '../authz/authz.service';
+import { WorkflowService } from '../workflow/workflow.service';
 
 @Injectable()
 export class AutoAssignWorkflowService {
@@ -11,12 +11,18 @@ export class AutoAssignWorkflowService {
     private readonly workflowService: WorkflowService,
   ) {}
 
-  async autoAssignWorkflow(params: any, body: any, user?: any): Promise<any> {
+  async autoAssignWorkflow(params: any, user?: any): Promise<any> {
     return this.prisma.$transaction(async (tx) => {
+      const owner = await tx.workflows.findUnique({
+        where: { id: params.id },
+        select: { org_id: true },
+      });
       await this.authz.check({
         action: 'AutoAssignWorkflow',
         resource: 'workflow',
         ResourceID: params.id,
+        resourceId: String(params.id),
+        owners: { workflows: { org_id: owner?.org_id } },
       });
       const wf = await tx.workflow.findUnique({ where: { id: params.id } });
       if (!wf) {

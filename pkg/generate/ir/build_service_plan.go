@@ -49,8 +49,10 @@ func BuildServicePlan(sf *ssac.ServiceFunc, fs *yongol.Fullstack) (*ServicePlan,
 	enrichFieldArgDDL(plan.Ops, fs)
 
 	// Resolve variable shadowing: detect duplicate VarName declarations and
-	// rename collisions with _result suffix.
-	resolveVariableShadowing(plan.Ops)
+	// rename collisions with _result suffix. Reserve common method parameter
+	// names so Op results do not shadow them (e.g. VerifyPassword ResultVar
+	// "user" must not collide with the "user" method parameter).
+	resolveVariableShadowing(plan.Ops, "params", "body", "query", "user", "payload")
 
 	// Annotate @get ops with lookahead guard info. When a @get is followed
 	// by @empty or @exists targeting the same result variable, the renderer

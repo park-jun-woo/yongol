@@ -51,8 +51,10 @@ func TestBuildServicePlanVerifyPassword(t *testing.T) {
 	if vpOp.VerifyPW.HashCol != "password_hash" {
 		t.Errorf("VerifyPW.HashCol = %q, want %q", vpOp.VerifyPW.HashCol, "password_hash")
 	}
-	if vpOp.VerifyPW.ResultVar != "user" {
-		t.Errorf("VerifyPW.ResultVar = %q, want %q", vpOp.VerifyPW.ResultVar, "user")
+	// "user" is a reserved method parameter name, so the shadowing
+	// resolution renames it to "user_result".
+	if vpOp.VerifyPW.ResultVar != "user_result" {
+		t.Errorf("VerifyPW.ResultVar = %q, want %q", vpOp.VerifyPW.ResultVar, "user_result")
 	}
 	if vpOp.VerifyPW.ErrStatus != 401 {
 		t.Errorf("VerifyPW.ErrStatus = %d, want 401", vpOp.VerifyPW.ErrStatus)

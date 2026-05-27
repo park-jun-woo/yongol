@@ -2,7 +2,6 @@ import {
   Controller,
   Post,
   Param,
-  Body,
   Req,
 } from '@nestjs/common';
 import { CreateWorkflowVersionService } from './createWorkflowVersion.service';
@@ -15,8 +14,7 @@ export class CreateWorkflowVersionController {
   async createWorkflowVersion(
     @Req() req: any,
     @Param() params: any,
-    @Body() body: any,
   ) {
-    return this.service.createWorkflowVersion(params, body, req.user);
+    return this.service.createWorkflowVersion(params, req.user);
   }
 }

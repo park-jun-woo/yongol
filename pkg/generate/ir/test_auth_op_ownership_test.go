@@ -107,6 +107,105 @@ func TestAuthOpOwnershipNoMapping(t *testing.T) {
 	}
 }
 
+// TestAuthOpOwnershipNoResourceID verifies that when Inputs has no ResourceID
+// key (e.g. @auth {} "Forbidden"), Ownership is not populated even if a
+// matching @ownership Rego annotation exists. This is the Group B fix.
+func TestAuthOpOwnershipNoResourceID(t *testing.T) {
+	fs := &yongol.Fullstack{
+		ParsedPolicies: []rego.Policy{
+			{
+				Ownerships: []rego.OwnershipMapping{
+					{Resource: "workflow", Table: "workflows", Column: "owner_id"},
+				},
+			},
+		},
+		DDLTables: []ddl.Table{
+			{
+				Name: "workflows",
+				Columns: map[string]ddl.Column{
+					"id":       {Name: "id"},
+					"owner_id": {Name: "owner_id"},
+				},
+				PrimaryKey: []string{"id"},
+			},
+		},
+	}
+
+	sf := &ssac.ServiceFunc{
+		Name:     "CreateWorkflow",
+		FileName: "create_workflow.ssac",
+		Sequences: []ssac.Sequence{
+			{
+				Type:     ssac.SeqAuth,
+				Action:   "CreateWorkflow",
+				Resource: "workflow",
+				Inputs:   map[string]string{},
+				Message:  "Forbidden",
+			},
+		},
+	}
+
+	plan, err := BuildServicePlan(sf, fs)
+	if err != nil {
+		t.Fatalf("BuildServicePlan: %v", err)
+	}
+	if plan.Ops[0].Auth.Ownership != nil {
+		t.Errorf("Ownership = %+v, want nil when no ResourceID in Inputs",
+			plan.Ops[0].Auth.Ownership)
+	}
+}
+
+// TestAuthOpOwnershipZeroResourceID verifies that a zero-value ResourceID
+// ("0", "", "nil", "null") also skips ownership enrichment.
+func TestAuthOpOwnershipZeroResourceID(t *testing.T) {
+	fs := &yongol.Fullstack{
+		ParsedPolicies: []rego.Policy{
+			{
+				Ownerships: []rego.OwnershipMapping{
+					{Resource: "workflow", Table: "workflows", Column: "owner_id"},
+				},
+			},
+		},
+		DDLTables: []ddl.Table{
+			{
+				Name: "workflows",
+				Columns: map[string]ddl.Column{
+					"id":       {Name: "id"},
+					"owner_id": {Name: "owner_id"},
+				},
+				PrimaryKey: []string{"id"},
+			},
+		},
+	}
+
+	for _, zero := range []string{"0", "", "nil", "null"} {
+		t.Run(zero, func(t *testing.T) {
+			sf := &ssac.ServiceFunc{
+				Name:     "ListWorkflows",
+				FileName: "list_workflows.ssac",
+				Sequences: []ssac.Sequence{
+					{
+						Type:     ssac.SeqAuth,
+						Action:   "ListWorkflows",
+						Resource: "workflow",
+						Inputs:   map[string]string{"ResourceID": zero},
+						Message:  "Forbidden",
+					},
+				},
+			}
+
+			plan, err := BuildServicePlan(sf, fs)
+			if err != nil {
+				t.Fatalf("BuildServicePlan: %v", err)
+			}
+			if plan.Ops[0].Auth.Ownership != nil {
+				t.Errorf("Ownership = %+v, want nil for zero ResourceID %q",
+					plan.Ops[0].Auth.Ownership, zero)
+			}
+		})
+	}
+}
+
 func TestAuthOpOwnershipNoPolicies(t *testing.T) {
 	sf := &ssac.ServiceFunc{
 		Name:     "DeleteCourse",

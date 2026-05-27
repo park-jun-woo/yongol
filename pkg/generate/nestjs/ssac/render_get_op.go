@@ -20,8 +20,27 @@ func renderGetOp(b *strings.Builder, op *ir.GetOp, indent, prismaRef string) {
 	}
 	model := lcFirst(op.Model)
 	method := "findUnique"
-	if op.IsList {
+	if op.IsCount {
+		method = "count"
+	} else if op.IsList {
 		method = "findMany"
+	}
+
+	// Count queries use a simplified form: only where clause, no select.
+	if op.IsCount {
+		var whereParts []string
+		for _, a := range op.Args {
+			key := resolveArgKey(a)
+			whereParts = append(whereParts, fmt.Sprintf("%s: %s", key, renderArgValue(a)))
+		}
+		if len(whereParts) > 0 {
+			b.WriteString(fmt.Sprintf("%sconst %s = await %s.%s.count({ where: { %s } });\n",
+				indent, op.VarName, prismaRef, model, strings.Join(whereParts, ", ")))
+		} else {
+			b.WriteString(fmt.Sprintf("%sconst %s = await %s.%s.count();\n",
+				indent, op.VarName, prismaRef, model))
+		}
+		return
 	}
 
 	// Build Prisma query options.

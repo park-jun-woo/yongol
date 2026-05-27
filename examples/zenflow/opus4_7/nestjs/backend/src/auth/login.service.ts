@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { AuthService } from '../../auth/auth.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class LoginService {
@@ -9,7 +9,7 @@ export class LoginService {
     private readonly authService: AuthService,
   ) {}
 
-  async login(params: any, body: any, user?: any): Promise<any> {
+  async login(body: any, user?: any): Promise<any> {
     const user = await this.prisma.user.findUnique({ where: { email: request.email } });
     if (!user) {
       throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);

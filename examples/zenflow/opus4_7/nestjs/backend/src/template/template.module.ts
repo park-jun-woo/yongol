@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from '../../prisma/prisma.module';
+import { PrismaModule } from '../prisma/prisma.module';
+import { AuthzModule } from '../authz/authz.module';
 import { CloneTemplateController } from './cloneTemplate.controller';
 import { CloneTemplateService } from './cloneTemplate.service';
 import { GetTemplateController } from './getTemplate.controller';
@@ -12,6 +13,7 @@ import { PublishTemplateService } from './publishTemplate.service';
 @Module({
   imports: [
     PrismaModule,
+    AuthzModule,
   ],
   controllers: [
     CloneTemplateController,

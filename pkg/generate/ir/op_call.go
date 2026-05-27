@@ -9,6 +9,12 @@ type CallOp struct {
 	// Package is the package prefix (e.g. "billing"). Empty for same-package.
 	Package string
 
+	// TargetFeature is the feature folder name of the call target (e.g.
+	// "webhookdelivery"). Derived from Package via lowercase convention.
+	// Empty for same-package calls. Used by module renderers to add
+	// cross-feature imports.
+	TargetFeature string
+
 	// Function is the function name (e.g. "HoldEscrow").
 	Function string
 

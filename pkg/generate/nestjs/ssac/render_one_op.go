@@ -25,7 +25,7 @@ func renderOneOp(b *strings.Builder, op ir.Op, indent, prismaRef string) {
 	case ir.OpExists:
 		renderExistsOp(b, op.Exists, indent)
 	case ir.OpAuth:
-		renderAuthOp(b, op.Auth, indent)
+		renderAuthOp(b, op.Auth, indent, prismaRef)
 	case ir.OpState:
 		renderStateOp(b, op.State, indent)
 	case ir.OpCall:

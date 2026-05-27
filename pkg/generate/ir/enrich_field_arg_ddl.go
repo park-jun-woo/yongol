@@ -4,6 +4,8 @@
 package ir
 
 import (
+	"strings"
+
 	"github.com/park-jun-woo/yongol/pkg/util/caseconv"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
@@ -32,10 +34,15 @@ func enrichFieldArgDDL(ops []Op, fs *yongol.Fullstack) {
 		for _, args := range collectFieldArgSlices(&ops[i]) {
 			for j := range *args {
 				fa := &(*args)[j]
+				// Target column (for where key)
 				snake := caseconv.PascalToSnake(fa.Key)
 				if _, ok := tbl.Columns[snake]; ok {
 					fa.ColumnName = snake
 					fa.IsPK = pkSet[snake]
+				}
+				// Source column (for value expression on variable references)
+				if fa.Field != "" {
+					fa.SourceColumn = caseconv.PascalToSnake(strings.TrimPrefix(fa.Field, "."))
 				}
 			}
 		}

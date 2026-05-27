@@ -3,17 +3,22 @@
 
 package ir
 
-import "github.com/park-jun-woo/yongol/pkg/parser/ssac"
+import (
+	"strings"
+
+	"github.com/park-jun-woo/yongol/pkg/parser/ssac"
+)
 
 // convertCall converts a @call sequence to an IR Op.
 func convertCall(seq ssac.Sequence) Op {
 	pkg, fn := splitModelMethod(seq.Model)
 	op := CallOp{
-		Package:   pkg,
-		Function:  fn,
-		Args:      convertInputsToFieldArgs(seq.Inputs),
-		ErrStatus: seq.ErrStatus,
-		Message:   seq.Message,
+		Package:       pkg,
+		TargetFeature: strings.ToLower(pkg),
+		Function:      fn,
+		Args:          convertInputsToFieldArgs(seq.Inputs),
+		ErrStatus:     seq.ErrStatus,
+		Message:       seq.Message,
 	}
 	if op.ErrStatus == 0 {
 		op.ErrStatus = 500

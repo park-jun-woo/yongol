@@ -36,13 +36,22 @@ func renderArgValue(a ir.FieldArg) string {
 	case ir.LocUser:
 		return fmt.Sprintf("user.%s", col)
 	case ir.LocVar:
-		if col != "" && a.Source != "" {
-			return fmt.Sprintf("%s.%s", a.Source, col)
+		// SourceColumn is the snake_case name on the source variable/struct.
+		// Falls back to ColumnName (target key) when Field is absent.
+		srcCol := a.SourceColumn
+		if srcCol == "" {
+			srcCol = toSnake(fieldName(a))
+		}
+		if srcCol == "" {
+			srcCol = col // fall back to target ColumnName
+		}
+		if srcCol != "" && a.Source != "" {
+			return fmt.Sprintf("%s.%s", a.Source, srcCol)
 		}
 		if a.Source != "" {
 			return a.Source
 		}
-		return col
+		return srcCol
 	case ir.LocLiteral:
 		return fmt.Sprintf("'%s'", a.Literal)
 	}
@@ -69,7 +78,7 @@ func renderArgValueLegacy(a ir.FieldArg, col string) string {
 	}
 	switch source {
 	case "request":
-		return fmt.Sprintf("params.%s", col)
+		return fmt.Sprintf("body.%s", col)
 	case "currentUser":
 		return fmt.Sprintf("user.%s", col)
 	default:

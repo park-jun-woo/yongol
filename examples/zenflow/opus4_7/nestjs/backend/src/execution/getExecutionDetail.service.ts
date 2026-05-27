@@ -1,7 +1,7 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { AuthzService } from '../../authz/authz.service';
-import { DashboardService } from '../../dashboard/dashboard.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { AuthzService } from '../authz/authz.service';
+import { DashboardService } from '../dashboard/dashboard.service';
 
 @Injectable()
 export class GetExecutionDetailService {
@@ -11,21 +11,27 @@ export class GetExecutionDetailService {
     private readonly dashboardService: DashboardService,
   ) {}
 
-  async getExecutionDetail(params: any, body: any, user?: any): Promise<any> {
+  async getExecutionDetail(params: any, user?: any): Promise<any> {
+    const owner = await tx.execution_logs.findUnique({
+      where: { id: params.id },
+      select: { org_id: true },
+    });
     await this.authz.check({
       action: 'GetExecutionDetail',
       resource: 'execution_log',
       ResourceID: params.id,
+      resourceId: String(params.id),
+      owners: { execution_logs: { org_id: owner?.org_id } },
     });
     const log = await this.prisma.executionLog.findUnique({ where: { id: params.id } });
     if (!log) {
       throw new HttpException('Execution log not found', HttpStatus.NOT_FOUND);
     }
-    const wf = await this.prisma.workflow.findUnique({ where: { id: log.workflow_id } });
+    const wf = await this.prisma.workflow.findUnique({ where: { id: log.id } });
     if (!wf) {
       throw new HttpException('Workflow not found', HttpStatus.NOT_FOUND);
     }
-    const org = await this.prisma.organization.findUnique({ where: { id: log.org_id } });
+    const org = await this.prisma.organization.findUnique({ where: { id: log.id } });
     if (!org) {
       throw new HttpException('Organization not found', HttpStatus.NOT_FOUND);
     }

@@ -5,8 +5,13 @@ package ir
 
 import "strings"
 
-// ddlTableSingularIR desingularises a lower-snake table name. Mirrors
-// gogin/ssac/ddlTableSingular for consistency.
+// DDLTableSingularIR desingularises a lower-snake table name. Mirrors
+// gogin/ssac/ddlTableSingular for consistency. Exported for cross-package use.
+func DDLTableSingularIR(name string) string {
+	return ddlTableSingularIR(name)
+}
+
+// ddlTableSingularIR is the unexported implementation.
 func ddlTableSingularIR(name string) string {
 	switch {
 	case strings.HasSuffix(name, "ies"):

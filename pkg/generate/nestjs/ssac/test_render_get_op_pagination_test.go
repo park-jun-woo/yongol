@@ -63,6 +63,45 @@ func TestRenderGetOpPagination(t *testing.T) {
 		}
 	})
 
+	t.Run("CountQuery", func(t *testing.T) {
+		op := &ir.GetOp{
+			VarName: "total",
+			VarType: "int64",
+			Model:   "AuditLog",
+			IsCount: true,
+			Args: []ir.FieldArg{
+				{Location: ir.LocUser, ColumnName: "org_id", Source: "currentUser", Field: ".OrgID"},
+			},
+		}
+		var b strings.Builder
+		renderGetOp(&b, op, "    ", "this.prisma")
+		got := b.String()
+		if !strings.Contains(got, ".count(") {
+			t.Errorf("expected count() for IsCount, got: %s", got)
+		}
+		if strings.Contains(got, "findUnique") || strings.Contains(got, "findMany") {
+			t.Errorf("should not use findUnique/findMany for count, got: %s", got)
+		}
+		if !strings.Contains(got, "where: { org_id: user.org_id }") {
+			t.Errorf("expected where clause in count, got: %s", got)
+		}
+	})
+
+	t.Run("CountQueryNoArgs", func(t *testing.T) {
+		op := &ir.GetOp{
+			VarName: "total",
+			VarType: "int64",
+			Model:   "Item",
+			IsCount: true,
+		}
+		var b strings.Builder
+		renderGetOp(&b, op, "    ", "this.prisma")
+		got := b.String()
+		if !strings.Contains(got, ".count()") {
+			t.Errorf("expected count() with no args, got: %s", got)
+		}
+	})
+
 	t.Run("NilOp", func(t *testing.T) {
 		var b strings.Builder
 		renderGetOp(&b, nil, "    ", "tx")

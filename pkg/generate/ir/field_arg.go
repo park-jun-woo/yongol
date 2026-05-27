@@ -48,6 +48,12 @@ type FieldArg struct {
 	// table columns. Empty when no DDL match is found.
 	ColumnName string
 
+	// SourceColumn is the snake_case field name on the source variable/struct,
+	// resolved from Field (e.g. Field=".OrgID" -> SourceColumn="org_id").
+	// Distinct from ColumnName which represents the target DDL column for
+	// the query key. Empty when Source is not a variable reference.
+	SourceColumn string
+
 	// IsPK is true when ColumnName matches a DDL PrimaryKey column.
 	IsPK bool
 }

@@ -2,7 +2,6 @@ import {
   Controller,
   Post,
   Param,
-  Body,
   Req,
 } from '@nestjs/common';
 import { PauseWorkflowService } from './pauseWorkflow.service';
@@ -15,8 +14,7 @@ export class PauseWorkflowController {
   async pauseWorkflow(
     @Req() req: any,
     @Param() params: any,
-    @Body() body: any,
   ) {
-    return this.service.pauseWorkflow(params, body, req.user);
+    return this.service.pauseWorkflow(params, req.user);
   }
 }

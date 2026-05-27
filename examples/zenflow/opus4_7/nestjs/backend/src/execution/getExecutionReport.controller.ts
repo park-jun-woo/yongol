@@ -2,7 +2,6 @@ import {
   Controller,
   Get,
   Param,
-  Body,
   Req,
 } from '@nestjs/common';
 import { GetExecutionReportService } from './getExecutionReport.service';
@@ -15,8 +14,7 @@ export class GetExecutionReportController {
   async getExecutionReport(
     @Req() req: any,
     @Param() params: any,
-    @Body() body: any,
   ) {
-    return this.service.getExecutionReport(params, body, req.user);
+    return this.service.getExecutionReport(params, req.user);
   }
 }
