@@ -31,6 +31,11 @@ func writeOneFeature(feature string, plans []*ir.ServicePlan, appDir string, reg
 		}
 		svcContent += content + "\n\n"
 	}
+
+	// Append inline stubs for same-feature @call/@eval targets that have
+	// no definition in this feature's service functions.
+	svcContent += ssac.RenderSameFeatureStubs(plans, feature)
+
 	if err := os.WriteFile(filepath.Join(servicesDir, feature+".py"), []byte(svcContent), 0o644); err != nil {
 		return fmt.Errorf("write service %s: %w", feature, err)
 	}

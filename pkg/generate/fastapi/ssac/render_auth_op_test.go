@@ -30,14 +30,14 @@ func TestRenderAuthOpOwnership(t *testing.T) {
 		if !strings.Contains(got, "owner_row = await session.execute") {
 			t.Errorf("expected ownership lookup, got: %s", got)
 		}
-		if !strings.Contains(got, "Workflows.org_id") {
-			t.Errorf("expected select owner column, got: %s", got)
+		if !strings.Contains(got, "Workflow.org_id") {
+			t.Errorf("expected singular model select owner column, got: %s", got)
 		}
 		if !strings.Contains(got, "scalar_one_or_none") {
 			t.Errorf("expected scalar_one_or_none, got: %s", got)
 		}
-		if !strings.Contains(got, `owners={"workflows": {"org_id": owner}}`) {
-			t.Errorf("expected owners map, got: %s", got)
+		if !strings.Contains(got, `owners={"workflow": {"org_id": owner}}`) {
+			t.Errorf("expected owners map with resource key, got: %s", got)
 		}
 		if !strings.Contains(got, "resource_id=str(id)") {
 			t.Errorf("expected resource_id, got: %s", got)

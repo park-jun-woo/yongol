@@ -3,7 +3,9 @@
 
 package ssac
 
-import "github.com/park-jun-woo/yongol/pkg/generate/ir"
+import (
+	"github.com/park-jun-woo/yongol/pkg/generate/ir"
+)
 
 // collectOpImport processes a single op into the importData. currentFeature
 // is used to skip self-imports (e.g. auth.py importing from itself).
@@ -32,6 +34,16 @@ func collectOpImport(d *importData, op ir.Op, currentFeature string) {
 		d.HasPublish = true
 	case ir.OpAuth:
 		d.HasAuth = true
+		if op.Auth != nil && op.Auth.Ownership != nil {
+			d.UsesSelect = true
+			model := pascalCase(ir.DDLTableSingularIR(op.Auth.Ownership.Table))
+			d.Models[model] = true
+		}
+	case ir.OpVerifyPassword:
+		d.UsesSelect = true
+		if op.VerifyPW != nil {
+			d.Models[pascalCase(op.VerifyPW.Model)] = true
+		}
 	case ir.OpCall:
 		if op.Call != nil && op.Call.Package != "" && op.Call.Package != currentFeature {
 			addExtPkgRef(d, op.Call.Package, op.Call.Function)

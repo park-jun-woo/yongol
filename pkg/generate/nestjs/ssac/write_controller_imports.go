@@ -19,6 +19,8 @@ func writeControllerImports(b *strings.Builder, plan *ir.ServicePlan) {
 	hasQuery := len(plan.QueryParams) > 0
 	hasPath := len(plan.PathParams) > 0
 
+	isPreAuth := hasVerifyPasswordOp(plan.Ops)
+
 	b.WriteString("import {\n")
 	b.WriteString("  Controller,\n")
 	if plan.TriggerKind == ir.TriggerHTTP {
@@ -32,7 +34,9 @@ func writeControllerImports(b *strings.Builder, plan *ir.ServicePlan) {
 		if hasQuery {
 			b.WriteString("  Query,\n")
 		}
-		b.WriteString("  Req,\n")
+		if !isPreAuth {
+			b.WriteString("  Req,\n")
+		}
 	}
 	b.WriteString("} from '@nestjs/common';\n")
 

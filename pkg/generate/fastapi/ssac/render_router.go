@@ -41,10 +41,27 @@ func RenderRouter(feature string, plans []*ir.ServicePlan) (string, error) {
 
 	var b strings.Builder
 
+	// Check if any plan needs authenticated user dependency.
+	needsAuth := false
+	needsEventBus := false
+	for _, p := range plans {
+		if p.TriggerKind == ir.TriggerHTTP && !hasVerifyPasswordOp(p.Ops) {
+			needsAuth = true
+		}
+		if hasPublishOp(p.Ops) {
+			needsEventBus = true
+		}
+	}
+
 	b.WriteString("from fastapi import APIRouter, Depends\n")
 	b.WriteString("from sqlalchemy.ext.asyncio import AsyncSession\n")
 	b.WriteString("from app.dependencies.database import get_session\n")
-	b.WriteString("from app.dependencies.auth import get_current_user\n")
+	if needsAuth {
+		b.WriteString("from app.dependencies.auth import get_current_user\n")
+	}
+	if needsEventBus {
+		b.WriteString("from app.dependencies.event_bus import EventBus, get_event_bus\n")
+	}
 
 	// Import the service module
 	b.WriteString(fmt.Sprintf("from app.services import %s as svc\n", feature))

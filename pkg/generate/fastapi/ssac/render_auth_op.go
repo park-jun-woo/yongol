@@ -21,7 +21,7 @@ func renderAuthOp(b *strings.Builder, op *ir.AuthOp, indent string) {
 	// Emit ownership lookup when Ownership metadata exists.
 	if op.Ownership != nil {
 		ow := op.Ownership
-		model := pascalCase(ow.Table)
+		model := pascalCase(ir.DDLTableSingularIR(ow.Table))
 		b.WriteString(fmt.Sprintf("%sowner_row = await session.execute(\n", indent))
 		b.WriteString(fmt.Sprintf("%s    select(%s.%s).where(%s.%s == %s)\n",
 			indent, model, ow.OwnerColumn, model, ow.ResourcePK, ow.ResourcePK))
@@ -44,7 +44,7 @@ func renderAuthOp(b *strings.Builder, op *ir.AuthOp, indent string) {
 		ow := op.Ownership
 		b.WriteString(fmt.Sprintf("%s    resource_id=str(%s),\n", indent, ow.ResourcePK))
 		b.WriteString(fmt.Sprintf("%s    owners={\"%s\": {\"%s\": owner}},\n",
-			indent, ow.Table, ow.OwnerColumn))
+			indent, op.Resource, ow.OwnerColumn))
 	} else {
 		// No ownership but ResourceID may still be present in inputs.
 		for _, input := range op.Inputs {

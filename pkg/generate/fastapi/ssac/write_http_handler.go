@@ -49,9 +49,19 @@ func writeHTTPHandler(b *strings.Builder, plan *ir.ServicePlan) {
 		}
 	}
 
-	// Dependency injections.
-	b.WriteString("    current_user: dict = Depends(get_current_user),\n")
+	// Dependency injections — skip current_user for pre-auth endpoints
+	// (login with @verify-password).
+	isPreAuth := hasVerifyPasswordOp(plan.Ops)
+	if !isPreAuth {
+		b.WriteString("    current_user: dict = Depends(get_current_user),\n")
+	}
 	b.WriteString("    session: AsyncSession = Depends(get_session),\n")
+
+	// event_bus dependency — inject when plan contains @publish ops.
+	needsEventBus := hasPublishOp(plan.Ops)
+	if needsEventBus {
+		b.WriteString("    event_bus: EventBus = Depends(get_event_bus),\n")
+	}
 	b.WriteString("):\n")
 
 	// Build service call arguments.
@@ -70,7 +80,12 @@ func writeHTTPHandler(b *strings.Builder, plan *ir.ServicePlan) {
 			callArgs = append(callArgs, qp.Name)
 		}
 	}
-	callArgs = append(callArgs, "current_user")
+	if !isPreAuth {
+		callArgs = append(callArgs, "current_user")
+	}
+	if needsEventBus {
+		callArgs = append(callArgs, "event_bus")
+	}
 
 	b.WriteString(fmt.Sprintf("    return await svc.%s(%s)\n",
 		funcName, strings.Join(callArgs, ", ")))

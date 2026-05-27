@@ -17,8 +17,10 @@ func renderVerifyPasswordOp(b *strings.Builder, op *ir.VerifyPasswordOp, indent,
 	}
 	model := pascalCase(op.Model)
 	emailCol := snakeCase(op.EmailCol)
+	emailVal := resolveFastAPIExpr(op.EmailExpr)
+	pwVal := resolveFastAPIExpr(op.PasswordExpr)
 	b.WriteString(fmt.Sprintf("%sresult = await %s.execute(select(%s).where(%s.%s == %s))\n",
-		indent, sessionRef, model, model, emailCol, op.EmailExpr))
+		indent, sessionRef, model, model, emailCol, emailVal))
 	b.WriteString(fmt.Sprintf("%s%s = result.scalars().first()\n",
 		indent, op.ResultVar))
 	b.WriteString(fmt.Sprintf("%sif not %s:\n", indent, op.ResultVar))
@@ -26,5 +28,16 @@ func renderVerifyPasswordOp(b *strings.Builder, op *ir.VerifyPasswordOp, indent,
 		indent, op.Message))
 	hashCol := snakeCase(op.HashCol)
 	b.WriteString(fmt.Sprintf("%s# TODO: bcrypt.checkpw(%s, %s.%s)\n",
-		indent, op.PasswordExpr, op.ResultVar, hashCol))
+		indent, pwVal, op.ResultVar, hashCol))
+}
+
+// resolveFastAPIExpr rewrites raw SSaC expressions for FastAPI. In particular,
+// "request.Xxx" is mapped to "body.xxx" (snake_case) because FastAPI service
+// methods receive the request body as a separate "body" parameter.
+func resolveFastAPIExpr(expr string) string {
+	if strings.HasPrefix(expr, "request.") {
+		field := expr[len("request."):]
+		return "body." + snakeCase(field)
+	}
+	return expr
 }

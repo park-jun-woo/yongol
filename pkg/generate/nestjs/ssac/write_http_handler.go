@@ -25,9 +25,15 @@ func writeHTTPHandler(b *strings.Builder, plan *ir.ServicePlan) {
 	hasQuery := len(plan.QueryParams) > 0
 	hasPath := len(plan.PathParams) > 0
 
+	// Skip @Req() and req.user for pre-auth endpoints (login with
+	// @verify-password).
+	isPreAuth := hasVerifyPasswordOp(plan.Ops)
+
 	b.WriteString(fmt.Sprintf("  @%s('%s')\n", decorator, routeSuffix))
 	b.WriteString(fmt.Sprintf("  async %s(\n", methodName))
-	b.WriteString("    @Req() req: any,\n")
+	if !isPreAuth {
+		b.WriteString("    @Req() req: any,\n")
+	}
 	if hasPath {
 		b.WriteString("    @Param() params: any,\n")
 	}
@@ -50,7 +56,9 @@ func writeHTTPHandler(b *strings.Builder, plan *ir.ServicePlan) {
 	if hasQuery {
 		callArgs = append(callArgs, "query")
 	}
-	callArgs = append(callArgs, "req.user")
+	if !isPreAuth {
+		callArgs = append(callArgs, "req.user")
+	}
 
 	b.WriteString(fmt.Sprintf("    return this.service.%s(%s);\n",
 		methodName, strings.Join(callArgs, ", ")))

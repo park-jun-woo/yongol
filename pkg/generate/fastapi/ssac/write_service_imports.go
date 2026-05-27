@@ -19,6 +19,7 @@ func writeServiceImports(b *strings.Builder, plans []*ir.ServicePlan, currentFea
 	emitSAImports(b, d)
 	b.WriteString("from sqlalchemy.ext.asyncio import AsyncSession\n")
 	emitModelImports(b, d.Models)
+	emitSchemaImports(b, plans, currentFeature)
 	emitInfraImports(b, d)
 	emitExtPkgImports(b, d.ExtPkgs)
 	b.WriteString("\n")

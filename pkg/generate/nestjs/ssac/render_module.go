@@ -28,6 +28,10 @@ func RenderModule(feature string, plans []*ir.ServicePlan) (string, error) {
 	needsAuthz := false
 	// Collect cross-feature @call dependencies.
 	callFeatures := make(map[string]bool)
+	// Detect same-feature @call — stub service needed when an op calls a
+	// function in its own feature (e.g. LoginService calls auth.IssueToken).
+	needsSameFeatureStub := false
+	lowerFeature := strings.ToLower(feature)
 	for _, p := range plans {
 		if hasPublishOp(p.Ops) {
 			needsQueue = true
@@ -37,12 +41,17 @@ func RenderModule(feature string, plans []*ir.ServicePlan) (string, error) {
 		}
 		for _, op := range p.Ops {
 			if op.Kind == ir.OpCall && op.Call != nil && op.Call.TargetFeature != "" {
-				if op.Call.TargetFeature != strings.ToLower(feature) {
+				if op.Call.TargetFeature != lowerFeature {
 					callFeatures[op.Call.TargetFeature] = true
+				} else {
+					needsSameFeatureStub = true
 				}
 			}
 		}
 	}
+
+	// Stub service name: e.g. "auth" → "AuthService"
+	stubSvcName := strings.ToUpper(feature[:1]) + feature[1:] + "Service"
 	if needsQueue {
 		b.WriteString("import { QueueModule } from '../queue/queue.module';\n")
 	}
@@ -68,6 +77,11 @@ func RenderModule(feature string, plans []*ir.ServicePlan) (string, error) {
 			p.OperationID, baseName))
 		b.WriteString(fmt.Sprintf("import { %sService } from './%s.service';\n",
 			p.OperationID, baseName))
+	}
+	// Import same-feature stub service when needed.
+	if needsSameFeatureStub {
+		b.WriteString(fmt.Sprintf("import { %s } from './%s.service';\n",
+			stubSvcName, lowerFeature))
 	}
 	b.WriteString("\n")
 
@@ -102,12 +116,18 @@ func RenderModule(feature string, plans []*ir.ServicePlan) (string, error) {
 	for _, p := range plans {
 		b.WriteString(fmt.Sprintf("    %sService,\n", p.OperationID))
 	}
+	if needsSameFeatureStub {
+		b.WriteString(fmt.Sprintf("    %s,\n", stubSvcName))
+	}
 	b.WriteString("  ],\n")
 
 	// Exports — all services are exported so cross-module DI works.
 	b.WriteString("  exports: [\n")
 	for _, p := range plans {
 		b.WriteString(fmt.Sprintf("    %sService,\n", p.OperationID))
+	}
+	if needsSameFeatureStub {
+		b.WriteString(fmt.Sprintf("    %s,\n", stubSvcName))
 	}
 	b.WriteString("  ],\n")
 	b.WriteString("})\n")
