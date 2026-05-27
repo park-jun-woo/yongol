@@ -1,0 +1,155 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model ExecutionLog {
+  id                   Int @id
+  workflow_id          Int
+  org_id               Int
+  status               String
+  credits_spent        Int
+  report_key           String
+  executed_at          DateTime
+  workflow             Workflow @relation(fields: [workflow_id], references: [id])
+  org                  Organization @relation(fields: [org_id], references: [id])
+  @@index([workflow_id])
+  @@index([org_id])
+  @@map("execution_logs")
+}
+
+model FullendCache {
+  key                  String @id
+  value                Bytes
+  expires_at           DateTime
+  @@index([expires_at])
+}
+
+model Template {
+  id                   Int @id
+  source_workflow_id   Int @unique
+  org_id               Int
+  title                String
+  description          String
+  category             String
+  clone_count          Int
+  created_at           DateTime
+  source_workflow      Workflow @relation(fields: [source_workflow_id], references: [id])
+  org                  Organization @relation(fields: [org_id], references: [id])
+  @@index([org_id])
+  @@map("templates")
+}
+
+model User {
+  id                   Int @id
+  org_id               Int
+  email                String @unique
+  password_hash        String
+  role                 String
+  claims               Json @default("{}")
+  created_at           DateTime
+  org                  Organization @relation(fields: [org_id], references: [id])
+  @@map("users")
+}
+
+model Webhook {
+  id                   Int @id
+  org_id               Int
+  url                  String
+  event_type           String
+  created_at           DateTime
+  org                  Organization @relation(fields: [org_id], references: [id])
+  @@index([org_id])
+  @@map("webhooks")
+}
+
+model RefreshToken {
+  token_hash           String @id
+  claims               Json
+  expires_at           DateTime
+  revoked_at           DateTime?
+  created_at           DateTime
+  @@index([claims])
+  @@map("refresh_tokens")
+}
+
+model FullendQueue {
+  id                   Int @id
+  topic                String
+  payload              Json
+  priority             String @default("normal")
+  status               String @default("pending")
+  created_at           DateTime
+  deliver_at           DateTime
+  processed_at         DateTime?
+  traceparent          String
+}
+
+model FullendSession {
+  key                  String @id
+  value                Bytes
+  expires_at           DateTime
+  @@index([expires_at])
+  @@map("fullend_sessions")
+}
+
+model Organization {
+  id                   Int @id
+  name                 String
+  plan_type            String @default("free")
+  credits_balance      Int
+  latitude             String
+  longitude            String
+  address_verified     Boolean
+  created_at           DateTime
+  @@map("organizations")
+}
+
+model Workflow {
+  id                   Int @id
+  org_id               Int
+  title                String
+  trigger_event        String
+  status               String @default("draft")
+  version              Int
+  root_workflow_id     Int
+  assigned_to          Int
+  assignment_confidence String @default("none")
+  created_at           DateTime
+  org                  Organization @relation(fields: [org_id], references: [id])
+  @@index([org_id])
+  @@index([status])
+  @@map("workflows")
+}
+
+model Action {
+  id                   Int @id
+  workflow_id          Int
+  action_type          String
+  config               String
+  sequence_order       Int
+  workflow             Workflow @relation(fields: [workflow_id], references: [id])
+  @@index([workflow_id])
+  @@map("actions")
+}
+
+model AuditLog {
+  id                   Int @id
+  org_id               Int
+  actor_id             Int
+  action               String
+  resource_type        String
+  resource_id          String
+  detail               String
+  created_at           DateTime
+  org                  Organization @relation(fields: [org_id], references: [id])
+  actor                User @relation(fields: [actor_id], references: [id])
+  @@index([org_id])
+  @@index([created_at])
+  @@index([action])
+  @@map("audit_logs")
+}

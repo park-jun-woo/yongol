@@ -12,7 +12,8 @@ import (
 
 // RenderRouter produces a FastAPI router file for a given feature. Each
 // ServicePlan contributes one route handler decorated with the appropriate
-// HTTP method decorator.
+// HTTP method decorator. Parameters are typed using PathParams, QueryParams,
+// and BodyFields from the ServicePlan.
 func RenderRouter(feature string, plans []*ir.ServicePlan) (string, error) {
 	if feature == "" {
 		return "", fmt.Errorf("RenderRouter: empty feature name")
@@ -20,9 +21,10 @@ func RenderRouter(feature string, plans []*ir.ServicePlan) (string, error) {
 
 	var b strings.Builder
 
-	b.WriteString("from fastapi import APIRouter, Depends, Request\n")
+	b.WriteString("from fastapi import APIRouter, Depends\n")
 	b.WriteString("from sqlalchemy.ext.asyncio import AsyncSession\n")
 	b.WriteString("from app.dependencies.database import get_session\n")
+	b.WriteString("from app.dependencies.auth import get_current_user\n")
 
 	// Import the service module
 	b.WriteString(fmt.Sprintf("from app.services import %s as svc\n", feature))

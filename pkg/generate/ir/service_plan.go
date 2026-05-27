@@ -48,4 +48,38 @@ type ServicePlan struct {
 
 	// QueryMethods lists all database query methods used by this plan.
 	QueryMethods []QueryMethod
+
+	// SuccessStatus is the HTTP 2xx status code for the success response
+	// (e.g. 200, 201, 204). Derived from OpenAPI via DeriveSuccessStatus.
+	// Zero when OpenAPI doc is absent.
+	SuccessStatus int
+
+	// PathParams lists OpenAPI path parameter names (e.g. ["id"]).
+	PathParams []string
+
+	// QueryParams lists OpenAPI query parameter metadata.
+	QueryParams []QueryParamMeta
+
+	// BodyFields lists OpenAPI request body property metadata.
+	BodyFields []BodyFieldMeta
+}
+
+// QueryParamMeta holds metadata for a single OpenAPI query parameter.
+type QueryParamMeta struct {
+	// Name is the OpenAPI parameter name.
+	Name string
+	// Type is the schema type (e.g. "string", "integer").
+	Type string
+	// Required is true when the parameter is required.
+	Required bool
+}
+
+// BodyFieldMeta holds metadata for a single OpenAPI request body property.
+type BodyFieldMeta struct {
+	// Name is the OpenAPI property name.
+	Name string
+	// Required is true when the property is listed in the schema's required array.
+	Required bool
+	// Format is the OpenAPI format (e.g. "email", "uuid", "date-time", "enum", "").
+	Format string
 }

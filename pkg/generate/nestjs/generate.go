@@ -1,5 +1,5 @@
 //ff:func feature=gen-nestjs type=command control=sequence
-//ff:what Generate — NestJS 백엔드 코드 생성 (IR → TypeScript 렌더링 파이프라인)
+//ff:what Generate — NestJS 백엔드 코드 생성 (IR → TypeScript 렌더링 파이프라인, 인프라 모듈 등록)
 
 package nestjs
 
@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 
 	"github.com/park-jun-woo/yongol/pkg/generate/ir"
 	"github.com/park-jun-woo/yongol/pkg/generate/nestjs/types"
@@ -21,7 +22,7 @@ import (
 //  3. Render Prisma schema from DDL tables
 //  4. For each service func, render controller + service + module
 //  5. Generate infrastructure stubs (queue, authz, external packages)
-//  6. Render main.ts + app.module.ts
+//  6. Render main.ts + app.module.ts (with infra + feature modules)
 //  7. Write all files to dir
 func Generate(fs *yongol.Fullstack, dir string) error {
 	psVal := prepared.New(fs)
@@ -51,11 +52,17 @@ func Generate(fs *yongol.Fullstack, dir string) error {
 		return fmt.Errorf("prisma module: %w", err)
 	}
 
+	// Collect infrastructure module names for app.module.ts registration.
+	// Only truly global modules go here (queue, authz). External package
+	// stubs that also have feature modules are excluded to avoid duplicates.
+	var infraModules []string
+
 	// Generate queue infrastructure when @publish exists.
 	if hasPublishPlans(plansByFeature) {
 		if err := writeQueueModule(srcDir); err != nil {
 			return fmt.Errorf("queue module: %w", err)
 		}
+		infraModules = append(infraModules, "queue")
 	}
 
 	// Generate authz infrastructure when @auth exists.
@@ -63,6 +70,7 @@ func Generate(fs *yongol.Fullstack, dir string) error {
 		if err := writeAuthzModule(srcDir); err != nil {
 			return fmt.Errorf("authz module: %w", err)
 		}
+		infraModules = append(infraModules, "authz")
 	}
 
 	// Generate stub services for external packages referenced by @call/@eval.
@@ -71,11 +79,20 @@ func Generate(fs *yongol.Fullstack, dir string) error {
 		if err := writeFuncStubs(srcDir, extPkgs); err != nil {
 			return fmt.Errorf("func stubs: %w", err)
 		}
+		// Only register as infra module if not already a feature module.
+		for _, ep := range extPkgs {
+			if _, isFeature := plansByFeature[ep.Name]; !isFeature {
+				infraModules = append(infraModules, ep.Name)
+			}
+		}
 	}
+
+	sort.Strings(infraModules)
 
 	featureNames, err := writeFeatureModules(plansByFeature, srcDir, reg)
 	if err != nil {
 		return err
 	}
-	return writeBootFiles(srcDir, bootPlan, featureNames)
+	sort.Strings(featureNames)
+	return writeBootFiles(srcDir, bootPlan, featureNames, infraModules)
 }

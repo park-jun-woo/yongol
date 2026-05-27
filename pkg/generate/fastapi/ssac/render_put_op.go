@@ -1,5 +1,5 @@
 //ff:func feature=gen-fastapi type=util control=sequence
-//ff:what renderPutOp — PutOp → SQLAlchemy update Python 문 렌더링 (where/data 분리)
+//ff:what renderPutOp — PutOp → IsPK 기반 where/data 분리 SQLAlchemy update 렌더링
 
 package ssac
 
@@ -10,14 +10,23 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/generate/ir"
 )
 
-// renderPutOp writes an SQLAlchemy async update statement. SSaC args are
-// split into where (PK fields) and data (remaining fields) clauses.
+// renderPutOp writes an SQLAlchemy async update statement. Args with IsPK ==
+// true go to the where clause; the rest go to the data clause. This uses the
+// Phase018 IR enrichment instead of heuristic PK detection.
 func renderPutOp(b *strings.Builder, op *ir.PutOp, indent, sessionRef string) {
 	if op == nil {
 		return
 	}
 	model := pascalCase(op.Model)
-	whereArgs, dataArgs := splitWhereData(op.Args)
+
+	var whereArgs, dataArgs []ir.FieldArg
+	for _, a := range op.Args {
+		if a.IsPK {
+			whereArgs = append(whereArgs, a)
+		} else {
+			dataArgs = append(dataArgs, a)
+		}
+	}
 
 	whereClause := renderSAWhere(op.Model, whereArgs)
 	dataClause := renderSAData(dataArgs)

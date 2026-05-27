@@ -1,5 +1,5 @@
 //ff:func feature=gen-nestjs type=util control=selection
-//ff:what columnAttributes — DDL Column → Prisma 속성 어노테이션 문자열 생성
+//ff:what columnAttributes — DDL Column → Prisma 속성 어노테이션 문자열 생성 (IDENTITY 지원)
 
 package prisma
 
@@ -10,6 +10,8 @@ import (
 )
 
 // columnAttributes produces Prisma attribute annotations for a column.
+// Handles SERIAL, BIGSERIAL, GENERATED ALWAYS AS IDENTITY, UUID defaults,
+// timestamp defaults, and generic defaults.
 func columnAttributes(col ddl.Column, colName string, primaryKey []string) string {
 	var attrs []string
 
@@ -24,6 +26,8 @@ func columnAttributes(col ddl.Column, colName string, primaryKey []string) strin
 	case strings.HasPrefix(upper, "TIMESTAMP") && col.HasDefault:
 		attrs = append(attrs, "@default(now())")
 	case strings.HasPrefix(upper, "SERIAL") || strings.HasPrefix(upper, "BIGSERIAL"):
+		attrs = append(attrs, "@default(autoincrement())")
+	case col.IsIdentity:
 		attrs = append(attrs, "@default(autoincrement())")
 	case col.HasDefault:
 		attrs = append(attrs, "@default("+prismaDefault(col)+")")

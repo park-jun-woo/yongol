@@ -30,4 +30,10 @@ type GetOp struct {
 	// of a plain error propagation so the guard logic can check the zero
 	// value. Zero value (OpGet) means no guard follows.
 	FollowedByGuard OpKind
+
+	// PaginationArgs holds pagination-specific arguments (cursor, per_page,
+	// page_offset, page, limit, offset) separated from the where-clause Args.
+	// Renderers targeting ORMs (Prisma, SQLAlchemy) use this to emit
+	// framework-native pagination calls.
+	PaginationArgs []FieldArg
 }

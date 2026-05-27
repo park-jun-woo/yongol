@@ -20,4 +20,9 @@ type StateOp struct {
 
 	// StatusCode is the HTTP status code on failure (default 409).
 	StatusCode int
+
+	// AllowedFromStates lists the source states from which the Transition
+	// is valid. Populated from the Mermaid stateDiagram transitions when
+	// fs.StateDiagrams is available. Nil when no matching diagram is found.
+	AllowedFromStates []string
 }

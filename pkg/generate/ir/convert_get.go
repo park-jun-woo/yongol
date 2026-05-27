@@ -1,5 +1,5 @@
 //ff:func feature=gen-ir type=util control=sequence
-//ff:what convertGet -- @get 시퀀스 → GetOp IR 변환
+//ff:what convertGet -- @get 시퀀스 → GetOp IR 변환 (PaginationArgs 분리 포함)
 
 package ir
 
@@ -7,15 +7,42 @@ import (
 	"strings"
 
 	"github.com/park-jun-woo/yongol/pkg/parser/ssac"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
-// convertGet converts a @get sequence to an IR Op.
-func convertGet(seq ssac.Sequence) Op {
+// paginationKeys lists the well-known pagination input keys that should be
+// separated from where-clause Args into GetOp.PaginationArgs.
+var paginationKeys = map[string]bool{
+	"cursor":      true,
+	"per_page":    true,
+	"page_offset": true,
+	"page":        true,
+	"limit":       true,
+	"offset":      true,
+}
+
+// convertGet converts a @get sequence to an IR Op. The Fullstack context
+// is accepted for signature consistency but is not used directly here;
+// enrichment happens in the BuildServicePlan post-processing passes.
+func convertGet(seq ssac.Sequence, _ *yongol.Fullstack) Op {
 	model, method := splitModelMethod(seq.Model)
+	allArgs := convertInputsToFieldArgs(seq.Inputs)
+
+	// Separate pagination args from where-clause args.
+	var whereArgs, pagArgs []FieldArg
+	for _, a := range allArgs {
+		if paginationKeys[a.Key] {
+			pagArgs = append(pagArgs, a)
+		} else {
+			whereArgs = append(whereArgs, a)
+		}
+	}
+
 	op := GetOp{
-		Model:  model,
-		Method: method,
-		Args:   convertInputsToFieldArgs(seq.Inputs),
+		Model:          model,
+		Method:         method,
+		Args:           whereArgs,
+		PaginationArgs: pagArgs,
 	}
 	if seq.Result != nil {
 		op.VarName = seq.Result.Var

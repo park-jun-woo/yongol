@@ -1,5 +1,5 @@
 //ff:func feature=gen-nestjs type=generator control=iteration dimension=2
-//ff:what RenderModule — feature 단위 NestJS module TypeScript 소스 생성
+//ff:what RenderModule — feature 단위 NestJS module TypeScript 소스 생성 (../ 경로)
 
 package ssac
 
@@ -21,17 +21,23 @@ func RenderModule(feature string, plans []*ir.ServicePlan) (string, error) {
 	var b strings.Builder
 
 	b.WriteString("import { Module } from '@nestjs/common';\n")
-	b.WriteString("import { PrismaModule } from '../../prisma/prisma.module';\n")
+	b.WriteString("import { PrismaModule } from '../prisma/prisma.module';\n")
 
 	needsQueue := false
+	needsAuthz := false
 	for _, p := range plans {
 		if hasPublishOp(p.Ops) {
 			needsQueue = true
-			break
+		}
+		if hasAuthOp(p.Ops) {
+			needsAuthz = true
 		}
 	}
 	if needsQueue {
-		b.WriteString("import { QueueModule } from '../../queue/queue.module';\n")
+		b.WriteString("import { QueueModule } from '../queue/queue.module';\n")
+	}
+	if needsAuthz {
+		b.WriteString("import { AuthzModule } from '../authz/authz.module';\n")
 	}
 
 	// Import each controller and service
@@ -53,6 +59,9 @@ func RenderModule(feature string, plans []*ir.ServicePlan) (string, error) {
 	b.WriteString("    PrismaModule,\n")
 	if needsQueue {
 		b.WriteString("    QueueModule,\n")
+	}
+	if needsAuthz {
+		b.WriteString("    AuthzModule,\n")
 	}
 	b.WriteString("  ],\n")
 

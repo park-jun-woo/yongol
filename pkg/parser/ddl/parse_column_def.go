@@ -39,6 +39,7 @@ func parseColumnDef(line, upper string, t *Table, pendingArchived bool) {
 		Name:          colName,
 		RawType:       colType,
 		NotNull:       strings.Contains(upper, "NOT NULL") || strings.Contains(upper, "PRIMARY KEY"),
+		IsIdentity:    strings.Contains(upper, "AS IDENTITY"),
 		NullableAnnot: colNullable,
 		Archived:      colArchived,
 		Sensitive:     colSensitive,

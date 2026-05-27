@@ -20,4 +20,8 @@ type AuthOp struct {
 
 	// StatusCode is the HTTP status code on failure (default 403).
 	StatusCode int
+
+	// Ownership carries the ownership lookup metadata extracted from
+	// Rego @ownership annotations. Nil when no ownership mapping applies.
+	Ownership *OwnershipInfo
 }

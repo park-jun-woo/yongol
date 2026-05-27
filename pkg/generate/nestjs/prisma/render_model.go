@@ -1,5 +1,5 @@
 //ff:func feature=gen-nestjs type=util control=iteration dimension=1
-//ff:what renderModel — 단일 DDL Table → Prisma model 블록 렌더링
+//ff:what renderModel — 단일 DDL Table → Prisma model 블록 렌더링 (역관계 + @@map 일괄)
 
 package prisma
 
@@ -11,9 +11,10 @@ import (
 )
 
 // renderModel writes a single Prisma model block for a DDL table.
-// Model name is singular PascalCase with @@map to the original table name.
-// FK relations and indexes are rendered after columns.
-func renderModel(b *strings.Builder, table ddl.Table) error {
+// Model name is singular PascalCase with @@map to the original table name
+// (always applied). FK relations, reverse relations, and indexes are
+// rendered after columns.
+func renderModel(b *strings.Builder, table ddl.Table, reverseRels []reverseRelation) error {
 	singularName := singularize(table.Name)
 	modelName := pascalCase(singularName)
 	b.WriteString(fmt.Sprintf("model %s {\n", modelName))
@@ -26,7 +27,7 @@ func renderModel(b *strings.Builder, table ddl.Table) error {
 		renderColumn(b, col, colName, table.PrimaryKey, table.Indexes)
 	}
 
-	// Render @relation fields for foreign keys.
+	// Render @relation fields for foreign keys (forward relations).
 	for _, fk := range table.ForeignKeys {
 		refModel := pascalCase(singularize(fk.RefTable))
 		relField := strings.TrimSuffix(fk.Column, "_id")
@@ -35,6 +36,11 @@ func renderModel(b *strings.Builder, table ddl.Table) error {
 		}
 		b.WriteString(fmt.Sprintf("  %-20s %s @relation(fields: [%s], references: [%s])\n",
 			relField, refModel, fk.Column, fk.RefColumn))
+	}
+
+	// Render reverse (has-many) relations for models referenced by other tables.
+	for _, rev := range dedupReverseRelations(reverseRels) {
+		b.WriteString(fmt.Sprintf("  %-20s %s[]\n", rev.FieldName, rev.ModelName))
 	}
 
 	// Render @@index for non-unique indexes.
@@ -56,10 +62,8 @@ func renderModel(b *strings.Builder, table ddl.Table) error {
 		b.WriteString(fmt.Sprintf("  @@unique([%s])\n", cols))
 	}
 
-	// Map to the original DDL table name.
-	if singularName != table.Name {
-		b.WriteString(fmt.Sprintf("  @@map(\"%s\")\n", table.Name))
-	}
+	// Always map to the original DDL table name.
+	b.WriteString(fmt.Sprintf("  @@map(\"%s\")\n", table.Name))
 
 	b.WriteString("}\n")
 	return nil

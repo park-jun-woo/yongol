@@ -1,5 +1,5 @@
 //ff:func feature=gen-nestjs type=util control=sequence
-//ff:what resolveDataKey — FieldArg → Prisma data 절 snake_case 키 추출
+//ff:what resolveDataKey — FieldArg.ColumnName 우선, fallback toSnake(Key) 로 Prisma data 키 추출
 
 package ssac
 
@@ -10,8 +10,12 @@ import (
 )
 
 // resolveDataKey extracts a snake_case key for the Prisma data clause from a
-// FieldArg.
+// FieldArg. Prefers ColumnName (DDL-origin snake_case from Phase018 IR),
+// then Key, then Field.
 func resolveDataKey(a ir.FieldArg) string {
+	if a.ColumnName != "" {
+		return a.ColumnName
+	}
 	if a.Key != "" {
 		return toSnake(a.Key)
 	}

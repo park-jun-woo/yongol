@@ -1,5 +1,5 @@
 //ff:func feature=gen-fastapi type=util control=sequence
-//ff:what resolveArgKey — FieldArg → SQLAlchemy where 절 snake_case 키 추출
+//ff:what resolveArgKey — FieldArg.ColumnName 우선, fallback snakeCase(Key) 로 SQLAlchemy where 키 추출
 
 package ssac
 
@@ -10,9 +10,12 @@ import (
 )
 
 // resolveArgKey extracts a snake_case key from a FieldArg for SQLAlchemy
-// where clauses. Prefers Key (converted to snake_case), then falls back to
-// Field converted to snake_case.
+// where clauses. Prefers ColumnName (DDL-origin snake_case from Phase018 IR),
+// then Key, then Field — each converted via snakeCase fallback.
 func resolveArgKey(a ir.FieldArg) string {
+	if a.ColumnName != "" {
+		return a.ColumnName
+	}
 	if a.Key != "" {
 		return snakeCase(a.Key)
 	}

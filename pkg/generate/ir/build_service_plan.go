@@ -1,5 +1,5 @@
 //ff:func feature=gen-ir type=util control=iteration dimension=2
-//ff:what BuildServicePlan -- SSaC ServiceFunc → ServicePlan IR 변환 (프레임워크 비의존)
+//ff:what BuildServicePlan -- SSaC ServiceFunc → ServicePlan IR 변환 (프레임워크 비의존, OpenAPI/DDL/Rego/StateDiagram 해석 정보 이식)
 
 package ir
 
@@ -30,14 +30,27 @@ func BuildServicePlan(sf *ssac.ServiceFunc, fs *yongol.Fullstack) (*ServicePlan,
 		plan.TriggerKind = TriggerHTTP
 	}
 
+	// Extract OpenAPI metadata (path/query/body classification, success status).
+	pathParams, queryParams := extractOpenAPIParams(fs, sf.Name, plan)
+
 	// Build ops from sequences.
 	for _, seq := range sf.Sequences {
-		op, err := convertSequence(seq)
+		op, err := convertSequence(seq, fs)
 		if err != nil {
 			return nil, fmt.Errorf("BuildServicePlan(%s): %w", sf.Name, err)
 		}
 		plan.Ops = append(plan.Ops, op)
 	}
+
+	// Enrich FieldArg.Location for all ops using OpenAPI param classification.
+	enrichFieldArgLocations(plan.Ops, pathParams, queryParams)
+
+	// Enrich FieldArg.ColumnName and IsPK from DDL metadata.
+	enrichFieldArgDDL(plan.Ops, fs)
+
+	// Resolve variable shadowing: detect duplicate VarName declarations and
+	// rename collisions with _result suffix.
+	resolveVariableShadowing(plan.Ops)
 
 	// Annotate @get ops with lookahead guard info. When a @get is followed
 	// by @empty or @exists targeting the same result variable, the renderer

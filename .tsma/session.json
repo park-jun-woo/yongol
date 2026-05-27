@@ -2,7 +2,7 @@
   "project": "/home/parkjunwoo/.clari/repos/fullend/yongol",
   "lang": "go",
   "checked_at": "2026-05-27T13:50:14.753339671+09:00",
-  "current_index": 37,
+  "current_index": 51,
   "functions": [
     {
       "qualified_name": "cmd/yongol.agentCmd",
@@ -466,8 +466,8 @@
       "end_line": 53,
       "exported": false,
       "test_file": "cmd/yongol/print_report_sarif_test.go",
-      "test_mtime": "2026-05-27T14:26:20+09:00",
-      "status": "todo",
+      "test_mtime": "2026-05-27T17:57:02+09:00",
+      "status": "done",
       "coverage_pct": 83.33333333333334,
       "attempt": 1
     },
@@ -478,7 +478,10 @@
       "start_line": 11,
       "end_line": 19,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/print_report_warn_diag_test.go",
+      "test_mtime": "2026-05-27T17:57:21+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.printSSOTSummary",
@@ -487,7 +490,11 @@
       "start_line": 17,
       "end_line": 36,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/print_ssot_summary_test.go",
+      "test_mtime": "2026-05-27T17:59:18+09:00",
+      "status": "pass",
+      "coverage_pct": 100,
+      "attempt": 1
     },
     {
       "qualified_name": "cmd/yongol.runPrintReportCase",
@@ -496,7 +503,11 @@
       "start_line": 15,
       "end_line": 38,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/run_print_report_case_test.go",
+      "test_mtime": "2026-05-27T18:00:25+09:00",
+      "status": "done",
+      "coverage_pct": 53.84615384615385,
+      "attempt": 1
     },
     {
       "qualified_name": "cmd/yongol.snapshotHashInfo",
@@ -505,7 +516,10 @@
       "start_line": 15,
       "end_line": 29,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/snapshot_hash_info_test.go",
+      "test_mtime": "2026-05-27T18:00:50+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.splitAdvice",
@@ -514,7 +528,10 @@
       "start_line": 10,
       "end_line": 17,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/split_advice_test.go",
+      "test_mtime": "2026-05-27T18:01:09+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.statusCmd",
@@ -523,7 +540,11 @@
       "start_line": 23,
       "end_line": 79,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/status_cmd_test.go",
+      "test_mtime": "2026-05-27T18:03:33+09:00",
+      "status": "done",
+      "coverage_pct": 94.44444444444444,
+      "attempt": 1
     },
     {
       "qualified_name": "cmd/yongol.statusMark",
@@ -532,7 +553,10 @@
       "start_line": 7,
       "end_line": 19,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/status_mark_test.go",
+      "test_mtime": "2026-05-27T18:03:53+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.usageArgs",
@@ -541,7 +565,10 @@
       "start_line": 11,
       "end_line": 18,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/usage_args_test.go",
+      "test_mtime": "2026-05-27T18:04:12+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.usageError.Error",
@@ -550,7 +577,10 @@
       "start_line": 6,
       "end_line": 6,
       "exported": true,
-      "status": "todo"
+      "test_file": "cmd/yongol/usage_error_error_test.go",
+      "test_mtime": "2026-05-27T18:04:27+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.usageError.Unwrap",
@@ -559,7 +589,10 @@
       "start_line": 6,
       "end_line": 6,
       "exported": true,
-      "status": "todo"
+      "test_file": "cmd/yongol/usage_error_unwrap_test.go",
+      "test_mtime": "2026-05-27T18:04:40+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.validateCmd",
@@ -568,7 +601,11 @@
       "start_line": 14,
       "end_line": 62,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/validate_cmd_test.go",
+      "test_mtime": "2026-05-27T18:05:17+09:00",
+      "status": "done",
+      "coverage_pct": 76.47058823529412,
+      "attempt": 1
     },
     {
       "qualified_name": "cmd/yongol.versionCmd",
@@ -577,7 +614,10 @@
       "start_line": 11,
       "end_line": 19,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/version_cmd_test.go",
+      "test_mtime": "2026-05-27T18:05:34+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "cmd/yongol.wrapParseAsReport",
@@ -586,7 +626,10 @@
       "start_line": 12,
       "end_line": 23,
       "exported": false,
-      "status": "todo"
+      "test_file": "cmd/yongol/wrap_parse_as_report_test.go",
+      "test_mtime": "2026-05-27T18:05:53+09:00",
+      "status": "pass",
+      "coverage_pct": 100
     },
     {
       "qualified_name": "examples/zenflow/opus4_7/arts/backend/cmd.buildSecurityHeadersCfg",
@@ -29963,8 +30006,8 @@
   ],
   "summary": {
     "total": 3269,
-    "pass": 33,
-    "done": 4,
-    "todo": 3232
+    "pass": 43,
+    "done": 8,
+    "todo": 3218
   }
 }
