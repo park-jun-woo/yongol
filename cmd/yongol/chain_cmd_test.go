@@ -1,9 +1,11 @@
 //ff:func feature=cli type=test control=sequence
-//ff:what chainCmd test — missing args, missing dir, happy path, unknown op
+//ff:what chainCmd test — missing args, missing dir, parse error, happy path, unknown op
 
 package main
 
 import (
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -22,6 +24,21 @@ func TestChainCmd(t *testing.T) {
 		_, _, err := runCmd(t, "chain", "SomeOpID", "/tmp/this-dir-should-not-exist-yongol-chain")
 		if err == nil {
 			t.Fatal("expected error for missing dir, got nil")
+		}
+	})
+	t.Run("ParseError", func(t *testing.T) {
+		dir := t.TempDir()
+		// A malformed manifest.yaml is detected as an SSOT but fails to parse,
+		// driving the ParseDiagnostics branch (printParseErrors + "parse failed").
+		if err := os.WriteFile(filepath.Join(dir, "manifest.yaml"), []byte("::: not valid yaml :::\n\t- broken"), 0o644); err != nil {
+			t.Fatalf("write manifest: %v", err)
+		}
+		_, _, err := runCmd(t, "chain", "SomeOpID", dir)
+		if err == nil {
+			t.Fatal("expected parse error, got nil")
+		}
+		if !strings.Contains(err.Error(), "parse failed") {
+			t.Fatalf("expected 'parse failed' error, got: %v", err)
 		}
 	})
 	t.Run("Happy", func(t *testing.T) {

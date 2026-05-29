@@ -1,11 +1,12 @@
 //ff:func feature=cli type=test control=sequence
-//ff:what generateCmd test — missing args, missing dir, happy path
+//ff:what generateCmd test — missing args, missing dir, parse error, backend resolution, happy path
 
 package main
 
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -32,6 +33,31 @@ func TestGenerateCmd(t *testing.T) {
 		_, _, err := runCmd(t, "generate", "/tmp/nonexistent-yongol-specs", "/tmp/output")
 		if err == nil {
 			t.Fatal("expected error for missing dir, got nil")
+		}
+	})
+	t.Run("ParseError", func(t *testing.T) {
+		// A malformed manifest.yaml is detected then fails to parse, driving the
+		// ParseDiagnostics branch (printParseErrors + "parse failed").
+		dir := t.TempDir()
+		if err := os.WriteFile(filepath.Join(dir, "manifest.yaml"), []byte("::: not valid yaml :::\n\t- broken"), 0o644); err != nil {
+			t.Fatalf("write manifest: %v", err)
+		}
+		_, _, err := runCmd(t, "generate", dir, t.TempDir())
+		if err == nil {
+			t.Fatal("expected parse error, got nil")
+		}
+		if !strings.Contains(err.Error(), "parse failed") {
+			t.Fatalf("expected 'parse failed' error, got: %v", err)
+		}
+	})
+	t.Run("UnknownBackendNoManifest", func(t *testing.T) {
+		// An empty (but valid) specs dir parses clean and has no manifest, so an
+		// unrecognized --backend falls through to the "unknown --backend" error
+		// rather than manifest resolution.
+		dir := t.TempDir()
+		_, _, err := runCmd(t, "generate", "--backend", "no-such-backend", dir, t.TempDir())
+		if err == nil {
+			t.Fatal("expected unknown backend error, got nil")
 		}
 	})
 	t.Run("HasFlags", func(t *testing.T) {

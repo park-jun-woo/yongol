@@ -64,4 +64,28 @@ func TestPrintReportJSON(t *testing.T) {
 			t.Fatal("expected write error")
 		}
 	})
+
+	t.Run("CatalogChecksPopulated", func(t *testing.T) {
+		// Exercises the rulecatalog.Load + cat.Len() path: the emitted JSON
+		// summary.checks must reflect the embedded catalog size (> 0), proving
+		// the non-error catalog branch wired the count into the document.
+		r := &validate.Report{Steps: []validate.StepResult{
+			{Name: "step", Status: validate.StatusPass},
+		}}
+		var buf bytes.Buffer
+		if _, _, err := printReportJSON(&buf, r, "/tmp/specs"); err != nil {
+			t.Fatalf("unexpected err: %v", err)
+		}
+		var doc struct {
+			Summary struct {
+				Checks int `json:"checks"`
+			} `json:"summary"`
+		}
+		if err := json.Unmarshal(buf.Bytes(), &doc); err != nil {
+			t.Fatalf("invalid JSON: %v", err)
+		}
+		if doc.Summary.Checks <= 0 {
+			t.Fatalf("expected summary.checks > 0 from embedded catalog, got %d", doc.Summary.Checks)
+		}
+	})
 }

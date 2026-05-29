@@ -70,10 +70,10 @@ func TestStatusCmd(t *testing.T) {
 	})
 
 	t.Run("ParseError", func(t *testing.T) {
-		// Create a specs dir with an invalid SSOT file.
+		// A malformed manifest.yaml is detected as an SSOT and fails to parse,
+		// driving the ParseDiagnostics branch (printParseErrors + "parse failed").
 		tmpDir := t.TempDir()
-		// Create an invalid openapi.yaml that will cause parse errors.
-		if err := writeTestFile(tmpDir, "openapi.yaml", "invalid: [yaml content"); err != nil {
+		if err := writeTestFile(tmpDir, "manifest.yaml", "::: not valid yaml :::\n\t- broken"); err != nil {
 			t.Fatal(err)
 		}
 		cmd := statusCmd()
@@ -82,8 +82,12 @@ func TestStatusCmd(t *testing.T) {
 		cmd.SetErr(&buf)
 		cmd.SetArgs([]string{tmpDir})
 		err := cmd.Execute()
-		// May or may not error depending on detection; just exercise the code path.
-		_ = err
+		if err == nil {
+			t.Fatal("expected parse error, got nil")
+		}
+		if !strings.Contains(err.Error(), "parse failed") {
+			t.Fatalf("expected 'parse failed' error, got: %v", err)
+		}
 	})
 
 	t.Run("WithArtsDir", func(t *testing.T) {

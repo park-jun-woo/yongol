@@ -35,25 +35,24 @@ func TestNextCmd(t *testing.T) {
 		_ = err
 	})
 	t.Run("WithErrors", func(t *testing.T) {
-		// Create a minimal specs dir with only a manifest to trigger validation errors.
+		// A clean (valid YAML) but incomplete manifest parses successfully and
+		// then produces validation issues with no OperationID, exercising the
+		// "issues found" + non-grouped (else) branch + "validation failed" return.
 		dir := t.TempDir()
-		manifest := `metadata:
-	  name: test-next
-	backend:
-	  lang: go
-	  framework: gin
-	`
+		manifest := "metadata:\n  name: test-next\nbackend:\n  lang: go\n  framework: gin\n"
 		if err := os.WriteFile(filepath.Join(dir, "manifest.yaml"), []byte(manifest), 0o644); err != nil {
 			t.Fatal(err)
 		}
-		features := `features: []
-	`
-		if err := os.WriteFile(filepath.Join(dir, "features.yaml"), []byte(features), 0o644); err != nil {
+		if err := os.WriteFile(filepath.Join(dir, "features.yaml"), []byte("features: []\n"), 0o644); err != nil {
 			t.Fatal(err)
 		}
 		_, _, err := runCmd(t, "next", dir)
-		// Should report validation issues (or parse issues).
-		_ = err
+		if err == nil {
+			t.Fatal("expected validation failure for incomplete manifest, got nil")
+		}
+		if err.Error() != "validation failed" {
+			t.Fatalf("expected 'validation failed', got: %v", err)
+		}
 	})
 	t.Run("WithParseError", func(t *testing.T) {
 		// Create a specs dir with an invalid YAML file to trigger parse errors.

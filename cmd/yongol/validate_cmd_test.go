@@ -71,25 +71,43 @@ func TestValidateCmd(t *testing.T) {
 
 	t.Run("ParseErrorJSON", func(t *testing.T) {
 		tmpDir := t.TempDir()
-		// An openapi.yaml that parses but with errors.
-		_ = writeTestFile(tmpDir, "openapi.yaml", "openapi: 3.0.0\n")
+		// A malformed manifest.yaml is detected then fails to parse, driving the
+		// ParseDiagnostics branch's JSON sub-path (wrapParseAsReport + printReport).
+		if err := writeTestFile(tmpDir, "manifest.yaml", "::: not valid yaml :::\n\t- broken"); err != nil {
+			t.Fatal(err)
+		}
 		cmd := validateCmd()
 		var buf bytes.Buffer
 		cmd.SetOut(&buf)
 		cmd.SetErr(&buf)
 		cmd.SetArgs([]string{"--format", "json", tmpDir})
-		_ = cmd.Execute() // Exercise parse error path with JSON format.
+		err := cmd.Execute()
+		if err == nil {
+			t.Fatal("expected parse error, got nil")
+		}
+		if err.Error() != "parse failed" {
+			t.Fatalf("expected 'parse failed', got: %v", err)
+		}
 	})
 
 	t.Run("ParseErrorMD", func(t *testing.T) {
 		tmpDir := t.TempDir()
-		_ = writeTestFile(tmpDir, "openapi.yaml", "openapi: 3.0.0\n")
+		// Default (md) format drives the else branch (printParseErrors).
+		if err := writeTestFile(tmpDir, "manifest.yaml", "::: not valid yaml :::\n\t- broken"); err != nil {
+			t.Fatal(err)
+		}
 		cmd := validateCmd()
 		var buf bytes.Buffer
 		cmd.SetOut(&buf)
 		cmd.SetErr(&buf)
 		cmd.SetArgs([]string{tmpDir})
-		_ = cmd.Execute() // Exercise parse error path with MD format.
+		err := cmd.Execute()
+		if err == nil {
+			t.Fatal("expected parse error, got nil")
+		}
+		if err.Error() != "parse failed" {
+			t.Fatalf("expected 'parse failed', got: %v", err)
+		}
 	})
 
 	t.Run("WithArtsDir", func(t *testing.T) {

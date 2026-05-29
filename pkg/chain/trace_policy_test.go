@@ -64,4 +64,25 @@ func TestTracePolicy(t *testing.T) {
 	if tracePolicy(sfNone, policies, specsDir) != nil {
 		t.Error("expected nil when no @auth resources")
 	}
+
+	// Dedup: two rules in the same file both match the referenced resource;
+	// the second hits the seen[relPath] guard so only one link is produced.
+	t.Run("Dedup", func(t *testing.T) {
+		dupPolicies := []rego.Policy{
+			{
+				File: regoFile,
+				Rules: []rego.AllowRule{
+					{Resource: "project", Actions: []string{"delete"}},
+					{Resource: "project", Actions: []string{"update"}}, // same file+resource
+				},
+			},
+		}
+		links := tracePolicy(sf, dupPolicies, specsDir)
+		if len(links) != 1 {
+			t.Fatalf("expected 1 deduped rego link, got %d: %+v", len(links), links)
+		}
+		if links[0].File != "authz/project.rego" {
+			t.Errorf("link file: got %q, want authz/project.rego", links[0].File)
+		}
+	})
 }

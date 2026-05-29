@@ -28,18 +28,29 @@ func TestImportCmd(t *testing.T) {
 	t.Run("ValidSource", func(t *testing.T) {
 		srcDir := t.TempDir()
 		spec := filepath.Join(srcDir, "openapi.yaml")
-		content := `openapi: "3.0.0"
-	info:
-	  title: Test
-	  version: "1.0"
-	paths: {}
-	`
+		// A minimal but fully valid OpenAPI 3.0 document so external.Generate
+		// succeeds and the RunE returns nil (success path).
+		content := "" +
+			"openapi: \"3.0.0\"\n" +
+			"info:\n" +
+			"  title: Test\n" +
+			"  version: \"1.0\"\n" +
+			"paths: {}\n"
 		if err := os.WriteFile(spec, []byte(content), 0o644); err != nil {
 			t.Fatal(err)
 		}
 		outDir := t.TempDir()
 		_, _, err := runCmd(t, "import", spec, outDir)
-		// Success or specific error — both exercise the RunE body fully.
-		_ = err
+		if err != nil {
+			t.Fatalf("expected import success for valid spec, got: %v", err)
+		}
+		// The generated Go file should exist in the output dir.
+		entries, derr := os.ReadDir(outDir)
+		if derr != nil {
+			t.Fatalf("read output dir: %v", derr)
+		}
+		if len(entries) == 0 {
+			t.Fatal("expected at least one generated file in output dir")
+		}
 	})
 }
