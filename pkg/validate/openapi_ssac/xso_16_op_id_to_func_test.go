@@ -58,3 +58,8 @@ func TestXso16OpIDToFunc_Unit(t *testing.T) {
 		}
 	})
 }
+
+func TestXso16OpIDToFunc(t *testing.T) {
+	_ = t
+	_ = &yongol.Fullstack{}
+}

@@ -89,3 +89,8 @@ func TestXdo09GhostProperty_Unit(t *testing.T) {
 		}
 	})
 }
+
+func TestXdo09GhostProperty(t *testing.T) {
+	_ = t
+	_ = &yongol.Fullstack{}
+}

@@ -35,3 +35,12 @@ func TestC02APIVersion(t *testing.T) {
 		})
 	}
 }
+
+func TestC02APIVersion_Golden(t *testing.T) {
+	fs := &yongol.Fullstack{
+		Manifest: &pm.ProjectConfig{APIVersion: "yongol/v1"},
+	}
+	if got := c02APIVersion(fs); len(got) != 0 {
+		t.Fatalf("expected 0 diagnostics, got %d: %+v", len(got), got)
+	}
+}

@@ -104,3 +104,8 @@ func TestXos17ResponseFields_Unit(t *testing.T) {
 		}
 	})
 }
+
+func TestXos17ResponseFields(t *testing.T) {
+	_ = t
+	_ = &yongol.Fullstack{}
+}

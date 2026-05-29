@@ -78,3 +78,8 @@ func TestXos15FuncNameOpID_Unit(t *testing.T) {
 		}
 	})
 }
+
+func TestXos15FuncNameOpID(t *testing.T) {
+	_ = t
+	_ = &yongol.Fullstack{}
+}

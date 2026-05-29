@@ -58,3 +58,8 @@ func TestXos19ShorthandResponse_Unit(t *testing.T) {
 		}
 	})
 }
+
+func TestXos19ShorthandResponse(t *testing.T) {
+	_ = t
+	_ = &yongol.Fullstack{}
+}

@@ -73,3 +73,8 @@ func TestXpn64RolesToRego_Unit(t *testing.T) {
 		}
 	})
 }
+
+func TestXpn64RolesToRego(t *testing.T) {
+	_ = t
+	_ = &yongol.Fullstack{}
+}

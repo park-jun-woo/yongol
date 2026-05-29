@@ -23,3 +23,26 @@ func TestC06BackendAuthRequired(t *testing.T) {
 		})
 	}
 }
+
+// TestC06BackendAuthRequired_AuthPresent_NoDiag — 정상 케이스: auth 블록이
+// 존재하면 진단 0 건.
+func TestC06BackendAuthRequired_AuthPresent_NoDiag(t *testing.T) {
+	fs := &yongol.Fullstack{
+		Manifest: &pm.ProjectConfig{
+			Backend: pm.Backend{
+				Module: "github.com/park-jun-woo/zenflow",
+				Auth: &pm.Auth{
+					Type:      "jwt",
+					SecretEnv: "JWT_SECRET",
+					RawClaims: map[string]string{
+						"ID":   "user_id:string",
+						"Role": "role",
+					},
+				},
+			},
+		},
+	}
+	if got := c06BackendAuthRequired(fs); len(got) != 0 {
+		t.Fatalf("expected 0 diagnostics, got %d: %+v", len(got), got)
+	}
+}

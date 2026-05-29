@@ -49,3 +49,20 @@ func TestCors01WildcardCredentials(t *testing.T) {
 		})
 	}
 }
+
+func TestCors01WildcardCredentials_Golden(t *testing.T) {
+	fs := &yongol.Fullstack{
+		Manifest: &pm.ProjectConfig{
+			Backend: pm.Backend{
+				CORS: &pm.CORSConfig{
+					Enabled:          true,
+					AllowOrigins:     []string{"https://a.com"},
+					AllowCredentials: true,
+				},
+			},
+		},
+	}
+	if got := cors01WildcardCredentials(fs); len(got) != 0 {
+		t.Fatalf("expected 0 diagnostics, got %d: %+v", len(got), got)
+	}
+}

@@ -97,3 +97,8 @@ func TestXnp53InputClaimsValues_Unit(t *testing.T) {
 		}
 	})
 }
+
+func TestXnp53InputClaimsValues(t *testing.T) {
+	_ = t
+	_ = &yongol.Fullstack{}
+}

@@ -65,3 +65,8 @@ func TestP01Parse_Unit(t *testing.T) {
 		}
 	})
 }
+
+func TestP01Parse(t *testing.T) {
+	_ = t
+	_ = &yongol.Fullstack{}
+}

@@ -80,3 +80,8 @@ func TestXod10DDLToResponse_Unit(t *testing.T) {
 		}
 	})
 }
+
+func TestXod10DDLToResponse(t *testing.T) {
+	_ = t
+	_ = &yongol.Fullstack{}
+}

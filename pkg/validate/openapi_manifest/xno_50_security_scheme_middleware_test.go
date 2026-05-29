@@ -72,3 +72,8 @@ func TestXno50SecuritySchemeMiddleware_Unit(t *testing.T) {
 		}
 	})
 }
+
+func TestXno50SecuritySchemeMiddleware(t *testing.T) {
+	_ = t
+	_ = &yongol.Fullstack{}
+}

@@ -23,3 +23,12 @@ func TestC03Kind(t *testing.T) {
 		})
 	}
 }
+
+func TestC03Kind_Golden(t *testing.T) {
+	fs := &yongol.Fullstack{
+		Manifest: &pm.ProjectConfig{Kind: "Project"},
+	}
+	if got := c03Kind(fs); len(got) != 0 {
+		t.Fatalf("expected 0 diagnostics, got %d: %+v", len(got), got)
+	}
+}

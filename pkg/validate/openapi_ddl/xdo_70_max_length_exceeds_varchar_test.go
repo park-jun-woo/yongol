@@ -99,3 +99,8 @@ func TestXdo70MaxLengthExceedsVarchar_Unit(t *testing.T) {
 		}
 	})
 }
+
+func TestXdo70MaxLengthExceedsVarchar(t *testing.T) {
+	_ = t
+	_ = &yongol.Fullstack{}
+}

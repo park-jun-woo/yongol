@@ -23,3 +23,14 @@ func TestC05BackendModule(t *testing.T) {
 		})
 	}
 }
+
+func TestC05BackendModule_Golden(t *testing.T) {
+	fs := &yongol.Fullstack{
+		Manifest: &pm.ProjectConfig{
+			Backend: pm.Backend{Module: "github.com/park-jun-woo/zenflow"},
+		},
+	}
+	if got := c05BackendModule(fs); len(got) != 0 {
+		t.Fatalf("expected 0 diagnostics, got %d: %+v", len(got), got)
+	}
+}

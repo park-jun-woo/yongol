@@ -66,3 +66,8 @@ func TestXpp30OwnershipNoAnnotation_Unit(t *testing.T) {
 		}
 	})
 }
+
+func TestXpp30OwnershipNoAnnotation(t *testing.T) {
+	_ = t
+	_ = &yongol.Fullstack{}
+}

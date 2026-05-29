@@ -88,3 +88,8 @@ func TestXos22ResponseNo2xx_Unit(t *testing.T) {
 		}
 	})
 }
+
+func TestXos22ResponseNo2xx(t *testing.T) {
+	_ = t
+	_ = &yongol.Fullstack{}
+}

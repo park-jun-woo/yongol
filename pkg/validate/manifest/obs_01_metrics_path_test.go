@@ -26,3 +26,46 @@ func TestObs01MetricsPath(t *testing.T) {
 		})
 	}
 }
+
+func TestObs01MetricsPath_Golden(t *testing.T) {
+	cases := []struct {
+		name string
+		fs   *yongol.Fullstack
+	}{
+		{
+			name: "observability absent",
+			fs: &yongol.Fullstack{
+				Manifest: &pm.ProjectConfig{Backend: pm.Backend{}},
+			},
+		},
+		{
+			name: "path empty -> default",
+			fs: &yongol.Fullstack{
+				Manifest: &pm.ProjectConfig{
+					Backend: pm.Backend{
+						Observability: &pm.Observability{Metrics: &pm.ObservabilityMetrics{}},
+					},
+				},
+			},
+		},
+		{
+			name: "leading slash path",
+			fs: &yongol.Fullstack{
+				Manifest: &pm.ProjectConfig{
+					Backend: pm.Backend{
+						Observability: &pm.Observability{
+							Metrics: &pm.ObservabilityMetrics{Path: "/internal/metrics"},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			if got := obs01MetricsPath(c.fs); len(got) != 0 {
+				t.Fatalf("expected 0 diagnostics, got %d: %+v", len(got), got)
+			}
+		})
+	}
+}

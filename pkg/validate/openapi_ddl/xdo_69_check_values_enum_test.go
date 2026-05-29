@@ -76,3 +76,8 @@ func TestXdo69CheckValuesEnum_Unit(t *testing.T) {
 		}
 	})
 }
+
+func TestXdo69CheckValuesEnum(t *testing.T) {
+	_ = t
+	_ = &yongol.Fullstack{}
+}

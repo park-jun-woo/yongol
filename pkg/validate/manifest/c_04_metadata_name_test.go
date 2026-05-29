@@ -23,3 +23,14 @@ func TestC04MetadataName(t *testing.T) {
 		})
 	}
 }
+
+func TestC04MetadataName_Golden(t *testing.T) {
+	fs := &yongol.Fullstack{
+		Manifest: &pm.ProjectConfig{
+			Metadata: pm.Metadata{Name: "zenflow"},
+		},
+	}
+	if got := c04MetadataName(fs); len(got) != 0 {
+		t.Fatalf("expected 0 diagnostics, got %d: %+v", len(got), got)
+	}
+}

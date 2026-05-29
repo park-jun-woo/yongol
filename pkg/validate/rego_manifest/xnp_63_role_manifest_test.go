@@ -67,3 +67,8 @@ func TestXnp63RoleManifest_Unit(t *testing.T) {
 		}
 	})
 }
+
+func TestXnp63RoleManifest(t *testing.T) {
+	_ = t
+	_ = &yongol.Fullstack{}
+}

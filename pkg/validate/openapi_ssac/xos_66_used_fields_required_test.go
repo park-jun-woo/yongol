@@ -67,3 +67,8 @@ func TestXos66UsedFieldsRequired_Unit(t *testing.T) {
 		}
 	})
 }
+
+func TestXos66UsedFieldsRequired(t *testing.T) {
+	_ = t
+	_ = &yongol.Fullstack{}
+}

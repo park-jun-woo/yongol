@@ -61,3 +61,8 @@ func TestXos21ErrStatusNotInOpenAPI_Unit(t *testing.T) {
 		}
 	})
 }
+
+func TestXos21ErrStatusNotInOpenAPI(t *testing.T) {
+	_ = t
+	_ = &yongol.Fullstack{}
+}

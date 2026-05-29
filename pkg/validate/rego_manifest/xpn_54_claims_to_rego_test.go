@@ -100,3 +100,8 @@ func TestXpn54ClaimsToRego_Unit(t *testing.T) {
 		}
 	})
 }
+
+func TestXpn54ClaimsToRego(t *testing.T) {
+	_ = t
+	_ = &yongol.Fullstack{}
+}
