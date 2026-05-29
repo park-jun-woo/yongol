@@ -23,19 +23,9 @@ func xoh01URLMethod(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	routes := collectOpenAPIRoutes(fs.OpenAPIDoc)
 	var diags []diagnostic.Diagnostic
 	for _, e := range fs.HurlEntries {
-		segs := normalizeHurlPath(e.Path)
-		if findExactRoute(segs, e.Method, routes) != nil {
-			continue
+		if d := checkEntryURLMethod(e, routes); d != nil {
+			diags = append(diags, *d)
 		}
-		msg, advice := xoh01Message(e, segs, routes)
-		diags = append(diags, diagnostic.Diagnostic{
-			File:    e.File,
-			Line:    e.Line,
-			Phase:   diagnostic.PhaseValidate,
-			Level:   diagnostic.LevelError,
-			Message: msg,
-			Advice:  advice,
-		})
 	}
 	return diags
 }

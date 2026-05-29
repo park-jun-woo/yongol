@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what requiredSet 단위 테스트 (schema.Required → lookup map, nil 안전)
 
 package ssac
@@ -26,6 +26,13 @@ func TestRequiredSet(t *testing.T) {
 
 	t.Run("empty required", func(t *testing.T) {
 		got := requiredSet(&openapi3.Schema{})
+		if got == nil || len(got) != 0 {
+			t.Errorf("expected empty non-nil map, got %v", got)
+		}
+	})
+
+	t.Run("nil schema", func(t *testing.T) {
+		got := requiredSet(nil)
 		if got == nil || len(got) != 0 {
 			t.Errorf("expected empty non-nil map, got %v", got)
 		}

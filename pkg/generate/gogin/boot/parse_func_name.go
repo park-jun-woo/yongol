@@ -14,7 +14,7 @@ func parseFuncName(decl string) string {
 		return ""
 	}
 	rest := decl[len(prefix):]
-	end := strings.IndexAny(rest, "(<")
+	end := strings.IndexAny(rest, "(<[")
 	if end <= 0 {
 		return ""
 	}

@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	reHurlRequest  = regexp.MustCompile(`^(GET|POST|PUT|DELETE|PATCH)\s+(?:\{\{host\}\}|https?://[^/]*)(/\S*)`)
+	reHurlRequest  = regexp.MustCompile(`^(GET|POST|PUT|DELETE|PATCH)\s+(?:\{\{([A-Za-z_][A-Za-z0-9_]*)\}\}|https?://[^/]*)(/\S*)`)
 	reHurlResponse = regexp.MustCompile(`^HTTP\s+(\d+)`)
 )
 
@@ -17,12 +17,7 @@ func (s *parseState) feed(raw string) {
 	line := strings.TrimSpace(raw)
 	if m := reHurlRequest.FindStringSubmatch(line); m != nil {
 		s.flushEntry()
-		s.current = &HurlEntry{
-			Method: m[1],
-			Path:   trimQuery(m[2]),
-			File:   s.path,
-			Line:   s.lineNum,
-		}
+		s.current = newRequestEntry(m, s.path, s.lineNum)
 		s.section = "request-headers"
 		s.bodyBuf.Reset()
 		return

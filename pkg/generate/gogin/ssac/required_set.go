@@ -9,10 +9,10 @@ import "github.com/getkin/kin-openapi/openapi3"
 // empty (non-nil) map when schema is nil or has no required list so
 // callers can index without a nil check.
 func requiredSet(schema *openapi3.Schema) map[string]bool {
-	out := make(map[string]bool, len(schema.Required))
 	if schema == nil {
-		return out
+		return map[string]bool{}
 	}
+	out := make(map[string]bool, len(schema.Required))
 	for _, r := range schema.Required {
 		out[r] = true
 	}

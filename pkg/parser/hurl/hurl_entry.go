@@ -16,6 +16,13 @@ type HurlEntry struct {
 	File       string
 	Line       int
 
+	// URLVar holds the name of the {{var}} placeholder used as the URL
+	// prefix on the request line (e.g. "host", "authurl", "rest"). It is
+	// "" when the request line uses an absolute http(s):// URL. Used by
+	// XOH-01 to skip OpenAPI path matching for external services
+	// (URLVar != "" && URLVar != "host").
+	URLVar string
+
 	// BodyFields lists top-level JSON request body field names found
 	// between the request line and the HTTP status line. Used by XOH-03
 	// (request body field in OpenAPI schema).

@@ -21,9 +21,11 @@ func importIdentifier(imp string) string {
 			return alias
 		}
 	}
-	if i := strings.Index(s, "\""); i >= 0 {
-		s = s[i:]
+	i := strings.Index(s, "\"")
+	if i < 0 {
+		return ""
 	}
+	s = s[i:]
 	s = strings.Trim(s, "\"")
 	if s == "" {
 		return ""
