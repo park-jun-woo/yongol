@@ -8,20 +8,21 @@ import (
 	"strings"
 
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/parser/ssac"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // checkSeqResultType validates XDS-12 for a single sequence.
 // Precondition: seq.Type != "call" && seq.Package == "" && seq.Result != nil.
 //
 // Two checks:
-//   1. Plural element type in singular context — `@get Workflows wf = ...` with
-//      Wrapper="" and no []. The plural form is suspect because the wrapper
-//      (Page/Cursor/slice) is normally what carries plurality; the element
-//      type should be singular. inflection.Plural is idempotent so without
-//      this guard the rule below accepts Workflows ≡ workflows in DDL.
-//   2. Standard coverage — the sqlc row type or modelToTable(type) must exist as a DDL table.
+//  1. Plural element type in singular context — `@get Workflows wf = ...` with
+//     Wrapper="" and no []. The plural form is suspect because the wrapper
+//     (Page/Cursor/slice) is normally what carries plurality; the element
+//     type should be singular. canonicalTableKey normalises to a singular form
+//     so without this guard the rule below would accept Workflows ≡ workflow in DDL.
+//  2. Standard coverage — the sqlc row type, or a DDL table whose
+//     canonicalTableKey matches the result type, must exist.
 func checkSeqResultType(fs *yongol.Fullstack, tables map[string]bool, fn ssac.ServiceFunc, seq ssac.Sequence) []diagnostic.Diagnostic {
 	typeName := normalizeTypeName(seq.Result.Type)
 	if typeName == "" || primitiveTypes[typeName] {
@@ -41,8 +42,7 @@ func checkSeqResultType(fs *yongol.Fullstack, tables map[string]bool, fn ssac.Se
 			Advice:  "Use the singular form, or wrap in []T / Page[T] / Cursor[T]",
 		}}
 	}
-	tableName := modelToTable(typeName)
-	if tables[tableName] {
+	if tables[canonicalTableKey(typeName)] {
 		return nil
 	}
 	return []diagnostic.Diagnostic{{
@@ -50,7 +50,7 @@ func checkSeqResultType(fs *yongol.Fullstack, tables map[string]bool, fn ssac.Se
 		Line:    seq.Line,
 		Phase:   diagnostic.PhaseValidate,
 		Level:   diagnostic.LevelWarning,
-		Message: fmt.Sprintf("[XDS-12] @result type %q has no matching DDL table %q", seq.Result.Type, tableName),
-		Advice:  fmt.Sprintf("Define table %s in the DDL or change the result type", tableName),
+		Message: fmt.Sprintf("[XDS-12] @result type %q has no matching DDL table", seq.Result.Type),
+		Advice:  fmt.Sprintf("Define a DDL table for %q (singular or plural naming) or change the result type", typeName),
 	}}
 }

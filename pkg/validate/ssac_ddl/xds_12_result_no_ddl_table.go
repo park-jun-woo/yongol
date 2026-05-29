@@ -11,7 +11,7 @@ import (
 // xds12ResultNoDDLTable validates XDS-12: SSaC @result type has no matching DDL table.
 // Skip conditions: seq.Type == "call", seq.Package != "", primitive Go types, sqlc row types.
 func xds12ResultNoDDLTable(fs *yongol.Fullstack) []diagnostic.Diagnostic {
-	tables := ddlTableSet(fs)
+	tables := canonicalDDLTableSet(fs)
 	var diags []diagnostic.Diagnostic
 	for _, fn := range fs.ServiceFuncs {
 		diags = append(diags, collectFuncResultDiags(fs, tables, fn)...)

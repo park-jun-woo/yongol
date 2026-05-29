@@ -12,7 +12,7 @@ import (
 )
 
 // TestCheckSeqResultType_UnknownTypeStillWarns — regression guard: a composite type not
-// registered in RowType must still emit a WARNING (verifies the modelToTable branch is preserved).
+// registered in RowType must still emit a WARNING (verifies the coverage branch is preserved).
 func TestCheckSeqResultType_UnknownTypeStillWarns(t *testing.T) {
 	fs := &yongol.Fullstack{
 		SQLcQueries: []sqlcparser.QuerySpec{
