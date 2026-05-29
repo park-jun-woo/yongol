@@ -16,13 +16,13 @@ func collectReferencedTable(seq ssac.Sequence, tables map[string]bool) {
 	if seq.Model != "" {
 		parts := strings.SplitN(seq.Model, ".", 2)
 		if len(parts) >= 1 && parts[0] != "" {
-			tables[modelToTable(parts[0])] = true
+			tables[canonicalTableKey(parts[0])] = true
 		}
 	}
 	if seq.Result != nil && seq.Result.Type != "" {
 		typeName := normalizeTypeName(seq.Result.Type)
 		if typeName != "" && !primitiveTypes[typeName] {
-			tables[modelToTable(typeName)] = true
+			tables[canonicalTableKey(typeName)] = true
 		}
 	}
 }

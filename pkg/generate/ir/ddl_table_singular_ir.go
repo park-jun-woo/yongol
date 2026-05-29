@@ -1,28 +1,20 @@
 //ff:func feature=gen-ir type=util control=selection
-//ff:what ddlTableSingularIR -- 복수형 lower-snake 테이블명 → 단수형 (gogin 미러)
+//ff:what ddlTableSingularIR -- 복수형 lower-snake 테이블명 → 단수형 (caseconv 공유)
 
 package ir
 
-import "strings"
+import (
+	"github.com/park-jun-woo/yongol/pkg/util/caseconv"
+)
 
-// DDLTableSingularIR desingularises a lower-snake table name. Mirrors
-// gogin/ssac/ddlTableSingular for consistency. Exported for cross-package use.
+// DDLTableSingularIR desingularises a lower-snake table name. Delegates to
+// caseconv.TableSingular for a single source of truth. Exported for
+// cross-package use.
 func DDLTableSingularIR(name string) string {
 	return ddlTableSingularIR(name)
 }
 
 // ddlTableSingularIR is the unexported implementation.
 func ddlTableSingularIR(name string) string {
-	switch {
-	case strings.HasSuffix(name, "ies"):
-		return name[:len(name)-3] + "y"
-	case strings.HasSuffix(name, "sses"):
-		return name[:len(name)-2]
-	case strings.HasSuffix(name, "xes"):
-		return name[:len(name)-2]
-	case strings.HasSuffix(name, "s") && !strings.HasSuffix(name, "ss"):
-		return name[:len(name)-1]
-	default:
-		return name
-	}
+	return caseconv.TableSingular(name)
 }

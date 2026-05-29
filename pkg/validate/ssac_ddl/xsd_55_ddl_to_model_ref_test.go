@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/park-jun-woo/yongol/pkg/parser/ddl"
+	"github.com/park-jun-woo/yongol/pkg/parser/ssac"
 	"github.com/park-jun-woo/yongol/pkg/rule"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
@@ -70,6 +71,56 @@ func TestXsd55DDLToModelRef(t *testing.T) {
 		}
 		if !strings.Contains(diags[0].Message, "orphans") {
 			t.Errorf("expected orphans to error, got: %q", diags[0].Message)
+		}
+	})
+
+	// 5. BUG-097: singular-named table referenced by a model → matched (no ERROR).
+	t.Run("singular table matched by model", func(t *testing.T) {
+		fs := newXsd55Fullstack(rule.StringSet{}, ddl.Table{Name: "app_config"})
+		fs.ServiceFuncs = []ssac.ServiceFunc{
+			{Sequences: []ssac.Sequence{{Model: "AppConfig.Get"}}},
+		}
+		if diags := xsd55DDLToModelRef(fs); len(diags) != 0 {
+			t.Fatalf("want 0 diags for singular table %q, got %d: %v", "app_config", len(diags), diags)
+		}
+	})
+
+	// 6. Plural-named tables still match (no regression across singular forms).
+	t.Run("plural tables still matched", func(t *testing.T) {
+		fs := newXsd55Fullstack(
+			rule.StringSet{},
+			ddl.Table{Name: "users"},
+			ddl.Table{Name: "bid_requests"},
+			ddl.Table{Name: "address"},   // ss preserved
+			ddl.Table{Name: "companies"}, // ies → y
+		)
+		fs.ServiceFuncs = []ssac.ServiceFunc{
+			{Sequences: []ssac.Sequence{{Model: "User.Get"}}},
+			{Sequences: []ssac.Sequence{{Model: "BidRequest.List"}}},
+			{Sequences: []ssac.Sequence{{Result: &ssac.Result{Type: "Address"}}}},
+			{Sequences: []ssac.Sequence{{Result: &ssac.Result{Type: "Company"}}}},
+		}
+		if diags := xsd55DDLToModelRef(fs); len(diags) != 0 {
+			t.Fatalf("want 0 diags for matched plural tables, got %d: %v", len(diags), diags)
+		}
+	})
+
+	// 7. A genuinely unreferenced table (no canonical match) still errors.
+	t.Run("genuine orphan still errors with references present", func(t *testing.T) {
+		fs := newXsd55Fullstack(
+			rule.StringSet{},
+			ddl.Table{Name: "users"},
+			ddl.Table{Name: "abandoned_widgets"},
+		)
+		fs.ServiceFuncs = []ssac.ServiceFunc{
+			{Sequences: []ssac.Sequence{{Model: "User.Get"}}},
+		}
+		diags := xsd55DDLToModelRef(fs)
+		if len(diags) != 1 {
+			t.Fatalf("want 1 diag, got %d: %v", len(diags), diags)
+		}
+		if !strings.Contains(diags[0].Message, "abandoned_widgets") {
+			t.Errorf("expected abandoned_widgets to error, got: %q", diags[0].Message)
 		}
 	})
 }

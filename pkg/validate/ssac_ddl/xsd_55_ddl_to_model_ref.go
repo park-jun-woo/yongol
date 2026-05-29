@@ -16,7 +16,7 @@ func xsd55DDLToModelRef(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	referenced := buildReferencedTables(fs.ServiceFuncs)
 	var diags []diagnostic.Diagnostic
 	for _, t := range fs.DDLTables {
-		if referenced[t.Name] {
+		if referenced[canonicalTableKey(t.Name)] {
 			continue
 		}
 		if isArchivedTable(fs, t.Name) {

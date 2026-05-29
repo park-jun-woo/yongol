@@ -25,14 +25,14 @@ func TestBuildReferencedTables(t *testing.T) {
 			funcs: []ssac.ServiceFunc{
 				{Sequences: []ssac.Sequence{{Model: "Course.FindByID"}}},
 			},
-			want: map[string]bool{"courses": true},
+			want: map[string]bool{"course": true},
 		},
 		{
 			name: "result reference",
 			funcs: []ssac.ServiceFunc{
 				{Sequences: []ssac.Sequence{{Result: &ssac.Result{Type: "Reservation"}}}},
 			},
-			want: map[string]bool{"reservations": true},
+			want: map[string]bool{"reservation": true},
 		},
 		{
 			name: "package sequence skipped",
@@ -54,7 +54,7 @@ func TestBuildReferencedTables(t *testing.T) {
 				{Sequences: []ssac.Sequence{{Model: "User.Create"}}},
 				{Sequences: []ssac.Sequence{{Model: "Course.FindByID"}}},
 			},
-			want: map[string]bool{"users": true, "courses": true},
+			want: map[string]bool{"user": true, "course": true},
 		},
 	}
 	for _, c := range cases {

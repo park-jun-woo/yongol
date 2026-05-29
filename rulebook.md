@@ -397,7 +397,7 @@ Bidirectional validation that SSaC `@result` / `@input` matches DDL tables/colum
 | Rule ID | Level | Description | Source |
 |---|---|---|---|
 | XDS-12 | WARNING | `@result` type must match a sqlc row type or DDL table | `pkg/validate/ssac_ddl/xds_12_result_no_ddl_table.go` |
-| XSD-55 | ERROR | DDL table must be referenced in a SSaC `@model` (coverage). Exempt: `-- @func-managed` (RPC/함수가 관리하는 활성 테이블 — `@call`로 위임되어 SSaC `@model`/`@result`에 직접 안 나타남), `-- @archived` (미사용/폐기 테이블) | `pkg/validate/ssac_ddl/xsd_55_ddl_to_model_ref.go` |
+| XSD-55 | ERROR | DDL table must be referenced in a SSaC `@model` (coverage). 모델↔테이블은 단수 정규화(canonical = 단수 lower-snake, `caseconv.TableSingular`)로 매칭하므로 단/복수 명명 모두 허용(`AppConfig` ↔ `app_config` / `app_configs`). Exempt: `-- @func-managed` (RPC/함수가 관리하는 활성 테이블 — `@call`로 위임되어 SSaC `@model`/`@result`에 직접 안 나타남), `-- @archived` (미사용/폐기 테이블) | `pkg/validate/ssac_ddl/xsd_55_ddl_to_model_ref.go` |
 
 ## P2. sqlc ↔ Rego
 
