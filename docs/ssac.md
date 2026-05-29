@@ -29,6 +29,8 @@ func Register() {}
 
 When using `@call pkg.Func` or `@eval pkg.Func`, the package must appear in the file's `import` block with a full Go import path (S-72, S-73).
 
+A DDL table consumed only through package delegation (`@call pkg.Func`, where the package is non-empty — e.g. an atomic RPC that writes the table inside its own transaction) is not referenced by any SSaC `@model`/`@result` directly. yongol cannot see inside the called function, so mark that table with DDL `-- @func-managed` to exempt it from XSD-55 (see [`docs/ddl.md` → @func-managed](./ddl.md#func-managed)).
+
 **Critical: SSaC is NOT regular Go.** Three rules that differ from Go conventions:
 
 1. **func has NO parameters and an empty body:**
@@ -357,7 +359,7 @@ Package-level singletons initialized at startup.
 | SSaC funcName -> OpenAPI operationId | Identical (PascalCase) |
 | TSX `apiClient.<op>()` -> OpenAPI operationId | Identical |
 | stateDiagram transition -> SSaC funcName | Identical |
-| SSaC Model -> DDL table | PascalCase -> snake_case plural |
+| SSaC Model -> DDL table | PascalCase -> snake_case (plural recommended, singular also matches; both normalised to a canonical singular form) |
 | SSaC `Model.Method` -> sqlc `-- name:` | After ModelPrefix stripping |
 | SSaC `@call pkg.Func` -> Func spec | Identical |
 

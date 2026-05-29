@@ -158,7 +158,9 @@ Standard SQL DDL and sqlc. Details: [`docs/ddl.md`](docs/ddl.md).
 
 - One table per `db/<table>.sql`. Model name = filename desingularised and
   PascalCased (`users.sql` → `User`; `ies→y`, `sses→ss`, `xes→x`, else drop
-  trailing `s`).
+  trailing `s`). Plural table naming is recommended, but singular naming
+  (`app_config.sql` → `AppConfig`) is also accepted — model↔table matching
+  normalises both sides to a canonical singular form.
 - `db/sqlc.yaml` is required (D-4). `sql[].schema` covers `db/*.sql`,
   `sql[].queries` covers `db/queries/`.
 - **`sql_package: pgx/v5` is required** (Q-11). yongol's backend codegen
@@ -650,7 +652,7 @@ invalid → 401. Permission checks are handled by `@auth`.
 | STML `data-param-*` ↔ OpenAPI parameters | Identical (TM-04) |
 | STML `data-field` ↔ OpenAPI request body field | Identical (TM-05) |
 | stateDiagram transition ↔ SSaC funcName | Identical |
-| SSaC Model ↔ DDL table | PascalCase ↔ snake_case plural |
+| SSaC Model ↔ DDL table | PascalCase ↔ snake_case (plural recommended; singular also matches — both sides normalised to a canonical singular lower-snake form) |
 | SSaC `Model.Method` ↔ sqlc `-- name:` | Identical after ModelPrefix strip |
 | SSaC `@call pkg.Func` ↔ Func spec | Identical |
 
@@ -758,7 +760,7 @@ hatch: `// nolint:prv-NN` (or `// nolint:panic` for PRV-10). Full spec:
 ### Authoring invariants
 
 - `operationId` is identical across OpenAPI / SSaC / STML / states / Hurl.
-- DDL table = snake_case plural; SSaC Model = PascalCase singular.
+- DDL table = snake_case (plural recommended, singular also accepted); SSaC Model = PascalCase singular. Model↔table matching normalises both sides to a canonical singular lower-snake form, so `AppConfig` matches `app_config` or `app_configs`.
 - stateDiagram transition label = SSaC funcName = OpenAPI operationId.
 - DDL `DEFAULT` on the state column = stateDiagram `[*] --> X` (XDM-28).
 - OPA `@ownership` references existing tables/columns; role literals appear in
@@ -779,3 +781,4 @@ hatch: `// nolint:prv-NN` (or `// nolint:panic` for PRV-10). Full spec:
 | `go build` other | SSOT or codegen bug — never edit `artifacts/`. |
 | `hurl --test` fails | Classify SSOT vs codegen, report. |
 | `XOH-NN` ERROR at validate | Hurl drifted from another SSOT. Fix the hurl, or fix OpenAPI / state machine / manifest so they agree. |
+| `XSD-55` ERROR: DDL table not referenced | If the table is consumed only through `@call <pkg>.<Func>` (an RPC / custom package) and so never appears in a SSaC `@model`/`@result` directly, add `-- @func-managed` above its `CREATE TABLE`. If the table is genuinely unused/retired, use `-- @archived` instead. |

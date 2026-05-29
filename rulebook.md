@@ -185,15 +185,15 @@ sqlc query file self-consistency.
 
 | Rule ID | Level | Description | Source |
 |---|---|---|---|
-| Q-1 | ERROR | `-- name:` annotation is required | `pkg/validate/query/q_01_name_required.go` |
-| Q-2 | ERROR | Cardinality (`:one` / `:many` / `:exec` / `:execrows`) is required | `pkg/validate/query/q_02_cardinality.go` |
-| Q-3 | ERROR | Query name must be PascalCase | `pkg/validate/query/q_03_name_pascalcase.go` |
-| Q-4 | WARNING | `:many` query is missing `LIMIT` | `pkg/validate/query/q_04_many_limit.go` |
-| Q-5 | ERROR | `DELETE` statement requires `WHERE` | `pkg/validate/query/q_05_delete_where.go` |
-| Q-6 | ERROR | `UPDATE` statement requires `WHERE` | `pkg/validate/query/q_06_update_where.go` |
-| Q-7 | WARNING | `SELECT *` on a table that has `@sensitive` columns | `pkg/validate/query/q_07_select_star_sensitive.go` |
-| Q-8 | ERROR | Declared parameter is unused in the query body | `pkg/validate/query/q_08_unused_param.go` |
-| Q-9 | ERROR | `:exec` query returns `SELECT` | `pkg/validate/query/q_09_select_on_exec.go` |
+| Q-01 | ERROR | `-- name:` annotation is required | `pkg/validate/query/q_01_name_required.go` |
+| Q-02 | ERROR | Cardinality (`:one` / `:many` / `:exec` / `:execrows`) is required | `pkg/validate/query/q_02_cardinality.go` |
+| Q-03 | ERROR | Query name must be PascalCase | `pkg/validate/query/q_03_name_pascalcase.go` |
+| Q-04 | WARNING | `:many` query is missing `LIMIT` | `pkg/validate/query/q_04_many_limit.go` |
+| Q-05 | ERROR | `DELETE` statement requires `WHERE` | `pkg/validate/query/q_05_delete_where.go` |
+| Q-06 | ERROR | `UPDATE` statement requires `WHERE` | `pkg/validate/query/q_06_update_where.go` |
+| Q-07 | WARNING | `SELECT *` on a table that has `@sensitive` columns | `pkg/validate/query/q_07_select_star_sensitive.go` |
+| Q-08 | ERROR | Declared parameter is unused in the query body | `pkg/validate/query/q_08_unused_param.go` |
+| Q-09 | ERROR | `:exec` query returns `SELECT` | `pkg/validate/query/q_09_select_on_exec.go` |
 | Q-10 | ERROR | `sql[].gen.go.out` in `sqlc.yaml` must resolve to `<artifacts>/backend/internal/db` (generate-time; requires `<artifacts>` CLI argument) | `pkg/generate/gogin/check_sqlc_out_path.go` |
 | Q-11 | ERROR | `sql[].gen.go.sql_package` in `sqlc.yaml` must be `pgx/v5` (yongol backend codegen is unified on pgx/v5) | `pkg/validate/query/q_11_sql_package_pgx_v5.go` |
 | Q-12 | ERROR | DDL has `UUID` column(s) but `sqlc.yaml` is missing the two `pgtype.UUID` overrides (NULL/NOT NULL). Implementation shares `checkPgtypeOverride` with the per-type Q-NN family below — the `NeedsOverride=true` flag on `types.GoTypeBinding` (`pkg/generate/gogin/types/`) is the single drift-free source. | `pkg/validate/query/q_12_pgtype_uuid_override.go` |

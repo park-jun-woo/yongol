@@ -212,8 +212,14 @@ CREATE TABLE users (
 
 ### Annotation placement rules
 
-All DDL annotations go at the **end** of the column line, inside a **single**
+**Column-scope** annotations (`@sensitive`, `@nosensitive`, column-level `@archived`, …)
+go at the **end** of the column line, inside a **single**
 `--` comment. Multiple annotations are space-separated within that comment.
+
+**Table-scope** annotations (`@func-managed`, table-level `@archived`) are the
+exception: each is a standalone `-- @annotation` comment on its **own line
+directly above** `CREATE TABLE`, and may be stacked on adjacent lines. See
+[`@func-managed`](#func-managed) below.
 
 ```sql
 -- Correct: single annotation
@@ -316,11 +322,28 @@ status VARCHAR(32) NOT NULL DEFAULT 'active', -- @archived 'deleted'
 
 Declares soft-delete. Rows whose value matches `@archived` are excluded from default queries.
 
+### @func-managed
+
+```sql
+-- @func-managed
+CREATE TABLE outbox_events (
+    id BIGSERIAL PRIMARY KEY,
+    payload JSONB NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+```
+
+Marks a **live** table that is managed by a `@call`'d function/RPC (for example an atomic SSaC `@call billing.CreateBidAtomic` that writes the table inside a transaction) rather than by a SSaC `@model` / `@result` directly. yongol cannot see inside the called function, so without this hint such a table looks unreferenced.
+
+- **Effect**: exempts the table from **XSD-55** only ("DDL table must be referenced by a SSaC `@model`/`@result`"). All other rules still apply.
+- **Placement**: a standalone `-- @func-managed` comment on its **own line directly above** `CREATE TABLE` — this is a table-scope annotation, unlike the column-line annotations above (which sit at the end of a column line). It may be **stacked** with `-- @archived` on adjacent lines.
+- **`@func-managed` vs `@archived`**: `@func-managed` = the table is **in active use** (consumed behind a function/RPC); `-- @archived` (table-scope, on its own line above `CREATE TABLE`) = the table is **unused / retired**. Use `@func-managed` for live tables so the operational meaning is not falsified.
+
 ## Cross-SSOT Links
 
 | Link | Validation |
 |---|---|
-| DDL table -> SSaC Model name | PascalCase-singular <-> snake_case-plural |
+| DDL table -> SSaC Model name | PascalCase-singular <-> snake_case (plural recommended, singular also matches; both normalised to a canonical singular form) |
 | DDL column -> sqlc query reference | Existence |
 | DDL state column DEFAULT -> Mermaid `[*] --> X` | XDM-28 exact match |
 | DDL column -> Rego `@ownership table.column` | Existence |
