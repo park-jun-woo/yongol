@@ -7,8 +7,8 @@ import (
 	"fmt"
 
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/validate/ssac_func"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // xos67ResponseFieldType validates that each `@response { key: value }` pair
@@ -16,8 +16,9 @@ import (
 // declared type for that key.
 //
 // Lookup (populators: Phase005/007):
-//   expected = Types["OpenAPI.response.<funcName>.<key>"]
-//   actual   = inferResponseValueType(g, funcName, value)
+//
+//	expected = Types["OpenAPI.response.<funcName>.<key>"]
+//	actual   = inferResponseValueType(g, funcName, value)
 //
 // Mismatch → ERROR. Unresolvable (expected=="" or actual=="") → skip.
 func xos67ResponseFieldType(fs *yongol.Fullstack) []diagnostic.Diagnostic {
@@ -41,6 +42,16 @@ func xos67ResponseFieldType(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				}
 				actual := inferResponseValueType(g, fn.Name, value)
 				if actual == "" {
+					continue
+				}
+				// DDL TIMESTAMPTZ (time.Time) serialised into an OpenAPI
+				// { type: string, format: date-time } field is compatible.
+				// This serialisation-context allowance lives here (not in the
+				// shared TypesCompatible) so directional rules like XFS-70 keep
+				// rejecting time.Time → string in Go-argument contexts.
+				if expected == "string" &&
+					g.Types["OpenAPI.response."+fn.Name+"."+key+".format"] == "date-time" &&
+					isTimeType(actual) {
 					continue
 				}
 				if ssac_func.TypesCompatible(actual, expected) {

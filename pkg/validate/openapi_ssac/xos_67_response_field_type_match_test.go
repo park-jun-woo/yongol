@@ -88,6 +88,86 @@ func TestXos67ResponseFieldType_Match(t *testing.T) {
 		}
 	})
 
+	t.Run("timestamptz bound to string+date-time passes", func(t *testing.T) {
+		fs := &yongol.Fullstack{
+			ServiceFuncs: []ssac.ServiceFunc{
+				{
+					Name: "approveItem",
+					Sequences: []ssac.Sequence{
+						{Type: "put", Result: &ssac.Result{Var: "updated", Type: "Item"}},
+						{Type: "response", Fields: map[string]string{"approved_at": "updated.ApprovedAt"}},
+					},
+				},
+			},
+		}
+		g := &rule.Ground{
+			Types: map[string]string{
+				"OpenAPI.response.approveItem.approved_at":        "string",
+				"OpenAPI.response.approveItem.approved_at.format": "date-time",
+				"SSaC.var.approveItem.updated":                    "Item",
+				"Struct.Item.ApprovedAt":                          "time.Time",
+			},
+		}
+		fs.SetGround(g)
+		diags := xos67ResponseFieldType(fs)
+		if len(diags) != 0 {
+			t.Fatalf("expected 0, got %d: %+v", len(diags), diags)
+		}
+	})
+
+	t.Run("string without date-time vs time.Time still errors", func(t *testing.T) {
+		fs := &yongol.Fullstack{
+			ServiceFuncs: []ssac.ServiceFunc{
+				{
+					Name:     "approveItem",
+					FileName: "item.ssac",
+					Sequences: []ssac.Sequence{
+						{Type: "put", Result: &ssac.Result{Var: "updated", Type: "Item"}},
+						{Type: "response", Fields: map[string]string{"approved_at": "updated.ApprovedAt"}},
+					},
+				},
+			},
+		}
+		g := &rule.Ground{
+			Types: map[string]string{
+				"OpenAPI.response.approveItem.approved_at": "string",
+				"SSaC.var.approveItem.updated":             "Item",
+				"Struct.Item.ApprovedAt":                   "time.Time",
+			},
+		}
+		fs.SetGround(g)
+		diags := xos67ResponseFieldType(fs)
+		if len(diags) != 1 {
+			t.Fatalf("expected 1, got %d: %+v", len(diags), diags)
+		}
+		if !strings.Contains(diags[0].Message, "XOS-67") {
+			t.Errorf("Message missing XOS-67: %s", diags[0].Message)
+		}
+	})
+
+	t.Run("string literal bound to string field passes", func(t *testing.T) {
+		fs := &yongol.Fullstack{
+			ServiceFuncs: []ssac.ServiceFunc{
+				{
+					Name: "ping",
+					Sequences: []ssac.Sequence{
+						{Type: "response", Fields: map[string]string{"status": `"ok"`}},
+					},
+				},
+			},
+		}
+		g := &rule.Ground{
+			Types: map[string]string{
+				"OpenAPI.response.ping.status": "string",
+			},
+		}
+		fs.SetGround(g)
+		diags := xos67ResponseFieldType(fs)
+		if len(diags) != 0 {
+			t.Fatalf("expected 0, got %d: %+v", len(diags), diags)
+		}
+	})
+
 	t.Run("unresolvable actual type skipped", func(t *testing.T) {
 		fs := &yongol.Fullstack{
 			ServiceFuncs: []ssac.ServiceFunc{

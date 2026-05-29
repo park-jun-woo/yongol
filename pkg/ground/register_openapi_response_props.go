@@ -20,5 +20,13 @@ func registerOpenAPIResponseProps(g *rule.Ground, opID string, schema *openapi3.
 			continue
 		}
 		g.Types["OpenAPI.response."+opID+"."+propName] = t
+		// Preserve the date-time format as a sibling marker so XOS-67 can
+		// recognise a DDL TIMESTAMPTZ (time.Time) bound to an OpenAPI
+		// { type: string, format: date-time } field as compatible. The
+		// primary type value stays "string" (resolvePrimitiveType drops
+		// string formats by design) to keep literal-string bindings valid.
+		if t == "string" && propRef != nil && propRef.Value != nil && propRef.Value.Format == "date-time" {
+			g.Types["OpenAPI.response."+opID+"."+propName+".format"] = "date-time"
+		}
 	}
 }
