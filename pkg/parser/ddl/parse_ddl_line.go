@@ -4,7 +4,7 @@ package ddl
 
 import "strings"
 
-func parseDDLLine(line string, currentTable string, tables map[string]*Table, pendingArchived bool, file string, lineNum int) string {
+func parseDDLLine(line string, currentTable string, tables map[string]*Table, pendingArchived bool, pendingFuncManaged bool, file string, lineNum int) string {
 	line = strings.TrimSpace(line)
 	upper := strings.ToUpper(line)
 
@@ -13,7 +13,7 @@ func parseDDLLine(line string, currentTable string, tables map[string]*Table, pe
 		return currentTable
 	}
 	if strings.HasPrefix(upper, "CREATE TABLE") {
-		return handleCreateTable(line, tables, pendingArchived, file, lineNum)
+		return handleCreateTable(line, tables, pendingArchived, pendingFuncManaged, file, lineNum)
 	}
 	if strings.HasPrefix(line, ")") {
 		return ""

@@ -8,6 +8,7 @@ func parseDDLContent(content string, tables map[string]*Table, file string) {
 	lines := strings.Split(content, "\n")
 	var currentTable string
 	pendingArchived := false
+	pendingFuncManaged := false
 	for i, line := range lines {
 		lineNum := i + 1
 		trimmed := strings.TrimSpace(line)
@@ -18,9 +19,14 @@ func parseDDLContent(content string, tables map[string]*Table, file string) {
 			pendingArchived = true
 			continue
 		}
-		currentTable = parseDDLLine(line, currentTable, tables, pendingArchived, file, lineNum)
-		// annotation was consumed by whichever line followed it
+		if isFuncManagedAnnotation(trimmed) {
+			pendingFuncManaged = true
+			continue
+		}
+		currentTable = parseDDLLine(line, currentTable, tables, pendingArchived, pendingFuncManaged, file, lineNum)
+		// annotations were consumed by whichever line followed them
 		pendingArchived = false
+		pendingFuncManaged = false
 	}
 
 	// Second pass: collect @sentinel INSERT blocks and attach them to

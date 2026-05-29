@@ -247,7 +247,8 @@ Standard SQL DDL and sqlc. Details: [`docs/ddl.md`](docs/ddl.md).
 |---|---|---|
 | `-- @sensitive` | column | Generates `json:"-"`; excluded from responses. |
 | `-- @nosensitive` | column | Keeps JSON tag; suppresses sensitive-pattern WARNING (for `file_hash`, `commit_hash`, etc.). |
-| `-- @archived` | table | Marks table as soft-deprecated. |
+| `-- @archived` | table | Marks table as soft-deprecated (미사용/폐기). XSD-55 면제. |
+| `-- @func-managed` | table | Marks table as actively managed by a `@call`'d function/RPC (살아있는 테이블, 미사용 아님). SSaC `@model`/`@result`에 직접 안 나타나도 XSD-55만 면제. 다른 규칙(응답/민감도 등)은 정상 적용. `@archived`와 의미가 다르므로 실사용 RPC 테이블엔 `@func-managed`를 쓴다. |
 | `-- @rename from=<old> [to=<new>]` | CREATE TABLE or column line | Migration emits `ALTER ... RENAME` instead of drop+add. |
 | `-- @cast using=<expr>` | column line | USING clause for `ALTER COLUMN TYPE`. Resolves MIG-005. |
 | `-- @backfill default=<value>` | column line | Populates existing rows before adding NOT NULL. Resolves MIG-002. |
@@ -258,10 +259,14 @@ Standard SQL DDL and sqlc. Details: [`docs/ddl.md`](docs/ddl.md).
 Patterns such as `password`, `secret`, `hash`, `token` without `@sensitive`
 emit a WARNING.
 
-**Annotation placement**: all DDL annotations go at the **end** of the column
-line, in a **single** `--` comment. Multiple annotations are space-separated
-inside that comment. Never place annotations on a separate line, and never
-write multiple `--` on the same line.
+**Annotation placement**: **column-scope** annotations (`@sensitive`,
+`@nullable`, …) go at the **end** of the column line, in a **single** `--`
+comment. Multiple annotations are space-separated inside that comment. Never
+place them on a separate line, and never write multiple `--` on the same line.
+**Table-scope** annotations (`@archived`, `@func-managed`) go on their own
+`--` comment line **directly above** the `CREATE TABLE`. They may be stacked
+on consecutive lines (each on its own `--` line); both take effect
+independently.
 
 ```sql
 -- Correct:

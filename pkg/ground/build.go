@@ -3,8 +3,8 @@
 package ground
 
 import (
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/rule"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // Build extracts all lookup data from Fullstack into a shared rule.Ground.
@@ -27,6 +27,7 @@ func Build(fs *yongol.Fullstack) *rule.Ground {
 	populateMiddleware(g, fs)
 	populateDDL(g, fs)
 	populateDDLArchived(g, fs)
+	populateDDLFuncManaged(g, fs)
 	populateRego(g, fs)
 	populateOpenAPIConstraints(g, fs)
 	populateOpenAPIParams(g, fs)

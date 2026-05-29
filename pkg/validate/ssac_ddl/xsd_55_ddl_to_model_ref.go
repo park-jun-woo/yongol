@@ -22,6 +22,9 @@ func xsd55DDLToModelRef(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		if isArchivedTable(fs, t.Name) {
 			continue
 		}
+		if isFuncManagedTable(fs, t.Name) {
+			continue
+		}
 		if isPkgModelTable(fs, t.Name) {
 			continue
 		}
@@ -34,7 +37,7 @@ func xsd55DDLToModelRef(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			Phase:   diagnostic.PhaseValidate,
 			Level:   diagnostic.LevelError,
 			Message: fmt.Sprintf("[XSD-55] DDL table %q is not referenced by any SSaC @model or @result", t.Name),
-			Advice:  fmt.Sprintf("DDL 테이블 %s 를 어떤 SSaC @model 또는 @result 에서 사용하거나 DDL 에서 제거하세요 (또는 @archived 어노테이션 추가)", t.Name),
+			Advice:  fmt.Sprintf("DDL 테이블 %s 를 어떤 SSaC @model 또는 @result 에서 사용하거나 DDL 에서 제거하세요. RPC/함수가 관리하는 활성 테이블이면 -- @func-managed, 미사용/폐기 테이블이면 -- @archived 어노테이션을 CREATE TABLE 바로 위에 추가하세요", t.Name),
 		})
 	}
 	return diags

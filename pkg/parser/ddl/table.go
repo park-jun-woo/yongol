@@ -15,5 +15,6 @@ type Table struct {
 	Indexes     []Index
 	PrimaryKey  []string
 	Archived    bool             // `-- @archived` directly above CREATE TABLE
+	FuncManaged bool             // `-- @func-managed` directly above CREATE TABLE (RPC/함수가 관리, XSD-55만 면제)
 	Sentinels   []SentinelInsert // `-- @sentinel` INSERT blocks targeting this table
 }
