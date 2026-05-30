@@ -4,7 +4,7 @@
   <img src="yongol.webp" alt="yongol — the keel of your AI-coded SaaS" width="480">
 </p>
 
-[![Version](https://img.shields.io/badge/version-v0.6.19-blue.svg)](https://github.com/park-jun-woo/yongol/releases)
+[![Version](https://img.shields.io/badge/version-v0.6.20-blue.svg)](https://github.com/park-jun-woo/yongol/releases)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![skills.sh](https://skills.sh/b/park-jun-woo/yongol)](https://skills.sh/park-jun-woo/yongol)
 
