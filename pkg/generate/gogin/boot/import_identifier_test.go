@@ -18,6 +18,7 @@ func TestImportIdentifier(t *testing.T) {
 		{"plain path", `"github.com/gin-gonic/gin"`, "gin"},
 		{"empty", ``, ""},
 		{"no quote", `strconv`, ""},
+		{"empty quotes", `""`, ""},
 	}
 	for _, c := range cases {
 		if got := importIdentifier(c.in); got != c.want {

@@ -20,6 +20,7 @@ func TestNormalizeBody(t *testing.T) {
 		{"bom_stripped", append([]byte{0xEF, 0xBB, 0xBF}, []byte("pkg\n")...), []byte("pkg\n")},
 		{"append_trailing_lf", []byte("pkg"), []byte("pkg\n")},
 		{"already_lf", []byte("a\nb\n"), []byte("a\nb\n")},
+		{"only_bom", []byte{0xEF, 0xBB, 0xBF}, []byte{}},
 	}
 	for _, c := range cases {
 		got := NormalizeBody(c.in)

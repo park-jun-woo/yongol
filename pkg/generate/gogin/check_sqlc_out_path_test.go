@@ -76,4 +76,21 @@ func TestCheckSqlcOutPath(t *testing.T) {
 			t.Errorf("expected match (nil error), got: %v", err)
 		}
 	})
+
+	t.Run("MatchRelative", func(t *testing.T) {
+		specs := t.TempDir()
+		artifacts := t.TempDir()
+		absArtifacts, _ := filepath.Abs(artifacts)
+		absDB, _ := filepath.Abs(filepath.Join(specs, "db"))
+		expected := filepath.Join(absArtifacts, "backend", "internal", "db")
+		// Relative out that, joined against specs/db, resolves to expected.
+		rel, err := filepath.Rel(absDB, expected)
+		if err != nil {
+			t.Fatalf("setup rel: %v", err)
+		}
+		writeSqlc(t, specs, "sql:\n  - gen:\n      go:\n          out: "+rel+"\n")
+		if err := checkSqlcOutPath(specs, artifacts); err != nil {
+			t.Errorf("expected relative match (nil error), got: %v", err)
+		}
+	})
 }

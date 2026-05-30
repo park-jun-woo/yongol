@@ -77,6 +77,17 @@ func TestHasMatchingParam(t *testing.T) {
 	if hasMatchingParam(operationEntry{}, "x") {
 		t.Error("nil op should yield no match")
 	}
+	// nil parameter entry / nil value → skipped (continue branch).
+	opNilParam := &openapi3.Operation{
+		Parameters: openapi3.Parameters{
+			nil,
+			{Value: nil},
+			{Value: &openapi3.Parameter{Name: "ok"}},
+		},
+	}
+	if !hasMatchingParam(operationEntry{method: "GET", op: opNilParam}, "ok") {
+		t.Error("expected match on ok after skipping nil params")
+	}
 }
 
 func TestDefaultLayoutFromManifest(t *testing.T) {
@@ -123,6 +134,8 @@ func TestAddSchemaProps(t *testing.T) {
 			{Value: &openapi3.Schema{Properties: openapi3.Schemas{
 				"name": {Value: &openapi3.Schema{Type: &openapi3.Types{"string"}}},
 			}}},
+			nil,                    // nil allOf ref → skipped
+			{Value: nil},           // nil allOf value → skipped
 		},
 	}
 	addSchemaProps(out, s)

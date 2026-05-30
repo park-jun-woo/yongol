@@ -25,4 +25,14 @@ func TestRecordPathOps(t *testing.T) {
 	if opToPath["CreateUser"] != "/users" {
 		t.Errorf("opToPath[CreateUser] = %q, want /users", opToPath["CreateUser"])
 	}
+
+	// Content that is a YAML sequence fails the direct map unmarshal, so the
+	// wrapped ("paths:\n  ...") fallback path is entered. The wrapped Paths is
+	// itself a sequence, so no mapping is recorded — but the fallback branch runs.
+	p2 := map[string][]string{}
+	o2 := map[string]string{}
+	recordPathOps("- item1\n- item2", "SeqOp", p2, o2)
+	if len(p2) != 0 || len(o2) != 0 {
+		t.Errorf("sequence content should record no mappings, got %v %v", p2, o2)
+	}
 }

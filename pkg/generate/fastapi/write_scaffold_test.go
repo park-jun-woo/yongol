@@ -45,4 +45,15 @@ func TestWriteScaffold(t *testing.T) {
 			t.Errorf("expected RenderPyproject error for empty projectID, got nil")
 		}
 	})
+
+	t.Run("WritePyprojectFails", func(t *testing.T) {
+		// backendDir exists; pyproject.toml path collides with a directory.
+		backendDir := t.TempDir()
+		if err := os.MkdirAll(filepath.Join(backendDir, "pyproject.toml"), 0o755); err != nil {
+			t.Fatalf("setup: %v", err)
+		}
+		if err := writeScaffold(backendDir, "myproject"); err == nil {
+			t.Errorf("expected write pyproject.toml error, got nil")
+		}
+	})
 }

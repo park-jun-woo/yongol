@@ -6,6 +6,7 @@ package boot
 import (
 	"testing"
 
+	"github.com/getkin/kin-openapi/openapi3"
 	pmanifest "github.com/park-jun-woo/yongol/pkg/parser/manifest"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
@@ -34,5 +35,17 @@ func TestBuildOperationRouteIndex_Maps(t *testing.T) {
 	}
 	if idx["CreateUser"] != "POST /users" {
 		t.Errorf("CreateUser = %q, want POST /users", idx["CreateUser"])
+	}
+}
+
+func TestBuildOperationRouteIndex_SkipsEmptyOperationID(t *testing.T) {
+	// An operation without an OperationID must be skipped (continue branch).
+	doc := &openapi3.T{Paths: &openapi3.Paths{}}
+	pi := &openapi3.PathItem{Get: &openapi3.Operation{OperationID: ""}}
+	doc.Paths.Set("/anon", pi)
+	fs := &yongol.Fullstack{OpenAPIDoc: doc}
+	idx := buildOperationRouteIndex(fs)
+	if len(idx) != 0 {
+		t.Errorf("operation without OperationID must be skipped, got %v", idx)
 	}
 }

@@ -62,4 +62,14 @@ func TestWriteIfNotPreserved(t *testing.T) {
 	if string(out) != string(preservedSrc) {
 		t.Fatalf("expected preserved body untouched, got %q", string(out))
 	}
+
+	// Case 4: os.Stat returns a non-NotExist error (parent is a regular file
+	// -> ENOTDIR). The error is surfaced rather than treated as new.
+	blocker := filepath.Join(dir, "blocker")
+	if err := os.WriteFile(blocker, []byte("x"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := WriteIfNotPreserved(filepath.Join(blocker, "sub.go"), []byte("x")); err == nil {
+		t.Fatalf("expected stat error for path under a file, got nil")
+	}
 }

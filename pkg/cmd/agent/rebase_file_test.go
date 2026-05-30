@@ -14,4 +14,10 @@ func TestRebaseFile(t *testing.T) {
 	if got := rebaseFile("/specs/api/openapi.yaml", "/specs"); got != "api/openapi.yaml" {
 		t.Errorf("absolute = %q, want api/openapi.yaml", got)
 	}
+	// An absolute file with a *relative* base makes filepath.Rel fail, so the
+	// original (absolute) path is returned unchanged.
+	abs := "/specs/api/openapi.yaml"
+	if got := rebaseFile(abs, "relative/base"); got != abs {
+		t.Errorf("rel error fallback = %q, want %q", got, abs)
+	}
 }

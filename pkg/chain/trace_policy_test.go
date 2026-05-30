@@ -85,4 +85,33 @@ func TestTracePolicy(t *testing.T) {
 			t.Errorf("link file: got %q, want authz/project.rego", links[0].File)
 		}
 	})
+
+	// NoActionMatch: the @auth resource matches a rule, but none of the rule's
+	// actions are requested by the SSaC function (and the auth seq carries an
+	// empty Action), so actList stays empty and the summary has no bracket
+	// suffix. Exercises the `seq.Action == ""` skip and `len(actList) == 0`
+	// branch of the summary builder.
+	t.Run("NoActionMatch", func(t *testing.T) {
+		sfNoAction := &ssac.ServiceFunc{
+			Name: "ListProject",
+			Sequences: []ssac.Sequence{
+				{Type: "auth", Resource: "project", Action: ""}, // empty action
+			},
+		}
+		pol := []rego.Policy{
+			{
+				File: regoFile,
+				Rules: []rego.AllowRule{
+					{Resource: "project", Actions: []string{"delete", "update"}},
+				},
+			},
+		}
+		links := tracePolicy(sfNoAction, pol, specsDir)
+		if len(links) != 1 {
+			t.Fatalf("expected 1 link, got %d: %+v", len(links), links)
+		}
+		if links[0].Summary != "resource: project" {
+			t.Errorf("summary: got %q, want %q (no action brackets)", links[0].Summary, "resource: project")
+		}
+	})
 }

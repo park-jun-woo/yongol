@@ -40,3 +40,35 @@ func TestCollectFieldSelector(t *testing.T) {
 		t.Errorf("fields: got %v want exactly {user.Name}", fields)
 	}
 }
+
+// TestCollectFieldSelector_NestedReceiver covers a non-Ident receiver routed
+// through go/printer (renderRecv printer path) producing a chained field key.
+func TestCollectFieldSelector_NestedReceiver(t *testing.T) {
+	fset, body := bodyFromFunc(t, "_ = outer.Inner.Field\n")
+
+	callSelectors := map[*ast.SelectorExpr]struct{}{}
+	fields := map[string]struct{}{}
+	ast.Inspect(body, func(n ast.Node) bool {
+		return collectFieldSelector(fset, n, callSelectors, fields)
+	})
+
+	// outer.Inner (Inner exported) and outer.Inner.Field (Field exported) both
+	// collected; the latter uses the printer path for its receiver.
+	if _, ok := fields["outer.Inner.Field"]; !ok {
+		t.Errorf("expected outer.Inner.Field, got %v", fields)
+	}
+}
+
+// TestCollectFieldSelector_NonSelectorNode covers the early return for nodes
+// that are not SelectorExpr.
+func TestCollectFieldSelector_NonSelectorNode(t *testing.T) {
+	fset, body := bodyFromFunc(t, "x := 1\n_ = x\n")
+	callSelectors := map[*ast.SelectorExpr]struct{}{}
+	fields := map[string]struct{}{}
+	ast.Inspect(body, func(n ast.Node) bool {
+		return collectFieldSelector(fset, n, callSelectors, fields)
+	})
+	if len(fields) != 0 {
+		t.Errorf("expected no fields, got %v", fields)
+	}
+}

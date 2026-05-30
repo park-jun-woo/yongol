@@ -27,4 +27,15 @@ func TestLLMCall(t *testing.T) {
 	if _, err := llmCall("gemini", "gemini-2.0-flash", "sys", "user"); err == nil {
 		t.Error("expected error when gemini credentials are unavailable")
 	}
+
+	// xai path fails fast without credentials (loadAPIKey error before network).
+	t.Setenv("XAI_API_KEY", "")
+	if _, err := llmCall("xai", "grok", "sys", "user"); err == nil {
+		t.Error("expected error when xai credentials are unavailable")
+	}
+
+	// ollama path routes to callOllama; with no local server reachable the
+	// request fails. Either an error or (rarely) a live response is acceptable —
+	// the goal is to exercise the ollama switch arm.
+	_, _ = llmCall("ollama", "llama3", "sys", "user")
 }

@@ -79,4 +79,16 @@ func TestWriteOneFeature(t *testing.T) {
 			t.Errorf("expected render router error, got: %v", err)
 		}
 	})
+
+	t.Run("WriteServiceFails", func(t *testing.T) {
+		// services dir creatable, but the service file path collides with a dir.
+		appDir := t.TempDir()
+		if err := os.MkdirAll(filepath.Join(appDir, "services", "workflow.py"), 0o755); err != nil {
+			t.Fatalf("setup: %v", err)
+		}
+		err := writeOneFeature("workflow", nil, appDir, nil)
+		if err == nil || !strings.Contains(err.Error(), "write service") {
+			t.Errorf("expected write service error, got: %v", err)
+		}
+	})
 }

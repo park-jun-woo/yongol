@@ -4,6 +4,7 @@
 package yongol
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
 )
@@ -37,6 +38,19 @@ func TestGoModCacheHomeFallback(t *testing.T) {
 	}
 	if filepath.Base(got) != "mod" || !endsWith(got, suffix) {
 		t.Errorf("goModCache = %q, want path ending in %q", got, suffix)
+	}
+}
+
+func TestGoModCacheNoHome(t *testing.T) {
+	t.Setenv("GOMODCACHE", "")
+	t.Setenv("GOPATH", "")
+	// On unix os.UserHomeDir reads $HOME; empty → error → final return "".
+	t.Setenv("HOME", "")
+	if _, err := os.UserHomeDir(); err == nil {
+		t.Skip("UserHomeDir still resolves a home directory on this platform")
+	}
+	if got := goModCache(); got != "" {
+		t.Fatalf("expected \"\" when no home resolvable, got %q", got)
 	}
 }
 

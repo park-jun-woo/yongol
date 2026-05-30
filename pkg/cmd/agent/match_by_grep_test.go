@@ -24,4 +24,10 @@ func TestMatchByGrep(t *testing.T) {
 	if ops != nil || rel != nil {
 		t.Errorf("expected nil,nil for no keywords, got %v %v", ops, rel)
 	}
+
+	// Quoted keyword present but absent from the YAML body → no hit lines → nil.
+	ops, rel = matchByGrep(`missing "notInYaml" here`, yaml, offsets)
+	if ops != nil || rel != nil {
+		t.Errorf("expected nil,nil when keyword not in body, got %v %v", ops, rel)
+	}
 }

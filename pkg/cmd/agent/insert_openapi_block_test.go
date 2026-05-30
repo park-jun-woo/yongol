@@ -33,4 +33,28 @@ func TestInsertOpenAPIBlock(t *testing.T) {
 	if _, err := insertOpenAPIBlock("openapi: 3.0.0\ninfo: {}", newBlock); err == nil {
 		t.Error("expected error when 'paths:' not found")
 	}
+
+	// Invalid YAML (unclosed flow sequence) fails yaml.Unmarshal.
+	if _, err := insertOpenAPIBlock(original, "x: [1, 2"); err == nil {
+		t.Error("expected YAML unmarshal error for unclosed flow sequence")
+	}
+}
+
+func TestInsertOpenAPIBlockBlankLineAndEOF(t *testing.T) {
+	// A blank line inside the paths section exercises the empty-line continue;
+	// paths being the last top-level section makes insertAt default to len(lines)
+	// so the new block is appended at the end.
+	original := "openapi: 3.0.0\npaths:\n  /old:\n    get:\n      operationId: Old\n\n"
+	newBlock := "/new:\n  get:\n    operationId: New"
+	got, err := insertOpenAPIBlock(original, newBlock)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !strings.Contains(got, "operationId: New") {
+		t.Errorf("result missing new block: %q", got)
+	}
+	// New block appended after the existing op (no later top-level section).
+	if strings.Index(got, "operationId: New") < strings.Index(got, "operationId: Old") {
+		t.Errorf("new block should be appended after Old: %q", got)
+	}
 }

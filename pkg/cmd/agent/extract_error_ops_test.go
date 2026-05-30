@@ -6,6 +6,8 @@ package agent
 import (
 	"errors"
 	"testing"
+
+	"github.com/park-jun-woo/yongol/pkg/parser/features"
 )
 
 func TestExtractErrorOps(t *testing.T) {
@@ -29,5 +31,26 @@ func TestExtractErrorOps(t *testing.T) {
 	ops, _ = extractErrorOps(errors.New("yaml: line 3: bad value"), offsets, nil, "")
 	if len(ops) != 1 || ops[0] != "OpA" {
 		t.Errorf("line match = %v, want [OpA]", ops)
+	}
+
+	// Schema match: a $ref schema name maps (case-insensitively) to a feature Op.
+	feats := []features.Feature{{Op: "OpA"}}
+	ops, _ = extractErrorOps(errors.New("invalid $ref #/components/schemas/opa here"), offsets, feats, "")
+	if len(ops) != 1 || ops[0] != "OpA" {
+		t.Errorf("schema match = %v, want [OpA]", ops)
+	}
+
+	// Grep match: a quoted keyword found in yamlContent at a line within OpB's
+	// range collects OpB and populates relativeLines.
+	yaml := "line1\nline2\nline3\nline4\nline5\nspecial_field: x\nl7\nl8\nl9\nl10\n"
+	ops, rl := extractErrorOps(errors.New(`unknown field "special_field"`), offsets, nil, yaml)
+	if len(ops) != 1 || ops[0] != "OpB" {
+		t.Errorf("grep match = %v, want [OpB]", ops)
+	}
+	if rl == nil {
+		t.Fatal("expected non-nil relativeLines from grep match")
+	}
+	if _, ok := rl["OpB"]; !ok {
+		t.Errorf("relativeLines missing OpB: %v", rl)
 	}
 }

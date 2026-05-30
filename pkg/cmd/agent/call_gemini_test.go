@@ -25,3 +25,22 @@ func TestCallGemini(t *testing.T) {
 		t.Errorf("expected gemini-related key error, got: %v", err)
 	}
 }
+
+// TestCallGeminiRequestPath drives the body-marshalling and http.Post path by
+// supplying a fake API key. The endpoint is hardcoded to googleapis.com, so in
+// a hermetic test environment the POST fails (DNS/network), exercising the
+// "gemini request: %w" error branch after the request payload is built.
+func TestCallGeminiRequestPath(t *testing.T) {
+	t.Setenv("GEMINI_API_KEY", "fake-key-for-test")
+
+	out, err := callGemini("gemini-2.0-flash", "system prompt", "user prompt")
+	if err == nil {
+		t.Skip("network reachable; gemini endpoint responded — request branch not exercised")
+	}
+	if out != "" {
+		t.Errorf("expected empty output on error, got %q", out)
+	}
+	if !strings.Contains(err.Error(), "gemini") {
+		t.Errorf("expected gemini-related error, got: %v", err)
+	}
+}

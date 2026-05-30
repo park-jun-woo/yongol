@@ -15,6 +15,8 @@ func TestStripMarkdownFences(t *testing.T) {
 		{"yaml fence", "```yaml\nkey: v\n```", "key: v"},
 		{"bare fence", "```\nbody\n```", "body"},
 		{"ws trimmed", "\n```\nx\n```\n", "x"},
+		{"fence no newline", "```yaml", "```yaml"},
+		{"opening fence no closing", "```\nbody", "body"},
 	}
 	for _, c := range cases {
 		if got := stripMarkdownFences(c.in); got != c.want {

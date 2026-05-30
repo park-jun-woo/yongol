@@ -20,4 +20,8 @@ func TestLLMCallWithNumCtx(t *testing.T) {
 	if _, err := llmCallWithNumCtx("unknown-backend", "m", "sys", "user", 0); err == nil {
 		t.Error("expected error for unsupported backend with numCtx=0")
 	}
+
+	// ollama with a positive numCtx routes to callOllamaWithCtx. With no local
+	// Ollama server reachable the call fails — the branch is still exercised.
+	_, _ = llmCallWithNumCtx("ollama", "llama3", "sys", "user", 4096)
 }

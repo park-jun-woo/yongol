@@ -84,6 +84,18 @@ func TestDetectReturnTypeNo200(t *testing.T) {
 	}
 }
 
+func TestDetectReturnTypeNoJSONContent(t *testing.T) {
+	// 200 present but with no application/json content -> empty return type.
+	op := &openapi3.Operation{
+		OperationID: "x",
+		Responses: openapi3.NewResponses(openapi3.WithStatus(200,
+			&openapi3.ResponseRef{Value: openapi3.NewResponse()})),
+	}
+	if got := detectReturnType(op); got != "" {
+		t.Errorf("expected empty return type for no JSON content, got %q", got)
+	}
+}
+
 func TestSortedKeys(t *testing.T) {
 	m := openapi3.Schemas{"c": strSchema(), "a": strSchema(), "b": strSchema()}
 	got := sortedKeys(m)

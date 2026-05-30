@@ -33,4 +33,9 @@ func TestParseParamsYAML(t *testing.T) {
 	if _, err := parseParamsYAML("parameters: scalar"); err == nil {
 		t.Error("expected error when 'parameters' is not an array")
 	}
+
+	// Completely malformed YAML fails both the array and the map unmarshal.
+	if _, err := parseParamsYAML("a: [1, 2"); err == nil {
+		t.Error("expected error for malformed YAML")
+	}
 }

@@ -19,6 +19,8 @@ func TestShouldKeepImport(t *testing.T) {
 		{"blank import dropped", `_ "github.com/lib/pq"`, "no usage here", false, false},
 		{"word boundary blocks suffix match", `"database/sql"`, "x := otelsql.Open()", false, false},
 		{"word boundary allows real use", `"database/sql"`, "var d sql.DB", false, true},
+		{"empty identifier dropped", `""`, "anything", false, false},
+		{"suffix match then real match", `"database/sql"`, "x := otelsql.Open(); var d sql.DB", false, true},
 	}
 	for _, c := range cases {
 		if got := shouldKeepImport(c.imp, c.body, c.keepBlank); got != c.want {

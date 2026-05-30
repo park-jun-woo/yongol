@@ -42,3 +42,26 @@ func TestGenerate_UnknownBackendErrors(t *testing.T) {
 		t.Errorf("expected 'unknown backend' in error, got: %v", err)
 	}
 }
+
+func TestGenerate_FullSuccess(t *testing.T) {
+	// Empty Fullstack: migration is a no-op, FastAPI backend + React frontend
+	// both succeed, and the hurl-mirror / opa-rego steps run to completion.
+	fs := &yongol.Fullstack{SpecsDir: ""}
+	if err := Generate(fs, t.TempDir(), FastAPI, React); err != nil {
+		t.Fatalf("expected success, got: %v", err)
+	}
+}
+
+func TestGenerate_FrontendErrorPropagates(t *testing.T) {
+	// FastAPI backend succeeds on an empty Fullstack (writes scaffold), so an
+	// unknown frontend then surfaces a wrapped "frontend:" error before the
+	// hurl/opa steps run.
+	fs := &yongol.Fullstack{SpecsDir: ""}
+	err := Generate(fs, t.TempDir(), FastAPI, FrontendType("does-not-exist"))
+	if err == nil || !strings.Contains(err.Error(), "frontend:") {
+		t.Fatalf("expected frontend error, got: %v", err)
+	}
+	if !strings.Contains(err.Error(), "unknown frontend") {
+		t.Errorf("expected 'unknown frontend' in error, got: %v", err)
+	}
+}

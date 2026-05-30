@@ -30,6 +30,72 @@ func TestBlockRateLimit_UnmatchedOpInert(t *testing.T) {
 	}
 }
 
+func TestBlockRateLimit_NilFullstack(t *testing.T) {
+	block := blockRateLimit(nil, "example.com/zenflow")
+	if len(block.Lines) != 0 {
+		t.Errorf("nil Fullstack must yield inert block, got %v", block.Lines)
+	}
+}
+
+func TestBlockRateLimit_InvalidPeriodInert(t *testing.T) {
+	doc := buildDoc([]opSpec{{path: "/login", method: "POST", opID: "Login"}}, false)
+	fs := &yongol.Fullstack{
+		OpenAPIDoc: doc,
+		Manifest: &pmanifest.ProjectConfig{
+			Backend: pmanifest.Backend{RateLimit: pmanifest.RateLimitConfig{
+				"Login": {Rate: 5, Period: "not-a-duration"},
+			}},
+		},
+	}
+	block := blockRateLimit(fs, "example.com/zenflow")
+	if len(block.Lines) != 0 {
+		t.Errorf("invalid period must skip rule -> inert block, got %v", block.Lines)
+	}
+}
+
+func TestBlockRateLimit_ExplicitKey(t *testing.T) {
+	doc := buildDoc([]opSpec{{path: "/login", method: "POST", opID: "Login"}}, false)
+	fs := &yongol.Fullstack{
+		OpenAPIDoc: doc,
+		Manifest: &pmanifest.ProjectConfig{
+			Backend: pmanifest.Backend{RateLimit: pmanifest.RateLimitConfig{
+				"Login": {Rate: 5, Period: "1m", Key: "user"},
+			}},
+		},
+	}
+	block := blockRateLimit(fs, "example.com/zenflow")
+	body := strings.Join(block.Lines, "\n")
+	if !strings.Contains(body, `Key: "user"`) {
+		t.Errorf("explicit key must be preserved, got:\n%s", body)
+	}
+}
+
+func TestBlockRateLimit_MultiRouteSorted(t *testing.T) {
+	doc := buildDoc([]opSpec{
+		{path: "/login", method: "POST", opID: "Login"},
+		{path: "/signup", method: "POST", opID: "Signup"},
+	}, false)
+	fs := &yongol.Fullstack{
+		OpenAPIDoc: doc,
+		Manifest: &pmanifest.ProjectConfig{
+			Backend: pmanifest.Backend{RateLimit: pmanifest.RateLimitConfig{
+				"Login":  {Rate: 5, Period: "1m"},
+				"Signup": {Rate: 3, Period: "1m"},
+			}},
+		},
+	}
+	block := blockRateLimit(fs, "example.com/zenflow")
+	body := strings.Join(block.Lines, "\n")
+	loginIdx := strings.Index(body, "POST /login")
+	signupIdx := strings.Index(body, "POST /signup")
+	if loginIdx < 0 || signupIdx < 0 {
+		t.Fatalf("both routes must be present, got:\n%s", body)
+	}
+	if loginIdx > signupIdx {
+		t.Errorf("routes must be sorted ascending, got:\n%s", body)
+	}
+}
+
 func TestBlockRateLimit_Resolved(t *testing.T) {
 	doc := buildDoc([]opSpec{{path: "/login", method: "POST", opID: "Login"}}, false)
 	fs := &yongol.Fullstack{

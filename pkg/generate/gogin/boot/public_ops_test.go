@@ -50,4 +50,11 @@ func TestCollectPublicOps(t *testing.T) {
 	if got := collectPublicOps(nil); got != nil {
 		t.Errorf("case4: got %v want nil", got)
 	}
+
+	// operation without OperationID is skipped (continue branch)
+	doc5 := &openapi3.T{Paths: &openapi3.Paths{}}
+	doc5.Paths.Set("/anon", &openapi3.PathItem{Get: &openapi3.Operation{OperationID: ""}})
+	if got := collectPublicOps(doc5); len(got) != 0 {
+		t.Errorf("case5: op without OperationID must be skipped, got %v", got)
+	}
 }

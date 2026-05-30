@@ -61,6 +61,16 @@ func TestDetectDirSSOTAbsent(t *testing.T) {
 	}
 }
 
+func TestDetectDirSSOTGlobError(t *testing.T) {
+	// A malformed glob pattern ("[") triggers filepath.ErrBadPattern,
+	// exercising the hard-error branch.
+	d := dirSSOT{kind: KindDDL, dir: t.TempDir(), globs: []string{"["}}
+	_, err := detectDirSSOT(d)
+	if err == nil {
+		t.Fatal("expected error for malformed glob pattern")
+	}
+}
+
 func TestDirectorySSOTs(t *testing.T) {
 	abs := "/specs/root"
 	got := directorySSOTs(abs)

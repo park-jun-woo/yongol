@@ -15,6 +15,7 @@ func TestExtractHelperBodyLines(t *testing.T) {
 		want []string
 	}{
 		{"no open brace", "func f() int", nil},
+		{"open brace without close", "func f() int {", nil},
 		{
 			"single line body",
 			"func f() int { return 1 }",

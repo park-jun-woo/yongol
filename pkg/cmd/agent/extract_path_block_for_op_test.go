@@ -37,3 +37,22 @@ func TestExtractPathBlockForOp(t *testing.T) {
 		t.Errorf("invalid yaml = %q, want empty", got)
 	}
 }
+
+func TestExtractPathBlockForOpNonMapEntries(t *testing.T) {
+	// A scalar path value (not a map) hits the methods type-assert continue;
+	// a scalar method detail (not a map) hits the detail type-assert continue.
+	// The well-formed /users path still resolves CreateUser.
+	content := `paths:
+  /scalar: "just a string"
+  /users:
+    summary: "a string detail"
+    post:
+      operationId: CreateUser`
+	block := extractPathBlockForOp(content, "CreateUser")
+	if block == "" {
+		t.Fatal("expected non-empty block despite non-map siblings")
+	}
+	if !strings.Contains(block, "operationId: CreateUser") {
+		t.Errorf("block = %q, want CreateUser", block)
+	}
+}

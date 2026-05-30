@@ -40,4 +40,13 @@ func TestLoadFeatureLookup(t *testing.T) {
 	if got := loadFeatureLookup(t.TempDir()); got != nil {
 		t.Errorf("missing file = %v, want nil", got)
 	}
+
+	// Malformed YAML → unmarshal error → nil.
+	bad := t.TempDir()
+	if err := os.WriteFile(filepath.Join(bad, "features.yaml"), []byte("features: [unclosed"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if got := loadFeatureLookup(bad); got != nil {
+		t.Errorf("malformed yaml = %v, want nil", got)
+	}
 }

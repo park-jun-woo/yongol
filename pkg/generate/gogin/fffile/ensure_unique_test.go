@@ -19,4 +19,8 @@ func TestEnsureUnique(t *testing.T) {
 	if got := EnsureUnique("", used); got != "" {
 		t.Fatalf("empty candidate: got %q want empty", got)
 	}
+	// nil used map -> candidate returned unchanged (cannot persist).
+	if got := EnsureUnique("file.go", nil); got != "file.go" {
+		t.Fatalf("nil used map: got %q want file.go", got)
+	}
 }

@@ -41,4 +41,19 @@ func TestTopoSortTables(t *testing.T) {
 	if len(gotCyc) != 2 {
 		t.Errorf("cycle: expected 2 tables returned, got %v", gotCyc)
 	}
+
+	// belongs_to references a table not in the map -> that edge is skipped,
+	// so orders has inDegree 0 and is returned normally.
+	dangling := map[string]features.TableDef{
+		"orders": {BelongsTo: []string{"ghost"}},
+	}
+	gotDangling := topoSortTables(dangling)
+	if len(gotDangling) != 1 || gotDangling[0] != "orders" {
+		t.Errorf("dangling ref: expected [orders], got %v", gotDangling)
+	}
+
+	// Empty map -> empty result.
+	if got := topoSortTables(map[string]features.TableDef{}); len(got) != 0 {
+		t.Errorf("empty: expected no tables, got %v", got)
+	}
 }

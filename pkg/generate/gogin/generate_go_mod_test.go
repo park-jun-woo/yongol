@@ -7,7 +7,30 @@ import (
 	"os/exec"
 	"path/filepath"
 	"testing"
+
+	pmanifest "github.com/park-jun-woo/yongol/pkg/parser/manifest"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
+
+// TestGenerateGoMod_MkdirError verifies that generateGoMod surfaces a wrapped
+// error when the backend output directory cannot be created (its parent path
+// already exists as a regular file). This path is deterministic and needs no
+// go toolchain / network access.
+func TestGenerateGoMod_MkdirError(t *testing.T) {
+	dir := t.TempDir()
+	// artifactsDir is a regular file -> MkdirAll(artifactsDir/backend) fails.
+	blocker := filepath.Join(dir, "blocker")
+	if err := os.WriteFile(blocker, []byte("x"), 0o644); err != nil {
+		t.Fatalf("setup: %v", err)
+	}
+	fs := &yongol.Fullstack{
+		Manifest: &pmanifest.ProjectConfig{Backend: pmanifest.Backend{Module: "example.com/app"}},
+	}
+	err := generateGoMod(fs, "example.com/app", blocker)
+	if err == nil {
+		t.Fatalf("expected mkdir error when backend parent is a file, got nil")
+	}
+}
 
 // TestRunGoModTidySuccess verifies that runGoModTidy succeeds on a minimal
 // valid go.mod (no require directives — nothing to resolve).

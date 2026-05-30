@@ -22,4 +22,9 @@ func TestMatchByLine(t *testing.T) {
 	if got := matchByLine("line 99 error", offsets); len(got) != 0 {
 		t.Errorf("expected no op for out-of-range line, got %v", got)
 	}
+	// A line number too large for int overflows strconv.Atoi, exercising the
+	// parse-error continue branch (no op collected).
+	if got := matchByLine("yaml: line 99999999999999999999999 error", offsets); len(got) != 0 {
+		t.Errorf("expected no op for overflowing line number, got %v", got)
+	}
 }
