@@ -1,0 +1,1056 @@
+openapi: 3.0.3
+info:
+  title: Communy API
+  description: DC Inside-style anonymous community
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080
+security:
+  - bearerAuth: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    ErrorResponse:
+      type: object
+      required: [error, code]
+      properties:
+        error: { type: string }
+        code: { type: string }
+        details:
+          type: object
+          additionalProperties: true
+    User:
+      type: object
+      required: [id, email, nickname, role]
+      properties:
+        id: { type: integer, format: int64 }
+        email: { type: string }
+        nickname: { type: string }
+        role: { type: string }
+    Gallery:
+      type: object
+      required: [id, slug, name, description, category, status, owner_id, post_count]
+      properties:
+        id: { type: integer, format: int64 }
+        slug: { type: string }
+        name: { type: string }
+        description: { type: string }
+        category: { type: string }
+        status: { type: string }
+        owner_id: { type: integer, format: int64 }
+        post_count: { type: integer, format: int64 }
+    GalleryManager:
+      type: object
+      required: [id, gallery_id, user_id, manager_role]
+      properties:
+        id: { type: integer, format: int64 }
+        gallery_id: { type: integer, format: int64 }
+        user_id: { type: integer, format: int64 }
+        manager_role: { type: string }
+    Post:
+      type: object
+      required: [id, gallery_id, user_id, title, body, status, is_anonymous, is_concept, upvotes, downvotes, comment_count, view_count]
+      properties:
+        id: { type: integer, format: int64 }
+        gallery_id: { type: integer, format: int64 }
+        user_id: { type: integer, format: int64 }
+        title: { type: string }
+        body: { type: string }
+        status: { type: string }
+        is_anonymous: { type: boolean }
+        is_concept: { type: boolean }
+        upvotes: { type: integer, format: int64 }
+        downvotes: { type: integer, format: int64 }
+        comment_count: { type: integer, format: int64 }
+        view_count: { type: integer, format: int64 }
+    Comment:
+      type: object
+      required: [id, post_id, user_id, body, status, is_anonymous]
+      properties:
+        id: { type: integer, format: int64 }
+        post_id: { type: integer, format: int64 }
+        parent_id: { type: integer, format: int64 }
+        user_id: { type: integer, format: int64 }
+        body: { type: string }
+        status: { type: string }
+        is_anonymous: { type: boolean }
+    Vote:
+      type: object
+      required: [id, post_id, user_id, vote_type]
+      properties:
+        id: { type: integer, format: int64 }
+        post_id: { type: integer, format: int64 }
+        user_id: { type: integer, format: int64 }
+        vote_type: { type: string }
+    Report:
+      type: object
+      required: [id, gallery_id, target_type, target_id, reporter_id, reason, status]
+      properties:
+        id: { type: integer, format: int64 }
+        gallery_id: { type: integer, format: int64 }
+        target_type: { type: string }
+        target_id: { type: integer, format: int64 }
+        reporter_id: { type: integer, format: int64 }
+        reason: { type: string }
+        status: { type: string }
+    Ban:
+      type: object
+      required: [id, gallery_id, user_id, reason]
+      properties:
+        id: { type: integer, format: int64 }
+        gallery_id: { type: integer, format: int64 }
+        user_id: { type: integer, format: int64 }
+        reason: { type: string }
+        expires_at: { type: string }
+
+paths:
+  /auth/register:
+    post:
+      operationId: Register
+      security: []
+      summary: Register a new user account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password, nickname]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8 }
+                nickname: { type: string }
+      responses:
+        '200':
+          description: Created user
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+        '409':
+          description: Email or nickname already taken
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /auth/login:
+    post:
+      operationId: Login
+      security: []
+      summary: Authenticate user and issue JWT token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8 }
+      responses:
+        '200':
+          description: JWT access token
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [access_token]
+                properties:
+                  access_token: { type: string }
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /galleries:
+    post:
+      operationId: CreateGallery
+      summary: Create a new gallery board
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [slug, name, description, category]
+              properties:
+                slug: { type: string }
+                name: { type: string }
+                description: { type: string }
+                category: { type: string, enum: [major, minor] }
+      responses:
+        '200':
+          description: Created gallery
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Gallery' }
+        '409':
+          description: Slug already taken
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+    get:
+      operationId: ListGalleries
+      security: []
+      summary: List galleries with category filter
+      parameters:
+        - name: category
+          in: query
+          required: false
+          schema: { type: string }
+      responses:
+        '200':
+          description: Galleries list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, total]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Gallery' }
+                  total: { type: integer, format: int64 }
+
+  /galleries/{galleryId}:
+    get:
+      operationId: GetGallery
+      security: []
+      summary: Get gallery detail by slug
+      parameters:
+        - name: galleryId
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '200':
+          description: Gallery detail
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Gallery' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /galleries/{galleryId}/suspend:
+    post:
+      operationId: SuspendGallery
+      summary: Suspend a gallery (admin only)
+      parameters:
+        - name: galleryId
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '200':
+          description: Suspended gallery
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Gallery' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /galleries/{galleryId}/unsuspend:
+    post:
+      operationId: UnsuspendGallery
+      summary: Unsuspend a gallery (admin only)
+      parameters:
+        - name: galleryId
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '200':
+          description: Unsuspended gallery
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Gallery' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /galleries/{galleryId}/managers:
+    post:
+      operationId: AddGalleryManager
+      summary: Add a manager to the gallery
+      parameters:
+        - name: galleryId
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [user_id, manager_role]
+              properties:
+                user_id: { type: integer, format: int64 }
+                manager_role: { type: string, enum: [sub_owner, manager] }
+      responses:
+        '200':
+          description: Created gallery manager
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GalleryManager' }
+        '409':
+          description: Already a manager
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+    get:
+      operationId: ListGalleryManagers
+      security: []
+      summary: List gallery management team
+      parameters:
+        - name: galleryId
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '200':
+          description: Gallery managers list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, total]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/GalleryManager' }
+                  total: { type: integer, format: int64 }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /galleries/{galleryId}/managers/{userId}:
+    delete:
+      operationId: RemoveGalleryManager
+      summary: Remove a manager from the gallery
+      parameters:
+        - name: galleryId
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+        - name: userId
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /galleries/{galleryId}/posts:
+    post:
+      operationId: CreatePost
+      summary: Create a new post in a gallery
+      parameters:
+        - name: galleryId
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, body, is_anonymous]
+              properties:
+                title: { type: string }
+                body: { type: string }
+                is_anonymous: { type: boolean }
+      responses:
+        '200':
+          description: Created post
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Post' }
+        '403':
+          description: Forbidden or banned
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: Gallery not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+    get:
+      operationId: ListPosts
+      security: []
+      summary: List posts in a gallery
+      parameters:
+        - name: galleryId
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '200':
+          description: Posts list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, total]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Post' }
+                  total: { type: integer, format: int64 }
+        '404':
+          description: Gallery not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /posts/{id}:
+    get:
+      operationId: GetPost
+      security: []
+      summary: Get post detail
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '200':
+          description: Post detail
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Post' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+    delete:
+      operationId: DeletePost
+      summary: Delete own post (author only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '200':
+          description: Deleted post
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Post' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /posts/{id}/hide:
+    post:
+      operationId: HidePost
+      summary: Hide a post (gallery owner or admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '200':
+          description: Hidden post
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Post' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /posts/{id}/unhide:
+    post:
+      operationId: UnhidePost
+      summary: Unhide a post (gallery owner or admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '200':
+          description: Unhidden post
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Post' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /posts/{id}/comments:
+    post:
+      operationId: CreateComment
+      summary: Add a comment to a post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [body, is_anonymous]
+              properties:
+                body: { type: string }
+                is_anonymous: { type: boolean }
+      responses:
+        '200':
+          description: Created comment
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Comment' }
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+    get:
+      operationId: ListComments
+      security: []
+      summary: List comments on a post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '200':
+          description: Comments list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, total]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Comment' }
+                  total: { type: integer, format: int64 }
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /comments/{id}:
+    delete:
+      operationId: DeleteComment
+      summary: Delete own comment (author only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '200':
+          description: Deleted comment
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Comment' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /comments/{id}/hide:
+    post:
+      operationId: HideComment
+      summary: Hide a comment (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '200':
+          description: Hidden comment
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Comment' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /posts/{id}/vote:
+    post:
+      operationId: VotePost
+      summary: Upvote or downvote a post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [vote_type]
+              properties:
+                vote_type: { type: string, enum: [up, down] }
+      responses:
+        '200':
+          description: Vote recorded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Vote' }
+        '409':
+          description: Already voted
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /posts/{id}/report:
+    post:
+      operationId: CreateReport
+      summary: Report a post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Report created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Report' }
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /comments/{id}/report:
+    post:
+      operationId: CreateCommentReport
+      summary: Report a comment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Report created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Report' }
+        '404':
+          description: Comment not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /galleries/{galleryId}/reports:
+    get:
+      operationId: ListReports
+      summary: List reports for a gallery
+      parameters:
+        - name: galleryId
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '200':
+          description: Reports list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, total]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Report' }
+                  total: { type: integer, format: int64 }
+        '404':
+          description: Gallery not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /reports/{id}/resolve:
+    post:
+      operationId: ResolveReport
+      summary: Resolve a report
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '200':
+          description: Resolved report
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Report' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /reports/{id}/dismiss:
+    post:
+      operationId: DismissReport
+      summary: Dismiss a report
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '200':
+          description: Dismissed report
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Report' }
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /galleries/{galleryId}/bans:
+    post:
+      operationId: BanUser
+      summary: Ban a user from a gallery
+      parameters:
+        - name: galleryId
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [user_id, reason]
+              properties:
+                user_id: { type: integer, format: int64 }
+                reason: { type: string }
+      responses:
+        '200':
+          description: Ban created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Ban' }
+        '409':
+          description: Already banned
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: Gallery not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+    get:
+      operationId: ListBans
+      summary: List active bans in a gallery
+      parameters:
+        - name: galleryId
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '200':
+          description: Bans list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, total]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Ban' }
+                  total: { type: integer, format: int64 }
+        '404':
+          description: Gallery not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /galleries/{galleryId}/bans/{banId}:
+    delete:
+      operationId: UnbanUser
+      summary: Unban a user from a gallery
+      parameters:
+        - name: galleryId
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+        - name: banId
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /posts/concept:
+    get:
+      operationId: ListConceptPosts
+      security: []
+      summary: List concept posts across all galleries
+      responses:
+        '200':
+          description: Concept posts list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, total]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Post' }
+                  total: { type: integer, format: int64 }
+
+  /posts/realtime:
+    get:
+      operationId: ListRealtimePosts
+      security: []
+      summary: List realtime posts across all galleries
+      responses:
+        '200':
+          description: Realtime posts list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, total]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Post' }
+                  total: { type: integer, format: int64 }

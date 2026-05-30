@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { AuthzService } from '../authz/authz.service';
+import { PrismaService } from '../../prisma/prisma.service';
+import { AuthzService } from '../../authz/authz.service';
 
 @Injectable()
 export class ListWorkflowsService {
@@ -9,7 +9,7 @@ export class ListWorkflowsService {
     private readonly authz: AuthzService,
   ) {}
 
-  async listWorkflows(user?: any): Promise<any> {
+  async listWorkflows(params: any, body: any, user?: any): Promise<any> {
     await this.authz.check({
       action: 'ListWorkflows',
       resource: 'workflow',

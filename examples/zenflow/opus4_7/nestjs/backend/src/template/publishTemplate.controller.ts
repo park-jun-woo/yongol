@@ -1,6 +1,7 @@
 import {
   Controller,
   Post,
+  Param,
   Body,
   Req,
 } from '@nestjs/common';
@@ -13,8 +14,9 @@ export class PublishTemplateController {
   @Post('')
   async publishTemplate(
     @Req() req: any,
+    @Param() params: any,
     @Body() body: any,
   ) {
-    return this.service.publishTemplate(body, req.user);
+    return this.service.publishTemplate(params, body, req.user);
   }
 }

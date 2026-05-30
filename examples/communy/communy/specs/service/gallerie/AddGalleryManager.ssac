@@ -1,0 +1,11 @@
+package service
+
+// @state-neutral
+// @auth "AddGalleryManager" "gallery" {ResourceID: request.galleryId} "Forbidden"
+// @get Gallery gallery = Gallery.FindByID({ID: request.galleryId})
+// @empty gallery "Gallery not found"
+// @get GalleryManager existing = GalleryManager.FindByGalleryAndUser({GalleryID: gallery.ID, UserID: request.user_id})
+// @exists existing "Already a manager" 409
+// @post GalleryManager mgr = GalleryManager.Create({GalleryID: gallery.ID, UserID: request.user_id, ManagerRole: request.manager_role})
+// @response { id: mgr.ID, gallery_id: mgr.GalleryID, user_id: mgr.UserID, manager_role: mgr.ManagerRole }
+func AddGalleryManager() {}

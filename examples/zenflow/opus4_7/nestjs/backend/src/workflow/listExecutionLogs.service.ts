@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { AuthzService } from '../authz/authz.service';
+import { PrismaService } from '../../prisma/prisma.service';
+import { AuthzService } from '../../authz/authz.service';
 
 @Injectable()
 export class ListExecutionLogsService {
@@ -9,16 +9,11 @@ export class ListExecutionLogsService {
     private readonly authz: AuthzService,
   ) {}
 
-  async listExecutionLogs(params: any, user?: any): Promise<any> {
-    const owner = await this.prisma.workflow.findUnique({
-      where: { id: params.id },
-      select: { org_id: true },
-    });
+  async listExecutionLogs(params: any, body: any, user?: any): Promise<any> {
     await this.authz.check({
       action: 'ListExecutionLogs',
       resource: 'workflow',
-      resourceId: String(params.id),
-      owners: { workflow: { org_id: owner?.org_id } },
+      ResourceID: params.id,
     });
     const wf = await this.prisma.workflow.findUnique({ where: { id: params.id } });
     if (!wf) {

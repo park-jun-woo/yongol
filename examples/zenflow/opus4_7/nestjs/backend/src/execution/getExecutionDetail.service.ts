@@ -1,7 +1,7 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { AuthzService } from '../authz/authz.service';
-import { DashboardService } from '../dashboard/dashboard.service';
+import { PrismaService } from '../../prisma/prisma.service';
+import { AuthzService } from '../../authz/authz.service';
+import { DashboardService } from '../../dashboard/dashboard.service';
 
 @Injectable()
 export class GetExecutionDetailService {
@@ -11,16 +11,11 @@ export class GetExecutionDetailService {
     private readonly dashboardService: DashboardService,
   ) {}
 
-  async getExecutionDetail(params: any, user?: any): Promise<any> {
-    const owner = await this.prisma.execution_log.findUnique({
-      where: { id: params.id },
-      select: { org_id: true },
-    });
+  async getExecutionDetail(params: any, body: any, user?: any): Promise<any> {
     await this.authz.check({
       action: 'GetExecutionDetail',
       resource: 'execution_log',
-      resourceId: String(params.id),
-      owners: { execution_log: { org_id: owner?.org_id } },
+      ResourceID: params.id,
     });
     const log = await this.prisma.executionLog.findUnique({ where: { id: params.id } });
     if (!log) {

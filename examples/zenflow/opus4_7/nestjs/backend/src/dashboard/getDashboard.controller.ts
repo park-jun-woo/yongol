@@ -1,6 +1,8 @@
 import {
   Controller,
   Get,
+  Param,
+  Body,
   Req,
 } from '@nestjs/common';
 import { GetDashboardService } from './getDashboard.service';
@@ -12,7 +14,9 @@ export class GetDashboardController {
   @Get('')
   async getDashboard(
     @Req() req: any,
+    @Param() params: any,
+    @Body() body: any,
   ) {
-    return this.service.getDashboard(req.user);
+    return this.service.getDashboard(params, body, req.user);
   }
 }

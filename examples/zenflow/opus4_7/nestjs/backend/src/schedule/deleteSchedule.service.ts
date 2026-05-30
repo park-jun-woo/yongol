@@ -1,8 +1,8 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { AuthzService } from '../authz/authz.service';
-import { ScheduleService } from '../schedule/schedule.service';
-import { SessionService } from '../session/session.service';
+import { PrismaService } from '../../prisma/prisma.service';
+import { AuthzService } from '../../authz/authz.service';
+import { ScheduleService } from '../../schedule/schedule.service';
+import { SessionService } from '../../session/session.service';
 
 @Injectable()
 export class DeleteScheduleService {
@@ -13,16 +13,11 @@ export class DeleteScheduleService {
     private readonly sessionService: SessionService,
   ) {}
 
-  async deleteSchedule(params: any, user?: any): Promise<any> {
-    const owner = await this.prisma.workflow.findUnique({
-      where: { id: params.id },
-      select: { org_id: true },
-    });
+  async deleteSchedule(params: any, body: any, user?: any): Promise<any> {
     await this.authz.check({
       action: 'DeleteSchedule',
       resource: 'workflow',
-      resourceId: String(params.id),
-      owners: { workflow: { org_id: owner?.org_id } },
+      ResourceID: params.id,
     });
     const wf = await this.prisma.workflow.findUnique({ where: { id: params.id } });
     if (!wf) {

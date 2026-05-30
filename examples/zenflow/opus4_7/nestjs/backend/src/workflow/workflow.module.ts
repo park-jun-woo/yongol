@@ -1,10 +1,6 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from '../prisma/prisma.module';
-import { QueueModule } from '../queue/queue.module';
-import { AuthzModule } from '../authz/authz.module';
-import { ReportModule } from '../report/report.module';
-import { VersionModule } from '../version/version.module';
-import { WorkerModule } from '../worker/worker.module';
+import { PrismaModule } from '../../prisma/prisma.module';
+import { QueueModule } from '../../queue/queue.module';
 import { ActivateWorkflowController } from './activateWorkflow.controller';
 import { ActivateWorkflowService } from './activateWorkflow.service';
 import { AddActionController } from './addAction.controller';
@@ -38,10 +34,6 @@ import { SaveWorkflowActionsService } from './saveWorkflowActions.service';
   imports: [
     PrismaModule,
     QueueModule,
-    AuthzModule,
-    ReportModule,
-    VersionModule,
-    WorkerModule,
   ],
   controllers: [
     ActivateWorkflowController,
@@ -60,22 +52,6 @@ import { SaveWorkflowActionsService } from './saveWorkflowActions.service';
     SaveWorkflowActionsController,
   ],
   providers: [
-    ActivateWorkflowService,
-    AddActionService,
-    ArchiveWorkflowService,
-    AutoAssignWorkflowService,
-    CreateWorkflowService,
-    CreateWorkflowVersionService,
-    ExecuteWithReportService,
-    ExecuteWorkflowService,
-    GetWorkflowService,
-    ListExecutionLogsService,
-    ListWorkflowVersionsService,
-    ListWorkflowsService,
-    PauseWorkflowService,
-    SaveWorkflowActionsService,
-  ],
-  exports: [
     ActivateWorkflowService,
     AddActionService,
     ArchiveWorkflowService,

@@ -1,0 +1,6 @@
+package service
+
+// @get Gallery gallery = Gallery.FindByID({ID: request.galleryId})
+// @empty gallery "Gallery not found"
+// @response { id: gallery.ID, slug: gallery.Slug, name: gallery.Name, description: gallery.Description, category: gallery.Category, status: gallery.Status, owner_id: gallery.OwnerID, post_count: gallery.PostCount }
+func GetGallery() {}

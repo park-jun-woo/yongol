@@ -1,32 +1,20 @@
 from fastapi import HTTPException
-from sqlalchemy import select, update
+from sqlalchemy import select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.models import Organization
-from app.dependencies.authz import authz_check
-from app.services.geocoding import geocode
 
-async def verify_org_address(session: AsyncSession, id: int, body: VerifyOrgAddressRequest, current_user: dict | None = None):
+async def verify_org_address(session: AsyncSession, params: dict, body: dict, user: dict | None = None):
     async with session.begin():
-        owner_row = await session.execute(
-            select(Organizations.id).where(Organizations.id == id)
-        )
-        owner = owner_row.scalar_one_or_none()
-        await authz_check(
-            current_user,
-            action="VerifyOrgAddress",
-            resource="organization",
-            resource_id=str(id),
-            owners={"organizations": {"id": owner}},
-        )
-        result = await session.execute(select(Organization).where(Organization.id == id))
+        # @auth organization.VerifyOrgAddress
+        # TODO: integrate OPA policy evaluation
+        result = await session.execute(select(Organization).where(Organization.ID == request["id"]))
         org = result.scalars().first()
         if not org:
             raise HTTPException(status_code=404, detail="Organization not found")
-        geo = await geocode(body.address)
+        geo = await geocoding.geocode(request["address"])
         await session.execute(
-            update(Organization).where(Organization.id == org.id).values(address_verified=geo.address_verified, latitude=geo.latitude, longitude=geo.longitude)
+            update(Organization).where(Organization.id == params["id"]).values(**body)
         )
-        result = await session.execute(select(Organization).where(Organization.id == org.id))
+        result = await session.execute(select(Organization).where(Organization.ID == org["ID"]))
         updated_org = result.scalars().first()
         if not updated_org:
             raise HTTPException(status_code=404, detail="Organization not found")

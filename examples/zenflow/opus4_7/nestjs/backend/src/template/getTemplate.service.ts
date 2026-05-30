@@ -1,5 +1,5 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class GetTemplateService {
@@ -7,7 +7,7 @@ export class GetTemplateService {
     private readonly prisma: PrismaService,
   ) {}
 
-  async getTemplate(params: any, user?: any): Promise<any> {
+  async getTemplate(params: any, body: any, user?: any): Promise<any> {
     const template = await this.prisma.template.findUnique({ where: { id: params.id } });
     if (!template) {
       throw new HttpException('Template not found', HttpStatus.NOT_FOUND);

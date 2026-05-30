@@ -1,6 +1,7 @@
 import {
   Controller,
   Post,
+  Param,
   Body,
   Req,
 } from '@nestjs/common';
@@ -13,8 +14,9 @@ export class LoginController {
   @Post('login')
   async login(
     @Req() req: any,
+    @Param() params: any,
     @Body() body: any,
   ) {
-    return this.service.login(body, req.user);
+    return this.service.login(params, body, req.user);
   }
 }

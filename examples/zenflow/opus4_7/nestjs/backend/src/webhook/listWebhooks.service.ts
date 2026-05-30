@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { AuthzService } from '../authz/authz.service';
+import { PrismaService } from '../../prisma/prisma.service';
+import { AuthzService } from '../../authz/authz.service';
 
 @Injectable()
 export class ListWebhooksService {
@@ -9,7 +9,7 @@ export class ListWebhooksService {
     private readonly authz: AuthzService,
   ) {}
 
-  async listWebhooks(user?: any): Promise<any> {
+  async listWebhooks(params: any, body: any, user?: any): Promise<any> {
     await this.authz.check({
       action: 'ListWebhooks',
       resource: 'webhook',

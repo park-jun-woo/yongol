@@ -1,0 +1,10 @@
+package service
+
+// @auth "DismissReport" "report" {ResourceID: request.id} "Forbidden"
+// @get Report report = Report.FindByID({ID: request.id})
+// @empty report "Report not found"
+// @state reports {status: report.Status} "DismissReport" "Invalid state transition"
+// @put Report.UpdateStatus({ID: report.ID, Status: "dismissed"})
+// @get Report updated = Report.FindByID({ID: report.ID})
+// @response { id: updated.ID, gallery_id: updated.GalleryID, target_type: updated.TargetType, target_id: updated.TargetID, reporter_id: updated.ReporterID, reason: updated.Reason, status: updated.Status }
+func DismissReport() {}

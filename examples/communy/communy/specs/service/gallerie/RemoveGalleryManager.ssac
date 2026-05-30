@@ -1,0 +1,10 @@
+package service
+
+// @state-neutral
+// @auth "RemoveGalleryManager" "gallery" {ResourceID: request.galleryId} "Forbidden"
+// @get Gallery gallery = Gallery.FindByID({ID: request.galleryId})
+// @empty gallery "Gallery not found"
+// @get GalleryManager mgr = GalleryManager.FindByGalleryAndUser({GalleryID: gallery.ID, UserID: request.userId})
+// @empty mgr "Manager not found"
+// @delete! GalleryManager.Delete({GalleryID: gallery.ID, UserID: request.userId})
+func RemoveGalleryManager() {}

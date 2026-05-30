@@ -1,0 +1,11 @@
+package service
+
+// @state-neutral
+// @auth "CreateCommentReport" "comment" {ResourceID: request.id} "Forbidden"
+// @get Comment comment = Comment.FindByID({ID: request.id})
+// @empty comment "Comment not found"
+// @get Post post = Post.FindByID({ID: comment.PostID})
+// @empty post "Post not found"
+// @post Report report = Report.Create({GalleryID: post.GalleryID, TargetType: "comment", TargetID: comment.ID, ReporterID: currentUser.ID, Reason: request.reason})
+// @response { id: report.ID, gallery_id: report.GalleryID, target_type: report.TargetType, target_id: report.TargetID, reporter_id: report.ReporterID, reason: report.Reason, status: report.Status }
+func CreateCommentReport() {}

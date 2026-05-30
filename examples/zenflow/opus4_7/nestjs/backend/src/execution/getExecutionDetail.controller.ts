@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Param,
+  Body,
   Req,
 } from '@nestjs/common';
 import { GetExecutionDetailService } from './getExecutionDetail.service';
@@ -14,7 +15,8 @@ export class GetExecutionDetailController {
   async getExecutionDetail(
     @Req() req: any,
     @Param() params: any,
+    @Body() body: any,
   ) {
-    return this.service.getExecutionDetail(params, req.user);
+    return this.service.getExecutionDetail(params, body, req.user);
   }
 }

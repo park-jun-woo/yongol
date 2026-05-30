@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from '../prisma/prisma.module';
-import { AuthzModule } from '../authz/authz.module';
-import { WebhookdeliveryModule } from '../webhookdelivery/webhookdelivery.module';
+import { PrismaModule } from '../../prisma/prisma.module';
 import { CreateWebhookController } from './createWebhook.controller';
 import { CreateWebhookService } from './createWebhook.service';
 import { DeleteWebhookController } from './deleteWebhook.controller';
@@ -14,8 +12,6 @@ import { OnWorkflowExecutedService } from './onWorkflowExecuted.service';
 @Module({
   imports: [
     PrismaModule,
-    AuthzModule,
-    WebhookdeliveryModule,
   ],
   controllers: [
     CreateWebhookController,
@@ -24,12 +20,6 @@ import { OnWorkflowExecutedService } from './onWorkflowExecuted.service';
     OnWorkflowExecutedController,
   ],
   providers: [
-    CreateWebhookService,
-    DeleteWebhookService,
-    ListWebhooksService,
-    OnWorkflowExecutedService,
-  ],
-  exports: [
     CreateWebhookService,
     DeleteWebhookService,
     ListWebhooksService,

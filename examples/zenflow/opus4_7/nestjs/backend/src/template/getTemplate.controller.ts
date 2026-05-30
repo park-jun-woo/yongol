@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Param,
+  Body,
   Req,
 } from '@nestjs/common';
 import { GetTemplateService } from './getTemplate.service';
@@ -14,7 +15,8 @@ export class GetTemplateController {
   async getTemplate(
     @Req() req: any,
     @Param() params: any,
+    @Body() body: any,
   ) {
-    return this.service.getTemplate(params, req.user);
+    return this.service.getTemplate(params, body, req.user);
   }
 }

@@ -1,0 +1,9 @@
+package service
+
+// @no-pagination
+// @get Gallery gallery = Gallery.FindByID({ID: request.galleryId})
+// @empty gallery "Gallery not found"
+// @get []GalleryManager managers = GalleryManager.ListByGallery({GalleryID: gallery.ID})
+// @get int64 total = GalleryManager.CountByGallery({GalleryID: gallery.ID})
+// @response { items: managers, total: total }
+func ListGalleryManagers() {}

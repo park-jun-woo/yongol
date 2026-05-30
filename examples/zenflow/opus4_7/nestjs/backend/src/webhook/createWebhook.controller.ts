@@ -1,6 +1,7 @@
 import {
   Controller,
   Post,
+  Param,
   Body,
   Req,
 } from '@nestjs/common';
@@ -13,8 +14,9 @@ export class CreateWebhookController {
   @Post('')
   async createWebhook(
     @Req() req: any,
+    @Param() params: any,
     @Body() body: any,
   ) {
-    return this.service.createWebhook(body, req.user);
+    return this.service.createWebhook(params, body, req.user);
   }
 }

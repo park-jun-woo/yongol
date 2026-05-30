@@ -1,22 +1,11 @@
 from fastapi import HTTPException
-from sqlalchemy import select
+from sqlalchemy import select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.models import AuditLog
-from app.dependencies.authz import authz_check
 
-async def get_audit_log(session: AsyncSession, id: int, current_user: dict | None = None):
-    owner_row = await session.execute(
-        select(AuditLogs.org_id).where(AuditLogs.id == id)
-    )
-    owner = owner_row.scalar_one_or_none()
-    await authz_check(
-        current_user,
-        action="GetAuditLog",
-        resource="audit_log",
-        resource_id=str(id),
-        owners={"audit_logs": {"org_id": owner}},
-    )
-    result = await session.execute(select(AuditLog).where(AuditLog.id == id))
+async def get_audit_log(session: AsyncSession, params: dict, body: dict, user: dict | None = None):
+    # @auth audit_log.GetAuditLog
+    # TODO: integrate OPA policy evaluation
+    result = await session.execute(select(AuditLog).where(AuditLog.ID == request["id"]))
     audit_log = result.scalars().first()
     if not audit_log:
         raise HTTPException(status_code=404, detail="Audit log not found")
@@ -25,28 +14,30 @@ async def get_audit_log(session: AsyncSession, id: int, current_user: dict | Non
     }
 
 
-async def get_recent_audit_logs(session: AsyncSession, current_user: dict | None = None):
-    await authz_check(
-        current_user,
-        action="GetRecentAuditLogs",
-        resource="audit_log",
-    )
-    result = await session.execute(select(AuditLog).where(AuditLog.filter_action == params, AuditLog.org_id == current_user["org_id"]).offset(0).limit(10))
+from fastapi import HTTPException
+from sqlalchemy import select, update, delete
+from sqlalchemy.ext.asyncio import AsyncSession
+
+async def get_recent_audit_logs(session: AsyncSession, params: dict, body: dict, user: dict | None = None):
+    # @auth audit_log.GetRecentAuditLogs
+    # TODO: integrate OPA policy evaluation
+    result = await session.execute(select(AuditLog).where(AuditLog.FilterAction == params, AuditLog.OrgID == currentUser["OrgID"], AuditLog.PageOffset == 0, AuditLog.PerPage == 10))
     items = result.scalars().all()
     return {
         "items": items,
     }
 
 
-async def list_audit_logs(session: AsyncSession, action: str | None = None, page: int | None = None, per_page: int | None = None, current_user: dict | None = None):
-    await authz_check(
-        current_user,
-        action="ListAuditLogs",
-        resource="audit_log",
-    )
-    result = await session.execute(select(AuditLog).where(AuditLog.filter_action == action, AuditLog.org_id == current_user["org_id"]).offset(page).limit(per_page))
+from fastapi import HTTPException
+from sqlalchemy import select, update, delete
+from sqlalchemy.ext.asyncio import AsyncSession
+
+async def list_audit_logs(session: AsyncSession, params: dict, body: dict, user: dict | None = None):
+    # @auth audit_log.ListAuditLogs
+    # TODO: integrate OPA policy evaluation
+    result = await session.execute(select(AuditLog).where(AuditLog.FilterAction == request["action"], AuditLog.OrgID == currentUser["OrgID"], AuditLog.PageOffset == request["page"], AuditLog.PerPage == request["per_page"]))
     items = result.scalars().all()
-    result = await session.execute(select(AuditLog).where(AuditLog.filter_action == action, AuditLog.org_id == current_user["org_id"]))
+    result = await session.execute(select(AuditLog).where(AuditLog.FilterAction == request["action"], AuditLog.OrgID == currentUser["OrgID"]))
     total = result.scalars().first()
     return {
         "items": items,

@@ -1,0 +1,7 @@
+package service
+
+// @auth "UnbanUser" "gallery" {ResourceID: request.galleryId} "Forbidden"
+// @get Ban ban = Ban.FindByID({ID: request.banId})
+// @empty ban "Ban not found"
+// @delete! Ban.Delete({ID: ban.ID})
+func UnbanUser() {}

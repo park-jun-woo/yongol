@@ -1,15 +1,16 @@
 from fastapi import HTTPException
+from sqlalchemy import select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
-async def login(session: AsyncSession, body: LoginRequest, current_user: dict | None = None):
+async def login(session: AsyncSession, params: dict, body: dict, user: dict | None = None):
     result = await session.execute(select(User).where(User.email == request.email))
-    user_result = result.scalars().first()
-    if not user_result:
+    user = result.scalars().first()
+    if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    # TODO: bcrypt.checkpw(request.password, user_result.password_hash)
-    token = await issue_token(user_result.email, user_result.id, user_result.org_id, user_result.role)
+    # TODO: bcrypt.checkpw(request.password, user.password_hash)
+    token = await auth.issue_token(user["Email"], user["ID"], user["OrgID"], user["Role"])
     return {
-        "access_token": token["access_token"],
+        "access_token": token.AccessToken,
     }
 
 

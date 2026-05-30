@@ -1,0 +1,8 @@
+package service
+
+// @no-pagination
+// @state-neutral
+// @get []Post posts = Post.ListConcept({})
+// @get int64 total = Post.CountConcept({})
+// @response { items: posts, total: total }
+func ListConceptPosts() {}

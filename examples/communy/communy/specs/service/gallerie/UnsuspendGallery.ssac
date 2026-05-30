@@ -1,0 +1,10 @@
+package service
+
+// @auth "UnsuspendGallery" "gallery" {ResourceID: request.galleryId} "Forbidden"
+// @get Gallery gallery = Gallery.FindByID({ID: request.galleryId})
+// @empty gallery "Gallery not found"
+// @state galleries {status: gallery.Status} "UnsuspendGallery" "Invalid state transition"
+// @put Gallery.UpdateStatus({ID: gallery.ID, Status: "active"})
+// @get Gallery updated = Gallery.FindByID({ID: gallery.ID})
+// @response { id: updated.ID, slug: updated.Slug, name: updated.Name, description: updated.Description, category: updated.Category, status: updated.Status, owner_id: updated.OwnerID, post_count: updated.PostCount }
+func UnsuspendGallery() {}

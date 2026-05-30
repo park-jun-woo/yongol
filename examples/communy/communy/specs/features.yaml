@@ -1,0 +1,206 @@
+features:
+  # Auth
+  - op: Register
+    path: POST /auth/register
+    desc: Register a new user account
+    table: users
+    public: true
+
+  - op: Login
+    path: POST /auth/login
+    desc: Authenticate user and issue JWT token
+    table: users
+    public: true
+
+  # Gallery
+  - op: CreateGallery
+    path: POST /galleries
+    desc: Create a new gallery board
+    table: galleries
+
+  - op: ListGalleries
+    path: GET /galleries
+    desc: List galleries with category filter
+    table: galleries
+    public: true
+
+  - op: GetGallery
+    path: GET /galleries/{galleryId}
+    desc: Get gallery detail by slug
+    table: galleries
+    public: true
+
+  - op: SuspendGallery
+    path: POST /galleries/{galleryId}/suspend
+    desc: Suspend a gallery (admin only)
+    table: galleries
+
+  - op: UnsuspendGallery
+    path: POST /galleries/{galleryId}/unsuspend
+    desc: Unsuspend a gallery (admin only)
+    table: galleries
+
+  # Gallery Management
+  - op: AddGalleryManager
+    path: POST /galleries/{galleryId}/managers
+    desc: Add a manager to the gallery
+    table: gallery_managers
+
+  - op: RemoveGalleryManager
+    path: DELETE /galleries/{galleryId}/managers/{userId}
+    desc: Remove a manager from the gallery
+    table: gallery_managers
+
+  - op: ListGalleryManagers
+    path: GET /galleries/{galleryId}/managers
+    desc: List gallery management team
+    table: gallery_managers
+    public: true
+
+  # Post
+  - op: CreatePost
+    path: POST /galleries/{galleryId}/posts
+    desc: Create a new post in a gallery
+    table: posts
+
+  - op: ListPosts
+    path: GET /galleries/{galleryId}/posts
+    desc: List posts in a gallery
+    table: posts
+    public: true
+
+  - op: GetPost
+    path: GET /posts/{id}
+    desc: Get post detail
+    table: posts
+    public: true
+
+  - op: DeletePost
+    path: DELETE /posts/{id}
+    desc: Delete own post (author only)
+    table: posts
+
+  - op: HidePost
+    path: POST /posts/{id}/hide
+    desc: Hide a post (gallery owner or admin)
+    table: posts
+
+  - op: UnhidePost
+    path: POST /posts/{id}/unhide
+    desc: Unhide a post (gallery owner or admin)
+    table: posts
+
+  # Comment
+  - op: CreateComment
+    path: POST /posts/{id}/comments
+    desc: Add a comment to a post
+    table: comments
+
+  - op: ListComments
+    path: GET /posts/{id}/comments
+    desc: List comments on a post
+    table: comments
+    public: true
+
+  - op: DeleteComment
+    path: DELETE /comments/{id}
+    desc: Delete own comment (author only)
+    table: comments
+
+  - op: HideComment
+    path: POST /comments/{id}/hide
+    desc: Hide a comment (admin only)
+    table: comments
+
+  # Vote
+  - op: VotePost
+    path: POST /posts/{id}/vote
+    desc: Upvote or downvote a post
+    table: votes
+
+  # Report
+  - op: CreateReport
+    path: POST /posts/{id}/report
+    desc: Report a post
+    table: reports
+
+  - op: CreateCommentReport
+    path: POST /comments/{id}/report
+    desc: Report a comment
+    table: reports
+
+  - op: ListReports
+    path: GET /galleries/{galleryId}/reports
+    desc: List reports for a gallery
+    table: reports
+
+  - op: ResolveReport
+    path: POST /reports/{id}/resolve
+    desc: Resolve a report
+    table: reports
+
+  - op: DismissReport
+    path: POST /reports/{id}/dismiss
+    desc: Dismiss a report
+    table: reports
+
+  # Ban
+  - op: BanUser
+    path: POST /galleries/{galleryId}/bans
+    desc: Ban a user from a gallery
+    table: bans
+
+  - op: UnbanUser
+    path: DELETE /galleries/{galleryId}/bans/{banId}
+    desc: Unban a user from a gallery
+    table: bans
+
+  - op: ListBans
+    path: GET /galleries/{galleryId}/bans
+    desc: List active bans in a gallery
+    table: bans
+
+  # Feed
+  - op: ListConceptPosts
+    path: GET /posts/concept
+    desc: List concept posts across all galleries
+    table: posts
+    public: true
+
+  - op: ListRealtimePosts
+    path: GET /posts/realtime
+    desc: List realtime posts across all galleries
+    table: posts
+    public: true
+
+tables:
+  users: {}
+
+  galleries:
+    states:
+      - active
+      - suspended
+
+  gallery_managers: {}
+
+  posts:
+    states:
+      - published
+      - hidden
+      - deleted
+
+  comments:
+    states:
+      - published
+      - hidden
+      - deleted
+
+  votes: {}
+
+  reports:
+    states:
+      - pending
+      - resolved
+      - dismissed
+
+  bans: {}

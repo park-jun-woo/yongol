@@ -1,0 +1,11 @@
+package service
+
+// @state-neutral
+// @auth "BanUser" "gallery" {ResourceID: request.galleryId} "Forbidden"
+// @get Gallery gallery = Gallery.FindByID({ID: request.galleryId})
+// @empty gallery "Gallery not found"
+// @get Ban existing = Ban.FindByGalleryAndUser({GalleryID: gallery.ID, UserID: request.user_id})
+// @exists existing "Already banned" 409
+// @post Ban ban = Ban.Create({GalleryID: gallery.ID, UserID: request.user_id, Reason: request.reason})
+// @response { id: ban.ID, gallery_id: ban.GalleryID, user_id: ban.UserID, reason: ban.Reason, expires_at: ban.ExpiresAt }
+func BanUser() {}

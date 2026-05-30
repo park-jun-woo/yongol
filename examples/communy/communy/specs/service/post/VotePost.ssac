@@ -1,0 +1,11 @@
+package service
+
+// @state-neutral
+// @auth "VotePost" "post" {ResourceID: request.id} "Forbidden"
+// @get Post post = Post.FindByID({ID: request.id})
+// @empty post "Post not found"
+// @get Vote existing = Vote.FindByPostAndUser({PostID: post.ID, UserID: currentUser.ID})
+// @exists existing "Already voted" 409
+// @post Vote vote = Vote.Create({PostID: post.ID, UserID: currentUser.ID, VoteType: request.vote_type})
+// @response { id: vote.ID, post_id: vote.PostID, user_id: vote.UserID, vote_type: vote.VoteType }
+func VotePost() {}

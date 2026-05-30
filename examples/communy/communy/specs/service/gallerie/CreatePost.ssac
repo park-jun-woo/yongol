@@ -1,0 +1,9 @@
+package service
+
+// @auth "CreatePost" "post" {} "Forbidden"
+// @get Gallery gallery = Gallery.FindByID({ID: request.galleryId})
+// @empty gallery "Gallery not found"
+// @post Post post = Post.Create({GalleryID: gallery.ID, UserID: currentUser.ID, Title: request.title, Body: request.body, IsAnonymous: request.is_anonymous})
+// @put Gallery.IncrementPostCount({ID: gallery.ID})
+// @response { id: post.ID, gallery_id: post.GalleryID, user_id: post.UserID, title: post.Title, body: post.Body, status: post.Status, is_anonymous: post.IsAnonymous, is_concept: post.IsConcept, upvotes: post.Upvotes, downvotes: post.Downvotes, comment_count: post.CommentCount, view_count: post.ViewCount }
+func CreatePost() {}

@@ -1,46 +1,39 @@
 from fastapi import HTTPException
-from sqlalchemy import select, update
+from sqlalchemy import select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.models import Action, Template, Workflow
-from app.dependencies.authz import authz_check
 
-async def clone_template(session: AsyncSession, id: int, current_user: dict | None = None):
+async def clone_template(session: AsyncSession, params: dict, body: dict, user: dict | None = None):
     async with session.begin():
-        owner_row = await session.execute(
-            select(Templates.org_id).where(Templates.id == id)
-        )
-        owner = owner_row.scalar_one_or_none()
-        await authz_check(
-            current_user,
-            action="CloneTemplate",
-            resource="template",
-            resource_id=str(id),
-            owners={"templates": {"org_id": owner}},
-        )
-        result = await session.execute(select(Template).where(Template.id == id))
+        # @auth template.CloneTemplate
+        # TODO: integrate OPA policy evaluation
+        result = await session.execute(select(Template).where(Template.ID == request["id"]))
         tmpl = result.scalars().first()
         if not tmpl:
             raise HTTPException(status_code=404, detail="Template not found")
-        result = await session.execute(select(Workflow).where(Workflow.id == tmpl.id))
+        result = await session.execute(select(Workflow).where(Workflow.ID == tmpl["SourceWorkflowID"]))
         sourceWf = result.scalars().first()
         if not sourceWf:
             raise HTTPException(status_code=404, detail="Source workflow not found")
-        newWf = Workflow(org_id=current_user["org_id"], title=sourceWf.title, trigger_event=sourceWf.trigger_event)
+        newWf = Workflow(OrgID=currentUser["OrgID"], Title=sourceWf["Title"], TriggerEvent=sourceWf["TriggerEvent"])
         session.add(newWf)
         await session.flush()
         await session.execute(
-            update(Action).values(new_workflow_id=newWf.id, source_workflow_id=sourceWf.id)
+            update(Action).where(Action.id == params["id"]).values(**body)
         )
         await session.execute(
-            update(Template).where(Template.id == tmpl.id).values(**body)
+            update(Template).where(Template.id == params["id"]).values(**body)
         )
         return {
             "workflow": newWf,
         }
 
 
-async def get_template(session: AsyncSession, id: int, current_user: dict | None = None):
-    result = await session.execute(select(Template).where(Template.id == id))
+from fastapi import HTTPException
+from sqlalchemy import select, update, delete
+from sqlalchemy.ext.asyncio import AsyncSession
+
+async def get_template(session: AsyncSession, params: dict, body: dict, user: dict | None = None):
+    result = await session.execute(select(Template).where(Template.ID == request["id"]))
     template = result.scalars().first()
     if not template:
         raise HTTPException(status_code=404, detail="Template not found")
@@ -49,26 +42,31 @@ async def get_template(session: AsyncSession, id: int, current_user: dict | None
     }
 
 
-async def list_templates(session: AsyncSession, category: str | None = None, cursor: str | None = None, per_page: int | None = None, current_user: dict | None = None):
-    result = await session.execute(select(Template).where(Template.category == category).limit(per_page))
+from fastapi import HTTPException
+from sqlalchemy import select, update, delete
+from sqlalchemy.ext.asyncio import AsyncSession
+
+async def list_templates(session: AsyncSession, params: dict, body: dict, user: dict | None = None):
+    result = await session.execute(select(Template).where(Template.Category == request["category"], Template.Cursor == request["cursor"], Template.PerPage == request["per_page"]))
     items = result.scalars().all()
     return {
         "items": items,
     }
 
 
-async def publish_template(session: AsyncSession, body: PublishTemplateRequest, current_user: dict | None = None):
+from fastapi import HTTPException
+from sqlalchemy import select, update, delete
+from sqlalchemy.ext.asyncio import AsyncSession
+
+async def publish_template(session: AsyncSession, params: dict, body: dict, user: dict | None = None):
     async with session.begin():
-        await authz_check(
-            current_user,
-            action="PublishTemplate",
-            resource="template",
-        )
-        result = await session.execute(select(Template).where(Template.source_workflow_id == body.source_workflow_id))
+        # @auth template.PublishTemplate
+        # TODO: integrate OPA policy evaluation
+        result = await session.execute(select(Template).where(Template.SourceWorkflowID == request["source_workflow_id"]))
         existing = result.scalars().first()
         if existing:
             raise HTTPException(status_code=409, detail="Already published")
-        template = Template(category=body.category, description=body.description, org_id=current_user["org_id"], source_workflow_id=body.source_workflow_id, title=body.title)
+        template = Template(Category=request["category"], Description=request["description"], OrgID=currentUser["OrgID"], SourceWorkflowID=request["source_workflow_id"], Title=request["title"])
         session.add(template)
         await session.flush()
         return {

@@ -15,8 +15,20 @@ model FullendSession {
   @@map("fullend_sessions")
 }
 
+model Organization {
+  id                   Int @id
+  name                 String
+  plan_type            String @default("free")
+  credits_balance      Int
+  latitude             String
+  longitude            String
+  address_verified     Boolean
+  created_at           DateTime
+  @@map("organizations")
+}
+
 model Template {
-  id                   Int @id @default(autoincrement())
+  id                   Int @id
   source_workflow_id   Int @unique
   org_id               Int
   title                String
@@ -30,41 +42,8 @@ model Template {
   @@map("templates")
 }
 
-model User {
-  id                   Int @id @default(autoincrement())
-  org_id               Int
-  email                String @unique
-  password_hash        String
-  role                 String
-  claims               Json @default("{}")
-  created_at           DateTime
-  org                  Organization @relation(fields: [org_id], references: [id])
-  audit_logs           AuditLog[]
-  @@map("users")
-}
-
-model Workflow {
-  id                   Int @id @default(autoincrement())
-  org_id               Int
-  title                String
-  trigger_event        String
-  status               String @default("draft")
-  version              Int
-  root_workflow_id     Int
-  assigned_to          Int
-  assignment_confidence String @default("none")
-  created_at           DateTime
-  org                  Organization @relation(fields: [org_id], references: [id])
-  templates            Template[]
-  actions              Action[]
-  execution_logs       ExecutionLog[]
-  @@index([org_id])
-  @@index([status])
-  @@map("workflows")
-}
-
 model Action {
-  id                   Int @id @default(autoincrement())
+  id                   Int @id
   workflow_id          Int
   action_type          String
   config               String
@@ -84,26 +63,39 @@ model RefreshToken {
   @@map("refresh_tokens")
 }
 
-model Organization {
-  id                   Int @id @default(autoincrement())
-  name                 String
-  plan_type            String @default("free")
-  credits_balance      Int
-  latitude             String
-  longitude            String
-  address_verified     Boolean
+model FullendCache {
+  key                  String @id
+  value                Bytes
+  expires_at           DateTime
+  @@index([expires_at])
+}
+
+model FullendQueue {
+  id                   Int @id
+  topic                String
+  payload              Json
+  priority             String @default("normal")
+  status               String @default("pending")
   created_at           DateTime
-  templates            Template[]
-  users                User[]
-  workflows            Workflow[]
-  webhooks             Webhook[]
-  audit_logs           AuditLog[]
-  execution_logs       ExecutionLog[]
-  @@map("organizations")
+  deliver_at           DateTime
+  processed_at         DateTime?
+  traceparent          String
+}
+
+model User {
+  id                   Int @id
+  org_id               Int
+  email                String @unique
+  password_hash        String
+  role                 String
+  claims               Json @default("{}")
+  created_at           DateTime
+  org                  Organization @relation(fields: [org_id], references: [id])
+  @@map("users")
 }
 
 model Webhook {
-  id                   Int @id @default(autoincrement())
+  id                   Int @id
   org_id               Int
   url                  String
   event_type           String
@@ -113,8 +105,25 @@ model Webhook {
   @@map("webhooks")
 }
 
+model Workflow {
+  id                   Int @id
+  org_id               Int
+  title                String
+  trigger_event        String
+  status               String @default("draft")
+  version              Int
+  root_workflow_id     Int
+  assigned_to          Int
+  assignment_confidence String @default("none")
+  created_at           DateTime
+  org                  Organization @relation(fields: [org_id], references: [id])
+  @@index([org_id])
+  @@index([status])
+  @@map("workflows")
+}
+
 model AuditLog {
-  id                   Int @id @default(autoincrement())
+  id                   Int @id
   org_id               Int
   actor_id             Int
   action               String
@@ -131,7 +140,7 @@ model AuditLog {
 }
 
 model ExecutionLog {
-  id                   Int @id @default(autoincrement())
+  id                   Int @id
   workflow_id          Int
   org_id               Int
   status               String
@@ -143,25 +152,4 @@ model ExecutionLog {
   @@index([workflow_id])
   @@index([org_id])
   @@map("execution_logs")
-}
-
-model FullendCache {
-  key                  String @id
-  value                Bytes
-  expires_at           DateTime
-  @@index([expires_at])
-  @@map("fullend_cache")
-}
-
-model FullendQueue {
-  id                   Int @id @default(autoincrement())
-  topic                String
-  payload              Json
-  priority             String @default("normal")
-  status               String @default("pending")
-  created_at           DateTime
-  deliver_at           DateTime
-  processed_at         DateTime?
-  traceparent          String
-  @@map("fullend_queue")
 }

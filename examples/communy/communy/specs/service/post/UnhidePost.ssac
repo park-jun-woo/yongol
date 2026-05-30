@@ -1,0 +1,10 @@
+package service
+
+// @auth "UnhidePost" "post" {ResourceID: request.id} "Forbidden"
+// @get Post post = Post.FindByID({ID: request.id})
+// @empty post "Post not found"
+// @state posts {status: post.Status} "UnhidePost" "Invalid state transition"
+// @put Post.UpdateStatus({ID: post.ID, Status: "published"})
+// @get Post updated = Post.FindByID({ID: post.ID})
+// @response { id: updated.ID, gallery_id: updated.GalleryID, user_id: updated.UserID, title: updated.Title, body: updated.Body, status: updated.Status, is_anonymous: updated.IsAnonymous, is_concept: updated.IsConcept, upvotes: updated.Upvotes, downvotes: updated.Downvotes, comment_count: updated.CommentCount, view_count: updated.ViewCount }
+func UnhidePost() {}

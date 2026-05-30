@@ -1,0 +1,6 @@
+package service
+
+// @auth "CreateGallery" "gallery" {} "Forbidden"
+// @post Gallery gallery = Gallery.Create({Slug: request.slug, Name: request.name, Description: request.description, Category: request.category, OwnerID: currentUser.ID})
+// @response { id: gallery.ID, slug: gallery.Slug, name: gallery.Name, description: gallery.Description, category: gallery.Category, status: gallery.Status, owner_id: gallery.OwnerID, post_count: gallery.PostCount }
+func CreateGallery() {}

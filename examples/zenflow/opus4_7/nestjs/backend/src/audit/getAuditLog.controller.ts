@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Param,
+  Body,
   Req,
 } from '@nestjs/common';
 import { GetAuditLogService } from './getAuditLog.service';
@@ -14,7 +15,8 @@ export class GetAuditLogController {
   async getAuditLog(
     @Req() req: any,
     @Param() params: any,
+    @Body() body: any,
   ) {
-    return this.service.getAuditLog(params, req.user);
+    return this.service.getAuditLog(params, body, req.user);
   }
 }

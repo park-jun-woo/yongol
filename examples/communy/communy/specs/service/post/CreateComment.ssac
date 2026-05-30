@@ -1,0 +1,10 @@
+package service
+
+// @state-neutral
+// @auth "CreateComment" "comment" {} "Forbidden"
+// @get Post post = Post.FindByID({ID: request.id})
+// @empty post "Post not found"
+// @post Comment comment = Comment.Create({PostID: post.ID, UserID: currentUser.ID, Body: request.body, IsAnonymous: request.is_anonymous})
+// @put Post.IncrementCommentCount({ID: post.ID})
+// @response { id: comment.ID, post_id: comment.PostID, parent_id: comment.ParentID, user_id: comment.UserID, body: comment.Body, status: comment.Status, is_anonymous: comment.IsAnonymous }
+func CreateComment() {}

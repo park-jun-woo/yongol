@@ -2,6 +2,7 @@ import {
   Controller,
   Delete,
   Param,
+  Body,
   Req,
 } from '@nestjs/common';
 import { DeleteScheduleService } from './deleteSchedule.service';
@@ -14,7 +15,8 @@ export class DeleteScheduleController {
   async deleteSchedule(
     @Req() req: any,
     @Param() params: any,
+    @Body() body: any,
   ) {
-    return this.service.deleteSchedule(params, req.user);
+    return this.service.deleteSchedule(params, body, req.user);
   }
 }

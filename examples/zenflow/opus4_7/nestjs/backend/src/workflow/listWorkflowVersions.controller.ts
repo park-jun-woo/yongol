@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Param,
+  Body,
   Req,
 } from '@nestjs/common';
 import { ListWorkflowVersionsService } from './listWorkflowVersions.service';
@@ -14,7 +15,8 @@ export class ListWorkflowVersionsController {
   async listWorkflowVersions(
     @Req() req: any,
     @Param() params: any,
+    @Body() body: any,
   ) {
-    return this.service.listWorkflowVersions(params, req.user);
+    return this.service.listWorkflowVersions(params, body, req.user);
   }
 }

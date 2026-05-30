@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from '../prisma/prisma.module';
-import { AuthzModule } from '../authz/authz.module';
+import { PrismaModule } from '../../prisma/prisma.module';
 import { GetAuditLogController } from './getAuditLog.controller';
 import { GetAuditLogService } from './getAuditLog.service';
 import { GetRecentAuditLogsController } from './getRecentAuditLogs.controller';
@@ -11,7 +10,6 @@ import { ListAuditLogsService } from './listAuditLogs.service';
 @Module({
   imports: [
     PrismaModule,
-    AuthzModule,
   ],
   controllers: [
     GetAuditLogController,
@@ -19,11 +17,6 @@ import { ListAuditLogsService } from './listAuditLogs.service';
     ListAuditLogsController,
   ],
   providers: [
-    GetAuditLogService,
-    GetRecentAuditLogsService,
-    ListAuditLogsService,
-  ],
-  exports: [
     GetAuditLogService,
     GetRecentAuditLogsService,
     ListAuditLogsService,

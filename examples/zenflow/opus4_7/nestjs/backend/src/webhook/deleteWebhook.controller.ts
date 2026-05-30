@@ -2,6 +2,7 @@ import {
   Controller,
   Delete,
   Param,
+  Body,
   Req,
 } from '@nestjs/common';
 import { DeleteWebhookService } from './deleteWebhook.service';
@@ -14,7 +15,8 @@ export class DeleteWebhookController {
   async deleteWebhook(
     @Req() req: any,
     @Param() params: any,
+    @Body() body: any,
   ) {
-    return this.service.deleteWebhook(params, req.user);
+    return this.service.deleteWebhook(params, body, req.user);
   }
 }

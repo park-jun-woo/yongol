@@ -1,43 +1,47 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.dependencies.database import get_session
-from app.dependencies.auth import get_current_user
 from app.services import template as svc
-from app.schemas.template import PublishTemplateRequest
 
 router = APIRouter(prefix="/template", tags=["template"])
 
 @router.post("/{id}/clone")
 async def clone_template(
-    id: int,
-    current_user: dict = Depends(get_current_user),
+    request: Request,
     session: AsyncSession = Depends(get_session),
 ):
-    return await svc.clone_template(session, id, current_user)
+    params = request.path_params
+    body = await request.json() if request.method in ("POST", "PUT", "PATCH") else {}
+    user = getattr(request.state, "user", None)
+    return await svc.clone_template(session, params, body, user)
 
 @router.get("/{id}")
 async def get_template(
-    id: int,
-    current_user: dict = Depends(get_current_user),
+    request: Request,
     session: AsyncSession = Depends(get_session),
 ):
-    return await svc.get_template(session, id, current_user)
+    params = request.path_params
+    body = await request.json() if request.method in ("POST", "PUT", "PATCH") else {}
+    user = getattr(request.state, "user", None)
+    return await svc.get_template(session, params, body, user)
 
 @router.get("/")
 async def list_templates(
-    category: str | None = None,
-    cursor: str | None = None,
-    per_page: int | None = None,
-    current_user: dict = Depends(get_current_user),
+    request: Request,
     session: AsyncSession = Depends(get_session),
 ):
-    return await svc.list_templates(session, category, cursor, per_page, current_user)
+    params = request.path_params
+    body = await request.json() if request.method in ("POST", "PUT", "PATCH") else {}
+    user = getattr(request.state, "user", None)
+    return await svc.list_templates(session, params, body, user)
 
 @router.post("/")
 async def publish_template(
-    body: PublishTemplateRequest,
-    current_user: dict = Depends(get_current_user),
+    request: Request,
     session: AsyncSession = Depends(get_session),
 ):
-    return await svc.publish_template(session, body, current_user)
+    params = request.path_params
+    body = await request.json() if request.method in ("POST", "PUT", "PATCH") else {}
+    user = getattr(request.state, "user", None)
+    return await svc.publish_template(session, params, body, user)
 

@@ -1,72 +1,46 @@
 from fastapi import HTTPException
 from sqlalchemy import select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.models import Action, ExecutionLog, Organization, User, Workflow
-from app.dependencies.event_bus import EventBus
-from app.dependencies.authz import authz_check
-from app.services.billing import is_zero_balance
-from app.services.report import generate_report
-from app.services.version import next_version, resolve_root_id
-from app.services.worker import process_action
 
-async def activate_workflow(session: AsyncSession, id: int, current_user: dict | None = None):
+async def activate_workflow(session: AsyncSession, params: dict, body: dict, user: dict | None = None):
     async with session.begin():
-        owner_row = await session.execute(
-            select(Workflows.org_id).where(Workflows.id == id)
-        )
-        owner = owner_row.scalar_one_or_none()
-        await authz_check(
-            current_user,
-            action="ActivateWorkflow",
-            resource="workflow",
-            resource_id=str(id),
-            owners={"workflows": {"org_id": owner}},
-        )
-        result = await session.execute(select(Workflow).where(Workflow.id == id))
+        # @auth workflow.ActivateWorkflow
+        # TODO: integrate OPA policy evaluation
+        result = await session.execute(select(Workflow).where(Workflow.ID == request["id"]))
         wf = result.scalars().first()
         if not wf:
             raise HTTPException(status_code=404, detail="Workflow not found")
-        result = await session.execute(select(Organization).where(Organization.id == wf.id))
+        result = await session.execute(select(Organization).where(Organization.ID == wf["OrgID"]))
         org = result.scalars().first()
         if not org:
             raise HTTPException(status_code=404, detail="Organization not found")
-        if is_zero_balance(org.credits_balance):
+        if billing.is_zero_balance(org["CreditsBalance"]):
             raise HTTPException(status_code=402, detail="Insufficient credits")
-        # @state workflows.ActivateWorkflow — transition guard
-        allowed_activate_workflow: dict[str, bool] = {
-            "draft": True,
-            "paused": True,
-        }
-        if wf.status not in allowed_activate_workflow:
-            raise HTTPException(status_code=409, detail="Cannot activate workflow")
+        # @state workflows.ActivateWorkflow
+        # TODO: integrate state machine validation
         await session.execute(
-            update(Workflow).where(Workflow.id == wf.id).values(status="active")
+            update(Workflow).where(Workflow.id == params["id"]).values(**body)
         )
-        result = await session.execute(select(Workflow).where(Workflow.id == wf.id))
+        result = await session.execute(select(Workflow).where(Workflow.ID == wf["ID"]))
         updated = result.scalars().first()
         return {
             "workflow": updated,
         }
 
 
-async def add_action(session: AsyncSession, id: int, body: AddActionRequest, current_user: dict | None = None):
+from fastapi import HTTPException
+from sqlalchemy import select, update, delete
+from sqlalchemy.ext.asyncio import AsyncSession
+
+async def add_action(session: AsyncSession, params: dict, body: dict, user: dict | None = None):
     async with session.begin():
-        owner_row = await session.execute(
-            select(Workflows.org_id).where(Workflows.id == id)
-        )
-        owner = owner_row.scalar_one_or_none()
-        await authz_check(
-            current_user,
-            action="AddAction",
-            resource="workflow",
-            resource_id=str(id),
-            owners={"workflows": {"org_id": owner}},
-        )
-        result = await session.execute(select(Workflow).where(Workflow.id == id))
+        # @auth workflow.AddAction
+        # TODO: integrate OPA policy evaluation
+        result = await session.execute(select(Workflow).where(Workflow.ID == request["id"]))
         wf = result.scalars().first()
         if not wf:
             raise HTTPException(status_code=404, detail="Workflow not found")
-        action = Action(action_type=body.action_type, config=body.config, sequence_order=body.sequence_order, workflow_id=wf.workflow_id)
+        action = Action(ActionType=request["action_type"], Config=request["config"], SequenceOrder=request["sequence_order"], WorkflowID=wf["ID"])
         session.add(action)
         await session.flush()
         return {
@@ -74,63 +48,49 @@ async def add_action(session: AsyncSession, id: int, body: AddActionRequest, cur
         }
 
 
-async def archive_workflow(session: AsyncSession, id: int, current_user: dict | None = None):
+from fastapi import HTTPException
+from sqlalchemy import select, update, delete
+from sqlalchemy.ext.asyncio import AsyncSession
+
+async def archive_workflow(session: AsyncSession, params: dict, body: dict, user: dict | None = None):
     async with session.begin():
-        owner_row = await session.execute(
-            select(Workflows.org_id).where(Workflows.id == id)
-        )
-        owner = owner_row.scalar_one_or_none()
-        await authz_check(
-            current_user,
-            action="ArchiveWorkflow",
-            resource="workflow",
-            resource_id=str(id),
-            owners={"workflows": {"org_id": owner}},
-        )
-        result = await session.execute(select(Workflow).where(Workflow.id == id))
+        # @auth workflow.ArchiveWorkflow
+        # TODO: integrate OPA policy evaluation
+        result = await session.execute(select(Workflow).where(Workflow.ID == request["id"]))
         wf = result.scalars().first()
         if not wf:
             raise HTTPException(status_code=404, detail="Workflow not found")
-        # @state workflows.ArchiveWorkflow — transition guard
-        allowed_archive_workflow: dict[str, bool] = {
-            "active": True,
-        }
-        if wf.status not in allowed_archive_workflow:
-            raise HTTPException(status_code=409, detail="Cannot archive workflow")
+        # @state workflows.ArchiveWorkflow
+        # TODO: integrate state machine validation
         await session.execute(
-            update(Workflow).where(Workflow.id == wf.id).values(status="archived")
+            update(Workflow).where(Workflow.id == params["id"]).values(**body)
         )
-        result = await session.execute(select(Workflow).where(Workflow.id == wf.id))
+        result = await session.execute(select(Workflow).where(Workflow.ID == wf["ID"]))
         updated = result.scalars().first()
         return {
             "workflow": updated,
         }
 
 
-async def auto_assign_workflow(session: AsyncSession, id: int, current_user: dict | None = None):
+from fastapi import HTTPException
+from sqlalchemy import select, update, delete
+from sqlalchemy.ext.asyncio import AsyncSession
+
+async def auto_assign_workflow(session: AsyncSession, params: dict, body: dict, user: dict | None = None):
     async with session.begin():
-        owner_row = await session.execute(
-            select(Workflows.org_id).where(Workflows.id == id)
-        )
-        owner = owner_row.scalar_one_or_none()
-        await authz_check(
-            current_user,
-            action="AutoAssignWorkflow",
-            resource="workflow",
-            resource_id=str(id),
-            owners={"workflows": {"org_id": owner}},
-        )
-        result = await session.execute(select(Workflow).where(Workflow.id == id))
+        # @auth workflow.AutoAssignWorkflow
+        # TODO: integrate OPA policy evaluation
+        result = await session.execute(select(Workflow).where(Workflow.ID == request["id"]))
         wf = result.scalars().first()
         if not wf:
             raise HTTPException(status_code=404, detail="Workflow not found")
-        result = await session.execute(select(User).where(User.org_id == wf.org_id))
+        result = await session.execute(select(User).where(User.OrgID == wf["OrgID"]))
         memberCount = result.scalars().first()
-        match = await match_member(memberCount, wf.trigger_event)
+        match = await workflow.match_member(memberCount, wf["TriggerEvent"])
         await session.execute(
-            update(Workflow).where(Workflow.id == wf.id).values(confidence=match.confidence, member_id=match.member_id)
+            update(Workflow).where(Workflow.id == params["id"]).values(**body)
         )
-        result = await session.execute(select(Workflow).where(Workflow.id == wf.id))
+        result = await session.execute(select(Workflow).where(Workflow.ID == wf["ID"]))
         updated = result.scalars().first()
         if not updated:
             raise HTTPException(status_code=404, detail="Workflow not found")
@@ -139,14 +99,15 @@ async def auto_assign_workflow(session: AsyncSession, id: int, current_user: dic
         }
 
 
-async def create_workflow(session: AsyncSession, body: CreateWorkflowRequest, current_user: dict | None = None):
+from fastapi import HTTPException
+from sqlalchemy import select, update, delete
+from sqlalchemy.ext.asyncio import AsyncSession
+
+async def create_workflow(session: AsyncSession, params: dict, body: dict, user: dict | None = None):
     async with session.begin():
-        await authz_check(
-            current_user,
-            action="CreateWorkflow",
-            resource="workflow",
-        )
-        wf = Workflow(org_id=current_user["org_id"], title=body.title, trigger_event=body.trigger_event)
+        # @auth workflow.CreateWorkflow
+        # TODO: integrate OPA policy evaluation
+        wf = Workflow(OrgID=currentUser["OrgID"], Title=request["title"], TriggerEvent=request["trigger_event"])
         session.add(wf)
         await session.flush()
         return {
@@ -154,71 +115,57 @@ async def create_workflow(session: AsyncSession, body: CreateWorkflowRequest, cu
         }
 
 
-async def create_workflow_version(session: AsyncSession, id: int, current_user: dict | None = None):
+from fastapi import HTTPException
+from sqlalchemy import select, update, delete
+from sqlalchemy.ext.asyncio import AsyncSession
+
+async def create_workflow_version(session: AsyncSession, params: dict, body: dict, user: dict | None = None):
     async with session.begin():
-        owner_row = await session.execute(
-            select(Workflows.org_id).where(Workflows.id == id)
-        )
-        owner = owner_row.scalar_one_or_none()
-        await authz_check(
-            current_user,
-            action="CreateWorkflowVersion",
-            resource="workflow",
-            resource_id=str(id),
-            owners={"workflows": {"org_id": owner}},
-        )
-        result = await session.execute(select(Workflow).where(Workflow.id == id))
+        # @auth workflow.CreateWorkflowVersion
+        # TODO: integrate OPA policy evaluation
+        result = await session.execute(select(Workflow).where(Workflow.ID == request["id"]))
         wf = result.scalars().first()
         if not wf:
             raise HTTPException(status_code=404, detail="Workflow not found")
-        rootResult = await resolve_root_id(wf.root_workflow_id, wf.id)
-        versionResult = await next_version(wf.version)
-        newWf = Workflow(org_id=wf.org_id, root_workflow_id=rootResult.root_workflow_id, title=wf.title, trigger_event=wf.trigger_event, version=versionResult.version)
+        rootResult = await version.resolve_root_i_d(wf["RootWorkflowID"], wf["ID"])
+        versionResult = await version.next_version(wf["Version"])
+        newWf = Workflow(OrgID=wf["OrgID"], RootWorkflowID=rootResult["RootID"], Title=wf["Title"], TriggerEvent=wf["TriggerEvent"], Version=versionResult["Version"])
         session.add(newWf)
         await session.flush()
         await session.execute(
-            update(Action).values(new_workflow_id=newWf.id, source_workflow_id=wf.id)
+            update(Action).where(Action.id == params["id"]).values(**body)
         )
         return {
             "workflow": newWf,
         }
 
 
-async def execute_with_report(session: AsyncSession, id: int, current_user: dict | None = None):
+from fastapi import HTTPException
+from sqlalchemy import select, update, delete
+from sqlalchemy.ext.asyncio import AsyncSession
+
+async def execute_with_report(session: AsyncSession, params: dict, body: dict, user: dict | None = None):
     async with session.begin():
-        owner_row = await session.execute(
-            select(Workflows.org_id).where(Workflows.id == id)
-        )
-        owner = owner_row.scalar_one_or_none()
-        await authz_check(
-            current_user,
-            action="ExecuteWorkflow",
-            resource="workflow",
-            resource_id=str(id),
-            owners={"workflows": {"org_id": owner}},
-        )
-        result = await session.execute(select(Workflow).where(Workflow.id == id))
+        # @auth workflow.ExecuteWorkflow
+        # TODO: integrate OPA policy evaluation
+        result = await session.execute(select(Workflow).where(Workflow.ID == request["id"]))
         wf = result.scalars().first()
         if not wf:
             raise HTTPException(status_code=404, detail="Workflow not found")
-        # @state workflows.ExecuteWorkflow — transition guard
-        allowed_execute_workflow: dict[str, bool] = {
-            "active": True,
-        }
-        if wf.status not in allowed_execute_workflow:
-            raise HTTPException(status_code=409, detail="Workflow is not active")
-        result = await session.execute(select(Organization).where(Organization.id == wf.id))
+        # @state workflows.ExecuteWorkflow
+        # TODO: integrate state machine validation
+        result = await session.execute(select(Organization).where(Organization.ID == wf["OrgID"]))
         org = result.scalars().first()
         if not org:
             raise HTTPException(status_code=404, detail="Organization not found")
-        if is_zero_balance(org.credits_balance):
+        if billing.is_zero_balance(org["CreditsBalance"]):
             raise HTTPException(status_code=402, detail="Insufficient credits")
-        actionResult = await process_action(wf.trigger_event, params)
+        actionResult = await worker.process_action(wf["TriggerEvent"], params)
         await session.execute(
-            update(Organization).where(Organization.id == org.id).values(amount=1)
+            update(Organization).where(Organization.id == params["id"]).values(**body)
         )
-        reportResult = await generate_report(1, "completed", wf.title)
-        log = ExecutionLog(credits_spent=1, org_id=wf.org_id, report_key=reportResult.report_key, status="completed", workflow_id=wf.workflow_id)
+        reportResult = await report.generate_report(1, "completed", wf["Title"])
+        log = ExecutionLog(CreditsSpent=1, OrgID=wf["OrgID"], ReportKey=reportResult["ReportKey"], Status="completed", WorkflowID=wf["ID"])
         session.add(log)
         await session.flush()
         return {
@@ -228,46 +175,38 @@ async def execute_with_report(session: AsyncSession, id: int, current_user: dict
         }
 
 
-async def execute_workflow(session: AsyncSession, id: int, current_user: dict | None = None, event_bus: EventBus | None = None):
+from fastapi import HTTPException
+from sqlalchemy import select, update, delete
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.dependencies.event_bus import EventBus
+
+async def execute_workflow(session: AsyncSession, params: dict, body: dict, user: dict | None = None):
     async with session.begin():
-        owner_row = await session.execute(
-            select(Workflows.org_id).where(Workflows.id == id)
-        )
-        owner = owner_row.scalar_one_or_none()
-        await authz_check(
-            current_user,
-            action="ExecuteWorkflow",
-            resource="workflow",
-            resource_id=str(id),
-            owners={"workflows": {"org_id": owner}},
-        )
-        result = await session.execute(select(Workflow).where(Workflow.id == id))
+        # @auth workflow.ExecuteWorkflow
+        # TODO: integrate OPA policy evaluation
+        result = await session.execute(select(Workflow).where(Workflow.ID == request["id"]))
         wf = result.scalars().first()
         if not wf:
             raise HTTPException(status_code=404, detail="Workflow not found")
-        # @state workflows.ExecuteWorkflow — transition guard
-        allowed_execute_workflow: dict[str, bool] = {
-            "active": True,
-        }
-        if wf.status not in allowed_execute_workflow:
-            raise HTTPException(status_code=409, detail="Workflow is not active")
-        result = await session.execute(select(Organization).where(Organization.id == wf.id))
+        # @state workflows.ExecuteWorkflow
+        # TODO: integrate state machine validation
+        result = await session.execute(select(Organization).where(Organization.ID == wf["OrgID"]))
         org = result.scalars().first()
         if not org:
             raise HTTPException(status_code=404, detail="Organization not found")
-        if is_zero_balance(org.credits_balance):
+        if billing.is_zero_balance(org["CreditsBalance"]):
             raise HTTPException(status_code=402, detail="Insufficient credits")
-        actionResult = await process_action(wf.trigger_event, params)
+        actionResult = await worker.process_action(wf["TriggerEvent"], params)
         await session.execute(
-            update(Organization).where(Organization.id == org.id).values(amount=1)
+            update(Organization).where(Organization.id == params["id"]).values(**body)
         )
-        log = ExecutionLog(credits_spent=1, org_id=wf.org_id, status="completed", workflow_id=wf.workflow_id)
+        log = ExecutionLog(CreditsSpent=1, OrgID=wf["OrgID"], Status="completed", WorkflowID=wf["ID"])
         session.add(log)
         await session.flush()
         await event_bus.publish("workflow.executed", {
-            "OrgID": wf.org_id,
+            "OrgID": wf["OrgID"],
             "Status": "completed",
-            "WorkflowID": wf.id,
+            "WorkflowID": wf["ID"],
         })
         return {
             "action_result": actionResult,
@@ -275,19 +214,14 @@ async def execute_workflow(session: AsyncSession, id: int, current_user: dict | 
         }
 
 
-async def get_workflow(session: AsyncSession, id: int, current_user: dict | None = None):
-    owner_row = await session.execute(
-        select(Workflows.org_id).where(Workflows.id == id)
-    )
-    owner = owner_row.scalar_one_or_none()
-    await authz_check(
-        current_user,
-        action="GetWorkflow",
-        resource="workflow",
-        resource_id=str(id),
-        owners={"workflows": {"org_id": owner}},
-    )
-    result = await session.execute(select(Workflow).where(Workflow.id == id))
+from fastapi import HTTPException
+from sqlalchemy import select, update, delete
+from sqlalchemy.ext.asyncio import AsyncSession
+
+async def get_workflow(session: AsyncSession, params: dict, body: dict, user: dict | None = None):
+    # @auth workflow.GetWorkflow
+    # TODO: integrate OPA policy evaluation
+    result = await session.execute(select(Workflow).where(Workflow.ID == request["id"]))
     wf = result.scalars().first()
     if not wf:
         raise HTTPException(status_code=404, detail="Workflow not found")
@@ -296,118 +230,95 @@ async def get_workflow(session: AsyncSession, id: int, current_user: dict | None
     }
 
 
-async def list_execution_logs(session: AsyncSession, id: int, current_user: dict | None = None):
-    owner_row = await session.execute(
-        select(Workflows.org_id).where(Workflows.id == id)
-    )
-    owner = owner_row.scalar_one_or_none()
-    await authz_check(
-        current_user,
-        action="ListExecutionLogs",
-        resource="workflow",
-        resource_id=str(id),
-        owners={"workflows": {"org_id": owner}},
-    )
-    result = await session.execute(select(Workflow).where(Workflow.id == id))
+from fastapi import HTTPException
+from sqlalchemy import select, update, delete
+from sqlalchemy.ext.asyncio import AsyncSession
+
+async def list_execution_logs(session: AsyncSession, params: dict, body: dict, user: dict | None = None):
+    # @auth workflow.ListExecutionLogs
+    # TODO: integrate OPA policy evaluation
+    result = await session.execute(select(Workflow).where(Workflow.ID == request["id"]))
     wf = result.scalars().first()
     if not wf:
         raise HTTPException(status_code=404, detail="Workflow not found")
-    result = await session.execute(select(ExecutionLog).where(ExecutionLog.workflow_id == wf.workflow_id))
+    result = await session.execute(select(ExecutionLog).where(ExecutionLog.WorkflowID == wf["ID"]))
     execution_logs = result.scalars().all()
     return {
         "execution_logs": execution_logs,
     }
 
 
-async def list_workflow_versions(session: AsyncSession, id: int, current_user: dict | None = None):
-    owner_row = await session.execute(
-        select(Workflows.org_id).where(Workflows.id == id)
-    )
-    owner = owner_row.scalar_one_or_none()
-    await authz_check(
-        current_user,
-        action="ListWorkflowVersions",
-        resource="workflow",
-        resource_id=str(id),
-        owners={"workflows": {"org_id": owner}},
-    )
-    result = await session.execute(select(Workflow).where(Workflow.id == id))
+from fastapi import HTTPException
+from sqlalchemy import select, update, delete
+from sqlalchemy.ext.asyncio import AsyncSession
+
+async def list_workflow_versions(session: AsyncSession, params: dict, body: dict, user: dict | None = None):
+    # @auth workflow.ListWorkflowVersions
+    # TODO: integrate OPA policy evaluation
+    result = await session.execute(select(Workflow).where(Workflow.ID == request["id"]))
     wf = result.scalars().first()
     if not wf:
         raise HTTPException(status_code=404, detail="Workflow not found")
-    result = await session.execute(select(Workflow).where(Workflow.org_id == current_user["org_id"], Workflow.root_id == wf.id))
+    result = await session.execute(select(Workflow).where(Workflow.OrgID == currentUser["OrgID"], Workflow.RootID == wf["ID"]))
     workflows = result.scalars().all()
     return {
         "workflows": workflows,
     }
 
 
-async def list_workflows(session: AsyncSession, current_user: dict | None = None):
-    await authz_check(
-        current_user,
-        action="ListWorkflows",
-        resource="workflow",
-    )
-    result = await session.execute(select(Workflow).where(Workflow.org_id == current_user["org_id"]))
+from fastapi import HTTPException
+from sqlalchemy import select, update, delete
+from sqlalchemy.ext.asyncio import AsyncSession
+
+async def list_workflows(session: AsyncSession, params: dict, body: dict, user: dict | None = None):
+    # @auth workflow.ListWorkflows
+    # TODO: integrate OPA policy evaluation
+    result = await session.execute(select(Workflow).where(Workflow.OrgID == currentUser["OrgID"]))
     workflows = result.scalars().all()
     return {
         "workflows": workflows,
     }
 
 
-async def pause_workflow(session: AsyncSession, id: int, current_user: dict | None = None):
+from fastapi import HTTPException
+from sqlalchemy import select, update, delete
+from sqlalchemy.ext.asyncio import AsyncSession
+
+async def pause_workflow(session: AsyncSession, params: dict, body: dict, user: dict | None = None):
     async with session.begin():
-        owner_row = await session.execute(
-            select(Workflows.org_id).where(Workflows.id == id)
-        )
-        owner = owner_row.scalar_one_or_none()
-        await authz_check(
-            current_user,
-            action="PauseWorkflow",
-            resource="workflow",
-            resource_id=str(id),
-            owners={"workflows": {"org_id": owner}},
-        )
-        result = await session.execute(select(Workflow).where(Workflow.id == id))
+        # @auth workflow.PauseWorkflow
+        # TODO: integrate OPA policy evaluation
+        result = await session.execute(select(Workflow).where(Workflow.ID == request["id"]))
         wf = result.scalars().first()
         if not wf:
             raise HTTPException(status_code=404, detail="Workflow not found")
-        # @state workflows.PauseWorkflow — transition guard
-        allowed_pause_workflow: dict[str, bool] = {
-            "active": True,
-        }
-        if wf.status not in allowed_pause_workflow:
-            raise HTTPException(status_code=409, detail="Cannot pause workflow")
+        # @state workflows.PauseWorkflow
+        # TODO: integrate state machine validation
         await session.execute(
-            update(Workflow).where(Workflow.id == wf.id).values(status="paused")
+            update(Workflow).where(Workflow.id == params["id"]).values(**body)
         )
-        result = await session.execute(select(Workflow).where(Workflow.id == wf.id))
+        result = await session.execute(select(Workflow).where(Workflow.ID == wf["ID"]))
         updated = result.scalars().first()
         return {
             "workflow": updated,
         }
 
 
-async def save_workflow_actions(session: AsyncSession, id: int, body: SaveWorkflowActionsRequest, current_user: dict | None = None):
+from fastapi import HTTPException
+from sqlalchemy import select, update, delete
+from sqlalchemy.ext.asyncio import AsyncSession
+
+async def save_workflow_actions(session: AsyncSession, params: dict, body: dict, user: dict | None = None):
     async with session.begin():
-        owner_row = await session.execute(
-            select(Workflows.org_id).where(Workflows.id == id)
-        )
-        owner = owner_row.scalar_one_or_none()
-        await authz_check(
-            current_user,
-            action="SaveWorkflowActions",
-            resource="workflow",
-            resource_id=str(id),
-            owners={"workflows": {"org_id": owner}},
-        )
-        result = await session.execute(select(Workflow).where(Workflow.id == id))
+        # @auth workflow.SaveWorkflowActions
+        # TODO: integrate OPA policy evaluation
+        result = await session.execute(select(Workflow).where(Workflow.ID == request["id"]))
         wf = result.scalars().first()
         if not wf:
             raise HTTPException(status_code=404, detail="Workflow not found")
-        await session.execute(delete(Action).where(Action.workflow_id == wf.workflow_id))
+        await session.execute(delete(Action).where(Action.WorkflowID == wf["ID"]))
         await session.execute(
-            update(Action).values(items=body.actions_json, workflow_id=wf.workflow_id)
+            update(Action).where(Action.id == params["id"]).values(**body)
         )
         return {
             "message": "ok",

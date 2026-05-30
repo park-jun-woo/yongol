@@ -1,0 +1,10 @@
+package service
+
+// @auth "DeleteComment" "comment" {ResourceID: request.id} "Forbidden"
+// @get Comment comment = Comment.FindByID({ID: request.id})
+// @empty comment "Comment not found"
+// @state comments {status: comment.Status} "DeleteComment" "Invalid state transition"
+// @put Comment.UpdateStatus({ID: comment.ID, Status: "deleted"})
+// @get Comment updated = Comment.FindByID({ID: comment.ID})
+// @response { id: updated.ID, post_id: updated.PostID, parent_id: updated.ParentID, user_id: updated.UserID, body: updated.Body, status: updated.Status, is_anonymous: updated.IsAnonymous }
+func DeleteComment() {}

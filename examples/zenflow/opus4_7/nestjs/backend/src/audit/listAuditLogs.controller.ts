@@ -1,7 +1,8 @@
 import {
   Controller,
   Get,
-  Query,
+  Param,
+  Body,
   Req,
 } from '@nestjs/common';
 import { ListAuditLogsService } from './listAuditLogs.service';
@@ -13,8 +14,9 @@ export class ListAuditLogsController {
   @Get('')
   async listAuditLogs(
     @Req() req: any,
-    @Query() query: any,
+    @Param() params: any,
+    @Body() body: any,
   ) {
-    return this.service.listAuditLogs(query, req.user);
+    return this.service.listAuditLogs(params, body, req.user);
   }
 }

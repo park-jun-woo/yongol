@@ -1,0 +1,10 @@
+package service
+
+// @no-pagination
+// @auth "ListReports" "gallery" {ResourceID: request.galleryId} "Forbidden"
+// @get Gallery gallery = Gallery.FindByID({ID: request.galleryId})
+// @empty gallery "Gallery not found"
+// @get []Report reports = Report.ListByGallery({GalleryID: gallery.ID})
+// @get int64 total = Report.CountByGallery({GalleryID: gallery.ID})
+// @response { items: reports, total: total }
+func ListReports() {}

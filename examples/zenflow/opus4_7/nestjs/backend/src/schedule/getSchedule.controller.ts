@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Param,
+  Body,
   Req,
 } from '@nestjs/common';
 import { GetScheduleService } from './getSchedule.service';
@@ -14,7 +15,8 @@ export class GetScheduleController {
   async getSchedule(
     @Req() req: any,
     @Param() params: any,
+    @Body() body: any,
   ) {
-    return this.service.getSchedule(params, req.user);
+    return this.service.getSchedule(params, body, req.user);
   }
 }
