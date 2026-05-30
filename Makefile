@@ -1,4 +1,4 @@
-VERSION := v0.6.23
+VERSION := v0.6.24
 
 .PHONY: install
 install:

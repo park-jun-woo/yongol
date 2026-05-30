@@ -1,5 +1,5 @@
 //ff:func feature=rule type=test control=iteration dimension=1
-//ff:what responsePropType test — 응답 본문 필드 type+format → Go 타입 (array items format-aware, BUG-102)
+//ff:what resolveOAPIGoType(CtxResponseBody) test — 응답 본문 필드 type+format → Go 타입 (array items format-aware, BUG-102)
 
 package ground
 
@@ -23,7 +23,7 @@ func arraySchema(items *openapi3.SchemaRef) *openapi3.SchemaRef {
 	}}
 }
 
-func TestResponsePropType(t *testing.T) {
+func TestResolveOAPIGoTypeResponseBody(t *testing.T) {
 	tests := []struct {
 		name string
 		ref  *openapi3.SchemaRef
@@ -51,9 +51,9 @@ func TestResponsePropType(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := responsePropType(tt.ref)
+			got := resolveOAPIGoType(tt.ref, CtxResponseBody)
 			if got != tt.want {
-				t.Errorf("responsePropType(%s) = %q, want %q", tt.name, got, tt.want)
+				t.Errorf("resolveOAPIGoType(%s, CtxResponseBody) = %q, want %q", tt.name, got, tt.want)
 			}
 		})
 	}
