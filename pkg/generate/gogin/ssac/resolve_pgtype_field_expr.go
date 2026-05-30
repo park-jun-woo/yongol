@@ -37,8 +37,11 @@ func (g *methodGen) resolvePgtypeFieldExpr(varExpr string) (string, []string) {
 	// Trim slice prefix — VarTypes may store "[]Workflow" for list results.
 	modelName = strings.TrimPrefix(modelName, "[]")
 
-	jsonName := strings.ToLower(fieldName[:1]) + fieldName[1:]
-	col := lookupDDLColumn(g.DDLTables, modelName, jsonName)
+	// Pass the PascalCase sqlc field name directly. lookupDDLColumn applies
+	// caseconv.PascalToSnake internally, which handles acronyms correctly
+	// (ID→id, OrgID→org_id, URL→url). A prior re-lowercasing step produced
+	// broken keys for leading/inner acronyms (ID→"iD"→"i_d" miss).
+	col := lookupDDLColumn(g.DDLTables, modelName, fieldName)
 	if col == nil {
 		return "", nil
 	}
@@ -58,7 +61,11 @@ func (g *methodGen) resolvePgtypeFieldExpr(varExpr string) (string, []string) {
 	var quoted []string
 	for _, imp := range binding.Imports {
 		// pgtype import is used by db package, not by the handler code.
-		if imp == "github.com/jackc/pgx/v5/pgtype" {
+		// runtime/types is used by the convert-func file (openapi_types
+		// alias) but never by the dotted-access conversion handler, which
+		// assigns the conversion expression directly without naming the type.
+		if imp == "github.com/jackc/pgx/v5/pgtype" ||
+			imp == "github.com/oapi-codegen/runtime/types" {
 			continue
 		}
 		quoted = append(quoted, `"`+imp+`"`)

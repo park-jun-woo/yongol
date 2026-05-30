@@ -12,6 +12,11 @@ import "strings"
 //   - exact string equality
 //   - pointer prefix `*` stripped before comparison
 //   - int family interchangeable (int, int8~64, uint*, byte, rune)
+//   - UUID family interchangeable (openapi_types.UUID / types.UUID — the same
+//     oapi-codegen runtime type under different package qualifiers). pgtype.UUID
+//     is deliberately EXCLUDED: it is the DB/sqlc layer type and the func→api
+//     converter does no type conversion, so a pgtype.UUID func field bound to
+//     an openapi_types.UUID response field must stay an ERROR.
 //   - nil is compatible with any side (pointer/interface/slice/map is
 //     structurally valid target; we accept optimistically)
 //   - object ↔ primitive are NOT compatible (falls through to false)
@@ -26,8 +31,22 @@ func TypesCompatible(actual, expected string) bool {
 	if isIntType(a) && isIntType(e) {
 		return true
 	}
+	if isUUIDType(a) && isUUIDType(e) {
+		return true
+	}
 	if a == "nil" || e == "nil" {
 		return true
 	}
 	return false
+}
+
+//ff:func feature=validate type=util control=selection topic=func-check
+//ff:what isUUIDType — report whether a Go type name is the oapi-codegen UUID type (excludes pgtype.UUID)
+
+// isUUIDType reports whether t names the oapi-codegen runtime UUID type. Both
+// "openapi_types.UUID" and "types.UUID" refer to the same
+// github.com/oapi-codegen/runtime/types.UUID under different import aliases.
+// "pgtype.UUID" (the DB/sqlc type) is intentionally NOT matched here.
+func isUUIDType(t string) bool {
+	return t == "openapi_types.UUID" || t == "types.UUID"
 }

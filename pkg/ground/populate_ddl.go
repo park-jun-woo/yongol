@@ -3,6 +3,9 @@
 package ground
 
 import (
+	"github.com/ettle/strcase"
+	"github.com/jinzhu/inflection"
+
 	"github.com/park-jun-woo/yongol/pkg/generate/gogin/types"
 	"github.com/park-jun-woo/yongol/pkg/rule"
 	"github.com/park-jun-woo/yongol/pkg/util/caseconv"
@@ -28,11 +31,26 @@ func populateDDL(g *rule.Ground, fs *yongol.Fullstack) {
 	// Register DDL column Go types for var.Field resolution (Phase009).
 	for _, t := range fs.DDLTables {
 		modelName := sqlcModelName(t.Name)
+		// apiModelName / apiFieldName use the same casing functions as
+		// populateSSaCSymbols (strcase.ToGoPascal over inflection.Singular)
+		// so that DDL.apifield.<M>.<f> keys align exactly with the
+		// Struct.<M>.<f> keys inferResponseValueType looks up. Using
+		// sqlcModelName/SnakeToPascalSqlc here would diverge on cases like
+		// "user_ids" (UserIDS vs UserIds) or irregular plurals, silently
+		// missing the apifield override (BUG-099 regression).
+		apiModelName := strcase.ToGoPascal(inflection.Singular(t.Name))
 		for _, colName := range t.ColumnOrder {
 			col := t.Columns[colName]
 			binding := types.MapPGType(col)
 			fieldName := caseconv.SnakeToPascalSqlc(colName)
 			g.Types["DDL.field."+modelName+"."+fieldName] = binding.SqlcGoType
+
+			// Register the api-surface field type (oapi-codegen) so XOS-67
+			// can compare @response bindings of DDL columns against the
+			// generated response struct field type. For UUID columns this
+			// corrects GoTypeOf=string → ApiField=openapi_types.UUID.
+			apiFieldName := strcase.ToGoPascal(colName)
+			g.Types["DDL.apifield."+apiModelName+"."+apiFieldName] = binding.ApiField
 		}
 	}
 }

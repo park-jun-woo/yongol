@@ -11,11 +11,11 @@ import (
 // inferResponseValueType resolves a @response field expression to a Go type
 // name via 3 paths:
 //
-//   1. Literal → inferLiteral (quoted string, numeric, bool, nil)
-//   2. Bare variable ("user") → Types["SSaC.var.<funcName>.<var>"] as-is
-//      (preserves slice/pointer/wrapper so []Webhook matches []Webhook)
-//   3. Dotted (var.field) → type(var) via SSaC.var.*, strip wrapper/prefix,
-//      then Types["Struct.<Type>.<field>"]
+//  1. Literal → inferLiteral (quoted string, numeric, bool, nil)
+//  2. Bare variable ("user") → Types["SSaC.var.<funcName>.<var>"] as-is
+//     (preserves slice/pointer/wrapper so []Webhook matches []Webhook)
+//  3. Dotted (var.field) → type(var) via SSaC.var.*, strip wrapper/prefix,
+//     then Types["Struct.<Type>.<field>"]
 //
 // Returns "" when unresolvable (downstream skips comparison).
 func inferResponseValueType(g *rule.Ground, funcName, value string) string {
@@ -34,9 +34,19 @@ func inferResponseValueType(g *rule.Ground, funcName, value string) string {
 			return ""
 		}
 		// When looking up a dotted field, strip all wrapper/slice/pointer/package
-		// prefixes and normalise to Struct.<UnqualifiedTypeName>.<field>.
-		return g.Types["Struct."+normalizeTypeName(varType)+"."+field]
+		// prefixes and normalise to <UnqualifiedTypeName>.<field>.
+		model := normalizeTypeName(varType)
+		// Prefer the DDL api-surface type (e.g. a UUID column's
+		// openapi_types.UUID) over the coarse GoTypeOf projection in
+		// Struct.* (which collapses UUID→string). Falls back to Struct.*
+		// for func-result structs and non-DDL row types, where no apifield
+		// key exists. Both keys share the same <Model>.<field> token space
+		// (populate_ddl.go and populate_ssac_symbols.go use the same casing
+		// functions — pinned by TestPopulateDDL_ApifieldStructKeyParity).
+		if apiType := g.Types["DDL.apifield."+model+"."+field]; apiType != "" {
+			return apiType
+		}
+		return g.Types["Struct."+model+"."+field]
 	}
 	return g.Types["SSaC.var."+funcName+"."+value]
 }
-

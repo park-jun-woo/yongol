@@ -44,16 +44,13 @@ func xos67ResponseFieldType(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				if actual == "" {
 					continue
 				}
-				// DDL TIMESTAMPTZ (time.Time) serialised into an OpenAPI
-				// { type: string, format: date-time } field is compatible.
-				// This serialisation-context allowance lives here (not in the
-				// shared TypesCompatible) so directional rules like XFS-70 keep
-				// rejecting time.Time → string in Go-argument contexts.
-				if expected == "string" &&
-					g.Types["OpenAPI.response."+fn.Name+"."+key+".format"] == "date-time" &&
-					isTimeType(actual) {
-					continue
-				}
+				// expected is now the format-aware oapi-codegen type
+				// (registerOpenAPIResponseProps): a { type: string,
+				// format: date-time } field resolves to time.Time and
+				// { format: uuid } to openapi_types.UUID, so a DDL
+				// TIMESTAMPTZ (time.Time) or UUID column (openapi_types.UUID)
+				// matches directly through TypesCompatible — no special-case
+				// format marker allowance is needed.
 				if ssac_func.TypesCompatible(actual, expected) {
 					continue
 				}
@@ -64,9 +61,9 @@ func xos67ResponseFieldType(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					Level: diagnostic.LevelError,
 					Message: fmt.Sprintf("[XOS-67] %s seq[%d] — @response field %q = %q: type %s ≠ OpenAPI response %q expected type %s",
 						fn.Name, seqIdx, key, value, actual, key, expected),
-					Advice: "Correct the value type so that it is compatible with the OpenAPI schema. " +
-						"DDL TIMESTAMPTZ maps to OpenAPI { type: string, format: date-time }. " +
-						"SSaC @response binds it as a string field.",
+					Advice: "Correct the value type so that it is compatible with the OpenAPI response schema's generated Go type. " +
+						"A { type: string, format: uuid } field is generated as openapi_types.UUID (not string or pgtype.UUID); " +
+						"{ format: date-time } as time.Time. Bind a value whose type matches, or fix the field's OpenAPI format.",
 					OperationID: fn.Name,
 				})
 			}

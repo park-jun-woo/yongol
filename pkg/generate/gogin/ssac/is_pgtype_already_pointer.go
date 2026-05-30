@@ -24,8 +24,11 @@ func (g *methodGen) isPgtypeAlreadyPointer(varExpr string) bool {
 		return false
 	}
 	modelName = strings.TrimPrefix(modelName, "[]")
-	jsonName := strings.ToLower(parts[1][:1]) + parts[1][1:]
-	col := lookupDDLColumn(g.DDLTables, modelName, jsonName)
+	// Pass the PascalCase sqlc field name directly. lookupDDLColumn applies
+	// caseconv.PascalToSnake internally; a prior re-lowercasing step broke
+	// acronym fields (ID→"iD"→"i_d" miss), wrongly returning false and
+	// causing optional pgtype fields to be double-pointer wrapped.
+	col := lookupDDLColumn(g.DDLTables, modelName, parts[1])
 	if col == nil {
 		return false
 	}

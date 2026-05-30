@@ -15,18 +15,29 @@ func registerOpenAPIResponseProps(g *rule.Ground, opID string, schema *openapi3.
 		return
 	}
 	for propName, propRef := range schema.Properties {
-		t := resolveSchemaType(propRef)
+		t := responsePropType(propRef)
 		if t == "" {
 			continue
 		}
 		g.Types["OpenAPI.response."+opID+"."+propName] = t
-		// Preserve the date-time format as a sibling marker so XOS-67 can
-		// recognise a DDL TIMESTAMPTZ (time.Time) bound to an OpenAPI
-		// { type: string, format: date-time } field as compatible. The
-		// primary type value stays "string" (resolvePrimitiveType drops
-		// string formats by design) to keep literal-string bindings valid.
-		if t == "string" && propRef != nil && propRef.Value != nil && propRef.Value.Format == "date-time" {
-			g.Types["OpenAPI.response."+opID+"."+propName+".format"] = "date-time"
+	}
+}
+
+//ff:func feature=rule type=util control=selection
+//ff:what responsePropType — 응답 본문 필드 1개의 oapi-codegen 생성 Go 타입 결정 (format-aware)
+
+// responsePropType resolves a single response-body property to the Go type
+// oapi-codegen generates. Primitive `string` schemas (no $ref) are mapped
+// format-aware via resolveOAPIResponseGoType (uuid→openapi_types.UUID,
+// date-time→time.Time, email→openapi_types.Email, else string), so XOS-67
+// compares @response values against the type the generated struct field
+// actually has. $ref / integer / array / object schemas keep the existing
+// resolveSchemaType path.
+func responsePropType(ref *openapi3.SchemaRef) string {
+	if ref != nil && ref.Ref == "" && ref.Value != nil {
+		if types := ref.Value.Type; types != nil && len(types.Slice()) > 0 && types.Slice()[0] == "string" {
+			return resolveOAPIResponseGoType("string", ref.Value.Format)
 		}
 	}
+	return resolveSchemaType(ref)
 }
