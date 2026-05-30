@@ -1,5 +1,5 @@
 //ff:func feature=validate type=test control=sequence topic=openapi-ssac
-//ff:what TestXos70_SkipCases — non-response/non-integer literal/required/non-integer type 스킵 검증
+//ff:what TestXos70_SkipCases — non-response/non-integer literal/non-integer type 스킵 + required 정수 필드 ERROR 검증
 
 package openapi_ssac
 
@@ -46,7 +46,10 @@ func TestXos70_SkipCases(t *testing.T) {
 		}
 	})
 
-	t.Run("RequiredFieldSkipped", func(t *testing.T) {
+	t.Run("RequiredFieldFlagged", func(t *testing.T) {
+		// Phase003: required integer fields are no longer skipped. codegen binds
+		// a required integer field directly (int64); formatless oapi-codegen `int`
+		// mismatches → ERROR requiring format: int64.
 		fs := &yongol.Fullstack{
 			ServiceFuncs: []ssac.ServiceFunc{
 				{Name: "getUser", Sequences: []ssac.Sequence{
@@ -58,8 +61,8 @@ func TestXos70_SkipCases(t *testing.T) {
 			},
 		}
 		diags := xos70ResponseLiteralIntFormat(fs)
-		if len(diags) != 0 {
-			t.Fatalf("expected 0, got %d", len(diags))
+		if len(diags) != 1 {
+			t.Fatalf("expected 1, got %d", len(diags))
 		}
 	})
 

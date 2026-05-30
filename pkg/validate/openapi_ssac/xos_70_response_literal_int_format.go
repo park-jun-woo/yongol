@@ -1,22 +1,23 @@
 //ff:func feature=validate type=rule control=iteration dimension=3 topic=openapi-ssac
-//ff:what XOS-70 — @response integer literal mapped to optional integer field must have format: int64
+//ff:what XOS-70 — @response integer field (literal or variable binding, required or optional) must have format: int64
 
 package openapi_ssac
 
 import (
-	"fmt"
-
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
-// xos70ResponseLiteralIntFormat validates that when a @response field maps an
-// integer literal to an optional integer property, the OpenAPI response schema
-// declares format: int64.
+// xos70ResponseLiteralIntFormat validates that when a @response field maps to an
+// OpenAPI integer property, that property declares format: int64.
 //
-// codegen emits ptrOf(int64(<lit>)) for integer literals. oapi-codegen generates
-// *int when format is absent and *int64 when format: int64. Without int64 the
-// generated types are incompatible and the build fails.
+// codegen binds integer response fields to int64: integer literals become
+// ptrOf(int64(<lit>)) (optional) or int64(<lit>) (required); variable bindings
+// become &<var> / <var> whose Go type is int64 (DDL columns, COUNT/Func results).
+// oapi-codegen generates int/*int when format is absent and int64/*int64 when
+// format: int64. Without int64 the generated types are incompatible and the
+// build fails. DDL-backed integer fields are already forced to format: int64 by
+// XDO-77; this rule additionally covers non-DDL (Func/COUNT) integer responses.
 func xos70ResponseLiteralIntFormat(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	if fs.ResponseConstraints == nil {
 		return nil
@@ -35,33 +36,9 @@ func xos70ResponseLiteralIntFormat(fs *yongol.Fullstack) []diagnostic.Diagnostic
 				continue
 			}
 			for key, value := range seq.Fields {
-				if inferLiteral(value) != "int64" {
-					continue
+				if diag, ok := xos70FieldDiag(fn, seq.Line, key, value, rc); ok {
+					diags = append(diags, diag)
 				}
-				fc, ok := rc[key]
-				if !ok {
-					continue
-				}
-				if fc.Type != "integer" {
-					continue
-				}
-				if fc.Required {
-					continue
-				}
-				if fc.Format == "int64" {
-					continue
-				}
-				diags = append(diags, diagnostic.Diagnostic{
-					File:  fn.FileName,
-					Line:  seq.Line,
-					Phase: diagnostic.PhaseValidate,
-					Level: diagnostic.LevelError,
-					Message: fmt.Sprintf(
-						"[XOS-70] %s @response field %q maps integer literal to optional integer without format: int64",
-						fn.Name, key),
-					Advice:      "Add format: int64 to OpenAPI response schema, or include the field in required",
-					OperationID: fn.Name,
-				})
 			}
 		}
 	}

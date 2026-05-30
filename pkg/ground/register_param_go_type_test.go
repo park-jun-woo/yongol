@@ -18,9 +18,10 @@ func strParam(name, format string) *openapi3.Parameter {
 // TestRegisterParamGoType verifies the Go type registered under
 // "OpenAPI.paramType.<opID>.<name>" — the key whose sole type-value consumer is
 // xfs_73. It pins (a) the CtxParam context (date-time param → string, NOT the
-// response-body time.Time), (b) the array blind-spot closure (array params now
-// register as []T instead of being skipped), and (c) the skip rule (a schema
-// resolving to "" registers nothing, leaving the key absent).
+// response-body time.Time), (b) the array/number blind-spot closure (array and
+// number params now register as []T / float32 instead of being skipped), and
+// (c) the skip rule (a schema resolving to "" registers nothing, leaving the
+// key absent — exercised by the nil-schema case).
 func TestRegisterParamGoType(t *testing.T) {
 	const op = "Op"
 	const key = "OpenAPI.paramType.Op."
@@ -38,9 +39,9 @@ func TestRegisterParamGoType(t *testing.T) {
 		// CONTEXT divergence: a date-time *parameter* is plain string,
 		// NOT time.Time — this kills a CtxParam→CtxResponseBody mutation.
 		{"date-time param stays string", strParam("dt", "date-time"), "string", true},
-		// integer default in param context is int32 (not response int)
-		{"plain integer param int32", &openapi3.Parameter{
-			Name: "n", In: "query", Schema: intSchema("")}, "int32", true},
+		// formatless integer param is int (context-independent, matches response)
+		{"plain integer param int", &openapi3.Parameter{
+			Name: "n", In: "query", Schema: intSchema("")}, "int", true},
 		// array blind-spot closure: array-uuid param registers as []T,
 		// formerly skipped entirely.
 		{"array-uuid param []T", &openapi3.Parameter{
@@ -51,9 +52,10 @@ func TestRegisterParamGoType(t *testing.T) {
 			Name: "wf", In: "query", Schema: refSchema("Workflow")}, "Workflow", true},
 		// SKIP rule: a nil schema resolves to "" → nothing registered.
 		{"nil schema not registered", &openapi3.Parameter{Name: "x", In: "query"}, "", false},
-		// SKIP rule: a number param resolves to "" in CtxParam → not registered.
-		{"number param not registered", &openapi3.Parameter{
-			Name: "y", In: "query", Schema: numSchema("float")}, "", false},
+		// number param registers as float32 (formerly skipped — array/number blind
+		// spot closure; oapi-codegen renders a formatless/float number param as float32).
+		{"number param registers float32", &openapi3.Parameter{
+			Name: "y", In: "query", Schema: numSchema("float")}, "float32", true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

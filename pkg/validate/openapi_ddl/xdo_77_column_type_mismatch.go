@@ -16,8 +16,7 @@ var ddlGoTypeToOpenAPI = map[string]openAPITypeCompat{
 	"string":          {oType: "string", oFormat: ""},
 	"bool":            {oType: "boolean", oFormat: ""},
 	"time.Time":       {oType: "string", oFormat: "date-time"},
-	"float64":         {oType: "number", oFormat: ""},
-	"float32":         {oType: "number", oFormat: ""},
+	"float64":         {oType: "number", oFormat: "double"},
 	"json.RawMessage": {oType: "object", oFormat: ""},
 	"uuid":            {oType: "string", oFormat: "uuid"},
 }

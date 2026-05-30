@@ -14,9 +14,10 @@ import (
 
 func TestXdo77PropDiag(t *testing.T) {
 	cols := map[string]string{
-		"id":     "int64",
-		"email":  "string",
-		"active": "bool",
+		"id":      "int64",
+		"email":   "string",
+		"active":  "bool",
+		"balance": "float64",
 	}
 	fs := &yongol.Fullstack{
 		OpenAPILines: &oapiparser.LineIndex{
@@ -93,6 +94,51 @@ func TestXdo77PropDiag(t *testing.T) {
 		_, ok := xdo77PropDiag(fs, "User", "users", "active", ref, cols)
 		if ok {
 			t.Error("expected false for matching boolean")
+		}
+	})
+
+	t.Run("float64 number with format double returns false", func(t *testing.T) {
+		ref := &openapi3.SchemaRef{Value: &openapi3.Schema{Type: &openapi3.Types{"number"}, Format: "double"}}
+		_, ok := xdo77PropDiag(fs, "User", "users", "balance", ref, cols)
+		if ok {
+			t.Error("expected false for number/double on float64 column")
+		}
+	})
+
+	t.Run("float64 formatless number returns float-specific diagnostic", func(t *testing.T) {
+		ref := &openapi3.SchemaRef{Value: &openapi3.Schema{Type: &openapi3.Types{"number"}}}
+		diag, ok := xdo77PropDiag(fs, "User", "users", "balance", ref, cols)
+		if !ok {
+			t.Fatal("expected true for formatless number on float64 column")
+		}
+		if !strings.Contains(diag.Message, "format: double") {
+			t.Errorf("Message should mention format: double: %s", diag.Message)
+		}
+		if !strings.Contains(diag.Message, "float64") {
+			t.Errorf("Message should mention float64: %s", diag.Message)
+		}
+	})
+
+	t.Run("float64 number with format float returns float-specific diagnostic", func(t *testing.T) {
+		ref := &openapi3.SchemaRef{Value: &openapi3.Schema{Type: &openapi3.Types{"number"}, Format: "float"}}
+		diag, ok := xdo77PropDiag(fs, "User", "users", "balance", ref, cols)
+		if !ok {
+			t.Fatal("expected true for number/float on float64 column")
+		}
+		if !strings.Contains(diag.Message, "format: double") {
+			t.Errorf("Message should mention format: double: %s", diag.Message)
+		}
+	})
+
+	t.Run("float64 wrong type returns generic diagnostic", func(t *testing.T) {
+		// type mismatch (string vs number) takes the generic path, not the float helper.
+		ref := &openapi3.SchemaRef{Value: &openapi3.Schema{Type: &openapi3.Types{"string"}}}
+		diag, ok := xdo77PropDiag(fs, "User", "users", "balance", ref, cols)
+		if !ok {
+			t.Fatal("expected true for string on float64 column")
+		}
+		if !strings.Contains(diag.Message, "XDO-77") {
+			t.Errorf("Message missing XDO-77: %s", diag.Message)
 		}
 	})
 }

@@ -51,6 +51,12 @@ func xdo77PropDiag(fs *yongol.Fullstack, schemaName, tableName, propName string,
 		return xdo77UUIDFormatDiag(tableName, colName, line), true
 	}
 
+	// Float-specific diagnostic: type matches `number` but format: double is
+	// missing/wrong — clearer message + targeted hint.
+	if ddlGoType == "float64" && !typeMismatch {
+		return xdo77FloatFormatDiag(tableName, colName, line), true
+	}
+
 	oaDisplay := actualType
 	if actualFormat != "" {
 		oaDisplay = actualType + "/" + actualFormat

@@ -52,18 +52,21 @@ func TestResolveOAPIGoType(t *testing.T) {
 		// context divergence: param date-time → string (NOT time.Time)
 		{"param string date-time", strSchema("date-time"), CtxParam, "string"},
 
-		// --- integer × format × context ---
+		// --- integer × format × context (int/int32/int64 are context-independent) ---
 		{"resp int plain", intSchema(""), CtxResponseBody, "int"},
 		{"resp int int64", intSchema("int64"), CtxResponseBody, "int64"},
-		{"resp int int32", intSchema("int32"), CtxResponseBody, "int"},
-		{"param int plain", intSchema(""), CtxParam, "int32"},
+		{"resp int int32", intSchema("int32"), CtxResponseBody, "int32"},
+		{"param int plain", intSchema(""), CtxParam, "int"},
 		{"param int int64", intSchema("int64"), CtxParam, "int64"},
 		{"param int int32", intSchema("int32"), CtxParam, "int32"},
 
-		// --- number × format × context ---
-		{"resp number plain", numSchema(""), CtxResponseBody, "float64"},
+		// --- number × format × context (float32 default; double→float64; context-independent) ---
+		{"resp number plain", numSchema(""), CtxResponseBody, "float32"},
 		{"resp number float", numSchema("float"), CtxResponseBody, "float32"},
-		{"param number float", numSchema("float"), CtxParam, ""},
+		{"resp number double", numSchema("double"), CtxResponseBody, "float64"},
+		{"param number plain", numSchema(""), CtxParam, "float32"},
+		{"param number float", numSchema("float"), CtxParam, "float32"},
+		{"param number double", numSchema("double"), CtxParam, "float64"},
 
 		// --- boolean / object ---
 		{"resp boolean", boolSchema(), CtxResponseBody, "bool"},

@@ -175,6 +175,7 @@ OpenAPI self-consistency (based on the document parsed by kin-openapi).
 | O-3 | ERROR | Path template parameter declaration missing | `pkg/validate/openapi/o_03_path_template_param.go` |
 | O-4 | ERROR | Operation is missing `operationId` | `pkg/validate/openapi/o_04_op_id_required.go` |
 | O-5 | ERROR | 4xx/5xx response is missing `content: application/json` + schema (204/304 exempt; 1xx-3xx out of scope) | `pkg/validate/openapi/o_05_response_body_required.go` |
+| O-6 | ERROR | Schema `required` entry is not declared in that schema's `properties` (dangling required; checked for components + request/response inline schemas + nested) | `pkg/validate/openapi/o06_required_property_consistency.go` |
 | XOO-71 | WARNING | Password-like fields have no `minLength` | `pkg/validate/openapi/xoo_71_password_no_min_length.go` |
 | XOO-72 | WARNING | Email-like fields have no `format` | `pkg/validate/openapi/xoo_72_email_no_format.go` |
 | XOE-01 | WARNING | ErrorResponse schema의 `error`/`code` 프로퍼티가 `required`에 없으면 oapi-codegen이 `*string`으로 생성하여 빌드 실패 | `pkg/validate/openapi/xoe_01_error_response_required.go` |
@@ -237,7 +238,7 @@ Cross-consistency between DDL tables/columns and OpenAPI schemas / extension fie
 | XDO-70 | WARNING | OpenAPI `maxLength` exceeds DDL `VARCHAR(n)` | `pkg/validate/openapi_ddl/xdo_70_max_length_exceeds_varchar.go` |
 | XDO-75 | ERROR | OpenAPI optional + DDL `NOT NULL` + no `DEFAULT` | `pkg/validate/openapi_ddl/xdo_75_optional_not_null_no_default.go` |
 | XDO-76 | WARNING | OpenAPI required + DDL nullable | `pkg/validate/openapi_ddl/xdo_76_required_nullable.go` |
-| XDO-77 | ERROR | DDL column type ↔ OpenAPI field type mismatch | `pkg/validate/openapi_ddl/xdo_77_column_type_mismatch.go` |
+| XDO-77 | ERROR | DDL column type ↔ OpenAPI field type/format mismatch (incl. float columns require `format: double` — yongol maps every float column to `float64`, so formatless `number` = oapi-codegen `float32` breaks generate) | `pkg/validate/openapi_ddl/xdo_77_column_type_mismatch.go` |
 | XDO-78 | ERROR | OpenAPI `enum` declared but DDL column has no matching `CHECK IN` constraint (reverse of XDO-68) | `pkg/validate/openapi_ddl/xdo_78_enum_no_check.go` |
 | XOD-10 | WARNING | DDL column is missing from an OpenAPI response schema (coverage) | `pkg/validate/openapi_ddl/xod_10_ddl_to_response.go` |
 
@@ -258,7 +259,7 @@ Cross-consistency between OpenAPI operations/responses and SSaC functions / `@re
 | XSO-16 | ERROR | OpenAPI operationId must be used as a SSaC function (coverage) | `pkg/validate/openapi_ssac/xso_16_op_id_to_func.go` |
 | XSO-18 | ERROR | OpenAPI response field must be used in a SSaC `@response` (coverage) | `pkg/validate/openapi_ssac/xso_18_response_field_used.go` |
 | XSO-20 | ERROR | OpenAPI response field must be used in a shorthand `@response` (coverage) | `pkg/validate/openapi_ssac/xso_20_shorthand_field_used.go` |
-| XOS-70 | ERROR | `@response` integer literal mapped to optional integer field requires `format: int64` in OpenAPI response schema | `pkg/validate/openapi_ssac/xos_70_response_literal_int_format.go` |
+| XOS-70 | ERROR | `@response` integer field (integer literal or variable binding, required or optional) requires `format: int64` in OpenAPI response schema — codegen binds integer fields to `int64` and formatless oapi-codegen `int` mismatches (covers non-DDL Func/COUNT integer responses; DDL-backed are already forced to int64 by XDO-77) | `pkg/validate/openapi_ssac/xos_70_response_literal_int_format.go` |
 | XOS-80 | ERROR | HTTP-method-conventional success status (POST→201, PUT→200, DELETE→204, GET→200) is not declared in OpenAPI responses — codegen cannot derive the success status | `pkg/validate/openapi_ssac/xos_80_success_status_mismatch.go` |
 | XOS-82 | WARNING | OpenAPI operation declares multiple 2xx responses but only the one selected by `DeriveSuccessStatus` is reachable from SSaC | `pkg/validate/openapi_ssac/xos_82_unreachable_success_status.go` |
 

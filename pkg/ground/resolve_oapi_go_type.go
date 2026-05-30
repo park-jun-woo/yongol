@@ -48,9 +48,12 @@ func resolveOAPIGoType(ref *openapi3.SchemaRef, ctx OAPIContext) string {
 		if s.Format == "int64" {
 			return "int64"
 		}
-		return ctxIntDefault(ctx)
+		if s.Format == "int32" {
+			return "int32"
+		}
+		return ctxIntDefault()
 	case "number":
-		return ctxNumberType(s.Format, ctx)
+		return ctxNumberType(s.Format)
 	case "boolean":
 		return "bool"
 	case "object":
