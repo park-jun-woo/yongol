@@ -31,12 +31,28 @@ func registerOpenAPIResponseProps(g *rule.Ground, opID string, schema *openapi3.
 // format-aware via resolveOAPIResponseGoType (uuid→openapi_types.UUID,
 // date-time→time.Time, email→openapi_types.Email, else string), so XOS-67
 // compares @response values against the type the generated struct field
-// actually has. $ref / integer / array / object schemas keep the existing
-// resolveSchemaType path.
+// actually has.
+//
+// Arrays whose items are a primitive `string` are descended into so that
+// { type: array, items: { type: string, format: uuid } } maps to
+// []openapi_types.UUID (not []string). resolvePrimitiveType's array case
+// drops the item format, which produced an XOS-67 false positive for
+// array-of-uuid response fields (BUG-102). Only primitive-string items are
+// format-aware here; $ref / nested-array / non-string items keep the
+// resolveSchemaType path, as do $ref / integer / object top-level schemas.
 func responsePropType(ref *openapi3.SchemaRef) string {
 	if ref != nil && ref.Ref == "" && ref.Value != nil {
-		if types := ref.Value.Type; types != nil && len(types.Slice()) > 0 && types.Slice()[0] == "string" {
-			return resolveOAPIResponseGoType("string", ref.Value.Format)
+		if types := ref.Value.Type; types != nil && len(types.Slice()) > 0 {
+			switch types.Slice()[0] {
+			case "string":
+				return resolveOAPIResponseGoType("string", ref.Value.Format)
+			case "array":
+				if items := ref.Value.Items; items != nil && items.Ref == "" && items.Value != nil {
+					if it := items.Value.Type; it != nil && len(it.Slice()) > 0 && it.Slice()[0] == "string" {
+						return "[]" + resolveOAPIResponseGoType("string", items.Value.Format)
+					}
+				}
+			}
 		}
 	}
 	return resolveSchemaType(ref)
