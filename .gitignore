@@ -21,6 +21,9 @@ CLAUDE.md
 # whyso cache (sibling dev tool)
 .whyso/
 
+# tsma session state (test-status tracker; regenerated each run, local only)
+.tsma/
+
 # Project-local config
 .clari/
 
