@@ -4,7 +4,7 @@ description: Full-stack SSOT orchestrator that validates the consistency of 10 d
 license: MIT
 metadata:
   author: park-jun-woo
-  version: "0.6.20"
+  version: "0.6.21"
 ---
 
 # yongol — Full-Stack SSOT Orchestrator
