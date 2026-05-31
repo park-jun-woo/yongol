@@ -1,6 +1,5 @@
-//ff:func feature=validate-contract type=test control=iteration dimension=1 topic=preserve-safety
+//ff:func feature=validate-contract type=test control=sequence topic=preserve-safety
 //ff:what TestScanFileForPanic — 단일 파일 내 허용되지 않은 panic() 호출 수집 검증
-
 package contract
 
 import (

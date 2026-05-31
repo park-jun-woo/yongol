@@ -1,6 +1,5 @@
-//ff:func feature=validate type=test control=selection topic=stml-design
+//ff:func feature=validate type=test control=sequence topic=stml-design
 //ff:what TestXmv12DeadComponentEmpty — xmv12DeadComponent 컴포넌트 토큰 없을 때 early-return 검증
-
 package stml_design
 
 import (

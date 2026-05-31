@@ -5,9 +5,9 @@ package ground
 import (
 	"github.com/jinzhu/inflection"
 
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/rule"
 	"github.com/park-jun-woo/yongol/pkg/util/caseconv"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // populateSQLc registers column names as sqlc parameter set per model.

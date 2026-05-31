@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=sequence
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestDefaultExprStopKeywords — DEFAULT 표현식 종료 키워드 집합 검증
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestDefaultExprStopKeywords(t *testing.T) {
 	kw := defaultExprStopKeywords()

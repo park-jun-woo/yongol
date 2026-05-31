@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=selection
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestMnemonicFor — Operation 별 snake_case mnemonic 생성
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestMnemonicFor(t *testing.T) {
 	cases := []struct {

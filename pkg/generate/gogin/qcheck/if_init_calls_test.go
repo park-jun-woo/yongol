@@ -1,24 +1,10 @@
-//ff:func feature=gen-gogin type=test control=branch topic=err-guard
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what TestIfInitCalls — if-init이 pkg.Func 호출인지 각 분기 검증
-
 package qcheck
 
 import (
-	"go/ast"
 	"testing"
 )
-
-// firstIf returns the first *ast.IfStmt in the parsed func body.
-func firstIf(t *testing.T, body string) *ast.IfStmt {
-	t.Helper()
-	for _, s := range blockStmts(t, body) {
-		if ifs, ok := s.(*ast.IfStmt); ok {
-			return ifs
-		}
-	}
-	t.Fatalf("no if statement found in %q", body)
-	return nil
-}
 
 func TestIfInitCalls(t *testing.T) {
 	t.Run("Match", func(t *testing.T) {

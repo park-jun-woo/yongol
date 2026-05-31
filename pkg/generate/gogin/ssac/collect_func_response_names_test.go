@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=2
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what collectFuncResponseNames 단위 테스트 (@call typed Result → funcRespInfo 맵)
-
 package ssac
 
 import (

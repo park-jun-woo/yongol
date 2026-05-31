@@ -1,9 +1,10 @@
-//ff:func feature=validate type=test control=selection topic=stml-design
+//ff:func feature=validate type=test control=sequence topic=stml-design
 //ff:what TestClassifySingleTokenRounded — classifySingleToken rounded-prefix early-return 분기 검증
-
 package stml_design
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestClassifySingleTokenRounded(t *testing.T) {
 	var out pageTokenRefs

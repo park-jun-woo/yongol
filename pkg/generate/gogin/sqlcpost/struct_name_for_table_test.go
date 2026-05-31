@@ -1,9 +1,10 @@
-//ff:func feature=gen-gogin type=test control=sequence topic=sqlc-post
+//ff:func feature=gen-gogin type=test control=iteration dimension=1
 //ff:what TestStructNameForTable — exported wrapper가 structNameFor와 동일 결과 반환 검증
-
 package sqlcpost
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestStructNameForTable(t *testing.T) {
 	cases := []string{"users", "audit_logs", "categories", "data"}

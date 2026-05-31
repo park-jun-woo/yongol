@@ -1,9 +1,10 @@
-//ff:func feature=agent type=test control=sequence
+//ff:func feature=agent type=test control=iteration dimension=1
 //ff:what TestTableFromSQLcFile — sqlc 파일명/경로에서 테이블명(.sql 제거) 추출 검증
-
 package agent
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestTableFromSQLcFile(t *testing.T) {
 	cases := []struct {

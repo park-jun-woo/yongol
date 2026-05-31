@@ -1,9 +1,10 @@
-//ff:func feature=agent type=test control=iteration dimension=2
+//ff:func feature=agent type=test control=sequence
 //ff:what TestMatchByLine — YAML line 에러의 라인 번호를 op 범위로 매핑 검증
-
 package agent
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestMatchByLine(t *testing.T) {
 	offsets := []pathOffset{

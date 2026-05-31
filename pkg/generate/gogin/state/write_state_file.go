@@ -26,9 +26,9 @@ func writeStateFile(dir, id, symbol string, transMap map[string]map[string]strin
 	base := strcase.ToSnake(id)
 
 	files := map[string]string{
-		base + ".go":                    renderStateFile(id, symbol, transMap),
-		base + "_can_transition.go":     renderCanTransitionFile(id, symbol),
-		base + "_next_state.go":         renderNextStateFile(id, symbol),
+		base + ".go":                renderStateFile(id, symbol, transMap),
+		base + "_can_transition.go": renderCanTransitionFile(id, symbol),
+		base + "_next_state.go":     renderNextStateFile(id, symbol),
 	}
 	for name, src := range files {
 		path := filepath.Join(dir, name)

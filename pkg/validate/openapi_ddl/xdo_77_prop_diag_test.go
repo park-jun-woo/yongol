@@ -1,144 +1,27 @@
-//ff:func feature=validate type=test control=sequence topic=openapi-ddl
-//ff:what TestXdo77PropDiag — nil/미존재 컬럼/타입 일치/불일치 검증
-
+//ff:func feature=validate type=test control=iteration dimension=1
+//ff:what TestXdo77PropDiag — 서브테스트 디스패치
 package openapi_ddl
 
-import (
-	"strings"
-	"testing"
-
-	"github.com/getkin/kin-openapi/openapi3"
-	oapiparser "github.com/park-jun-woo/yongol/pkg/parser/openapi"
-	"github.com/park-jun-woo/yongol/pkg/yongol"
-)
+import "testing"
 
 func TestXdo77PropDiag(t *testing.T) {
-	cols := map[string]string{
-		"id":      "int64",
-		"email":   "string",
-		"active":  "bool",
-		"balance": "float64",
+	for _, st := range []struct {
+		name string
+		fn   func(*testing.T)
+	}{
+		{"nil propRef returns false", subtestTestXdo77PropDiagNilPropRefReturnsFalse},
+		{"column not in DDL returns false", subtestTestXdo77PropDiagColumnNotInDDLReturnsFalse},
+		{"matching types returns false", subtestTestXdo77PropDiagMatchingTypesReturnsFalse},
+		{"type mismatch returns diagnostic", subtestTestXdo77PropDiagTypeMismatchReturnsDiagnostic},
+		{"unknown DDL Go type returns false", subtestTestXdo77PropDiagUnknownDDLGoTypeReturnsFalse},
+		{"empty type slice returns false", subtestTestXdo77PropDiagEmptyTypeSliceReturnsFalse},
+		{"format mismatch with format in display", subtestTestXdo77PropDiagFormatMismatchWithFormatInDisplay},
+		{"boolean match returns false", subtestTestXdo77PropDiagBooleanMatchReturnsFalse},
+		{"float64 number with format double returns false", subtestTestXdo77PropDiagFloat64NumberWithFormatDoubleReturnsFalse},
+		{"float64 formatless number returns float-specific diagnostic", subtestTestXdo77PropDiagFloat64FormatlessNumberReturnsFloatSpecificDiagnostic},
+		{"float64 number with format float returns float-specific diagnostic", subtestTestXdo77PropDiagFloat64NumberWithFormatFloatReturnsFloatSpecificDiagnostic},
+		{"float64 wrong type returns generic diagnostic", subtestTestXdo77PropDiagFloat64WrongTypeReturnsGenericDiagnostic},
+	} {
+		t.Run(st.name, st.fn)
 	}
-	fs := &yongol.Fullstack{
-		OpenAPILines: &oapiparser.LineIndex{
-			SchemaProperties: map[string]map[string]int{},
-			Schemas:          map[string]int{},
-		},
-	}
-
-	t.Run("nil propRef returns false", func(t *testing.T) {
-		_, ok := xdo77PropDiag(fs, "User", "users", "id", nil, cols)
-		if ok {
-			t.Error("expected false for nil propRef")
-		}
-	})
-
-	t.Run("column not in DDL returns false", func(t *testing.T) {
-		ref := &openapi3.SchemaRef{Value: &openapi3.Schema{Type: &openapi3.Types{"string"}}}
-		_, ok := xdo77PropDiag(fs, "User", "users", "ghost", ref, cols)
-		if ok {
-			t.Error("expected false for missing column")
-		}
-	})
-
-	t.Run("matching types returns false", func(t *testing.T) {
-		ref := &openapi3.SchemaRef{Value: &openapi3.Schema{Type: &openapi3.Types{"integer"}, Format: "int64"}}
-		_, ok := xdo77PropDiag(fs, "User", "users", "id", ref, cols)
-		if ok {
-			t.Error("expected false for matching types")
-		}
-	})
-
-	t.Run("type mismatch returns diagnostic", func(t *testing.T) {
-		ref := &openapi3.SchemaRef{Value: &openapi3.Schema{Type: &openapi3.Types{"string"}}}
-		diag, ok := xdo77PropDiag(fs, "User", "users", "id", ref, cols)
-		if !ok {
-			t.Fatal("expected true for mismatch")
-		}
-		if !strings.Contains(diag.Message, "XDO-77") {
-			t.Errorf("Message missing XDO-77: %s", diag.Message)
-		}
-	})
-
-	t.Run("unknown DDL Go type returns false", func(t *testing.T) {
-		unknownCols := map[string]string{"data": "unknownType"}
-		ref := &openapi3.SchemaRef{Value: &openapi3.Schema{Type: &openapi3.Types{"string"}}}
-		_, ok := xdo77PropDiag(fs, "User", "users", "data", ref, unknownCols)
-		if ok {
-			t.Error("expected false for unknown DDL Go type")
-		}
-	})
-
-	t.Run("empty type slice returns false", func(t *testing.T) {
-		ref := &openapi3.SchemaRef{Value: &openapi3.Schema{Type: &openapi3.Types{}}}
-		_, ok := xdo77PropDiag(fs, "User", "users", "id", ref, cols)
-		if ok {
-			t.Error("expected false for empty type slice")
-		}
-	})
-
-	t.Run("format mismatch with format in display", func(t *testing.T) {
-		// id is int64 which expects integer/int64, provide integer/int32
-		ref := &openapi3.SchemaRef{Value: &openapi3.Schema{Type: &openapi3.Types{"integer"}, Format: "int32"}}
-		diag, ok := xdo77PropDiag(fs, "User", "users", "id", ref, cols)
-		if !ok {
-			t.Fatal("expected true for format mismatch")
-		}
-		if !strings.Contains(diag.Message, "int32") {
-			t.Errorf("Message missing format: %s", diag.Message)
-		}
-	})
-
-	t.Run("boolean match returns false", func(t *testing.T) {
-		ref := &openapi3.SchemaRef{Value: &openapi3.Schema{Type: &openapi3.Types{"boolean"}}}
-		_, ok := xdo77PropDiag(fs, "User", "users", "active", ref, cols)
-		if ok {
-			t.Error("expected false for matching boolean")
-		}
-	})
-
-	t.Run("float64 number with format double returns false", func(t *testing.T) {
-		ref := &openapi3.SchemaRef{Value: &openapi3.Schema{Type: &openapi3.Types{"number"}, Format: "double"}}
-		_, ok := xdo77PropDiag(fs, "User", "users", "balance", ref, cols)
-		if ok {
-			t.Error("expected false for number/double on float64 column")
-		}
-	})
-
-	t.Run("float64 formatless number returns float-specific diagnostic", func(t *testing.T) {
-		ref := &openapi3.SchemaRef{Value: &openapi3.Schema{Type: &openapi3.Types{"number"}}}
-		diag, ok := xdo77PropDiag(fs, "User", "users", "balance", ref, cols)
-		if !ok {
-			t.Fatal("expected true for formatless number on float64 column")
-		}
-		if !strings.Contains(diag.Message, "format: double") {
-			t.Errorf("Message should mention format: double: %s", diag.Message)
-		}
-		if !strings.Contains(diag.Message, "float64") {
-			t.Errorf("Message should mention float64: %s", diag.Message)
-		}
-	})
-
-	t.Run("float64 number with format float returns float-specific diagnostic", func(t *testing.T) {
-		ref := &openapi3.SchemaRef{Value: &openapi3.Schema{Type: &openapi3.Types{"number"}, Format: "float"}}
-		diag, ok := xdo77PropDiag(fs, "User", "users", "balance", ref, cols)
-		if !ok {
-			t.Fatal("expected true for number/float on float64 column")
-		}
-		if !strings.Contains(diag.Message, "format: double") {
-			t.Errorf("Message should mention format: double: %s", diag.Message)
-		}
-	})
-
-	t.Run("float64 wrong type returns generic diagnostic", func(t *testing.T) {
-		// type mismatch (string vs number) takes the generic path, not the float helper.
-		ref := &openapi3.SchemaRef{Value: &openapi3.Schema{Type: &openapi3.Types{"string"}}}
-		diag, ok := xdo77PropDiag(fs, "User", "users", "balance", ref, cols)
-		if !ok {
-			t.Fatal("expected true for string on float64 column")
-		}
-		if !strings.Contains(diag.Message, "XDO-77") {
-			t.Errorf("Message missing XDO-77: %s", diag.Message)
-		}
-	})
 }

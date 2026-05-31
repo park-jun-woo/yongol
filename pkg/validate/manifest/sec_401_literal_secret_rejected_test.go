@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	pmanifest "github.com/park-jun-woo/yongol/pkg/parser/manifest"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 func TestSEC401_LiteralSecretRejected(t *testing.T) {

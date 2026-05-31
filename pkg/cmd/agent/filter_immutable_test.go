@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=iteration dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestFilterImmutable — immutable 파일의 diagnostic 만 제외하고 나머지 보존 검증
-
 package agent
 
 import (

@@ -5,8 +5,8 @@ package ssac_ddl
 
 import (
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/parser/ssac"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 func collectFuncResultDiags(fs *yongol.Fullstack, tables map[string]bool, fn ssac.ServiceFunc) []diagnostic.Diagnostic {

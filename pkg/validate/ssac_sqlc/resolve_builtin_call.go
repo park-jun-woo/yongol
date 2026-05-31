@@ -9,8 +9,8 @@ import ssacparser "github.com/park-jun-woo/yongol/pkg/parser/ssac"
 // check for a single SSaC sequence. Returns empty strings when the
 // sequence is not a DB-facing built-in call.
 //
-//   @call <pkg>.<Method>   → (pkg, Method)
-//   @publish "topic"       → ("queue", "Publish")
+//	@call <pkg>.<Method>   → (pkg, Method)
+//	@publish "topic"       → ("queue", "Publish")
 //
 // @subscribe is handled one level up in the loop because it lives on the
 // ServiceFunc, not the sequence.

@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=iteration dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestFilterDiagsByOp — op 포함 진단만 필터, 없으면 원본 반환 검증
-
 package agent
 
 import (

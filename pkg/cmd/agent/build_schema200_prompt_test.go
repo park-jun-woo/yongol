@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=selection dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestBuildSchema200Prompt — DDL 컨텍스트 유무에 따른 200 schema 프롬프트 구성 검증
-
 package agent
 
 import (

@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what collectResponseSchemas 단위 테스트 (전체 doc의 200 $ref 스키마 이름 집합)
-
 package ssac
 
 import (

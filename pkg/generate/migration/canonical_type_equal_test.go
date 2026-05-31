@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=selection
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestCanonicalTypeEqual — 모든 필드가 같을 때만 Equal=true
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestCanonicalTypeEqual(t *testing.T) {
 	base := CanonicalType{Base: "VARCHAR", Length: 10, Precision: 0, Scale: 0, Array: false}

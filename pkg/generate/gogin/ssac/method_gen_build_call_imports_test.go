@@ -1,9 +1,10 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what buildCallImports 단위 테스트 (ImportMap/auth model/slog/otel/gin 분기)
-
 package ssac
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestBuildCallImports(t *testing.T) {
 	t.Run("project pkg import + slog for http", func(t *testing.T) {

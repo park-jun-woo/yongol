@@ -1,9 +1,10 @@
-//ff:func feature=validate type=test control=selection topic=states
+//ff:func feature=validate type=test control=iteration dimension=1 topic=states
 //ff:what TestPathHasIDParam — pathHasIDParam {id} 파라미터 포함 여부 분기 검증
-
 package ssac_statemachine
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestPathHasIDParam(t *testing.T) {
 	cases := []struct {

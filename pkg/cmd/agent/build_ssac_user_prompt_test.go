@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=selection dimension=2
+//ff:func feature=agent type=test control=sequence
 //ff:what TestBuildSSaCUserPrompt — DDL/쿼리/pathBlock 옵션 섹션 유무에 따른 SSaC 프롬프트 구성 검증
-
 package agent
 
 import (

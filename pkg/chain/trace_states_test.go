@@ -1,4 +1,4 @@
-//ff:func feature=chain type=test control=iteration dimension=2
+//ff:func feature=chain type=test control=sequence
 //ff:what traceStates 가 @state sequence 를 매칭 stateDiagram 과 연결하고 미참조 시 nil 을 반환하는지 검증
 package chain
 

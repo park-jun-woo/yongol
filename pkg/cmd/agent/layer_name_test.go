@@ -1,9 +1,10 @@
-//ff:func feature=agent type=test control=selection
+//ff:func feature=agent type=test control=iteration dimension=1
 //ff:what TestLayerName — 각 레이어의 사람이 읽기 쉬운 이름 매핑 검증
-
 package agent
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestLayerName(t *testing.T) {
 	cases := []struct {

@@ -1,6 +1,5 @@
-//ff:func feature=validate-contract type=test control=sequence
+//ff:func feature=validate-contract type=test control=iteration dimension=1
 //ff:what TestResolveImportName — import alias 또는 경로 basename 으로 패키지 식별자 결정 검증
-
 package contract
 
 import (

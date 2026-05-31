@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=iteration dimension=2
+//ff:func feature=agent type=test control=sequence
 //ff:what TestAssemblePathBlock — security/params/requestBody/error-response 분기별 path 블록 조립 검증
-
 package agent
 
 import (

@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=selection dimension=2
+//ff:func feature=migration type=test control=sequence
 //ff:what TestAddForeignKey_SQL — ON DELETE/UPDATE 절 유무 분기
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestAddForeignKey_SQL(t *testing.T) {
 	t.Run("no actions", func(t *testing.T) {

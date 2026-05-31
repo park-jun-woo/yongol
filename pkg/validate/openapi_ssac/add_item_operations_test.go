@@ -15,7 +15,7 @@ func TestAddItemOperations(t *testing.T) {
 		Get:    &openapi3.Operation{OperationID: "getUser"},
 		Post:   &openapi3.Operation{OperationID: "createUser"},
 		Put:    nil,
-		Delete: &openapi3.Operation{},  // no operationId
+		Delete: &openapi3.Operation{}, // no operationId
 		Patch:  &openapi3.Operation{OperationID: "patchUser"},
 	}
 

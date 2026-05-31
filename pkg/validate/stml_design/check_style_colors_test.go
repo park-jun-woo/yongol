@@ -1,6 +1,5 @@
-//ff:func feature=validate type=test control=selection topic=stml-design
+//ff:func feature=validate type=test control=sequence topic=stml-design
 //ff:what TestCheckStyleColors — checkStyleColors 하드코딩 hex 색상 검출 분기 검증
-
 package stml_design
 
 import (

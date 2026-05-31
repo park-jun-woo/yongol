@@ -24,7 +24,7 @@ import (
 // Subsequent tables inside the same section (currently none) are ignored.
 //
 // Description and Source fields are trimmed of surrounding whitespace and
-// leading/trailing backticks (since Source is typically wrapped in `` ` ``).
+// leading/trailing backticks (since Source is typically wrapped in “ ` “).
 func Parse(r io.Reader) ([]RuleMeta, error) {
 	scanner := bufio.NewScanner(r)
 	// rulebook rows are short; default buffer size is plenty but raise the

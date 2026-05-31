@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=selection dimension=3
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestCreateIndex_SQL — UNIQUE/USING/WHERE 절 조합 렌더
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestCreateIndex_SQL(t *testing.T) {
 	cases := []struct {

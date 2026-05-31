@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what collectSensitiveKeysFromTable — 한 테이블의 @sensitive 컬럼명을 seen 맵에 누적
-
 package boot
 
 import (

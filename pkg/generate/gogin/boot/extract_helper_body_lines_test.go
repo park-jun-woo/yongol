@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=sequence
+//ff:func feature=gen-gogin type=test control=iteration dimension=1
 //ff:what extractHelperBodyLines — top-level func 선언 문자열에서 body 라인 추출 (signature/braces 제거)
-
 package boot
 
 import (

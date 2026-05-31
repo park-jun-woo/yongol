@@ -12,13 +12,13 @@ package manifest
 // the manifest only exposes the three knobs that can vary per deployment.
 // Callers upgrading from Phase005:
 //   - Name      → AccessName (renamed; previous `session`-style values no
-//                 longer apply because the generator enforces __Host-).
+//     longer apply because the generator enforces __Host-).
 //   - Secure    → removed (always true; __Host- prefix mandates it).
 //   - HTTPOnly  → removed (always true; JS access is never permitted for
-//                 session tokens per OWASP ASVS 5.0).
+//     session tokens per OWASP ASVS 5.0).
 //   - MaxAge    → removed (derived from auth.access_token_ttl /
-//                 refresh_token_ttl, keeping cookie lifetime locked to
-//                 token lifetime).
+//     refresh_token_ttl, keeping cookie lifetime locked to
+//     token lifetime).
 type CookieConfig struct {
 	// AccessName overrides the Set-Cookie name of the access token.
 	// Defaults to "__Host-access_token". Names that don't begin with

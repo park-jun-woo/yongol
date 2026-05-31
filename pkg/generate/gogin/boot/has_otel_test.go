@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=sequence topic=observability
+//ff:func feature=gen-gogin type=test control=iteration dimension=1 topic=observability
 //ff:what hasOtel — manifest.backend.observability.tracing.enabled 여부 (기본 false)
-
 package boot
 
 import (
@@ -9,12 +8,6 @@ import (
 	pmanifest "github.com/park-jun-woo/yongol/pkg/parser/manifest"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
-
-func fsWithTracing(tr *pmanifest.ObservabilityTracing) *yongol.Fullstack {
-	return &yongol.Fullstack{Manifest: &pmanifest.ProjectConfig{
-		Backend: pmanifest.Backend{Observability: &pmanifest.Observability{Tracing: tr}},
-	}}
-}
 
 func TestHasOtel(t *testing.T) {
 	cases := []struct {

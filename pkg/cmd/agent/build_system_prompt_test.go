@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=selection dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestBuildSystemPrompt — docs 섹션 매칭 시 포함, 미매칭/무문서 레이어는 예시만 포함 검증
-
 package agent
 
 import (

@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=selection dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestBuildRequestBodyPrompt — DDL 컨텍스트 유무에 따른 requestBody 프롬프트 구성 검증
-
 package agent
 
 import (

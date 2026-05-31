@@ -1,6 +1,5 @@
-//ff:func feature=validate-contract type=test control=iteration dimension=1 topic=preserve-safety
+//ff:func feature=validate-contract type=test control=sequence topic=preserve-safety
 //ff:what TestPRV10PreservedPanic — preserved 파일 목록 panic 오케스트레이션 검증
-
 package contract
 
 import (

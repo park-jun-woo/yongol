@@ -1,9 +1,10 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what methodGen.returnErr 단위 테스트 (subscribe면 return err, 아니면 return nil, err)
-
 package ssac
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestMethodGenReturnErr(t *testing.T) {
 	if got := (&methodGen{IsSubscribe: true}).returnErr(); got != "return err" {

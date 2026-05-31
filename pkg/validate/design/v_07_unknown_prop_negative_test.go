@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	pdesign "github.com/park-jun-woo/yongol/pkg/parser/design"
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
+	pdesign "github.com/park-jun-woo/yongol/pkg/parser/design"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 

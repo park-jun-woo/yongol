@@ -1,6 +1,5 @@
-//ff:func feature=validate type=test control=selection topic=states
+//ff:func feature=validate type=test control=sequence topic=states
 //ff:what TestXms24StateDiagramExists — XMS-24 @state 참조 diagram 존재 검증
-
 package ssac_statemachine
 
 import (

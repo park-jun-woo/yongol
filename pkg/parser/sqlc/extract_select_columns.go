@@ -48,4 +48,3 @@ func extractSelectColumns(body string) (selectStar bool, selectCols []string) {
 	}
 	return false, selectCols
 }
-

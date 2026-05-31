@@ -1,6 +1,5 @@
-//ff:func feature=validate-contract type=test control=selection topic=preserve-safety
+//ff:func feature=validate-contract type=test control=iteration dimension=1 topic=preserve-safety
 //ff:what TestBinaryIsErrNotNil — `x != nil` / `nil != x` err 패턴 판정 검증
-
 package contract
 
 import (

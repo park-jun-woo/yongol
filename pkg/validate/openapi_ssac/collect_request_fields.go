@@ -17,4 +17,3 @@ func collectRequestFields(fn ssac.ServiceFunc) map[string]bool {
 	}
 	return fields
 }
-

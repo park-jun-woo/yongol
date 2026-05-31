@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=sequence topic=observability
+//ff:func feature=gen-gogin type=test control=iteration dimension=1 topic=observability
 //ff:what otelStdoutCaseLines — switch "stdout" case 의 본문 라인 생성
-
 package boot
 
 import (

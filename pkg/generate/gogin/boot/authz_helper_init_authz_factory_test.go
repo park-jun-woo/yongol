@@ -1,6 +1,5 @@
 //ff:func feature=gen-gogin type=test control=iteration dimension=1
 //ff:what authzHelperInitAuthzFactory — OPA authz.Init 호출 헬퍼 (OwnershipMapping 임베드) 소스 생성
-
 package boot
 
 import (
@@ -28,12 +27,5 @@ func TestAuthzHelperInitAuthzFactory(t *testing.T) {
 	// No DB threading post Phase002.
 	if strings.Contains(src, "*sql.DB") || strings.Contains(src, "conn") {
 		t.Errorf("initAuthz must be DB-free (Phase002), got:\n%s", src)
-	}
-}
-
-func TestAuthzHelperInitAuthzFactory_NoMappings(t *testing.T) {
-	src := authzHelperInitAuthzFactory(nil)
-	if !strings.Contains(src, "authz.Init(policyPath, []authz.OwnershipMapping{") {
-		t.Errorf("empty mappings should still emit Init call, got:\n%s", src)
 	}
 }

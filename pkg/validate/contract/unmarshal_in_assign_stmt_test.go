@@ -1,10 +1,8 @@
-//ff:func feature=validate-contract type=test control=sequence topic=preserve-safety
+//ff:func feature=validate-contract type=test control=iteration dimension=1 topic=preserve-safety
 //ff:what TestUnmarshalInAssignStmt — AssignStmt Unmarshal 호출의 kind/errName 분류 검증
-
 package contract
 
 import (
-	"go/ast"
 	"testing"
 )
 
@@ -22,17 +20,7 @@ func TestUnmarshalInAssignStmt(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			as := mustFirstStmt(t, tt.body).(*ast.AssignStmt)
-			_, call, errName, kind := unmarshalInAssignStmt(as)
-			if (call == nil) != tt.wantNil {
-				t.Fatalf("call nil=%v, want %v", call == nil, tt.wantNil)
-			}
-			if kind != tt.wantKind {
-				t.Errorf("kind = %v, want %v", kind, tt.wantKind)
-			}
-			if errName != tt.wantErr {
-				t.Errorf("errName = %q, want %q", errName, tt.wantErr)
-			}
+			assertUnmarshalInAssignStmt(t, tt.body, tt.wantNil, tt.wantKind, tt.wantErr)
 		})
 	}
 }

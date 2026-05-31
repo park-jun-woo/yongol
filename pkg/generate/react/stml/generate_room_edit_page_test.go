@@ -2,7 +2,12 @@
 //ff:what 스터디룸 수정 페이지 TSX 생성을 검증
 package stml
 
-import ("strings"; "testing"; stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml")
+import (
+	"strings"
+	"testing"
+
+	stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
+)
 
 func TestGenerateRoomEditPage(t *testing.T) {
 	page, _ := stmlparser.ParseReader("room-edit-page.html", strings.NewReader(`<main class="max-w-2xl mx-auto p-6">

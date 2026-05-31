@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=iteration dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestBuildTableFeatureMap — table 기준 feature 그룹화 및 빈 table skip 검증
-
 package agent
 
 import (

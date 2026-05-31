@@ -19,18 +19,7 @@ func renderPutOp(b *strings.Builder, op *ir.PutOp, indent, prismaRef string) {
 	}
 	model := lcFirst(op.Model)
 
-	var whereParts, dataParts []string
-	for _, a := range op.Args {
-		key := resolveArgKey(a)
-		val := renderArgValue(a)
-		pair := fmt.Sprintf("%s: %s", key, val)
-		if a.IsPK {
-			whereParts = append(whereParts, pair)
-		} else {
-			dataParts = append(dataParts, pair)
-		}
-	}
-
+	whereParts, dataParts := splitPutParts(op.Args)
 	whereStr := strings.Join(whereParts, ", ")
 	if whereStr == "" {
 		whereStr = "id: params.id"

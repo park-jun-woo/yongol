@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=iteration dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestCollectRemainingFiles — ERROR만 file:line 요약으로 정렬·중복제거하는지 검증
-
 package agent
 
 import (

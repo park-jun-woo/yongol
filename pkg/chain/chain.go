@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/parser/funcspec"
 	"github.com/park-jun-woo/yongol/pkg/parser/ssac"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // Chain traces all SSOT nodes connected to the given operationId.

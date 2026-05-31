@@ -1,6 +1,5 @@
-//ff:func feature=validate-contract type=test control=sequence topic=preserve-safety
+//ff:func feature=validate-contract type=test control=iteration dimension=1 topic=preserve-safety
 //ff:what TestUnmarshalInIfStmt — if-init Unmarshal 은 Discarded(가드됨) 로 분류
-
 package contract
 
 import (

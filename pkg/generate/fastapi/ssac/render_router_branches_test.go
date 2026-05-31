@@ -1,6 +1,5 @@
-//ff:func feature=gen-fastapi type=test control=iteration dimension=1
+//ff:func feature=gen-fastapi type=test control=sequence
 //ff:what TestRenderRouterBranches — RenderRouter 미커버 분기(빈 feature/schema import/subscribe)
-
 package ssac
 
 import (

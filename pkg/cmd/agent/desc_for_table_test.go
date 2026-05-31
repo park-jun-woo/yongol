@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=iteration dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestDescForTable — 테이블과 일치하는 feature 의 desc 반환, 미일치 시 빈 문자열 검증
-
 package agent
 
 import (

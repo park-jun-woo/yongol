@@ -1,6 +1,5 @@
-//ff:func feature=validate-contract type=test control=iteration dimension=1 topic=preserve-safety
+//ff:func feature=validate-contract type=test control=sequence topic=preserve-safety
 //ff:what TestScanFileForMissingClose — 함수별 리소스 획득/close 매칭 검증
-
 package contract
 
 import (

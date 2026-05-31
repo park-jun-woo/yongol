@@ -1,13 +1,11 @@
-//ff:func feature=validate type=test control=selection topic=states
+//ff:func feature=validate type=test control=sequence topic=states
 //ff:what TestXsm27StateIntentDeclarationNilGuards — xsm27StateIntentDeclaration 가드 early-return 분기 검증
-
 package ssac_statemachine
 
 import (
 	"testing"
 
 	"github.com/getkin/kin-openapi/openapi3"
-
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 

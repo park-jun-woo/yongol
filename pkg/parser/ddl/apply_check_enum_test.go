@@ -1,9 +1,10 @@
-//ff:func feature=manifest type=test control=iteration dimension=1
+//ff:func feature=manifest type=test control=sequence
 //ff:what applyCheckEnum — CHECK IN (...) 값을 Column.CheckEnum 에 적용
-
 package ddl
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestApplyCheckEnum(t *testing.T) {
 	t.Run("captures enum values", func(t *testing.T) {

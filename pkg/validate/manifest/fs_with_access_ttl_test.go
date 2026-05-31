@@ -4,8 +4,8 @@
 package manifest
 
 import (
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	pmanifest "github.com/park-jun-woo/yongol/pkg/parser/manifest"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // fsWithAccessTTL returns a minimal Fullstack with only auth.access_token_ttl set.

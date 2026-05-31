@@ -5,6 +5,7 @@ package openapi_ssac
 
 import (
 	"testing"
+
 	"github.com/park-jun-woo/yongol/pkg/parser/ssac"
 	"github.com/park-jun-woo/yongol/pkg/rule"
 	"github.com/park-jun-woo/yongol/pkg/yongol"

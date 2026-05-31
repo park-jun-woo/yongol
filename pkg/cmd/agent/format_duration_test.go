@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=sequence
+//ff:func feature=agent type=test control=iteration dimension=1
 //ff:what TestFormatDuration — 분 미만은 초, 분 이상은 "Nm SSs" 포맷 검증
-
 package agent
 
 import (

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/generate/filefunc"
 	"github.com/park-jun-woo/yongol/pkg/generate/gogin/auth"
 	"github.com/park-jun-woo/yongol/pkg/generate/gogin/boot"
@@ -17,6 +16,7 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/generate/gogin/state"
 	"github.com/park-jun-woo/yongol/pkg/generate/prepared"
 	"github.com/park-jun-woo/yongol/pkg/generate/splitter"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // Generate produces Go+Gin backend artifacts from a parsed Fullstack.

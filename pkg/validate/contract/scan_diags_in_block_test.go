@@ -1,6 +1,5 @@
-//ff:func feature=validate-contract type=test control=iteration dimension=1 topic=preserve-safety
+//ff:func feature=validate-contract type=test control=sequence topic=preserve-safety
 //ff:what TestScanDiagsInBlock — 단일 블록 내 Scan 호출 에러 누락 진단 생성 검증
-
 package contract
 
 import (

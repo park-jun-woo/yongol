@@ -10,26 +10,27 @@ package manifest
 //
 //   - Enabled:      master switch. Missing or false → no OTel code emitted.
 //   - ServiceName:  `service.name` resource attribute. Empty → metadata.name
-//                   from manifest at codegen time.
+//     from manifest at codegen time.
 //   - Exporter:     one of "otlp" | "stdout" | "noop". Validated by OBS-003.
-//                   Default "noop" keeps SDK init paths exercised without
-//                   talking to a collector.
+//     Default "noop" keeps SDK init paths exercised without
+//     talking to a collector.
 //   - OtlpEndpoint: gRPC endpoint for the OTLP exporter ("host:port" form,
-//                   no scheme). Only consulted when Exporter == "otlp".
-//                   Default "localhost:4317".
+//     no scheme). Only consulted when Exporter == "otlp".
+//     Default "localhost:4317".
 //   - SampleRate:   head-based sampler ratio in [0.0, 1.0]. Validated by
-//                   OBS-004. Default 1.0 (sample every trace).
+//     OBS-004. Default 1.0 (sample every trace).
 //   - WrapCalls:    when true, yongol wraps every SSaC `@call` with an
-//                   explicit `otel.Tracer("ssac").Start(...)` span. Off by
-//                   default to avoid excessive span volume — flip on for
-//                   deep debugging or low-traffic services.
+//     explicit `otel.Tracer("ssac").Start(...)` span. Off by
+//     default to avoid excessive span volume — flip on for
+//     deep debugging or low-traffic services.
 //
 // Env overrides (resolved in generated main.go):
-//   BACKEND_OBSERVABILITY_TRACING_ENABLED
-//   BACKEND_OBSERVABILITY_TRACING_SERVICE_NAME
-//   BACKEND_OBSERVABILITY_TRACING_EXPORTER
-//   BACKEND_OBSERVABILITY_TRACING_OTLP_ENDPOINT
-//   BACKEND_OBSERVABILITY_TRACING_SAMPLE_RATE
+//
+//	BACKEND_OBSERVABILITY_TRACING_ENABLED
+//	BACKEND_OBSERVABILITY_TRACING_SERVICE_NAME
+//	BACKEND_OBSERVABILITY_TRACING_EXPORTER
+//	BACKEND_OBSERVABILITY_TRACING_OTLP_ENDPOINT
+//	BACKEND_OBSERVABILITY_TRACING_SAMPLE_RATE
 type ObservabilityTracing struct {
 	Enabled      bool    `yaml:"enabled,omitempty"`
 	ServiceName  string  `yaml:"service_name,omitempty"`

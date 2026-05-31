@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=selection dimension=1
+//ff:func feature=agent type=test control=iteration dimension=1
 //ff:what TestBuildGeneratePrompt — layer별(OpenAPI/Rego/Hurl/기본) 생성 프롬프트 구성 검증
-
 package agent
 
 import (
@@ -23,19 +22,7 @@ func TestBuildGeneratePrompt(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			got := buildGeneratePrompt(tc.l, op, "make one", "/v1/workflows", "SSAC")
-			if !strings.Contains(got, "Feature: make one") {
-				t.Errorf("expected feature header, got:\n%s", got)
-			}
-			if !strings.Contains(got, "SSaC file (CreateWorkflow.ssac):\nSSAC") {
-				t.Errorf("expected SSaC section, got:\n%s", got)
-			}
-			if !strings.Contains(got, tc.wantHas) {
-				t.Errorf("expected %q, got:\n%s", tc.wantHas, got)
-			}
-			if strings.Contains(got, tc.wantSkip) {
-				t.Errorf("did not expect %q for layer %s, got:\n%s", tc.wantSkip, tc.name, got)
-			}
+			assertGeneratePromptLayer(t, tc.l, op, tc.wantHas, tc.wantSkip)
 		})
 	}
 

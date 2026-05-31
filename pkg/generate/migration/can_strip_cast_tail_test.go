@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=selection dimension=4
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestCanStripCastTail — 빈/괄호불균형/비식별자는 false, 단순 타입은 true
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestCanStripCastTail(t *testing.T) {
 	cases := []struct {

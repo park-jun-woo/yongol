@@ -1,6 +1,5 @@
-//ff:func feature=validate type=test control=selection topic=ssac-statemachine
+//ff:func feature=validate type=test control=sequence topic=ssac-statemachine
 //ff:what TestXsm71StateInputTypeBranches — xsm71StateInputType 가드/skip 분기 검증
-
 package ssac_statemachine
 
 import (

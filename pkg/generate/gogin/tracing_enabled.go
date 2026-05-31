@@ -4,8 +4,8 @@
 package gogin
 
 import (
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	pmanifest "github.com/park-jun-woo/yongol/pkg/parser/manifest"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // tracingEnabled returns the tracing block when enabled, else nil. Used by

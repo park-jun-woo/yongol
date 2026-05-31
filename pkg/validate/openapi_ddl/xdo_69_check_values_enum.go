@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/util/caseconv"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // xdo69CheckValuesEnum validates XDO-69: when both DDL CHECK IN and OpenAPI

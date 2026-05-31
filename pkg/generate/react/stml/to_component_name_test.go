@@ -12,6 +12,8 @@ func TestToComponentName(t *testing.T) {
 	}
 	for _, tt := range tests {
 		got := toComponentName(tt.in)
-		if got != tt.want { t.Errorf("toComponentName(%q) = %q, want %q", tt.in, got, tt.want) }
+		if got != tt.want {
+			t.Errorf("toComponentName(%q) = %q, want %q", tt.in, got, tt.want)
+		}
 	}
 }

@@ -1,9 +1,10 @@
-//ff:func feature=manifest type=test control=iteration dimension=1
+//ff:func feature=manifest type=test control=sequence
 //ff:what collectSentinelInsert — INSERT 본문을 종결 `;` 까지 수집 (단일/다중 라인, 인용 인식)
-
 package ddl
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestCollectSentinelInsert(t *testing.T) {
 	t.Run("single line insert", func(t *testing.T) {

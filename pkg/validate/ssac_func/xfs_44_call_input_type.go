@@ -13,6 +13,7 @@ import (
 // Types["Func.request.<funcName>.<key>"]. Two resolution paths:
 //   - literal (quoted string, numeric, bool, nil) → inferLiteralType
 //   - bare variable → Types["SSaC.var.<funcName>.<var>"]
+//
 // Field access (var.Field) remains deferred until a variable-symbol populator
 // registers field types.
 func xfs44CallInputType(fs *yongol.Fullstack) []diagnostic.Diagnostic {

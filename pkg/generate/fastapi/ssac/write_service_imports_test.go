@@ -1,6 +1,5 @@
-//ff:func feature=gen-fastapi type=test control=sequence
+//ff:func feature=gen-fastapi type=test control=iteration dimension=1
 //ff:what TestWriteServiceImports — feature service 파일 통합 import 작성
-
 package ssac
 
 import (

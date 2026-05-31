@@ -1,4 +1,4 @@
-//ff:func feature=chain type=test control=iteration dimension=2
+//ff:func feature=chain type=test control=sequence
 //ff:what traceDDL 가 SSaC sequence 의 Model 을 복수형 테이블명으로 매칭하고 미참조 시 nil 을 반환하는지 검증
 package chain
 

@@ -1,6 +1,5 @@
-//ff:func feature=gen-fastapi type=test control=selection
+//ff:func feature=gen-fastapi type=test control=iteration dimension=1
 //ff:what TestResolveDataKey — ColumnName/Key/Field 우선순위 키 추출
-
 package ssac
 
 import (

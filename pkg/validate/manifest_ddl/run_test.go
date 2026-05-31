@@ -13,10 +13,10 @@ import (
 
 func TestRun(t *testing.T) {
 	tests := []struct {
-		name       string
-		fs         *yongol.Fullstack
-		wantEmpty  bool
-		minDiags   int // minimum number of diagnostics expected (0 means check wantEmpty)
+		name      string
+		fs        *yongol.Fullstack
+		wantEmpty bool
+		minDiags  int // minimum number of diagnostics expected (0 means check wantEmpty)
 	}{
 		{
 			name:      "nil fullstack returns empty",

@@ -29,14 +29,3 @@ func TestCreateTable_SQL(t *testing.T) {
 		}
 	}
 }
-
-func TestCreateTable_SQL_NoPrimaryKey(t *testing.T) {
-	op := CreateTable{Table: &Table{
-		Name:    "logs",
-		Columns: []*Column{{Name: "msg", Type: CanonicalType{Base: "TEXT"}, Nullable: true}},
-	}}
-	got := op.SQL()
-	if strings.Contains(got, "PRIMARY KEY") {
-		t.Errorf("SQL() should not contain PRIMARY KEY:\n%s", got)
-	}
-}

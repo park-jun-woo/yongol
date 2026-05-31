@@ -11,10 +11,10 @@ import (
 
 	"github.com/ettle/strcase"
 
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/generate/gogin/ffannot"
 	"github.com/park-jun-woo/yongol/pkg/generate/gogin/fffile"
 	ssacparser "github.com/park-jun-woo/yongol/pkg/parser/ssac"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // generateSubscribeMethod writes a subscribe handler method.

@@ -1,6 +1,5 @@
-//ff:func feature=validate-contract type=test control=iteration dimension=1
+//ff:func feature=validate-contract type=test control=sequence
 //ff:what TestCompareExternalSymbols — 알려진/미지 패키지·denylist·일치 항목 필터링 검증
-
 package contract
 
 import (

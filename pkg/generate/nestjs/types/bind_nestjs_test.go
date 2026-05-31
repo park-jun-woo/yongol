@@ -1,4 +1,4 @@
-//ff:func feature=gen-nestjs type=test control=sequence
+//ff:func feature=gen-nestjs type=test control=iteration dimension=1
 //ff:what TestBindNestJSDispatch — bindNestJS 전 family 디스패치 + unsupported 커버
 package types
 

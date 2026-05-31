@@ -15,10 +15,10 @@ import (
 // convert<Model>() — regression guard for BUG-050 fix.
 func TestBuildResponse_DBModelUnchanged(t *testing.T) {
 	g := &methodGen{
-		FuncName:       "GetWorkflow",
-		SuccessStatus:  200,
-		RespFields:     make(map[string]responseField),
-		VarTypes:       map[string]string{"workflow": "Workflow"},
+		FuncName:      "GetWorkflow",
+		SuccessStatus: 200,
+		RespFields:    make(map[string]responseField),
+		VarTypes:      map[string]string{"workflow": "Workflow"},
 	}
 	seq := ssacparser.Sequence{
 		Type:   "response",

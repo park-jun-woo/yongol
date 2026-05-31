@@ -23,8 +23,8 @@ func TestCollectFromArgs(t *testing.T) {
 		args := []ssac.Arg{
 			{Source: "request", Field: "CourseID"},
 			{Source: "request", Field: "Name"},
-			{Source: "course", Field: "ID"},     // non-request, skipped
-			{Source: "request", Field: ""},       // empty field, skipped
+			{Source: "course", Field: "ID"}, // non-request, skipped
+			{Source: "request", Field: ""},  // empty field, skipped
 		}
 		collectFromArgs(fields, args)
 		if len(fields) != 2 {

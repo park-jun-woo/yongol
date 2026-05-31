@@ -1,9 +1,10 @@
-//ff:func feature=agent type=test control=sequence
+//ff:func feature=agent type=test control=iteration dimension=1
 //ff:what TestNeedsRequestBody — post/put/patch 만 request body 필요로 판별 검증
-
 package agent
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestNeedsRequestBody(t *testing.T) {
 	cases := map[string]bool{

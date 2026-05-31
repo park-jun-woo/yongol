@@ -1,9 +1,10 @@
-//ff:func feature=gen-gogin type=test control=selection
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what methodGen.sqlcArgs 단위 테스트 (0/1/N 입력 분기 디스패치 + activeMethod 정리)
-
 package ssac
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestMethodGenSqlcArgs(t *testing.T) {
 	g := &methodGen{PathParams: map[string]bool{"id": true}}

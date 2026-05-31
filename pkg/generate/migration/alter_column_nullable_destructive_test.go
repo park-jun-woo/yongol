@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=selection dimension=2
+//ff:func feature=migration type=test control=sequence
 //ff:what TestAlterColumnNullable_Destructive — NOT NULL 추가(To=false)만 파괴적
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestAlterColumnNullable_Destructive(t *testing.T) {
 	if (AlterColumnNullable{To: true}).Destructive() {

@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=sequence
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestInnerParens — 바깥 "()" 제거, 비괄호는 그대로
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestInnerParens(t *testing.T) {
 	cases := []struct{ in, want string }{

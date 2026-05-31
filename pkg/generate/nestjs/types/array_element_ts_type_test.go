@@ -1,8 +1,10 @@
-//ff:func feature=gen-nestjs type=test control=sequence
+//ff:func feature=gen-nestjs type=test control=iteration dimension=1
 //ff:what TestArrayElementTSType — 배열 element head → TS/Prisma 타입 (4 family + 미지원) 커버
 package types
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestArrayElementTSType_ZeroCov(t *testing.T) {
 	for _, h := range []string{"BIGINT", "REAL", "TEXT", "BOOLEAN"} {

@@ -3,17 +3,17 @@
 package manifest
 
 type Auth struct {
-	Type                   string              `yaml:"type"`       // "jwt" (required when auth is present)
-	SecretEnv              string              `yaml:"secret_env"`
-	UserTable              string              `yaml:"user_table"` // DDL table name that holds user rows backing JWT claims (XDN-01~04)
-	UserTableLine          int                 `yaml:"-"`           // 1-based line number of `user_table:` in manifest.yaml (0 = unknown)
-	RawClaims              map[string]string   `yaml:"claims"`     // YAML original: FieldName → "claim_key" or "claim_key:go_type"
-	Claims                 map[string]ClaimDef `yaml:"-"`           // Parsed from RawClaims after Load()
-	Roles                  []string            `yaml:"roles"`       // valid role names (e.g. ["client", "freelancer"])
-	RolesLines             map[string]int      `yaml:"-"`           // role → 1-based line in manifest.yaml (0 = unknown)
-	AccessTokenTTL         string              `yaml:"access_token_ttl"`         // default "15m" (Phase002)
-	RefreshTokenTTL        string              `yaml:"refresh_token_ttl"`        // default "168h" (7d) (Phase002)
-	DetectReuseLogoutAll   bool                `yaml:"detect_reuse_logout_all"`  // default false (Phase002)
+	Type                 string              `yaml:"type"` // "jwt" (required when auth is present)
+	SecretEnv            string              `yaml:"secret_env"`
+	UserTable            string              `yaml:"user_table"`              // DDL table name that holds user rows backing JWT claims (XDN-01~04)
+	UserTableLine        int                 `yaml:"-"`                       // 1-based line number of `user_table:` in manifest.yaml (0 = unknown)
+	RawClaims            map[string]string   `yaml:"claims"`                  // YAML original: FieldName → "claim_key" or "claim_key:go_type"
+	Claims               map[string]ClaimDef `yaml:"-"`                       // Parsed from RawClaims after Load()
+	Roles                []string            `yaml:"roles"`                   // valid role names (e.g. ["client", "freelancer"])
+	RolesLines           map[string]int      `yaml:"-"`                       // role → 1-based line in manifest.yaml (0 = unknown)
+	AccessTokenTTL       string              `yaml:"access_token_ttl"`        // default "15m" (Phase002)
+	RefreshTokenTTL      string              `yaml:"refresh_token_ttl"`       // default "168h" (7d) (Phase002)
+	DetectReuseLogoutAll bool                `yaml:"detect_reuse_logout_all"` // default false (Phase002)
 
 	// Phase020 — cookie session authentication (now default).
 	// Mode: "cookie" (default) | "bearer" | "hybrid". Env override:

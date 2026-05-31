@@ -5,6 +5,7 @@ package ssac
 
 import (
 	"fmt"
+
 	ssacparser "github.com/park-jun-woo/yongol/pkg/parser/ssac"
 )
 
@@ -25,7 +26,7 @@ func (g *methodGen) buildPut(seq ssacparser.Sequence) ([]string, []string) {
 	lines := append([]string(nil), preamble...)
 	lines = append(lines,
 		fmt.Sprintf("err %s %s.%s(%s)", assign, g.queryVar(), method, argStr),
-		"if err != nil { " + g.returnErr() + " }",
+		"if err != nil { "+g.returnErr()+" }",
 	)
 	return lines, argImports
 }

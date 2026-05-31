@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=sequence topic=request-id
+//ff:func feature=gen-gogin type=test control=iteration dimension=1 topic=request-id
 //ff:what blockRequestID — middleware.RequestID(...) 최상위 등록 (Phase004)
-
 package boot
 
 import (

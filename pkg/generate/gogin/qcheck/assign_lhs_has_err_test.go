@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=branch topic=err-guard
+//ff:func feature=gen-gogin type=test control=iteration dimension=1
 //ff:what TestAssignLHSHasErr — err/접미사 err / 비-ident / 무-err LHS 분기 검증
-
 package qcheck
 
 import (

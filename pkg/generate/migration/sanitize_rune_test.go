@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=selection dimension=4
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestSanitizeRune — a-z/0-9/_ 유지, 그 외는 _
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestSanitizeRune(t *testing.T) {
 	cases := []struct {

@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=selection dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestBuildUserPrompt — desc 유무/메시지 목록에 따른 user prompt 구성 검증
-
 package agent
 
 import (

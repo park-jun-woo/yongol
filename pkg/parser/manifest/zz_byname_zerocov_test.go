@@ -1,9 +1,10 @@
-//ff:func feature=manifest-parse type=test control=sequence
+//ff:func feature=projectconfig type=test control=sequence
 //ff:what TestByName_ZeroCov — manifest auth 헬퍼들을 이름으로 직접 호출해 커버리지 귀속
-
 package manifest
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestByNameAuthLines_ZeroCov(t *testing.T) {
 	data := []byte(`version: "1.0"

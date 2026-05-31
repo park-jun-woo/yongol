@@ -1,44 +1,11 @@
-//ff:func feature=gen-fastapi type=test control=sequence
+//ff:func feature=gen-fastapi type=test control=iteration dimension=1
 //ff:what TestRenderPyproject — pyproject.toml / requirements.txt / 의존성 목록 생성 검증
-
 package scaffold
 
 import (
 	"strings"
 	"testing"
 )
-
-func TestRuntimeDependencies(t *testing.T) {
-	deps := runtimeDependencies()
-	if len(deps) == 0 {
-		t.Fatal("expected runtime dependencies")
-	}
-	found := false
-	for _, d := range deps {
-		if strings.HasPrefix(d, "fastapi>=") {
-			found = true
-		}
-	}
-	if !found {
-		t.Errorf("fastapi dependency missing: %v", deps)
-	}
-}
-
-func TestDevDependencies(t *testing.T) {
-	deps := devDependencies()
-	if len(deps) == 0 {
-		t.Fatal("expected dev dependencies")
-	}
-	found := false
-	for _, d := range deps {
-		if strings.HasPrefix(d, "pytest>=") {
-			found = true
-		}
-	}
-	if !found {
-		t.Errorf("pytest dev dependency missing: %v", deps)
-	}
-}
 
 func TestRenderPyproject(t *testing.T) {
 	out, err := RenderPyproject("myapp")
@@ -71,27 +38,5 @@ func TestRenderPyproject(t *testing.T) {
 		if !strings.Contains(out, d) {
 			t.Errorf("dev dep %q not embedded", d)
 		}
-	}
-}
-
-func TestRenderPyprojectEmptyID(t *testing.T) {
-	if _, err := RenderPyproject(""); err == nil {
-		t.Error("expected error for empty projectID")
-	}
-}
-
-func TestRenderRequirements(t *testing.T) {
-	out, err := RenderRequirements()
-	if err != nil {
-		t.Fatalf("RenderRequirements error: %v", err)
-	}
-	for _, d := range runtimeDependencies() {
-		if !strings.Contains(out, d) {
-			t.Errorf("requirements missing %q\n%s", d, out)
-		}
-	}
-	// dev deps should NOT be in requirements.txt
-	if strings.Contains(out, "pytest>=") {
-		t.Errorf("requirements.txt should not contain dev deps:\n%s", out)
 	}
 }

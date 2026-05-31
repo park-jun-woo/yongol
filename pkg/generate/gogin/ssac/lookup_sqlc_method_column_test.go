@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what lookupSQLCMethodColumn 단위 테스트 (activeMethod → model → DDL 컬럼)
-
 package ssac
 
 import (

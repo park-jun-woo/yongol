@@ -1,6 +1,5 @@
-//ff:func feature=gen-filefunc type=test control=sequence
+//ff:func feature=gen-filefunc type=test control=iteration dimension=1
 //ff:what TestBuildTopicEntries — 고정 topic 맵 반환 검증
-
 package filefunc
 
 import (

@@ -11,10 +11,10 @@ import (
 
 func TestPickConvertRHS_NullablePgtypeNoDoublePtr(t *testing.T) {
 	cases := []struct {
-		name       string
-		col        *ddl.Column
-		isRequired bool
-		wantPrefix string
+		name        string
+		col         *ddl.Column
+		isRequired  bool
+		wantPrefix  string
 		wantNoPtrOf bool
 	}{
 		{

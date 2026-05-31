@@ -1,6 +1,5 @@
-//ff:func feature=validate type=test control=selection
+//ff:func feature=validate type=test control=sequence
 //ff:what TestStepIsPresent — step.isPresent 모든 kind 존재 여부 판정 분기 검증
-
 package validate
 
 import (

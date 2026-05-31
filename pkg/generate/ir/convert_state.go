@@ -27,12 +27,7 @@ func convertState(seq ssac.Sequence, fs *yongol.Fullstack) Op {
 
 	// Enrich with allowed source states from Mermaid stateDiagram.
 	if fs != nil {
-		for _, d := range fs.StateDiagrams {
-			if d.ID == seq.DiagramID || d.Symbol == seq.DiagramID {
-				op.AllowedFromStates = d.ValidFromStates(seq.Transition)
-				break
-			}
-		}
+		op.AllowedFromStates = lookupAllowedFromStates(fs, seq.DiagramID, seq.Transition)
 	}
 
 	return Op{Kind: OpState, State: &op}

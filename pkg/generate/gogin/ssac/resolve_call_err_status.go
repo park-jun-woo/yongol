@@ -24,4 +24,3 @@ func resolveCallErrStatus(seqStatus int, pkgName, funcName string, project, buil
 	}
 	return 500
 }
-

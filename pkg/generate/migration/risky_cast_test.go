@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=sequence
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestRiskyCast — 같은 Base 축소 또는 카테고리 교차 변환은 risky
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestRiskyCast(t *testing.T) {
 	cases := []struct {

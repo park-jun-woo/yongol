@@ -1,6 +1,5 @@
-//ff:func feature=gen-ir type=test control=sequence
+//ff:func feature=gen-ir type=test control=iteration dimension=1
 //ff:what TestStateOpAllowedFromStates -- StateOp.AllowedFromStates Mermaid 전이 이식 검증
-
 package ir
 
 import (
@@ -61,69 +60,5 @@ func TestStateOpAllowedFromStates(t *testing.T) {
 	}
 	if !found["active"] || !found["draft"] {
 		t.Errorf("AllowedFromStates = %v, want [active, draft]", allowed)
-	}
-}
-
-func TestStateOpAllowedFromStatesNoDiagram(t *testing.T) {
-	sf := &ssac.ServiceFunc{
-		Name:     "ArchiveWorkflow",
-		FileName: "archive_workflow.ssac",
-		Sequences: []ssac.Sequence{
-			{
-				Type:       ssac.SeqState,
-				DiagramID:  "workflow",
-				Inputs:     map[string]string{"Status": "wf.Status"},
-				Transition: "ArchiveWorkflow",
-				ErrStatus:  409,
-			},
-		},
-	}
-
-	plan, err := BuildServicePlan(sf, &yongol.Fullstack{})
-	if err != nil {
-		t.Fatalf("BuildServicePlan: %v", err)
-	}
-
-	stateOp := plan.Ops[0]
-	if stateOp.State.AllowedFromStates != nil {
-		t.Errorf("AllowedFromStates = %v, want nil when no diagrams", stateOp.State.AllowedFromStates)
-	}
-}
-
-func TestStateOpAllowedFromStatesSymbolMatch(t *testing.T) {
-	fs := &yongol.Fullstack{
-		StateDiagrams: []*statemachine.StateDiagram{
-			{
-				ID:     "workflow",
-				Symbol: "Workflow",
-				Transitions: []statemachine.Transition{
-					{From: "draft", To: "active", Event: "Activate"},
-				},
-			},
-		},
-	}
-
-	// DiagramID uses PascalCase Symbol form.
-	sf := &ssac.ServiceFunc{
-		Name:     "Activate",
-		FileName: "activate.ssac",
-		Sequences: []ssac.Sequence{
-			{
-				Type:       ssac.SeqState,
-				DiagramID:  "Workflow",
-				Inputs:     map[string]string{"Status": "wf.Status"},
-				Transition: "Activate",
-			},
-		},
-	}
-
-	plan, err := BuildServicePlan(sf, fs)
-	if err != nil {
-		t.Fatalf("BuildServicePlan: %v", err)
-	}
-
-	allowed := plan.Ops[0].State.AllowedFromStates
-	if len(allowed) != 1 || allowed[0] != "draft" {
-		t.Errorf("AllowedFromStates = %v, want [draft]", allowed)
 	}
 }

@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=sequence
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestCrossCategoryCast — 숫자↔텍스트 카테고리 변환 판정
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestCrossCategoryCast(t *testing.T) {
 	cases := []struct {

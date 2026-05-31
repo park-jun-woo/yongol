@@ -31,4 +31,3 @@ func q16PgtypeDateOverride(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			"      type: \"Date\"\n",
 	})
 }
-

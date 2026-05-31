@@ -1,6 +1,5 @@
-//ff:func feature=gen-fastapi type=test control=iteration dimension=1
+//ff:func feature=gen-fastapi type=test control=sequence
 //ff:what TestRenderSAWhere — FieldArg 배열 → SQLAlchemy .where() 절 문자열
-
 package ssac
 
 import (

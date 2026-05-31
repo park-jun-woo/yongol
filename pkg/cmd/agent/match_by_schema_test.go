@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=iteration dimension=2
+//ff:func feature=agent type=test control=sequence
 //ff:what TestMatchBySchema — $ref 스키마 이름을 feature op 와 매핑 검증
-
 package agent
 
 import (

@@ -79,7 +79,7 @@ func (g *methodGen) buildAuth(seq ssacparser.Sequence) ([]string, []string) {
 		fmt.Sprintf("_, err %s authz.Check(authz.CheckRequest{%s})", assign, strings.Join(checkFields, ", ")),
 		"if err != nil {",
 		fmt.Sprintf("\t%s(\"handler: %s\", \"op\", %q, \"status\", %d, \"err\", err)", logLevelFuncForStatus(status), logTagForStatus(status), g.FuncName, status),
-		"\t" + g.guardReturn(msg, status),
+		"\t"+g.guardReturn(msg, status),
 		"}",
 	)
 	if g.IsSubscribe {

@@ -6,8 +6,8 @@ package ssac_sqlc
 import (
 	"testing"
 
-	ssacparser "github.com/park-jun-woo/yongol/pkg/parser/ssac"
 	sqlcparser "github.com/park-jun-woo/yongol/pkg/parser/sqlc"
+	ssacparser "github.com/park-jun-woo/yongol/pkg/parser/ssac"
 	"github.com/park-jun-woo/yongol/pkg/ssacmeta"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )

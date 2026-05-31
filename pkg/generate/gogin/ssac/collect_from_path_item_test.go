@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what collectFromPathItem 단위 테스트 (PathItem의 모든 verb 200 $ref 수집)
-
 package ssac
 
 import (

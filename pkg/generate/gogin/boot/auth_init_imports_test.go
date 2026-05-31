@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=sequence
+//ff:func feature=gen-gogin type=test control=iteration dimension=1
 //ff:what authInitImports — blockAuthInit 가 필요한 Imports 슬라이스 구성
-
 package boot
 
 import (

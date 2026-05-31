@@ -13,14 +13,14 @@ import (
 
 // methodGen holds all context needed to generate one StrictServerInterface method.
 type methodGen struct {
-	FuncName     string
-	FileName     string // 원본 SSaC 파일명 (진단 메시지용)
-	ModulePath   string
+	FuncName   string
+	FileName   string // 원본 SSaC 파일명 (진단 메시지용)
+	ModulePath string
 	// ImportMap maps a package alias (path.Base of the import) to the full
 	// Go import path declared in the SSaC file. Populated at newMethodGen
 	// from sf.Imports so buildCallImports / buildEvalImports can look up
 	// the correct import path without synthesising it (Phase006).
-	ImportMap map[string]string
+	ImportMap    map[string]string
 	PathParams   map[string]bool          // OpenAPI path param names (lowercase)
 	QueryParams  map[string]queryParam    // OpenAPI query param name → rich metadata
 	BodyFormats  map[string]string        // OpenAPI body field name → format ("email", "uuid", ...)

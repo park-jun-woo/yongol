@@ -13,11 +13,12 @@ package manifest
 //   - Enabled: opt-out flag. When nil → true. When set, respected verbatim.
 //   - Path:    HTTP route for the scrape endpoint. Must start with "/".
 //   - Buckets: histogram buckets (seconds) for http_request_duration_seconds.
-//              Empty → prometheus.DefBuckets at codegen time.
+//     Empty → prometheus.DefBuckets at codegen time.
 //
 // Env overrides (resolved in generated main.go):
-//   BACKEND_OBSERVABILITY_METRICS_ENABLED
-//   BACKEND_OBSERVABILITY_METRICS_PATH
+//
+//	BACKEND_OBSERVABILITY_METRICS_ENABLED
+//	BACKEND_OBSERVABILITY_METRICS_PATH
 type ObservabilityMetrics struct {
 	Enabled *bool     `yaml:"enabled,omitempty"`
 	Path    string    `yaml:"path,omitempty"`

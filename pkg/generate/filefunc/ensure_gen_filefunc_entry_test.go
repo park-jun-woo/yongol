@@ -1,9 +1,10 @@
-//ff:func feature=gen-filefunc type=test control=sequence
+//ff:func feature=gen-filefunc type=test control=iteration dimension=1
 //ff:what TestEnsureGenFilefuncEntry — anchor feature 삽입 + 기존 값 보존 검증
-
 package filefunc
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestEnsureGenFilefuncEntry(t *testing.T) {
 	dst := map[string]string{"main": "custom main"} // existing value must be preserved

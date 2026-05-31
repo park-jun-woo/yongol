@@ -1,4 +1,4 @@
-//ff:func feature=chain type=test control=iteration dimension=2
+//ff:func feature=chain type=test control=sequence
 //ff:what Print 가 빈 링크 / SSOT+artifact 분리 출력을 올바르게 수행하는지 검증
 package chain
 

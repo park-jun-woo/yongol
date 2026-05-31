@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=iteration dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestBuildRegoUserPrompt — Table 유무에 따른 resource 결정(테이블/경로유래) 검증
-
 package agent
 
 import (

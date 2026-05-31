@@ -1,9 +1,10 @@
-//ff:func feature=manifest type=test control=iteration dimension=1
+//ff:func feature=manifest type=test control=sequence
 //ff:what applyVarcharLen — VARCHAR(N) 길이 설정 / 비VARCHAR 무시
-
 package ddl
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestApplyVarcharLen(t *testing.T) {
 	t.Run("sets length", func(t *testing.T) {

@@ -1,4 +1,4 @@
-//ff:func feature=chain type=test control=iteration dimension=2
+//ff:func feature=chain type=test control=sequence
 //ff:what traceOpenAPI 가 operationId 매칭 시 Link / Paths nil 또는 미매칭 시 nil 을 반환하는지 검증
 package chain
 

@@ -49,8 +49,8 @@ func TestValidateActionBlock(t *testing.T) {
 	a := stml.ActionBlock{
 		OperationID: "CreateItem",
 		Fields: []stml.FieldBind{
-			{Name: "title"},               // present → no diag
-			{Name: "missing"},             // absent → TM-05
+			{Name: "title"},                // present → no diag
+			{Name: "missing"},              // absent → TM-05
 			{Tag: "data-component:Picker"}, // component → TM-09 (exists → no diag)
 		},
 	}

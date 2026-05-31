@@ -1,9 +1,10 @@
-//ff:func feature=agent type=test control=sequence
+//ff:func feature=agent type=test control=iteration dimension=1
 //ff:what TestStripMarkdownFences — 감싸는 markdown 코드 펜스 제거 검증
-
 package agent
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestStripMarkdownFences(t *testing.T) {
 	cases := []struct {

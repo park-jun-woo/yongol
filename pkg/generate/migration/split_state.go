@@ -7,10 +7,10 @@ import "strings"
 // splitState is the tiny state machine used by splitStatements to walk
 // a SQL text while tracking string / comment context.
 type splitState struct {
-	out  []string
-	sb   strings.Builder
-	inSQ bool
-	inDQ bool
-	inBC bool
+	out   []string
+	sb    strings.Builder
+	inSQ  bool
+	inDQ  bool
+	inBC  bool
 	depth int
 }

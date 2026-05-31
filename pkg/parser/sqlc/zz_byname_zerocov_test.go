@@ -1,9 +1,10 @@
-//ff:func feature=sqlc-parse type=test control=sequence
+//ff:func feature=orchestrator type=test control=iteration dimension=1
 //ff:what TestByName_ZeroCov — sqlc 파서 헬퍼들을 이름으로 직접 호출해 커버리지 귀속
-
 package sqlc
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestByNameSQLCHelpers_ZeroCov(t *testing.T) {
 	// rowTypeFor across cardinalities.

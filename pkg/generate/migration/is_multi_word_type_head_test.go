@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=selection dimension=2
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestIsMultiWordTypeHead — CHARACTER/TIMESTAMP/TIME/DOUBLE 만 true
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestIsMultiWordTypeHead(t *testing.T) {
 	for _, s := range []string{"CHARACTER", "TIMESTAMP", "TIME", "DOUBLE"} {

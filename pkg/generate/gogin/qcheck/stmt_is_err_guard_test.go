@@ -1,9 +1,10 @@
-//ff:func feature=gen-gogin type=test control=branch topic=err-guard
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what TestStmtIsErrGuard — if err != nil 가드 true + 비-if/비-binary/비-NEQ false 분기 검증
-
 package qcheck
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestStmtIsErrGuard(t *testing.T) {
 	t.Run("ErrGuard", func(t *testing.T) {

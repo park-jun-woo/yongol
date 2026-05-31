@@ -1,9 +1,10 @@
-//ff:func feature=agent type=test control=iteration dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestFilterMessagesByOp — op 를 언급하는 메시지만 필터링 검증
-
 package agent
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestFilterMessagesByOp(t *testing.T) {
 	msgs := []string{"CreateUser bad", "ListOrders bad", "CreateUser worse"}

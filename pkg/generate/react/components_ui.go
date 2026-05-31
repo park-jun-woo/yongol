@@ -31,4 +31,3 @@ func writeComponentsUI(srcDir string, spec *design.DesignSpec) error {
 	}
 	return nil
 }
-

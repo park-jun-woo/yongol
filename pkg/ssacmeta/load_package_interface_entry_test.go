@@ -1,6 +1,5 @@
 //ff:func feature=ssacmeta type=test control=iteration dimension=1
 //ff:what TestloadPackageInterfaceEntry — loadPackageInterfaceEntry() dir/파일/키 폴백 분기
-
 package ssacmeta
 
 import (
@@ -55,26 +54,4 @@ func TestLoadPackageInterfaceEntry(t *testing.T) {
 	if len(out) != 2 {
 		t.Errorf("out size = %d, want 2 (%v)", len(out), keysOf(out))
 	}
-}
-
-func mustMkdir(t *testing.T, path string) {
-	t.Helper()
-	if err := os.MkdirAll(path, 0o755); err != nil {
-		t.Fatalf("mkdir %s: %v", path, err)
-	}
-}
-
-func mustWrite(t *testing.T, path, body string) {
-	t.Helper()
-	if err := os.WriteFile(path, []byte(body), 0o644); err != nil {
-		t.Fatalf("write %s: %v", path, err)
-	}
-}
-
-func keysOf(m map[string]*PackageInterface) []string {
-	ks := make([]string, 0, len(m))
-	for k := range m {
-		ks = append(ks, k)
-	}
-	return ks
 }

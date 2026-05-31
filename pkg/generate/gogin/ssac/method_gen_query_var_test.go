@@ -1,9 +1,10 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what methodGen.queryVar 단위 테스트 (tx면 qtx, 아니면 server.Queries)
-
 package ssac
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestMethodGenQueryVar(t *testing.T) {
 	if got := (&methodGen{UseTx: true}).queryVar(); got != "qtx" {

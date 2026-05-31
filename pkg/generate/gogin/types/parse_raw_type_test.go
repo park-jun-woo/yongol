@@ -7,11 +7,11 @@ import "testing"
 
 func TestParseRawType(t *testing.T) {
 	cases := []struct {
-		raw         string
-		wantHead    string
-		wantParam   string
-		wantArray   bool
-		wantMulti   bool
+		raw       string
+		wantHead  string
+		wantParam string
+		wantArray bool
+		wantMulti bool
 	}{
 		{"BIGINT", "BIGINT", "", false, false},
 		{"VARCHAR(255)", "VARCHAR", "255", false, false},

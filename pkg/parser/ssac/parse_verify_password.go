@@ -20,10 +20,10 @@ import (
 //	  -> user 401 "Invalid credentials"
 //
 // Semantics (handled by the code generator):
-//   1. findByEmail against Model using emailCol/emailExpr
-//   2. on miss: bcrypt-compare pwExpr against auth.DummyHash (timing equaliser) → status+message
-//   3. on hit: bcrypt-compare pwExpr against row.<hashCol> → status+message on mismatch
-//   4. on success: bind the user row to <var>
+//  1. findByEmail against Model using emailCol/emailExpr
+//  2. on miss: bcrypt-compare pwExpr against auth.DummyHash (timing equaliser) → status+message
+//  3. on hit: bcrypt-compare pwExpr against row.<hashCol> → status+message on mismatch
+//  4. on success: bind the user row to <var>
 //
 // The Model must be a sqlc row type (e.g. User) and both emailCol/hashCol
 // must be actual columns on that table — validation layer enforces this.

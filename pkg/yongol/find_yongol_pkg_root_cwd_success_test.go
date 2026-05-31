@@ -1,6 +1,5 @@
 //ff:func feature=orchestrator type=test control=sequence
 //ff:what findYongolPkgRoot — env 미설정 시 CWD fallback이 sibling ssac/pkg를 반환
-
 package yongol
 
 import (
@@ -9,9 +8,6 @@ import (
 	"testing"
 )
 
-// TestFindYongolPkgRootCWDSuccess builds a synthetic dev-worktree layout
-// (<base>/yongol with go.mod+pkg, <base>/ssac/pkg) and verifies the CWD
-// resolver branch returns the sibling ssac/pkg path.
 func TestFindYongolPkgRootCWDSuccess(t *testing.T) {
 	base := t.TempDir()
 	yongolRoot := filepath.Join(base, "yongol")
@@ -36,12 +32,5 @@ func TestFindYongolPkgRootCWDSuccess(t *testing.T) {
 	gotResolved, _ := filepath.EvalSymlinks(got)
 	if got == "" || gotResolved != wantResolved {
 		t.Fatalf("findYongolPkgRoot = %q; want %q", got, ssacPkg)
-	}
-}
-
-func mustMkdir(t *testing.T, dir string) {
-	t.Helper()
-	if err := os.MkdirAll(dir, 0o755); err != nil {
-		t.Fatal(err)
 	}
 }

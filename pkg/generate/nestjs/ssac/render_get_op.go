@@ -19,66 +19,21 @@ func renderGetOp(b *strings.Builder, op *ir.GetOp, indent, prismaRef string) {
 		return
 	}
 	model := lcFirst(op.Model)
-	method := "findUnique"
-	if op.IsCount {
-		method = "count"
-	} else if op.IsList {
-		method = "findMany"
-	}
 
-	// Count queries use a simplified form: only where clause, no select.
 	if op.IsCount {
-		var whereParts []string
-		for _, a := range op.Args {
-			key := resolveArgKey(a)
-			whereParts = append(whereParts, fmt.Sprintf("%s: %s", key, renderArgValue(a)))
-		}
-		if len(whereParts) > 0 {
-			b.WriteString(fmt.Sprintf("%sconst %s = await %s.%s.count({ where: { %s } });\n",
-				indent, op.VarName, prismaRef, model, strings.Join(whereParts, ", ")))
-		} else {
-			b.WriteString(fmt.Sprintf("%sconst %s = await %s.%s.count();\n",
-				indent, op.VarName, prismaRef, model))
-		}
+		renderCountQuery(b, op, indent, prismaRef, model)
 		return
 	}
 
-	// Build Prisma query options.
-	var opts []string
-
-	// where clause from Args.
-	if len(op.Args) > 0 {
-		whereParts := make([]string, 0, len(op.Args))
-		for _, a := range op.Args {
-			key := resolveArgKey(a)
-			whereParts = append(whereParts, fmt.Sprintf("%s: %s", key, renderArgValue(a)))
-		}
-		opts = append(opts, fmt.Sprintf("where: { %s }", strings.Join(whereParts, ", ")))
-	}
-
-	// Pagination options from PaginationArgs (cursor, per_page, etc.).
-	for _, pa := range op.PaginationArgs {
-		key := resolveArgKey(pa)
-		val := renderArgValue(pa)
-		switch key {
-		case "per_page", "limit":
-			opts = append(opts, fmt.Sprintf("take: %s", val))
-		case "page_offset", "offset":
-			opts = append(opts, fmt.Sprintf("skip: %s", val))
-		case "cursor":
-			opts = append(opts, fmt.Sprintf("cursor: %s ? { id: %s } : undefined", val, val))
-		default:
-			opts = append(opts, fmt.Sprintf("%s: %s", key, val))
-		}
-	}
-
-	var argsStr string
+	opts := buildPrismaQueryOpts(op)
+	argsStr := "{}"
 	if len(opts) > 0 {
 		argsStr = "{ " + strings.Join(opts, ", ") + " }"
-	} else {
-		argsStr = "{}"
 	}
-
+	method := "findUnique"
+	if op.IsList {
+		method = "findMany"
+	}
 	b.WriteString(fmt.Sprintf("%sconst %s = await %s.%s.%s(%s);\n",
 		indent, op.VarName, prismaRef, model, method, argsStr))
 }

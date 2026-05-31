@@ -45,14 +45,14 @@ func xos69ResponseEmptyBinding(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 				continue
 			}
 			diags = append(diags, diagnostic.Diagnostic{
-				File:        fn.FileName,
-				Line:        seq.Line,
-				Phase:       diagnostic.PhaseValidate,
-				Level:       diagnostic.LevelWarning,
-				Message:     fmt.Sprintf("[XOS-69] %s — @response binds 0 fields but OpenAPI 200 schema has properties", fn.Name),
+				File:    fn.FileName,
+				Line:    seq.Line,
+				Phase:   diagnostic.PhaseValidate,
+				Level:   diagnostic.LevelWarning,
+				Message: fmt.Sprintf("[XOS-69] %s — @response binds 0 fields but OpenAPI 200 schema has properties", fn.Name),
 				Advice: "@response requires explicit field binding with braces. " +
-						"Example: @response { id: todo.ID, title: todo.Title, created_at: todo.CreatedAt }. " +
-						"Do NOT write @response todo — that binds 0 fields.",
+					"Example: @response { id: todo.ID, title: todo.Title, created_at: todo.CreatedAt }. " +
+					"Do NOT write @response todo — that binds 0 fields.",
 				OperationID: fn.Name,
 			})
 		}

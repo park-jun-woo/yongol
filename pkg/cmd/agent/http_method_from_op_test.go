@@ -1,9 +1,10 @@
-//ff:func feature=agent type=test control=selection
+//ff:func feature=agent type=test control=iteration dimension=1
 //ff:what TestHTTPMethodFromOp — operationId 접두사로 HTTP method 추론 검증
-
 package agent
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestHTTPMethodFromOp(t *testing.T) {
 	cases := []struct {

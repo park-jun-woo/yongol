@@ -1,9 +1,10 @@
-//ff:func feature=gen-filefunc type=test control=sequence
+//ff:func feature=gen-filefunc type=test control=iteration dimension=1
 //ff:what TestDefaultSSOTEntries — 고정 ssot 키 맵 반환 검증
-
 package filefunc
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestDefaultSSOTEntries(t *testing.T) {
 	got := defaultSSOTEntries()

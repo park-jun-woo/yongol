@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what hasBearerAuth — manifest.backend.middleware 에 bearerAuth 포함 여부
-
 package boot
 
 import (

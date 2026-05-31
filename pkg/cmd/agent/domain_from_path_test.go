@@ -1,9 +1,10 @@
-//ff:func feature=agent type=test control=sequence
+//ff:func feature=agent type=test control=iteration dimension=1
 //ff:what TestDomainFromPath — API path 에서 도메인 추출(복수형 단수화, kebab→snake) 검증
-
 package agent
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestDomainFromPath(t *testing.T) {
 	cases := []struct {

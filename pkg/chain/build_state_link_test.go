@@ -1,4 +1,4 @@
-//ff:func feature=chain type=test control=iteration dimension=2
+//ff:func feature=chain type=test control=sequence
 //ff:what buildStateLink 가 transition 유무에 따라 line/summary 를 구성하는지 검증
 package chain
 

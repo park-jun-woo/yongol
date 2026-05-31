@@ -4,6 +4,6 @@ package ssac
 
 // StructInfo holds metadata for a Go struct declared in a .ssac file.
 type StructInfo struct {
-	Name   string        // "OnOrderCompletedMessage"
+	Name   string // "OnOrderCompletedMessage"
 	Fields []StructField
 }

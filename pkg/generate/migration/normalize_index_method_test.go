@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=sequence
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestNormalizeIndexMethod — "" 와 btree 는 동일 토큰, 그 외는 보존
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestNormalizeIndexMethod(t *testing.T) {
 	cases := []struct{ in, want string }{

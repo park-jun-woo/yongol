@@ -3,8 +3,8 @@
 package ground
 
 import (
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/rule"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // populateMiddleware registers JWT claim KEY names that the auto-generated

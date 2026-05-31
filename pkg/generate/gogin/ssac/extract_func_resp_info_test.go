@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1 topic=response
+//ff:func feature=gen-gogin type=test control=sequence topic=response
 //ff:what extractFuncRespInfo 단위 테스트 (Model alias + import path 추출)
-
 package ssac
 
 import (

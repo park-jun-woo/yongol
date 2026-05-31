@@ -19,7 +19,7 @@ func TestBuildServicePlanPost(t *testing.T) {
 				Type:  ssac.SeqPost,
 				Model: "Course.Create",
 				Inputs: map[string]string{
-					"Title":       "request.title",
+					"Title":        "request.title",
 					"InstructorID": "currentUser.ID",
 				},
 				Result: &ssac.Result{Var: "course", Type: "Course"},

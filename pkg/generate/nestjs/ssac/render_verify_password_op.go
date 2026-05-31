@@ -27,13 +27,3 @@ func renderVerifyPasswordOp(b *strings.Builder, op *ir.VerifyPasswordOp, indent,
 	b.WriteString(fmt.Sprintf("%s// TODO: bcrypt.compare(%s, %s.%s)\n",
 		indent, pwVal, op.ResultVar, lcFirst(op.HashCol)))
 }
-
-// resolveNestJSExpr rewrites raw SSaC expressions for NestJS. In particular,
-// "request.xxx" is mapped to "body.xxx" because NestJS service methods receive
-// the request body as a separate "body" parameter.
-func resolveNestJSExpr(expr string) string {
-	if strings.HasPrefix(expr, "request.") {
-		return "body." + expr[len("request."):]
-	}
-	return expr
-}

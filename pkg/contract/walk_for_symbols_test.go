@@ -1,6 +1,5 @@
-//ff:func feature=contract type=test control=iteration dimension=1
+//ff:func feature=contract type=test control=sequence
 //ff:what test: TestWalkForSymbols — body 2-pass walk 으로 SqlcQueries·CallTargets·DDLFields 정렬 분류 검증
-
 package contract
 
 import (
@@ -33,13 +32,5 @@ func TestWalkForSymbols(t *testing.T) {
 	wantFields := []string{"server.Queries", "user.Email", "user.Name"}
 	if !reflect.DeepEqual(sym.DDLFields, wantFields) {
 		t.Errorf("DDLFields: got %v want %v", sym.DDLFields, wantFields)
-	}
-}
-
-func TestWalkForSymbolsEmpty(t *testing.T) {
-	fset, body := bodyFromFunc(t, "x := 1\n_ = x\n")
-	sym := walkForSymbols(fset, body)
-	if sym.SqlcQueries != nil || sym.CallTargets != nil || sym.DDLFields != nil {
-		t.Errorf("expected all nil for body with no external symbols, got %+v", sym)
 	}
 }

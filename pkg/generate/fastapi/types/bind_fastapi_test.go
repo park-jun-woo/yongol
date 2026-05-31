@@ -1,6 +1,5 @@
-//ff:func feature=gen-fastapi type=test control=selection
+//ff:func feature=gen-fastapi type=test control=iteration dimension=1
 //ff:what TestBindFastAPI — PGFamily 별 디스패치 검증 (모든 family + default unsupported)
-
 package types
 
 import (

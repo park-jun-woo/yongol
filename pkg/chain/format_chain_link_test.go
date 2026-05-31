@@ -1,4 +1,4 @@
-//ff:func feature=chain type=test control=iteration dimension=2
+//ff:func feature=chain type=test control=sequence
 //ff:what formatChainLink 가 SSOT/artifact 분기 및 line/summary 유무에 따라 포맷하는지 검증
 package chain
 

@@ -7,9 +7,9 @@ import (
 	"fmt"
 
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	oapiparser "github.com/park-jun-woo/yongol/pkg/parser/openapi"
 	"github.com/park-jun-woo/yongol/pkg/util/caseconv"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // xdo75FieldDiag performs the per-field check. Returns (diag, true) when the

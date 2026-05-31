@@ -1,9 +1,10 @@
-//ff:func feature=gen-fastapi type=test control=sequence
+//ff:func feature=gen-fastapi type=test control=iteration dimension=1
 //ff:what TestFindParamEnd — 경로 파라미터 이름 끝 위치 탐색 (슬래시/문자열끝)
-
 package ssac
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestFindParamEnd(t *testing.T) {
 	cases := []struct {

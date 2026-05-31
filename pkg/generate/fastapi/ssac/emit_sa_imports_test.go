@@ -1,6 +1,5 @@
-//ff:func feature=gen-fastapi type=test control=sequence
+//ff:func feature=gen-fastapi type=test control=iteration dimension=1
 //ff:what TestEmitSAImports — SQLAlchemy DML(select/update/delete) import 조건부 출력
-
 package ssac
 
 import (

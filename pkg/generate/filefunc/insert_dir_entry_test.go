@@ -1,6 +1,5 @@
-//ff:func feature=gen-filefunc type=test control=sequence
+//ff:func feature=gen-filefunc type=test control=iteration dimension=1
 //ff:what TestInsertDirEntry — 디렉토리만 feature 맵에 삽입, 파일/중복 제외 검증
-
 package filefunc
 
 import (

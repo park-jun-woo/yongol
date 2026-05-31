@@ -1,4 +1,4 @@
-//ff:func feature=report type=test control=selection topic=sarif
+//ff:func feature=report type=test control=sequence topic=sarif
 //ff:what TestTryAbsRelativeURI — empty absSpecs / rebase 성공 / escape("..") 분기 검증
 package sarif
 
@@ -7,8 +7,6 @@ import (
 	"testing"
 )
 
-// TestTryAbsRelativeURI covers the empty-guard, successful rebase, and ".."
-// escape rejection branches.
 func TestTryAbsRelativeURI(t *testing.T) {
 	if got := tryAbsRelativeURI("anything", ""); got != "" {
 		t.Errorf("empty absSpecs: got %q, want empty", got)

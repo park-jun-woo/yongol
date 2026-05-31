@@ -1,6 +1,5 @@
-//ff:func feature=gen-fastapi type=test control=sequence
+//ff:func feature=gen-fastapi type=test control=iteration dimension=1
 //ff:what TestRouteSuffix — URLPath → FastAPI 라우트 suffix (prefix 제거)
-
 package ssac
 
 import (

@@ -10,13 +10,13 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/parser/ddl"
 	"github.com/park-jun-woo/yongol/pkg/parser/design"
 	"github.com/park-jun-woo/yongol/pkg/parser/features"
+	"github.com/park-jun-woo/yongol/pkg/parser/funcspec"
 	"github.com/park-jun-woo/yongol/pkg/parser/hurl"
 	"github.com/park-jun-woo/yongol/pkg/parser/manifest"
 	"github.com/park-jun-woo/yongol/pkg/parser/rego"
 	"github.com/park-jun-woo/yongol/pkg/parser/ssac"
 	"github.com/park-jun-woo/yongol/pkg/parser/statemachine"
 	"github.com/park-jun-woo/yongol/pkg/parser/stml"
-	"github.com/park-jun-woo/yongol/pkg/parser/funcspec"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 

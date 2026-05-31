@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=selection dimension=2
+//ff:func feature=migration type=test control=sequence
 //ff:what TestAlterColumnType_SafetyLevel — USING 있으면 Safe, 없으면 Warning
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestAlterColumnType_SafetyLevel(t *testing.T) {
 	if got := (AlterColumnType{Using: "c::int"}).SafetyLevel(); got != SafetySafe {

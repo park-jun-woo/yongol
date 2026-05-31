@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=2
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what hasAuthSequence — SSaC ServiceFuncs 에 @auth 시퀀스 존재 여부
-
 package boot
 
 import (

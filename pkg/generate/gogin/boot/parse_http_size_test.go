@@ -1,9 +1,10 @@
-//ff:func feature=gen-gogin type=test control=sequence topic=dos-guard
+//ff:func feature=gen-gogin type=test control=iteration dimension=1 topic=dos-guard
 //ff:what parseHTTPSize — middleware.ParseSize 래퍼: 빈 문자열/에러를 ok=false 로 통일
-
 package boot
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestParseHTTPSize(t *testing.T) {
 	cases := []struct {

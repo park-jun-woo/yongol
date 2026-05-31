@@ -18,16 +18,7 @@ func renderPutOp(b *strings.Builder, op *ir.PutOp, indent, sessionRef string) {
 		return
 	}
 	model := pascalCase(op.Model)
-
-	var whereArgs, dataArgs []ir.FieldArg
-	for _, a := range op.Args {
-		if a.IsPK {
-			whereArgs = append(whereArgs, a)
-		} else {
-			dataArgs = append(dataArgs, a)
-		}
-	}
-
+	whereArgs, dataArgs := splitPKArgs(op.Args)
 	whereClause := renderSAWhere(op.Model, whereArgs)
 	dataClause := renderSAData(dataArgs)
 

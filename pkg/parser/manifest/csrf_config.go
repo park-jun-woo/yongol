@@ -9,7 +9,8 @@ package manifest
 // and ExemptPaths skip verification.
 //
 // env overrides:
-//   BACKEND_AUTH_CSRF_ENABLED=false  — emergency disable.
+//
+//	BACKEND_AUTH_CSRF_ENABLED=false  — emergency disable.
 type CsrfConfig struct {
 	Enabled     bool     `yaml:"enabled"`
 	CookieName  string   `yaml:"cookie_name"`  // default "XSRF-TOKEN"

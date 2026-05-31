@@ -7,24 +7,31 @@ package sqlc
 // Name        : raw query name from the comment (e.g. "UserFindByEmail").
 // Model       : PascalCase model derived from the filename (singularized).
 // Method      : method name after stripping the model prefix. Falls back to
-//               the full query name when the prefix does not match.
+//
+//	the full query name when the prefix does not match.
+//
 // Cardinality : ":one" / ":many" / ":exec" value without the leading colon.
 // RowType     : sqlc-synthesized row struct name (e.g. "UserFindByEmailRow").
-//               Populated for ":one" / ":many"; empty for ":exec" / ":execresult"
-//               because those return no rows.
+//
+//	Populated for ":one" / ":many"; empty for ":exec" / ":execresult"
+//	because those return no rows.
+//
 // Params      : named params from SQL (@param_name → PascalCase "ParamName").
 // File        : absolute path to the .sql file.
 // Line        : 1-based line number of the `-- name:` comment.
 // Body        : raw SQL body for this query, lines joined with "\n", with the
-//               leading `-- name:` line excluded. Trailing whitespace trimmed.
-//               Comment lines are preserved as-is (the body is the raw text
-//               between `-- name:` markers). Consumers downstream extract the
-//               RETURNING clause from this string (see XQS-20).
+//
+//	leading `-- name:` line excluded. Trailing whitespace trimmed.
+//	Comment lines are preserved as-is (the body is the raw text
+//	between `-- name:` markers). Consumers downstream extract the
+//	RETURNING clause from this string (see XQS-20).
+//
 // SelectStar  : true when the query uses SELECT * (all columns).
 // SelectCols  : populated when SelectStar is false and the query is a SELECT
-//               with an explicit column list. Contains snake_case column names
-//               as written in the SQL. Empty for non-SELECT queries or SELECT *.
-//               PhaseG03 — validate uses this to verify SSaC field references.
+//
+//	with an explicit column list. Contains snake_case column names
+//	as written in the SQL. Empty for non-SELECT queries or SELECT *.
+//	PhaseG03 — validate uses this to verify SSaC field references.
 type QuerySpec struct {
 	Name        string
 	Model       string

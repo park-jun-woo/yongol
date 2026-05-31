@@ -3,9 +3,9 @@
 package validate
 
 import (
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/ground"
 	contractvalidate "github.com/park-jun-woo/yongol/pkg/validate/contract"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // Validate runs per-SSOT and pair-cross validation and returns a Report.

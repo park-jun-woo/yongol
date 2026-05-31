@@ -1,6 +1,5 @@
-//ff:func feature=validate-contract type=test control=sequence topic=preserve-safety
+//ff:func feature=validate-contract type=test control=iteration dimension=1 topic=preserve-safety
 //ff:what TestResourceAcquireFromAssign — close 필요한 리소스 획득 AssignStmt 의 var 이름 반환 검증
-
 package contract
 
 import (

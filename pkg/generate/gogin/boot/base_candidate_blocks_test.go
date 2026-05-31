@@ -1,6 +1,5 @@
 //ff:func feature=gen-gogin type=test control=sequence
 //ff:what TestBaseCandidateBlocks — main.go 후보 블록 구성 + prepared backend 분기 검증
-
 package boot
 
 import (
@@ -49,14 +48,4 @@ func TestBaseCandidateBlocks(t *testing.T) {
 			}
 		}
 	})
-}
-
-//ff:func feature=gen-gogin type=test-helper control=iteration dimension=1
-//ff:what blockNames — MainBlock 슬라이스에서 Name 집합 추출 (테스트 헬퍼)
-func blockNames(blocks []MainBlock) map[string]bool {
-	out := make(map[string]bool, len(blocks))
-	for _, b := range blocks {
-		out[b.Name] = true
-	}
-	return out
 }

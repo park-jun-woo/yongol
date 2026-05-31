@@ -1,6 +1,5 @@
-//ff:func feature=manifest type=test control=iteration dimension=1
+//ff:func feature=manifest type=test control=sequence
 //ff:what rebuildBufferWithTerminator — i==j 단일 라인 절단 / 다중 라인 연결
-
 package ddl
 
 import (

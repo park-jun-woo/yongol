@@ -1,4 +1,4 @@
-//ff:func feature=chain type=test control=iteration dimension=2
+//ff:func feature=chain type=test control=sequence
 //ff:what findDDLTable 가 db/*.sql 에서 CREATE TABLE 위치를 찾고 미발견/디렉토리없음을 처리하는지 검증
 package chain
 

@@ -2,7 +2,12 @@
 //ff:what GenerateOptions 기본값 적용 검증
 package stml
 
-import ("strings"; "testing"; stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml")
+import (
+	"strings"
+	"testing"
+
+	stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
+)
 
 func TestGenerateOptionsDefaults(t *testing.T) {
 	page, _ := stmlparser.ParseReader("login-page.html", strings.NewReader(`<main>

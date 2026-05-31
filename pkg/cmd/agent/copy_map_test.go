@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=iteration dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestCopyMap — copyMap 이 동일 내용의 독립 복사본을 만드는지 검증
-
 package agent
 
 import (

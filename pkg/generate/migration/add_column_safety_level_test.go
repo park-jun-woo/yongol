@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=selection dimension=4
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestAddColumn_SafetyLevel — NOT NULL + default/backfill 조합별 안전등급
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestAddColumn_SafetyLevel(t *testing.T) {
 	cases := []struct {

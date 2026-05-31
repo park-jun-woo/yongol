@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=sequence
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestNormalizeNextval — nextval(...) 내부 ::regclass 캐스트 제거
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestNormalizeNextval(t *testing.T) {
 	cases := []struct{ in, want string }{

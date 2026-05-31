@@ -18,11 +18,11 @@ import (
 // SDK bits it actually uses at runtime:
 //
 //   - "otlp":   go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc
-//               (default gRPC → localhost:4317, Jaeger or otel-collector)
+//     (default gRPC → localhost:4317, Jaeger or otel-collector)
 //   - "stdout": go.opentelemetry.io/otel/exporters/stdout/stdouttrace
-//               (dev-mode — spans printed to stderr)
+//     (dev-mode — spans printed to stderr)
 //   - "noop":   no exporter. The SDK + sampler still run, which exercises the
-//               instrumentation path end-to-end without shipping any data.
+//     instrumentation path end-to-end without shipping any data.
 //
 // The TracerProvider is set globally (`otel.SetTracerProvider`) and the
 // W3C TraceContext + Baggage propagators are registered so otelgin,

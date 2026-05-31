@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=selection dimension=2
+//ff:func feature=agent type=test control=sequence
 //ff:what TestBuildDDLUserPrompt — 관계/상태/관련기능 유무에 따른 DDL prompt 구성 검증
-
 package agent
 
 import (

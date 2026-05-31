@@ -1,6 +1,5 @@
-//ff:func feature=validate-contract type=test control=iteration dimension=1 topic=preserve-safety
+//ff:func feature=validate-contract type=test control=sequence topic=preserve-safety
 //ff:what TestPRV16PreservedNilDeref — Get*/Find* 반환값 즉시 selector 접근 오케스트레이션 검증
-
 package contract
 
 import (

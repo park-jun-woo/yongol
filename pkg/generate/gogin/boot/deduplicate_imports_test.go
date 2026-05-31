@@ -1,9 +1,10 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=2
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what deduplicateImports — 블록별 import 합산 + 중복 제거 + 정렬
-
 package boot
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestDeduplicateImports(t *testing.T) {
 	blocks := []MainBlock{

@@ -18,9 +18,9 @@ func TestXdo75FieldDiag(t *testing.T) {
 			{
 				Name: "users",
 				Columns: map[string]ddl.Column{
-					"name":    {NotNull: true, HasDefault: false},
-					"role":    {NotNull: true, HasDefault: true},
-					"bio":     {NotNull: false},
+					"name": {NotNull: true, HasDefault: false},
+					"role": {NotNull: true, HasDefault: true},
+					"bio":  {NotNull: false},
 				},
 			},
 		},

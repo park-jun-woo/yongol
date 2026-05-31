@@ -78,4 +78,3 @@ func s64EmptyExistsModelOnly(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	}
 	return diags
 }
-

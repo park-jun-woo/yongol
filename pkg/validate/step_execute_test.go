@@ -1,6 +1,5 @@
-//ff:func feature=validate type=test control=selection
+//ff:func feature=validate type=test control=sequence
 //ff:what TestStepExecute — step.execute missing/skip/run 정책 분기 검증
-
 package validate
 
 import (

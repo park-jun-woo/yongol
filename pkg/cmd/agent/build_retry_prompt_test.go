@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=selection dimension=2
+//ff:func feature=agent type=test control=sequence
 //ff:what TestBuildRetryPrompt — DDL/relativeLine 유무에 따른 재시도 프롬프트 구성 검증
-
 package agent
 
 import (

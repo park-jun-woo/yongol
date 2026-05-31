@@ -15,10 +15,10 @@ func TestRun_NoLayouts_SkipLayoutRules(t *testing.T) {
 		"/items": getOp("ListItems", nil, nil),
 	})
 	fs := makeFS([]stml.PageSpec{{
-		Name:        "page",
-		FileName:    "page.html",
-		Layout:      "nonexistent",
-		Fetches:     []stml.FetchBlock{{OperationID: "ListItems"}},
+		Name:     "page",
+		FileName: "page.html",
+		Layout:   "nonexistent",
+		Fetches:  []stml.FetchBlock{{OperationID: "ListItems"}},
 	}}, doc)
 	// fs.Layouts is nil, fs.Manifest is nil → skip TM-11/12/13
 	diags := Run(fs)

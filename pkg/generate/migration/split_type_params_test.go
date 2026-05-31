@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=sequence
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestSplitTypeParams — base 와 괄호 내부 파라미터 분리
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestSplitTypeParams(t *testing.T) {
 	cases := []struct {

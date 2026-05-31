@@ -1,9 +1,10 @@
-//ff:func feature=validate type=test control=selection topic=states
+//ff:func feature=validate type=test control=iteration dimension=1 topic=states
 //ff:what TestFirstPathSegment — firstPathSegment 분기별 첫 세그먼트 추출 검증
-
 package ssac_statemachine
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestFirstPathSegment(t *testing.T) {
 	cases := []struct {

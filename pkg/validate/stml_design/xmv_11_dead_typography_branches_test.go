@@ -1,6 +1,5 @@
-//ff:func feature=validate type=test control=selection topic=stml-design
+//ff:func feature=validate type=test control=sequence topic=stml-design
 //ff:what TestXmv11DeadTypographyBranches — xmv11DeadTypography early-return / empty fontFamily skip 검증
-
 package stml_design
 
 import (

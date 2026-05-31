@@ -7,15 +7,15 @@ import "strings"
 // NormalizeDefault rewrites a PostgreSQL DEFAULT expression into a
 // canonical form so that equivalent expressions compare equal:
 //
-//   'foo'::text        -> 'foo'
-//   'foo'              -> 'foo'
-//   NOW()              -> CURRENT_TIMESTAMP
-//   now()              -> CURRENT_TIMESTAMP
-//   CURRENT_TIMESTAMP  -> CURRENT_TIMESTAMP
-//   TRUE / true        -> TRUE
-//   FALSE / false      -> FALSE
-//   0::integer         -> 0
-//   nextval('s'::regclass) -> nextval('s')
+//	'foo'::text        -> 'foo'
+//	'foo'              -> 'foo'
+//	NOW()              -> CURRENT_TIMESTAMP
+//	now()              -> CURRENT_TIMESTAMP
+//	CURRENT_TIMESTAMP  -> CURRENT_TIMESTAMP
+//	TRUE / true        -> TRUE
+//	FALSE / false      -> FALSE
+//	0::integer         -> 0
+//	nextval('s'::regclass) -> nextval('s')
 //
 // Empty input returns "" (meaning "no default").
 func NormalizeDefault(raw string) string {

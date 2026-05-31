@@ -1,9 +1,10 @@
-//ff:func feature=manifest type=test control=iteration dimension=1
+//ff:func feature=manifest type=test control=sequence
 //ff:what applyTrailingCommentHint — 인라인 `-- @...` 주석을 HintComment로 파싱해 out에 추가
-
 package ddl
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestApplyTrailingCommentHint(t *testing.T) {
 	t.Run("hint comment appended with column ctx", func(t *testing.T) {

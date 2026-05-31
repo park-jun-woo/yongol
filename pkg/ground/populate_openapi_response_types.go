@@ -5,8 +5,8 @@ package ground
 import (
 	"strings"
 
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/rule"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // populateOpenAPIResponseTypes registers per-operation response field types.
@@ -14,7 +14,7 @@ import (
 // property is mapped via resolveSchemaType ($ref normalized, primitives
 // normalized to Go types).
 //
-//   Types["OpenAPI.response.<opID>.<fieldName>"] = <Type>
+//	Types["OpenAPI.response.<opID>.<fieldName>"] = <Type>
 //
 // XOS-67 consumes this to validate @response field value types.
 func populateOpenAPIResponseTypes(g *rule.Ground, fs *yongol.Fullstack) {

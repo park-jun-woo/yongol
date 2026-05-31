@@ -1,9 +1,10 @@
-//ff:func feature=agent type=test control=sequence
+//ff:func feature=agent type=test control=iteration dimension=1
 //ff:what TestExtractRuleID — 대괄호/콜론 형식의 룰 ID 추출 검증
-
 package agent
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestExtractRuleID(t *testing.T) {
 	cases := []struct {

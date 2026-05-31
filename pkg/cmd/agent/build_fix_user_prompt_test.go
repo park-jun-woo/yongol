@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=selection dimension=2
+//ff:func feature=agent type=test control=iteration dimension=1
 //ff:what TestBuildFixUserPrompt — 레이어별 cross-SSOT 컨텍스트/공통 섹션 구성 검증
-
 package agent
 
 import (

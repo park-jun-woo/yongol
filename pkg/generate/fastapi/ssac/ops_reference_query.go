@@ -8,10 +8,8 @@ import "github.com/park-jun-woo/yongol/pkg/generate/ir"
 // opsReferenceQuery returns true if any FieldArg in ops has Location == LocQuery.
 func opsReferenceQuery(ops []ir.Op) bool {
 	for _, op := range ops {
-		for _, fa := range collectFieldArgs(op) {
-			if fa.Location == ir.LocQuery {
-				return true
-			}
+		if opReferencesLocation(op, ir.LocQuery) {
+			return true
 		}
 	}
 	return false

@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=iteration dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestDiagMessages — 진단 목록에서 메시지 문자열을 순서대로 추출 검증
-
 package agent
 
 import (

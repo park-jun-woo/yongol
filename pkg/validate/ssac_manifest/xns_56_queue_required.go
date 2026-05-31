@@ -29,4 +29,3 @@ func xns56QueueRequired(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		Advice:  "Set manifest queue.backend (e.g. memory, kafka, or redis)",
 	}}
 }
-

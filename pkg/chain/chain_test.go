@@ -1,41 +1,13 @@
-//ff:func feature=chain type=test control=selection dimension=2
+//ff:func feature=chain type=test control=sequence
 //ff:what TestChain — Chain 의 nil-OpenAPI / not-found / matched-ServiceFunc 분기 검증
-
 package chain
 
 import (
-	"os"
-	"path/filepath"
-	"runtime"
 	"testing"
 
 	"github.com/getkin/kin-openapi/openapi3"
-
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
-
-// opus47SpecsDir resolves examples/zenflow/opus4_7/specs relative to the module
-// root by walking up from this test file. Returns "" if not found.
-func opus47SpecsDir(t *testing.T) string {
-	t.Helper()
-	_, thisFile, _, ok := runtime.Caller(0)
-	if !ok {
-		return ""
-	}
-	dir := filepath.Dir(thisFile)
-	for i := 0; i < 10; i++ {
-		candidate := filepath.Join(dir, "examples", "zenflow", "opus4_7", "specs")
-		if info, err := os.Stat(candidate); err == nil && info.IsDir() {
-			return candidate
-		}
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			return ""
-		}
-		dir = parent
-	}
-	return ""
-}
 
 func TestChain(t *testing.T) {
 	t.Run("NilOpenAPI", func(t *testing.T) {

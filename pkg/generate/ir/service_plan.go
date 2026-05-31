@@ -63,23 +63,3 @@ type ServicePlan struct {
 	// BodyFields lists OpenAPI request body property metadata.
 	BodyFields []BodyFieldMeta
 }
-
-// QueryParamMeta holds metadata for a single OpenAPI query parameter.
-type QueryParamMeta struct {
-	// Name is the OpenAPI parameter name.
-	Name string
-	// Type is the schema type (e.g. "string", "integer").
-	Type string
-	// Required is true when the parameter is required.
-	Required bool
-}
-
-// BodyFieldMeta holds metadata for a single OpenAPI request body property.
-type BodyFieldMeta struct {
-	// Name is the OpenAPI property name.
-	Name string
-	// Required is true when the property is listed in the schema's required array.
-	Required bool
-	// Format is the OpenAPI format (e.g. "email", "uuid", "date-time", "enum", "").
-	Format string
-}

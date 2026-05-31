@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/util/caseconv"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // xdo68CheckInEnum validates XDO-68: request fields backed by a CHECK IN

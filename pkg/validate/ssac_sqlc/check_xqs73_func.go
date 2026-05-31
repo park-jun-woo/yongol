@@ -4,9 +4,9 @@
 package ssac_sqlc
 
 import (
+	"github.com/park-jun-woo/yongol/pkg/diagnostic"
 	sqlcparser "github.com/park-jun-woo/yongol/pkg/parser/sqlc"
 	ssacparser "github.com/park-jun-woo/yongol/pkg/parser/ssac"
-	"github.com/park-jun-woo/yongol/pkg/diagnostic"
 )
 
 // checkXqs73Func checks one SSaC function for partial SELECT field

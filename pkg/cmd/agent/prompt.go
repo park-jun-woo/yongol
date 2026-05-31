@@ -1,4 +1,3 @@
-
 package agent
 
 const ssacExample = `package service

@@ -1,26 +1,10 @@
-//ff:func feature=gen-gogin type=test control=branch topic=err-guard
+//ff:func feature=gen-gogin type=test control=iteration dimension=1
 //ff:what TestIsSelectorCall — pkg 매칭/임의 ident/비-selector/중첩 receiver/이름 불일치 분기 검증
-
 package qcheck
 
 import (
-	"go/ast"
-	"go/parser"
 	"testing"
 )
-
-func callExpr(t *testing.T, expr string) *ast.CallExpr {
-	t.Helper()
-	e, err := parser.ParseExpr(expr)
-	if err != nil {
-		t.Fatalf("parse %q: %v", expr, err)
-	}
-	call, ok := e.(*ast.CallExpr)
-	if !ok {
-		t.Fatalf("expr %q is not CallExpr: %T", expr, e)
-	}
-	return call
-}
 
 func TestIsSelectorCall(t *testing.T) {
 	cases := []struct {
@@ -28,7 +12,7 @@ func TestIsSelectorCall(t *testing.T) {
 		want          bool
 	}{
 		{"json.Unmarshal(b, v)", "json", "Unmarshal", true},
-		{"row.Scan(x)", "", "Scan", true},      // empty pkg accepts any ident
+		{"row.Scan(x)", "", "Scan", true},                 // empty pkg accepts any ident
 		{"json.Unmarshal(b)", "yaml", "Unmarshal", false}, // wrong pkg
 		{"json.Marshal(v)", "json", "Unmarshal", false},   // wrong func
 		{"plain(x)", "", "plain", false},                  // not a selector

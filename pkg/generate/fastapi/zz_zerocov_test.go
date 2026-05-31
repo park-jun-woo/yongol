@@ -1,4 +1,4 @@
-//ff:func feature=gen-fastapi type=test
+//ff:func feature=gen-fastapi type=test control=iteration dimension=1
 //ff:what zz_zerocov_test — fastapi.buildPlansByFeature 0% 커버리지 단위 테스트
 package fastapi
 

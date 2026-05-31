@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=iteration dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestReadSQLcQueryNames — sqlc 파일의 "-- name:" 선언 추출 및 부재/빈 입력 처리 검증
-
 package agent
 
 import (

@@ -1,9 +1,10 @@
-//ff:func feature=agent type=test control=sequence
+//ff:func feature=agent type=test control=iteration dimension=1
 //ff:what TestTableFromStatesFile — states 파일명/경로에서 테이블명(.md 제거) 추출 검증
-
 package agent
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestTableFromStatesFile(t *testing.T) {
 	cases := []struct {

@@ -45,4 +45,3 @@ func xfs63CallFuncSignature(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	}
 	return diags
 }
-

@@ -13,10 +13,10 @@ import (
 // without a re-@get assignment is stale (the in-memory struct is out of date).
 //
 // Algorithm (sequence-order aware):
-//   1. Track variable → type via Result.Var assignments
-//   2. On @put/@delete of model M, mark every variable whose type is M stale
-//   3. On @get re-assignment of var V, clear stale[V]
-//   4. @response referencing a stale var → WARNING
+//  1. Track variable → type via Result.Var assignments
+//  2. On @put/@delete of model M, mark every variable whose type is M stale
+//  3. On @get re-assignment of var V, clear stale[V]
+//  4. @response referencing a stale var → WARNING
 func s36StaleResponse(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	var diags []diagnostic.Diagnostic
 	for _, fn := range fs.ServiceFuncs {

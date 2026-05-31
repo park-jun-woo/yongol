@@ -1,9 +1,10 @@
-//ff:func feature=validate-contract type=test control=sequence topic=preserve-safety
+//ff:func feature=validate-contract type=test control=iteration dimension=1 topic=preserve-safety
 //ff:what TestDeferStmtClosesVar — defer Close (직접 또는 closure) 인지 판정 검증
-
 package contract
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestDeferStmtClosesVar(t *testing.T) {
 	tests := []struct {

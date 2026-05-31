@@ -1,4 +1,4 @@
-//ff:func feature=gen-nestjs type=util control=switch
+//ff:func feature=gen-nestjs type=util control=selection
 //ff:what collectFieldArgs — Op 에서 모든 FieldArg 슬라이스를 추출 (kind 불문)
 
 package ssac

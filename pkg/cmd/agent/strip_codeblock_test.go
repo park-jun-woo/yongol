@@ -1,9 +1,10 @@
-//ff:func feature=agent type=test control=sequence
+//ff:func feature=agent type=test control=iteration dimension=1
 //ff:what TestStripCodeBlock — markdown 코드블록 울타리 제거 및 비-펜스 입력 통과 검증
-
 package agent
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestStripCodeBlock(t *testing.T) {
 	cases := []struct {

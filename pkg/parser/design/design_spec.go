@@ -6,12 +6,12 @@ package design
 // YAML front matter provides token maps; Markdown body yields Headings.
 type DesignSpec struct {
 	File       string
-	Version    string                   `yaml:"version"`
-	Name       string                   `yaml:"name"`
-	Colors     map[string]string        `yaml:"colors"`
+	Version    string                     `yaml:"version"`
+	Name       string                     `yaml:"name"`
+	Colors     map[string]string          `yaml:"colors"`
 	Typography map[string]TypographyToken `yaml:"typography"`
-	Rounded    map[string]string        `yaml:"rounded"`
-	Spacing    map[string]string        `yaml:"spacing"`
-	Components map[string]ComponentToken `yaml:"components"`
-	Headings   []string                 // ## headings extracted from body
+	Rounded    map[string]string          `yaml:"rounded"`
+	Spacing    map[string]string          `yaml:"spacing"`
+	Components map[string]ComponentToken  `yaml:"components"`
+	Headings   []string                   // ## headings extracted from body
 }

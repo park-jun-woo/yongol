@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=selection dimension=3
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestAlterColumnNullable_SQL — SET/DROP NOT NULL 및 backfill UPDATE 분기
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestAlterColumnNullable_SQL(t *testing.T) {
 	cases := []struct {

@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what sqlcModelNameSet 단위 테스트 (DDL 테이블명 → sqlc row struct 이름 set)
-
 package ssac
 
 import (

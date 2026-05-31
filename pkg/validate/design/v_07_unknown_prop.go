@@ -21,7 +21,7 @@ var knownComponentProps = map[string]bool{
 	"label":          true,
 	"children":       true,
 	"onClick":        true,
-	"onChange":        true,
+	"onChange":       true,
 	"value":          true,
 	"placeholder":    true,
 	"type":           true,

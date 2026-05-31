@@ -1,6 +1,5 @@
-//ff:func feature=validate-contract type=test control=iteration dimension=1
+//ff:func feature=validate-contract type=test control=sequence
 //ff:what TestCompareParams — 파라미터 타입 불일치를 인덱스 단위 diff 로 반환 검증
-
 package contract
 
 import (

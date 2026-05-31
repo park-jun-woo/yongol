@@ -3,12 +3,11 @@
 package ground
 
 import (
-
 	"github.com/jinzhu/inflection"
 
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/rule"
 	"github.com/park-jun-woo/yongol/pkg/util/caseconv"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 func populateSymbolTable(g *rule.Ground, fs *yongol.Fullstack) {

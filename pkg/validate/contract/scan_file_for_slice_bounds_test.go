@@ -1,6 +1,5 @@
-//ff:func feature=validate-contract type=test control=iteration dimension=1 topic=preserve-safety
+//ff:func feature=validate-contract type=test control=sequence topic=preserve-safety
 //ff:what TestScanFileForSliceBounds — FuncDecl 단위 slice[0] 가드 누락 수집 검증
-
 package contract
 
 import (

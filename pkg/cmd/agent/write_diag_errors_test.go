@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=iteration dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestWriteDiagErrors — 진단 메시지/Advice를 문자열 빌더에 형식대로 기록 검증
-
 package agent
 
 import (

@@ -15,7 +15,7 @@ func TestHasPgtypexColumn(t *testing.T) {
 		{
 			Name: "users",
 			Columns: map[string]ddl.Column{
-				"id":   {Name: "id", RawType: "UUID", NotNull: true},  // pgtypex.FromPgUUID
+				"id":   {Name: "id", RawType: "UUID", NotNull: true},   // pgtypex.FromPgUUID
 				"name": {Name: "name", RawType: "TEXT", NotNull: true}, // native
 			},
 		},

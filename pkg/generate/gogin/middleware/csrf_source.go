@@ -6,10 +6,10 @@ package middleware
 // csrfSourceTemplate is the verbatim Go source for
 // internal/middleware/csrf.go. Double-submit cookie defense:
 //
-//   1. Server sets cfg.CookieName cookie (JS-readable) on safe requests.
-//   2. Client duplicates cookie value into cfg.HeaderName header on
-//      state-changing requests.
-//   3. Server compares cookie vs header with constant-time equality.
+//  1. Server sets cfg.CookieName cookie (JS-readable) on safe requests.
+//  2. Client duplicates cookie value into cfg.HeaderName header on
+//     state-changing requests.
+//  3. Server compares cookie vs header with constant-time equality.
 //
 // Token is 32 random bytes → base64url. Safe methods (GET/HEAD/OPTIONS)
 // and cfg.ExemptPaths prefix matches skip verification. Hybrid mode

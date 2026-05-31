@@ -1,9 +1,10 @@
-//ff:func feature=gen-fastapi type=test control=sequence
+//ff:func feature=gen-fastapi type=test control=iteration dimension=1
 //ff:what TestResolveFastAPIExpr — request.X → body.x 치환 + snake_case 변환 검증
-
 package ssac
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestResolveFastAPIExpr(t *testing.T) {
 	tests := []struct {

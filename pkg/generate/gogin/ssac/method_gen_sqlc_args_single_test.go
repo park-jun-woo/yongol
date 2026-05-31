@@ -1,9 +1,10 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what methodGen.sqlcArgsSingle 단위 테스트 (0개 → ctx, 1개 → ctx, <mapped>)
-
 package ssac
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestMethodGenSqlcArgsSingle(t *testing.T) {
 	t.Run("no inputs → ctx", func(t *testing.T) {

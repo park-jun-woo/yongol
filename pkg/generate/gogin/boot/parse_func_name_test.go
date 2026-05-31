@@ -1,9 +1,10 @@
-//ff:func feature=gen-gogin type=test control=sequence
+//ff:func feature=gen-gogin type=test control=iteration dimension=1
 //ff:what parseFuncName — raw func 선언에서 식별자 이름만 추출
-
 package boot
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestParseFuncName(t *testing.T) {
 	cases := []struct {

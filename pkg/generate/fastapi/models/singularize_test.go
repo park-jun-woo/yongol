@@ -1,9 +1,10 @@
-//ff:func feature=gen-fastapi type=test control=sequence
+//ff:func feature=gen-fastapi type=test control=iteration dimension=1
 //ff:what TestSingularize — 영어 복수형 snake_case → 단수형 변환 검증
-
 package models
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestSingularize(t *testing.T) {
 	tests := []struct {

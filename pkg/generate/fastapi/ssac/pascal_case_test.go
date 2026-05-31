@@ -1,9 +1,10 @@
-//ff:func feature=gen-fastapi type=test control=sequence
+//ff:func feature=gen-fastapi type=test control=iteration dimension=1
 //ff:what TestPascalCase — snake_case → PascalCase 변환 (빈 세그먼트/단일/다중)
-
 package ssac
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestPascalCase(t *testing.T) {
 	cases := []struct {

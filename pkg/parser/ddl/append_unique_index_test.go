@@ -1,9 +1,10 @@
-//ff:func feature=manifest type=test control=iteration dimension=1
+//ff:func feature=manifest type=test control=sequence
 //ff:what appendUniqueIndex — UNIQUE 컬럼에서 unique index 추가 / 컬럼 없으면 무시
-
 package ddl
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestAppendUniqueIndex(t *testing.T) {
 	t.Run("single column", func(t *testing.T) {

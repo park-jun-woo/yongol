@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=selection dimension=2
+//ff:func feature=agent type=test control=sequence
 //ff:what TestBuildBlockFixUserPrompt — desc 조회/layer 분기/진단 출력 등 prompt 구성 검증
-
 package agent
 
 import (

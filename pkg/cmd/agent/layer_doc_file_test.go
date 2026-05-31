@@ -1,9 +1,10 @@
-//ff:func feature=agent type=test control=selection
+//ff:func feature=agent type=test control=iteration dimension=1
 //ff:what TestLayerDocFile — 레이어별 docs 파일명 매핑 및 unknown 빈 문자열 검증
-
 package agent
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestLayerDocFile(t *testing.T) {
 	cases := []struct {

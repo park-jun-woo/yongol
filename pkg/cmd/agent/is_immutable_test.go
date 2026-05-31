@@ -1,9 +1,10 @@
-//ff:func feature=agent type=test control=sequence
+//ff:func feature=agent type=test control=iteration dimension=1
 //ff:what TestIsImmutable — features.yaml/.hurl/.yongol 만 immutable 로 판별 검증
-
 package agent
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestIsImmutable(t *testing.T) {
 	cases := []struct {

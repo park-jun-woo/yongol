@@ -1,9 +1,10 @@
-//ff:func feature=agent type=test control=iteration dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestIndentText — 비어있지 않은 줄에만 prefix 가 붙는지 검증
-
 package agent
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestIndentText(t *testing.T) {
 	got := indentText("a\n\nb", "  ")

@@ -25,4 +25,3 @@ type GenerateOptions struct {
 	// wraps the useParams() value with Number() to satisfy TypeScript.
 	PathParamTypes map[string]map[string]string
 }
-

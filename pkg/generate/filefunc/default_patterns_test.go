@@ -1,9 +1,10 @@
-//ff:func feature=gen-filefunc type=test control=sequence
+//ff:func feature=gen-filefunc type=test control=iteration dimension=1
 //ff:what TestDefaultPatternEntries — 고정 pattern 키 맵 반환 검증
-
 package filefunc
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestDefaultPatternEntries(t *testing.T) {
 	got := defaultPatternEntries()

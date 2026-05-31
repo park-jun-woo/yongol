@@ -26,10 +26,10 @@ package manifest
 //
 // Env overrides (resolved in generated main.go):
 //
-//   BACKEND_SECURITY_HEADERS_ENABLED
-//   BACKEND_SECURITY_HEADERS_PROFILE
-//   BACKEND_SECURITY_HEADERS_HSTS_MAX_AGE
-//   BACKEND_SECURITY_HEADERS_CSP_REPORT_ONLY
+//	BACKEND_SECURITY_HEADERS_ENABLED
+//	BACKEND_SECURITY_HEADERS_PROFILE
+//	BACKEND_SECURITY_HEADERS_HSTS_MAX_AGE
+//	BACKEND_SECURITY_HEADERS_CSP_REPORT_ONLY
 type SecurityHeadersConfig struct {
 	Enabled           *bool               `yaml:"enabled,omitempty"`
 	Profile           string              `yaml:"profile,omitempty"` // production | dev | api

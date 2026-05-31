@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1 topic=response
+//ff:func feature=gen-gogin type=test control=sequence topic=response
 //ff:what buildFuncFieldLookup 단위 테스트 (JSONName 직접 매칭 + PascalToSnake fallback)
-
 package ssac
 
 import (

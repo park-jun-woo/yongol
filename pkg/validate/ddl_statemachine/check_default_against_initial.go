@@ -16,8 +16,8 @@ func checkDefaultAgainstInitial(g *rule.Ground, diagramID, table, column, initia
 	got := g.Types["DDL.default.value."+table+"."+column]
 	if got == "" {
 		return &diagnostic.Diagnostic{
-			Phase:   diagnostic.PhaseValidate,
-			Level:   diagnostic.LevelError,
+			Phase: diagnostic.PhaseValidate,
+			Level: diagnostic.LevelError,
 			Message: "[XDM-28] DDL " + table + "." + column + " has no DEFAULT but stateDiagram " + diagramID +
 				" initial state is '" + initial + "'",
 			Advice: "Add DEFAULT '" + initial + "' to DDL column " + table + "." + column,
@@ -25,8 +25,8 @@ func checkDefaultAgainstInitial(g *rule.Ground, diagramID, table, column, initia
 	}
 	if got != initial {
 		return &diagnostic.Diagnostic{
-			Phase:   diagnostic.PhaseValidate,
-			Level:   diagnostic.LevelError,
+			Phase: diagnostic.PhaseValidate,
+			Level: diagnostic.LevelError,
 			Message: "[XDM-28] DDL " + table + "." + column + " DEFAULT '" + got + "' ≠ stateDiagram " +
 				diagramID + " initial '" + initial + "'",
 			Advice: "Change the DDL DEFAULT to '" + initial + "' or change the stateDiagram [*] --> transition to '" + got + "' so they agree",

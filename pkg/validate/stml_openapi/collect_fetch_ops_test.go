@@ -1,6 +1,5 @@
-//ff:func feature=validate type=test control=sequence topic=stml-openapi
+//ff:func feature=validate type=test control=iteration dimension=1 topic=stml-openapi
 //ff:what TestCollectFetchOps — FetchBlock + nested fetches + state children operationId 재귀 수집
-
 package stml_openapi
 
 import (

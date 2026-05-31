@@ -4,20 +4,20 @@
 package contract
 
 import (
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/rule"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // expectedExternalSymbols returns three lookup sets used by PRV-02:
 //
 //   - queries   : valid sqlc method names (Queries.<Method> / qtx.<Method>).
-//                 Derived from fs.SQLcQueries (.Name — the raw `-- name:` ident).
+//     Derived from fs.SQLcQueries (.Name — the raw `-- name:` ident).
 //   - calls     : valid `<pkg>.<Func>` call targets. Union of fs.ProjectFuncSpecs
-//                 + fs.YongolPkgSpecs (canonical spec identity) and SSaC
-//                 `SSaC.callRef` (normalized) so user handlers can invoke any
-//                 func surface that SSaC / Func SSOT expose.
+//   - fs.YongolPkgSpecs (canonical spec identity) and SSaC
+//     `SSaC.callRef` (normalized) so user handlers can invoke any
+//     func surface that SSaC / Func SSOT expose.
 //   - ddlFields : valid DDL column names rendered in PascalCase (matches
-//                 oapi-codegen / sqlc-generated struct field exports).
+//     oapi-codegen / sqlc-generated struct field exports).
 //
 // The symbol sets are intentionally permissive — false positives from
 // local/temporary identifiers are acceptable; the function body may

@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=iteration dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestBuildFeatureLookupFromFF — nil/빈/다수 feature 의 op→Feature 맵 구성 검증
-
 package agent
 
 import (

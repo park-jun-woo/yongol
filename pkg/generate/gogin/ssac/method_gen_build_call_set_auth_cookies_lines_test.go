@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what buildCallSetAuthCookiesLines 단위 테스트 (AccessTokenVar + refresh var로 SetAuthCookies)
-
 package ssac
 
 import (

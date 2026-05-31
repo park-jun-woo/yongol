@@ -9,9 +9,9 @@ import "go/ast"
 // explicitly Closed. The allowlist covers the handful of stdlib APIs
 // that matter for preserved handler bodies:
 //
-//   os.Open / os.Create / os.OpenFile
-//   http.Get / http.Post / client.Do / http.DefaultClient.Do
-//   db.Query / db.QueryContext / tx.Query / tx.QueryContext / conn.Query*
+//	os.Open / os.Create / os.OpenFile
+//	http.Get / http.Post / client.Do / http.DefaultClient.Do
+//	db.Query / db.QueryContext / tx.Query / tx.QueryContext / conn.Query*
 //
 // db.QueryRow / tx.QueryRow are excluded — Scan releases the row
 // automatically, there is no Close obligation on the caller.

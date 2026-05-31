@@ -80,11 +80,7 @@ func Generate(fs *yongol.Fullstack, dir string) error {
 			return fmt.Errorf("func stubs: %w", err)
 		}
 		// Only register as infra module if not already a feature module.
-		for _, ep := range extPkgs {
-			if _, isFeature := plansByFeature[ep.Name]; !isFeature {
-				infraModules = append(infraModules, ep.Name)
-			}
-		}
+		infraModules = append(infraModules, nonFeatureExternalModules(extPkgs, plansByFeature)...)
 	}
 
 	sort.Strings(infraModules)

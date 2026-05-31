@@ -7,8 +7,8 @@ import (
 	"fmt"
 
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	parsessac "github.com/park-jun-woo/yongol/pkg/parser/ssac"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // xss59SubscribeFields validates XSS-59: every field declared on a @subscribe

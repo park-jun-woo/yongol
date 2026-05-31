@@ -1,9 +1,10 @@
-//ff:func feature=manifest type=test control=iteration dimension=1
+//ff:func feature=manifest type=test control=sequence
 //ff:what drainPendingHints — pending 힌트에 table/column 컨텍스트 부착 후 방출
-
 package ddl
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestDrainPendingHints(t *testing.T) {
 	t.Run("attaches column and table", func(t *testing.T) {

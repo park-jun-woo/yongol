@@ -1,9 +1,10 @@
-//ff:func feature=gen-filefunc type=test control=sequence
+//ff:func feature=gen-filefunc type=test control=iteration dimension=1
 //ff:what TestResolveFeatureDescription — SSOT→infra→fallback 우선순위 검증
-
 package filefunc
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestResolveFeatureDescription(t *testing.T) {
 	cases := []struct {

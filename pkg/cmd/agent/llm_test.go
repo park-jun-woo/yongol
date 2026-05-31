@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=selection
+//ff:func feature=agent type=test control=sequence
 //ff:what TestLLMCall — 미지원 backend는 즉시 에러, 네트워크 호출 backend는 조기 실패 경로 검증
-
 package agent
 
 import (

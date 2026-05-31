@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=iteration dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestWriteSSaCContextForTable — 테이블 관련 op들의 SSaC 컨텍스트 기록, 무관련 op 제외 검증
-
 package agent
 
 import (

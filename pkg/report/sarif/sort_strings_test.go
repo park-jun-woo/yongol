@@ -6,8 +6,6 @@ import (
 	"testing"
 )
 
-// TestSortStrings checks the insertion sort orders in place and handles
-// already-sorted, reversed, duplicate, and empty inputs.
 func TestSortStrings(t *testing.T) {
 	cases := []struct {
 		name string
@@ -23,18 +21,7 @@ func TestSortStrings(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			// Copy in place without changing nil-ness vs empty-ness.
-			s := make([]string, len(c.in))
-			copy(s, c.in)
-			sortStrings(s)
-			if len(s) != len(c.want) {
-				t.Fatalf("len: got %d, want %d", len(s), len(c.want))
-			}
-			for i := range c.want {
-				if s[i] != c.want[i] {
-					t.Errorf("index %d: got %q, want %q", i, s[i], c.want[i])
-				}
-			}
+			assertSortStrings(t, c.in, c.want)
 		})
 	}
 }

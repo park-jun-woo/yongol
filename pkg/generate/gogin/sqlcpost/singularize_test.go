@@ -1,9 +1,10 @@
-//ff:func feature=gen-gogin type=test control=branch topic=sqlc-post
+//ff:func feature=gen-gogin type=test control=iteration dimension=1
 //ff:what TestSingularize — ies/es-sibilant/s/무변환 각 분기 검증
-
 package sqlcpost
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestSingularize(t *testing.T) {
 	cases := []struct {

@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=iteration dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestExtractErrorOps — nil 에러 처리 및 line/path 매칭으로 원인 op 수집 검증
-
 package agent
 
 import (

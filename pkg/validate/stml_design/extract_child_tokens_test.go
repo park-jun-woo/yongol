@@ -1,6 +1,5 @@
-//ff:func feature=validate type=test control=selection topic=stml-design
+//ff:func feature=validate type=test control=iteration dimension=1 topic=stml-design
 //ff:what TestExtractChildTokens — extractChildTokens ChildNode 종류별 분기 검증
-
 package stml_design
 
 import (

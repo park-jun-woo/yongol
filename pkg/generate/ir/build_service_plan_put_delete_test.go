@@ -69,4 +69,3 @@ func TestBuildServicePlanPutDelete(t *testing.T) {
 		t.Errorf("Delete = {%q %q}, want {Workflow Delete}", delOp.Delete.Model, delOp.Delete.Method)
 	}
 }
-

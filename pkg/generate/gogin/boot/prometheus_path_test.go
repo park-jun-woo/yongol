@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=sequence topic=observability
+//ff:func feature=gen-gogin type=test control=iteration dimension=1 topic=observability
 //ff:what prometheusPath — metrics.path 결정 (미지정 시 "/metrics")
-
 package boot
 
 import (

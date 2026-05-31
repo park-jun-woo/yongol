@@ -1,4 +1,4 @@
-//ff:func feature=chain type=test control=iteration dimension=2
+//ff:func feature=chain type=test control=sequence
 //ff:what findFuncSpecLink 가 pkg/이름 매칭 시 Link 반환, 불일치 시 false 반환을 검증
 package chain
 

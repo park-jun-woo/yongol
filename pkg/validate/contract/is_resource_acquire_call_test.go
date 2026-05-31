@@ -1,9 +1,10 @@
-//ff:func feature=validate-contract type=test control=selection topic=preserve-safety
+//ff:func feature=validate-contract type=test control=iteration dimension=1 topic=preserve-safety
 //ff:what TestIsResourceAcquireCall — CallExpr 가 close 필요 리소스 반환 호출인지 판정 검증
-
 package contract
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestIsResourceAcquireCall(t *testing.T) {
 	tests := []struct {

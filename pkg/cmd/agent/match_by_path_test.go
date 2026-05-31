@@ -1,9 +1,10 @@
-//ff:func feature=agent type=test control=iteration dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestMatchByPath — 에러 메시지에 포함된 path 키로 op 매핑 검증
-
 package agent
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestMatchByPath(t *testing.T) {
 	offsets := []pathOffset{

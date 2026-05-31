@@ -7,8 +7,8 @@ import (
 	"fmt"
 
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/util/caseconv"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // xdo67MaxLengthVarchar validates XDO-67: request fields backed by a VARCHAR

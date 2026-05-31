@@ -6,8 +6,8 @@ package boot
 import (
 	"testing"
 
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	pmanifest "github.com/park-jun-woo/yongol/pkg/parser/manifest"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 func TestBlockOtelInit_Disabled(t *testing.T) {

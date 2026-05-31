@@ -1,9 +1,10 @@
-//ff:func feature=manifest type=test control=iteration dimension=1
+//ff:func feature=manifest type=test control=sequence
 //ff:what applyInlineConstraints — 인라인 PK / UNIQUE / FK 반영
-
 package ddl
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestApplyInlineConstraints(t *testing.T) {
 	t.Run("primary key", func(t *testing.T) {

@@ -1,9 +1,10 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what filterImportsUsed — body 에서 실제 참조된 import 라인만 남기기
-
 package boot
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestFilterImportsUsed(t *testing.T) {
 	imports := []string{

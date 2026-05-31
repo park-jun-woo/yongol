@@ -1,9 +1,10 @@
-//ff:func feature=cli-init type=test control=sequence
+//ff:func feature=cli-init type=test control=iteration dimension=1
 //ff:what TestExtractDomain — path→domain: 정상/복수형/하이픈/빈세그/필드부족 분기 검증
-
 package cliinit
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestExtractDomain(t *testing.T) {
 	cases := []struct{ in, want string }{

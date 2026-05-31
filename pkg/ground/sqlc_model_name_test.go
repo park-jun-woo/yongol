@@ -15,10 +15,10 @@ func TestSqlcModelName(t *testing.T) {
 		{"users", "User"},
 		{"actions", "Action"},
 		{"execution_logs", "ExecutionLog"},
-		{"categories", "Category"},          // ies → y
-		{"addresses", "Address"},            // sses → ss
-		{"indexes", "Index"},                // xes → x
-		{"boss", "Boss"},                   // "ss" suffix — no strip
+		{"categories", "Category"}, // ies → y
+		{"addresses", "Address"},   // sses → ss
+		{"indexes", "Index"},       // xes → x
+		{"boss", "Boss"},           // "ss" suffix — no strip
 	}
 	for _, tt := range tests {
 		got := sqlcModelName(tt.table)

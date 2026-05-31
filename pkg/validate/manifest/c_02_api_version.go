@@ -24,4 +24,3 @@ func c02APIVersion(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		Advice:  "Set apiVersion to yongol/v1",
 	}}
 }
-

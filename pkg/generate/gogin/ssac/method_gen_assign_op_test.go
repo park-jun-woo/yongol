@@ -1,9 +1,10 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=2
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what methodGen.assignOp 단위 테스트 (FirstErr + DeclaredVars 추적으로 := / = 선택)
-
 package ssac
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestMethodGenAssignOp(t *testing.T) {
 	t.Run("err-only first := then =", func(t *testing.T) {

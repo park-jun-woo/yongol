@@ -1,6 +1,5 @@
-//ff:func feature=validate-contract type=test control=iteration dimension=1
+//ff:func feature=validate-contract type=test control=sequence
 //ff:what TestPRV01SignatureDrift — preserved 파일 목록의 signature drift 오케스트레이션 검증
-
 package contract
 
 import (

@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=iteration dimension=2
+//ff:func feature=agent type=test control=sequence
 //ff:what TestExtractHurlBlock — "# OperationId" 기준 블록 추출, 경계/미존재 op 처리 검증
-
 package agent
 
 import (

@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=sequence topic=loop-report
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what TestBodyReport — 루프 body 순수 라인 수와 헤더 라인을 PureLinesReport로 반환 검증
-
 package qcheck
 
 import (

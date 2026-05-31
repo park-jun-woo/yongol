@@ -1,9 +1,10 @@
-//ff:func feature=agent type=test control=iteration dimension=3
+//ff:func feature=agent type=test control=sequence
 //ff:what TestMatchByGrep — 메시지의 따옴표 키워드를 YAML 본문에서 grep 하여 op/상대라인 매핑 검증
-
 package agent
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestMatchByGrep(t *testing.T) {
 	yaml := "line1\nfield: secretKey\nline3\nother: value"

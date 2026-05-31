@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=iteration dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestCountImmutable — countImmutable 이 immutable 파일을 가리키는 ERROR 만 세는지 검증
-
 package agent
 
 import (

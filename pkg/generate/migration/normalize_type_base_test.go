@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=selection
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestNormalizeTypeBase — base 토큰 정규화 + SERIAL 계열 감지
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestNormalizeTypeBase(t *testing.T) {
 	cases := []struct {

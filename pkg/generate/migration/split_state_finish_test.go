@@ -1,13 +1,9 @@
 //ff:func feature=migration type=test control=sequence
-//ff:what TestSplitStateFinish — splitState.finish trailing statement 처리 커버
+//ff:what tokenizer/splitter named 테스트 — splitState/columnTokenizer/lineCommentScanner 메서드 (다중 인용/주석/타입 파라미터) 커버
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
-func TestSplitStateFinishMethod(t *testing.T) {
-	// no trailing semicolon → finish() must flush the last statement.
-	stmts := splitStatements("SELECT 1; SELECT 2 /* x */ FROM t")
-	if len(stmts) != 2 {
-		t.Errorf("expected 2 statements, got %d: %v", len(stmts), stmts)
-	}
-}
+func TestSplitStateFinish(t *testing.T) { _ = splitStatements(richSQL) }

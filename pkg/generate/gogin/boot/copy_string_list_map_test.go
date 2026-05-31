@@ -1,9 +1,10 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what copyStringListMap — map[string][]string 의 deep copy (generator shared-state 보호)
-
 package boot
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestCopyStringListMap(t *testing.T) {
 	if copyStringListMap(nil) != nil {

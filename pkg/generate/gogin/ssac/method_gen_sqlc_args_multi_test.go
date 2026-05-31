@@ -1,9 +1,10 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what methodGen.sqlcArgsMulti 단위 테스트 (정렬된 Params 구조체 리터럴 방출)
-
 package ssac
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestMethodGenSqlcArgsMulti(t *testing.T) {
 	g := &methodGen{

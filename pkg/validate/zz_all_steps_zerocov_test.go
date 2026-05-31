@@ -1,9 +1,10 @@
-//ff:func feature=validate type=test control=sequence
+//ff:func feature=validate type=test control=iteration dimension=1
 //ff:what TestAllSteps_ZeroCov — allSteps() 고정 step 목록을 이름으로 직접 호출
-
 package validate
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestAllSteps_ZeroCov(t *testing.T) {
 	steps := allSteps()

@@ -1,9 +1,10 @@
-//ff:func feature=gen-fastapi type=test control=sequence
+//ff:func feature=gen-fastapi type=test control=iteration dimension=1
 //ff:what TestPyHTTPDecorator — HTTP 메서드 → FastAPI 데코레이터 이름 매핑
-
 package ssac
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestPyHTTPDecorator(t *testing.T) {
 	cases := []struct {

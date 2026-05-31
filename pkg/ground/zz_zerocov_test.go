@@ -1,4 +1,4 @@
-//ff:func feature=rule type=test
+//ff:func feature=rule type=test control=sequence
 //ff:what zz_zerocov_test — ground.registerFuncSpec 0% 커버리지 단위 테스트
 package ground
 

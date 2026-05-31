@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=selection dimension=2
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestIsIdentOrSpaceRune — 식별자 문자/공백/_ 은 true, 그 외 false
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestIsIdentOrSpaceRune(t *testing.T) {
 	for _, r := range []rune{'a', 'Z', '5', '_', ' '} {

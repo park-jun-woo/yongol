@@ -1,9 +1,10 @@
-//ff:func feature=agent type=test control=iteration dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestMergeMethodBlock — 신규 path 추가 및 기존 path에 method 병합 검증
-
 package agent
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestMergeMethodBlock(t *testing.T) {
 	// New path key: block stored as-is.

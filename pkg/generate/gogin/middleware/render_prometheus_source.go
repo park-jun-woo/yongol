@@ -11,6 +11,6 @@ func renderPrometheusSources(buckets []float64) map[string]string {
 	lit := bucketsLiteral(buckets)
 	return map[string]string{
 		"prometheus_middleware.go": strings.ReplaceAll(prometheusMiddlewareSourceTemplate, "__BUCKETS__", lit),
-		"prometheus_handler.go":   prometheusHandlerSource,
+		"prometheus_handler.go":    prometheusHandlerSource,
 	}
 }

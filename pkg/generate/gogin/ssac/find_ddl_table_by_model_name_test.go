@@ -1,6 +1,5 @@
 //ff:func feature=gen-gogin type=test control=iteration dimension=1
 //ff:what findDDLTableByModelName 단위 테스트 (sqlc 모델명 → DDL 테이블)
-
 package ssac
 
 import (
@@ -27,16 +26,7 @@ func TestFindDDLTableByModelName(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			got := findDDLTableByModelName(tables, tc.modelName)
-			if tc.wantTable == "" {
-				if got != nil {
-					t.Errorf("expected nil, got %q", got.Name)
-				}
-				return
-			}
-			if got == nil || got.Name != tc.wantTable {
-				t.Errorf("findDDLTableByModelName(%q) = %v, want table %q", tc.modelName, got, tc.wantTable)
-			}
+			assertFindDDLTableByModelName(t, tables, tc.modelName, tc.wantTable)
 		})
 	}
 }

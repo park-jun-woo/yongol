@@ -1,9 +1,10 @@
-//ff:func feature=gen-gogin type=test control=iteration topic=sqlc-post
+//ff:func feature=gen-gogin type=test control=iteration dimension=1
 //ff:what TestSqlcFieldName — snake_case→PascalCase + id→ID 이니셜리즘 + 빈 파트 스킵 검증
-
 package sqlcpost
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestSqlcFieldName(t *testing.T) {
 	cases := []struct {

@@ -1,6 +1,5 @@
 //ff:func feature=gen-gogin type=test control=iteration dimension=1
 //ff:what lookupDDLColumn 단위 테스트 ((table, column) → *ddl.Column)
-
 package ssac
 
 import (
@@ -33,19 +32,7 @@ func TestLookupDDLColumn(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			got := lookupDDLColumn(tables, tc.model, tc.column)
-			if tc.wantNil {
-				if got != nil {
-					t.Errorf("expected nil, got %+v", got)
-				}
-				return
-			}
-			if got == nil {
-				t.Fatalf("expected column, got nil")
-			}
-			if got.RawType != tc.wantRaw {
-				t.Errorf("RawType = %q, want %q", got.RawType, tc.wantRaw)
-			}
+			assertLookupDDLColumn(t, tables, tc.model, tc.column, tc.wantNil, tc.wantRaw)
 		})
 	}
 }

@@ -1,9 +1,10 @@
-//ff:func feature=validate-contract type=test control=iteration dimension=1
+//ff:func feature=validate-contract type=test control=sequence
 //ff:what TestBuildExpectedQueries — SQLcQueries 의 Name/Method 모두 허용 집합에 포함 검증
-
 package contract
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestBuildExpectedQueries(t *testing.T) {
 	fs := buildFSForPRV02() // single query UserFindByID/FindByID

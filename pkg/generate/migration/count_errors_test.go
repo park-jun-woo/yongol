@@ -1,4 +1,4 @@
-//ff:func feature=migration type=test control=iteration dimension=1
+//ff:func feature=migration type=test control=sequence
 //ff:what TestCountErrors — 진단 중 ERROR 레벨 개수
 package migration
 

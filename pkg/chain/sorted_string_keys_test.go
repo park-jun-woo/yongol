@@ -1,4 +1,4 @@
-//ff:func feature=chain type=test control=iteration dimension=1
+//ff:func feature=chain type=test control=sequence
 //ff:what sortedStringKeys 가 map 키를 정렬해 반환하는지 검증
 package chain
 

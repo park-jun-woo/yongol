@@ -1,4 +1,4 @@
-//ff:func feature=migration type=test control=iteration dimension=1
+//ff:func feature=migration type=test control=sequence
 //ff:what TestStripLineComments — -- 라인 코멘트 제거, single-quote 내부 보존
 package migration
 

@@ -1,6 +1,5 @@
-//ff:func feature=contract type=test control=iteration dimension=1
+//ff:func feature=contract type=test control=sequence
 //ff:what test: TestAppendFieldEntries — 다중 이름 그룹 분해 및 익명 필드 단일 엔트리 분기 검증
-
 package contract
 
 import (

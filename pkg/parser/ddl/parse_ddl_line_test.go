@@ -1,9 +1,10 @@
-//ff:func feature=manifest type=test control=iteration dimension=1
+//ff:func feature=manifest type=test control=sequence
 //ff:what parseDDLLine — CREATE TABLE/INDEX 분기, 닫는 괄호 리셋, 컬럼 위임
-
 package ddl
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestParseDDLLine(t *testing.T) {
 	t.Run("create table sets current table", func(t *testing.T) {

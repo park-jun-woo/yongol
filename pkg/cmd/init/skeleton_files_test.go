@@ -1,9 +1,10 @@
-//ff:func feature=cli-init type=test control=sequence
+//ff:func feature=cli-init type=test control=iteration dimension=1
 //ff:what TestSkeletonFiles — 모든 srcEmbed가 embed.FS에서 읽히고 dest 비어있지 않음을 검증
-
 package cliinit
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestSkeletonFiles(t *testing.T) {
 	files := skeletonFiles()

@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=iteration dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestCountErrors — countErrors 가 ERROR 레벨 진단만 세는지 검증
-
 package agent
 
 import (

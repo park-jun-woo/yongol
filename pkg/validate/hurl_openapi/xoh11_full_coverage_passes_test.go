@@ -14,8 +14,8 @@ import (
 func TestXoh11_FullCoveragePasses(t *testing.T) {
 	fs := &yongol.Fullstack{
 		OpenAPIDoc: newDoc(map[string]map[string]*openapi3.Operation{
-			"/gigs":       {"GET": {OperationID: "ListGigs"}, "POST": {OperationID: "CreateGig"}},
-			"/gigs/{id}":  {"GET": {OperationID: "GetGig"}},
+			"/gigs":      {"GET": {OperationID: "ListGigs"}, "POST": {OperationID: "CreateGig"}},
+			"/gigs/{id}": {"GET": {OperationID: "GetGig"}},
 		}),
 		HurlFiles: []string{"specs/tests/smoke.hurl"},
 		HurlEntries: []hurl.HurlEntry{

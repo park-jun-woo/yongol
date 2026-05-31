@@ -1,6 +1,5 @@
-//ff:func feature=validate type=test control=selection topic=ssac-statemachine
+//ff:func feature=validate type=test control=iteration dimension=1 topic=ssac-statemachine
 //ff:what TestResolveStateInputType — resolveStateInputType @state input 표현식 타입 해석 분기 검증
-
 package ssac_statemachine
 
 import (

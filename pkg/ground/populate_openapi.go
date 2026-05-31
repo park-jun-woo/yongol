@@ -3,8 +3,8 @@
 package ground
 
 import (
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/rule"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 func populateOpenAPI(g *rule.Ground, fs *yongol.Fullstack) {

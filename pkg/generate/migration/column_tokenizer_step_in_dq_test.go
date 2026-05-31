@@ -1,9 +1,9 @@
 //ff:func feature=migration type=test control=sequence
-//ff:what TestColumnTokenizerStepInDQ — columnTokenizer.stepInDQ 이중인용 내부 커버
+//ff:what tokenizer/splitter named 테스트 — splitState/columnTokenizer/lineCommentScanner 메서드 (다중 인용/주석/타입 파라미터) 커버
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
-func TestColumnTokenizerStepInDQMethod(t *testing.T) {
-	_ = tokenizeColumnDef(`"weird col" VARCHAR(10) NOT NULL`)
-}
+func TestColumnTokenizerStepInDQ(t *testing.T) { _ = tokenizeColumnDef(`"weird col" VARCHAR(10)`) }

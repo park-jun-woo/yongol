@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=selection dimension=4
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestCanonIdent — quoted 보존, 그 외 trim+소문자화+후행 콤마 제거
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestCanonIdent(t *testing.T) {
 	cases := []struct {

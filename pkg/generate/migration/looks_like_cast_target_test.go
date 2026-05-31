@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=selection dimension=5
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestLooksLikeCastTarget — 단순 식별자/quoted/array 는 true, 비식별자는 false
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestLooksLikeCastTarget(t *testing.T) {
 	cases := []struct {

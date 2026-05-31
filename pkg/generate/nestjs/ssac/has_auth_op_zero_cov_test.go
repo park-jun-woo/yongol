@@ -1,0 +1,18 @@
+//ff:func feature=gen-nestjs type=test control=sequence
+//ff:what nestjs/ssac 내부 함수 by-name 직접 호출 테스트 — tsma content-aware 귀속용
+package ssac
+
+import (
+	"testing"
+
+	"github.com/park-jun-woo/yongol/pkg/generate/ir"
+)
+
+func TestHasAuthOp_ZeroCov(t *testing.T) {
+	if !hasAuthOp([]ir.Op{{Kind: ir.OpAuth}}) {
+		t.Error("expected auth op")
+	}
+	if hasAuthOp([]ir.Op{{Kind: ir.OpGet}}) {
+		t.Error("unexpected auth op")
+	}
+}

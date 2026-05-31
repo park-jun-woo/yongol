@@ -1,9 +1,10 @@
-//ff:func feature=validate-contract type=test control=selection topic=preserve-safety
+//ff:func feature=validate-contract type=test control=iteration dimension=1 topic=preserve-safety
 //ff:what TestIsScanCall — call 이 row/rows/r.Scan(...) 호출인지 판정 검증
-
 package contract
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestIsScanCall(t *testing.T) {
 	tests := []struct {

@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what collectOwnerships 단위 테스트 (ParsedPolicies 전체 @ownership 평탄화)
-
 package ssac
 
 import (

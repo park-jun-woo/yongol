@@ -6,7 +6,7 @@ package ddl
 // scanValidateLineForTerminator walks ln one character at a time,
 // returning (done, nextInSingle). done=true when an unquoted `;` is
 // encountered; otherwise the caller carries nextInSingle into the next
-// line. Doubled `''` inside a literal counts as an escaped quote.
+// line. Doubled `”` inside a literal counts as an escaped quote.
 func scanValidateLineForTerminator(ln string, inSingle bool) (bool, bool) {
 	k := 0
 	for k < len(ln) {

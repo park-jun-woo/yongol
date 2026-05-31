@@ -1,9 +1,10 @@
-//ff:func feature=gen-gogin type=test control=sequence
+//ff:func feature=gen-gogin type=test control=iteration dimension=1
 //ff:what TestCountBraceDelta — 라인 brace delta 계산 + 주석 제외 검증
-
 package ffannot
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestCountBraceDelta(t *testing.T) {
 	cases := map[string]int{

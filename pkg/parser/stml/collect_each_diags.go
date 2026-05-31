@@ -16,4 +16,3 @@ func collectEachDiags(page *PageSpec, file string) []diagnostic.Diagnostic {
 	}
 	return out
 }
-

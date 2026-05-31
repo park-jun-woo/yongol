@@ -1,6 +1,5 @@
-//ff:func feature=gen-fastapi type=test control=selection
+//ff:func feature=gen-fastapi type=test control=iteration dimension=1
 //ff:what TestRenderOneOp — OpKind 분기 디스패치 (nil sub-pointer로 모든 case 도달)
-
 package ssac
 
 import (

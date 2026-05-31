@@ -10,8 +10,8 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	pmanifest "github.com/park-jun-woo/yongol/pkg/parser/manifest"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // sec401JWTSecretEnvRequired flags manifests that embed a literal JWT

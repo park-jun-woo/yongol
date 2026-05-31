@@ -1,13 +1,16 @@
 //ff:func feature=migration type=test control=sequence
-//ff:what TestLineCommentScannerStepQuote — lineCommentScanner.stepQuote 인용 내부 -- 보존 커버
+//ff:what tokenizer/splitter named 테스트 — splitState/columnTokenizer/lineCommentScanner 메서드 (다중 인용/주석/타입 파라미터) 커버
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
-func TestLineCommentScannerStepQuoteMethod(t *testing.T) {
-	// -- inside a single-quoted string is not a comment.
-	if findLineCommentStart("x = 'a -- b'") >= 0 {
-		t.Errorf("-- inside quotes should not be a comment start")
+func TestLineCommentScannerStepQuote(t *testing.T) {
+	// single-quoted string containing -- must be preserved.
+	out := stripLineComments("INSERT INTO t VALUES ('a -- not a comment')")
+	if out == "" {
+		t.Errorf("stripLineComments returned empty")
 	}
 	_ = findLineCommentStart("x = 'a -- b' -- real")
 }

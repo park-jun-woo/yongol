@@ -1,4 +1,4 @@
-//ff:func feature=chain type=test control=iteration dimension=2
+//ff:func feature=chain type=test control=sequence
 //ff:what traceHurl 가 endpoint 참조 .hurl 파일을 찾고 nil 조건(doc nil/미매칭)을 처리하는지 검증
 package chain
 

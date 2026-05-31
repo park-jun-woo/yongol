@@ -20,7 +20,7 @@ func TestCheckDiagramOrder(t *testing.T) {
 		},
 	}
 	opID := map[string]string{
-		"POST /orders":            "submitOrder",
+		"POST /orders":                "submitOrder",
 		"POST /orders/:param/approve": "approveOrder",
 	}
 

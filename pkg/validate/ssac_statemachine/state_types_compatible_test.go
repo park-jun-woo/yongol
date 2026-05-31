@@ -1,9 +1,10 @@
-//ff:func feature=validate type=test control=selection topic=ssac-statemachine
+//ff:func feature=validate type=test control=iteration dimension=1 topic=ssac-statemachine
 //ff:what TestStateTypesCompatible — stateTypesCompatible 대입 가능성 판별 분기 검증
-
 package ssac_statemachine
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestStateTypesCompatible(t *testing.T) {
 	cases := []struct {

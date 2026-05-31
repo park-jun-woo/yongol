@@ -1,9 +1,10 @@
-//ff:func feature=manifest type=test control=iteration dimension=1
+//ff:func feature=manifest type=test control=sequence
 //ff:what parseColumnDef — 이름/타입/NOT NULL/default/varchar/check/주석 어노테이션 추출
-
 package ddl
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestParseColumnDef(t *testing.T) {
 	t.Run("full column with default and varchar", func(t *testing.T) {

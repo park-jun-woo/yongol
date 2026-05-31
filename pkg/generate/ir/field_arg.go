@@ -3,20 +3,6 @@
 
 package ir
 
-// ParamLocation classifies where a request field originates in the HTTP
-// request. Mirrors the classification that gogin/ssac/methodGen performs
-// via addParam (path/query) and mapRequestValue (body fallback).
-type ParamLocation string
-
-const (
-	LocPath    ParamLocation = "path"    // OpenAPI path parameter
-	LocQuery   ParamLocation = "query"   // OpenAPI query parameter
-	LocBody    ParamLocation = "body"    // OpenAPI request body property
-	LocVar     ParamLocation = "var"     // previous sequence result variable
-	LocLiteral ParamLocation = "literal" // inline literal value
-	LocUser    ParamLocation = "user"    // currentUser field
-)
-
 // FieldArg is the unified IR representation for SSaC arguments. It merges the
 // two parser-level representations (ssac.Arg for positional args and
 // map[string]string for state/auth/publish inputs) into a single struct.

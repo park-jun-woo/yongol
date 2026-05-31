@@ -34,4 +34,3 @@ func q13PgtypeNumericOverride(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			"NUMERIC / DECIMAL have no Go native type — yongol routes them through pgNumericToString in the convert layer.",
 	})
 }
-

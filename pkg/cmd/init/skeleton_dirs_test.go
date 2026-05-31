@@ -1,9 +1,10 @@
-//ff:func feature=cli-init type=test control=sequence
+//ff:func feature=cli-init type=test control=iteration dimension=1
 //ff:what TestSkeletonDirs — 필수 디렉토리 목록 포함 및 shallow→deep 순서 검증
-
 package cliinit
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestSkeletonDirs(t *testing.T) {
 	dirs := skeletonDirs()
@@ -11,10 +12,10 @@ func TestSkeletonDirs(t *testing.T) {
 		t.Fatal("expected non-empty skeleton dir list")
 	}
 	want := map[string]bool{
-		"specs":                      false,
-		"specs/db/queries":           false,
-		"specs/frontend/components":  false,
-		"specs/tests":                false,
+		"specs":                     false,
+		"specs/db/queries":          false,
+		"specs/frontend/components": false,
+		"specs/tests":               false,
 	}
 	for _, d := range dirs {
 		if _, ok := want[d]; ok {

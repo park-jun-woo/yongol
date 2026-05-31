@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=iteration dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestLoadFeatureLookup — features.yaml에서 op→Feature 맵 구성, 부재 시 nil 검증
-
 package agent
 
 import (

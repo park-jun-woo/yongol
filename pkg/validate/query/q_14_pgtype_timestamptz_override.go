@@ -32,4 +32,3 @@ func q14PgtypeTimestamptzOverride(fs *yongol.Fullstack) []diagnostic.Diagnostic 
 			"      type: \"Timestamptz\"\n",
 	})
 }
-

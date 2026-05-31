@@ -1,9 +1,10 @@
-//ff:func feature=agent type=test control=selection
+//ff:func feature=agent type=test control=iteration dimension=1
 //ff:what TestResolveSpecsRoot — 레이어별 specs 루트 디렉토리 추론 (2단계 vs 1단계 상위) 검증
-
 package agent
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestResolveSpecsRoot(t *testing.T) {
 	cases := []struct {

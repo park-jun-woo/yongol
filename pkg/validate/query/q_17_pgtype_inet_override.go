@@ -32,4 +32,3 @@ func q17PgtypeInetOverride(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			"yongol routes INET / CIDR through pgInetToString in the convert layer.",
 	})
 }
-

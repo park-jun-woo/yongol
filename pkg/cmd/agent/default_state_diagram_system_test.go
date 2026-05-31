@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=sequence
+//ff:func feature=agent type=test control=iteration dimension=1
 //ff:what TestDefaultStateDiagramSystem — fallback system prompt가 핵심 규칙·예시 포함 검증
-
 package agent
 
 import (

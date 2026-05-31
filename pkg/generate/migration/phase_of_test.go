@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=selection
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestPhaseOf — Operation 타입을 정렬 단계(1..13) 로 매핑
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestPhaseOf(t *testing.T) {
 	cases := []struct {

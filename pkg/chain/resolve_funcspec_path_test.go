@@ -1,4 +1,4 @@
-//ff:func feature=chain type=test control=iteration dimension=2
+//ff:func feature=chain type=test control=sequence
 //ff:what resolveFuncSpecPath 가 snake_case 직접경로 / glob 매칭 / fallback 을 올바르게 선택하는지 검증
 package chain
 

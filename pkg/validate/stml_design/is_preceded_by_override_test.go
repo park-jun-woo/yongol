@@ -1,6 +1,5 @@
-//ff:func feature=validate type=test control=selection topic=stml-design
+//ff:func feature=validate type=test control=sequence topic=stml-design
 //ff:what TestIsPrecededByOverride — isPrecededByOverride @override 주석 선행 여부 분기 검증
-
 package stml_design
 
 import (
@@ -8,11 +7,6 @@ import (
 
 	"golang.org/x/net/html"
 )
-
-// link wires prev as the immediate previous sibling of n.
-func link(prev, n *html.Node) {
-	n.PrevSibling = prev
-}
 
 func TestIsPrecededByOverride(t *testing.T) {
 	t.Run("no previous sibling", func(t *testing.T) {

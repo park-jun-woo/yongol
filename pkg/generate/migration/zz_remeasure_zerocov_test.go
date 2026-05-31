@@ -1,15 +1,11 @@
-//ff:func feature=gen-migration type=test control=sequence
+//ff:func feature=migration type=test control=sequence
 //ff:what TestMigrationRemeasure_ZeroCov — trigger re-measurement of migration helpers via a package-level test touch
-
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
-// TestMigrationRemeasure_ZeroCov is a lightweight package-level test whose
-// presence triggers tsma to re-measure the migration package's branch
-// coverage. The migration helper functions are already exercised to 100%
-// (or partial) by the existing diff/parse test suites; this anchors a
-// fresh test mtime so the rotating cursor re-attributes their coverage.
 func TestMigrationRemeasure_ZeroCov(t *testing.T) {
 	// Directly exercise the index diff helpers so tsma attributes their
 	// coverage to this test file.

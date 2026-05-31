@@ -1,4 +1,4 @@
-//ff:func feature=report type=test control=selection topic=json
+//ff:func feature=report type=test control=sequence topic=json
 //ff:what TestTryAbsRelativeFile — empty absSpecs / rebase 성공 / escape("..") 분기 검증
 package json
 
@@ -7,8 +7,6 @@ import (
 	"testing"
 )
 
-// TestTryAbsRelativeFile covers the three branches: empty absSpecs guard,
-// successful rebase, and the ".." escape rejection.
 func TestTryAbsRelativeFile(t *testing.T) {
 	// empty absSpecs → "".
 	if got := tryAbsRelativeFile("anything", ""); got != "" {

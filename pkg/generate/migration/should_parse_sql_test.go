@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=sequence
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestShouldParseSQL — 디렉토리/비-SQL/skip/baseline 제외 규칙
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestShouldParseSQL(t *testing.T) {
 	skip := map[string]bool{"skipme.sql": true}

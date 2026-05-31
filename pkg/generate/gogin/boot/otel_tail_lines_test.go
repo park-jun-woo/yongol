@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=sequence topic=observability
+//ff:func feature=gen-gogin type=test control=iteration dimension=1 topic=observability
 //ff:what otelTailLines — exporter 분기 이후 공통 TracerProvider 초기화 + shutdown
-
 package boot
 
 import (

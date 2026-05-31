@@ -1,6 +1,5 @@
-//ff:func feature=validate-contract type=test control=iteration dimension=1
+//ff:func feature=validate-contract type=test control=sequence
 //ff:what TestAppendFuncSpecEntries — FuncSpec 목록을 "pkg.Name" 키로 calls 맵에 추가 검증
-
 package contract
 
 import (

@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	pmanifest "github.com/park-jun-woo/yongol/pkg/parser/manifest"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 func TestSec301_Wildcard(t *testing.T) {

@@ -3,9 +3,10 @@
 package stml
 
 import (
-	stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
 	"strings"
 	"testing"
+
+	stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
 )
 
 func TestGenerateMyReservationsPage(t *testing.T) {

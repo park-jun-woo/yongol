@@ -1,6 +1,5 @@
-//ff:func feature=validate type=test control=selection topic=ssac-statemachine
+//ff:func feature=validate type=test control=sequence topic=ssac-statemachine
 //ff:what TestMakeStateTypeDiag — makeStateTypeDiag XSM-71 진단 생성 분기 검증
-
 package ssac_statemachine
 
 import (

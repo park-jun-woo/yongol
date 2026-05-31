@@ -1,9 +1,10 @@
-//ff:func feature=gen-fastapi type=test control=selection
+//ff:func feature=gen-fastapi type=test control=iteration dimension=1
 //ff:what TestArrayElementPyType — 배열 element head → Python/SA 타입 매핑 (4개 family + 미지원)
-
 package types
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestArrayElementPyType(t *testing.T) {
 	cases := []struct {

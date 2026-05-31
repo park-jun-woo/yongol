@@ -3,8 +3,8 @@
 package ddl_rego
 
 import (
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/rule"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // buildDDLTableSet returns the set of DDL table names. Prefers Ground.Lookup

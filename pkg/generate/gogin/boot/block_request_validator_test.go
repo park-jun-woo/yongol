@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=sequence
+//ff:func feature=gen-gogin type=test control=iteration dimension=1
 //ff:what blockRequestValidator — request_validator 미들웨어 등록 (CORS 이후, Health 이전)
-
 package boot
 
 import (

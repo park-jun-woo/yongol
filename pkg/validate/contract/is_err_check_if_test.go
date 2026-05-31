@@ -1,6 +1,5 @@
-//ff:func feature=validate-contract type=test control=sequence topic=preserve-safety
+//ff:func feature=validate-contract type=test control=iteration dimension=1 topic=preserve-safety
 //ff:what TestIsErrCheckIf — IfStmt 이 err != nil 계열 가드인지 판정 검증
-
 package contract
 
 import (

@@ -1,4 +1,4 @@
-//ff:func feature=gen-fastapi type=util control=iteration dimension=1
+//ff:func feature=gen-fastapi type=util control=sequence
 //ff:what renderAuthOp — AuthOp.Ownership 기반 DB lookup + authz_check 호출 Python 코드 렌더링
 
 package ssac
@@ -18,40 +18,15 @@ func renderAuthOp(b *strings.Builder, op *ir.AuthOp, indent string) {
 		return
 	}
 
-	// Emit ownership lookup when Ownership metadata exists.
 	if op.Ownership != nil {
-		ow := op.Ownership
-		model := pascalCase(ir.DDLTableSingularIR(ow.Table))
-		b.WriteString(fmt.Sprintf("%sowner_row = await session.execute(\n", indent))
-		b.WriteString(fmt.Sprintf("%s    select(%s.%s).where(%s.%s == %s)\n",
-			indent, model, ow.OwnerColumn, model, ow.ResourcePK, ow.ResourcePK))
-		b.WriteString(fmt.Sprintf("%s)\n", indent))
-		b.WriteString(fmt.Sprintf("%sowner = owner_row.scalar_one_or_none()\n", indent))
+		writeOwnershipLookup(b, op.Ownership, indent)
 	}
 
 	b.WriteString(fmt.Sprintf("%sawait authz_check(\n", indent))
 	b.WriteString(fmt.Sprintf("%s    current_user,\n", indent))
 	b.WriteString(fmt.Sprintf("%s    action=\"%s\",\n", indent, op.Action))
 	b.WriteString(fmt.Sprintf("%s    resource=\"%s\",\n", indent, op.Resource))
-	// Render inputs, skipping ResourceID (handled separately below).
-	for _, input := range op.Inputs {
-		if input.Key == "ResourceID" {
-			continue
-		}
-		b.WriteString(fmt.Sprintf("%s    %s=%s,\n", indent, resolveArgKey(input), renderArgValue(input)))
-	}
-	if op.Ownership != nil {
-		ow := op.Ownership
-		b.WriteString(fmt.Sprintf("%s    resource_id=str(%s),\n", indent, ow.ResourcePK))
-		b.WriteString(fmt.Sprintf("%s    owners={\"%s\": {\"%s\": owner}},\n",
-			indent, op.Resource, ow.OwnerColumn))
-	} else {
-		// No ownership but ResourceID may still be present in inputs.
-		for _, input := range op.Inputs {
-			if input.Key == "ResourceID" {
-				b.WriteString(fmt.Sprintf("%s    resource_id=str(%s),\n", indent, renderArgValue(input)))
-			}
-		}
-	}
+	writeAuthInputs(b, op.Inputs, indent)
+	writeAuthResourceID(b, op, indent)
 	b.WriteString(fmt.Sprintf("%s)\n", indent))
 }

@@ -9,7 +9,6 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/rule"
 )
 
-
 // resolveStateInputType resolves the Go type of a @state input value
 // expression using Ground.Types. Duplicates the var.Field logic from
 // ssac_func.resolveInputType to avoid cross-package dependency.

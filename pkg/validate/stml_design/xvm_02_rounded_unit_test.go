@@ -1,6 +1,5 @@
-//ff:func feature=validate type=test control=selection topic=stml-design
+//ff:func feature=validate type=test control=sequence topic=stml-design
 //ff:what TestXvm02RoundedUnit — xvm02Rounded rounded 토큰 정의 여부 분기 검증
-
 package stml_design
 
 import (

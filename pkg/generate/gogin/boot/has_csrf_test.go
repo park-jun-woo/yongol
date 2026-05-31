@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=sequence topic=csrf
+//ff:func feature=gen-gogin type=test control=iteration dimension=1 topic=csrf
 //ff:what hasCsrf — prepared.Auth.Mode=cookie|hybrid && csrf.enabled 여부
-
 package boot
 
 import (

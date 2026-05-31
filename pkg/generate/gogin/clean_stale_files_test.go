@@ -1,6 +1,5 @@
 //ff:func feature=gen-gogin type=test control=sequence
 //ff:what TestCleanStaleFiles — stale .go 제거 + keep/ext/subdir/missing/error 분기 검증
-
 package gogin
 
 import (
@@ -66,13 +65,4 @@ func TestCleanStaleFiles(t *testing.T) {
 			t.Skip("Remove did not fail (likely running as root)")
 		}
 	})
-}
-
-//ff:func feature=gen-gogin type=test-helper control=sequence
-//ff:what mustWrite — 테스트용 파일 기록 헬퍼
-func mustWrite(t *testing.T, path, content string) {
-	t.Helper()
-	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
-		t.Fatalf("write %s: %v", path, err)
-	}
 }

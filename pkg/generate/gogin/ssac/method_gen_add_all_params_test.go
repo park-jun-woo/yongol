@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what methodGen.addAllParams 단위 테스트 (path-level + operation-level 파라미터 모두 등록)
-
 package ssac
 
 import (

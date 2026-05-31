@@ -1,4 +1,4 @@
-//ff:func feature=migration type=test control=iteration dimension=1
+//ff:func feature=migration type=test control=sequence
 //ff:what TestHasErrorDiag — ERROR 레벨 진단 존재 여부
 package migration
 

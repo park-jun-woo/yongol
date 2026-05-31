@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what appendQueueSubscribeLines — ServiceFunc @subscribe에서 queue.Subscribe 라인 추가
-
 package boot
 
 import (

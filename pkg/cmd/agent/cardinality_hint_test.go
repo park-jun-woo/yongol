@@ -1,9 +1,10 @@
-//ff:func feature=agent type=test control=selection
+//ff:func feature=agent type=test control=iteration dimension=1
 //ff:what TestCardinalityHint — op/path 로부터 sqlc cardinality 어노테이션 추론 검증
-
 package agent
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestCardinalityHint(t *testing.T) {
 	cases := []struct {

@@ -1,9 +1,10 @@
-//ff:func feature=agent type=test control=selection
+//ff:func feature=agent type=test control=iteration dimension=1
 //ff:what TestClassifyFile — 파일 경로로 SSOT 레이어를 판별하는지 검증
-
 package agent
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestClassifyFile(t *testing.T) {
 	cases := []struct {

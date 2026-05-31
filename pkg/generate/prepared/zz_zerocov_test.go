@@ -1,4 +1,4 @@
-//ff:func feature=generate type=test
+//ff:func feature=generate type=test control=sequence
 //ff:what zz_zerocov_test — prepared.funcUsesQueue 0% 커버리지 단위 테스트
 package prepared
 

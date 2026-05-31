@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what fillMissingNullableParams 단위 테스트 (Inputs에 없는 nullable pgtype param을 zero 값으로 채움)
-
 package ssac
 
 import (

@@ -1,9 +1,10 @@
-//ff:func feature=manifest type=test control=iteration dimension=1
+//ff:func feature=manifest type=test control=sequence
 //ff:what parseHintLine — `@tag key=val` 파싱 / 비힌트 nil / 태그 소문자화
-
 package ddl
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestParseHintLine(t *testing.T) {
 	t.Run("tag with args", func(t *testing.T) {

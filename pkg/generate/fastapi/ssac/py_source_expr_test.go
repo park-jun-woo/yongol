@@ -1,9 +1,10 @@
-//ff:func feature=gen-fastapi type=test control=sequence
+//ff:func feature=gen-fastapi type=test control=iteration dimension=1
 //ff:what TestPySourceExpr — Go dot-access → Python dict key access 변환
-
 package ssac
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestPySourceExpr(t *testing.T) {
 	cases := []struct {

@@ -28,8 +28,8 @@ func TestBuildServicePlanGet(t *testing.T) {
 				},
 			},
 			{
-				Type:    ssac.SeqResponse,
-				Target:  "course",
+				Type:   ssac.SeqResponse,
+				Target: "course",
 			},
 		},
 	}

@@ -25,9 +25,9 @@ func c06BackendAuthRequired(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		return nil
 	}
 	return []diagnostic.Diagnostic{{
-		File:  "manifest.yaml",
-		Phase: diagnostic.PhaseValidate,
-		Level: diagnostic.LevelError,
+		File:    "manifest.yaml",
+		Phase:   diagnostic.PhaseValidate,
+		Level:   diagnostic.LevelError,
 		Message: "[C-6] manifest.backend.auth is required",
 		Advice: "yongol does not support auth-free backends. Add a backend.auth " +
 			"section (type: jwt + secret_env + claims) to manifest.yaml. " +

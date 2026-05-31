@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=selection dimension=4
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestStringSliceEqual — 길이/요소 동등 비교
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestStringSliceEqual(t *testing.T) {
 	cases := []struct {

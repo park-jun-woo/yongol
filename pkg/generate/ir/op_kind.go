@@ -9,16 +9,16 @@ type OpKind int
 
 const (
 	OpGet            OpKind = iota // @get
-	OpPost                        // @post
-	OpPut                         // @put
-	OpDelete                      // @delete
-	OpEmpty                       // @empty
-	OpExists                      // @exists
-	OpAuth                        // @auth
-	OpState                       // @state
-	OpCall                        // @call
-	OpEval                        // @eval
-	OpPublish                     // @publish
-	OpVerifyPassword              // @verify-password
-	OpResponse                    // @response
+	OpPost                         // @post
+	OpPut                          // @put
+	OpDelete                       // @delete
+	OpEmpty                        // @empty
+	OpExists                       // @exists
+	OpAuth                         // @auth
+	OpState                        // @state
+	OpCall                         // @call
+	OpEval                         // @eval
+	OpPublish                      // @publish
+	OpVerifyPassword               // @verify-password
+	OpResponse                     // @response
 )

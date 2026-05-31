@@ -1,9 +1,10 @@
-//ff:func feature=validate-contract type=test control=sequence topic=preserve-safety
+//ff:func feature=validate-contract type=test control=iteration dimension=1 topic=preserve-safety
 //ff:what TestIfStmtClosesVar — IfStmt body 내에 varName Close 호출 존재 여부 검증
-
 package contract
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestIfStmtClosesVar(t *testing.T) {
 	tests := []struct {

@@ -7,8 +7,8 @@ import (
 	"fmt"
 
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/util/caseconv"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // xdo76RequiredNullable validates XDO-76: if an OpenAPI request field is

@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=selection
+//ff:func feature=gen-gogin type=util control=sequence
 //ff:what ddlTableSingular — 복수형 lower-snake 테이블명 → 단수형 (caseconv 공유)
 
 package ssac

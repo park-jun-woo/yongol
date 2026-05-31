@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=iteration dimension=2
+//ff:func feature=agent type=test control=sequence
 //ff:what TestSplitSections — markdown 콘텐츠를 ## 헤딩별 섹션으로 분리하는지 검증
-
 package agent
 
 import (

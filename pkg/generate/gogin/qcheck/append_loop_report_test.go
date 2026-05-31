@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=branch topic=loop-report
+//ff:func feature=gen-gogin type=test control=iteration dimension=1
 //ff:what TestAppendLoopReport — for/range 노드는 append, 비루프 노드는 무시 검증
-
 package qcheck
 
 import (

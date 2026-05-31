@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=test
+//ff:func feature=gen-gogin type=test control=iteration dimension=1
 //ff:what zz_zerocov_test — gogin.WriteManyFiles 0% 커버리지 단위 테스트
 package gogin
 

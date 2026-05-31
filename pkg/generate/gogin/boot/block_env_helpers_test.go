@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=sequence
+//ff:func feature=gen-gogin type=test control=iteration dimension=1
 //ff:what blockEnvHelpers — envInt / envDuration / envStringList / envBool 헬퍼 (top-level)
-
 package boot
 
 import (

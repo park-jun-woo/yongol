@@ -1,6 +1,5 @@
-//ff:func feature=validate type=test control=selection topic=states
+//ff:func feature=validate type=test control=sequence topic=states
 //ff:what TestXms25StateEvent — XMS-25 @state transition → diagram event 검증
-
 package ssac_statemachine
 
 import (

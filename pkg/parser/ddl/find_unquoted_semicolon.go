@@ -5,7 +5,7 @@ package ddl
 // findUnquotedSemicolon scans ln character-by-character starting with the
 // quote state inSingle and returns the index of the first `;` that falls
 // outside a single-quoted literal. Returns (-1, false) when the line
-// terminates without an unquoted `;`. Handles doubled `''` as an escaped
+// terminates without an unquoted `;`. Handles doubled `”` as an escaped
 // quote inside a literal.
 func findUnquotedSemicolon(ln string, inSingle bool) (int, bool) {
 	k := 0

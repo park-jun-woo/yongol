@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/park-jun-woo/yongol/pkg/parser/ssac"
-	"github.com/park-jun-woo/yongol/pkg/util/caseconv"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
@@ -28,18 +27,7 @@ var paginationKeys = map[string]bool{
 func convertGet(seq ssac.Sequence, _ *yongol.Fullstack) Op {
 	model, method := splitModelMethod(seq.Model)
 	allArgs := convertInputsToFieldArgs(seq.Inputs)
-
-	// Separate pagination args from where-clause args. Keys from SSaC may
-	// be PascalCase (e.g. "PerPage"), so convert to snake_case for matching.
-	var whereArgs, pagArgs []FieldArg
-	for _, a := range allArgs {
-		snake := caseconv.PascalToSnake(a.Key)
-		if paginationKeys[snake] {
-			pagArgs = append(pagArgs, a)
-		} else {
-			whereArgs = append(whereArgs, a)
-		}
-	}
+	whereArgs, pagArgs := splitPaginationArgs(allArgs)
 
 	op := GetOp{
 		Model:          model,
@@ -54,14 +42,4 @@ func convertGet(seq ssac.Sequence, _ *yongol.Fullstack) Op {
 		op.IsCount = isCountResultType(seq.Result.Type)
 	}
 	return Op{Kind: OpGet, Get: &op}
-}
-
-// isCountResultType returns true for scalar integer result types that indicate
-// a COUNT query rather than a row query.
-func isCountResultType(t string) bool {
-	switch t {
-	case "int64", "int32", "int", "uint64":
-		return true
-	}
-	return false
 }

@@ -1,13 +1,11 @@
-//ff:func feature=report type=test control=selection topic=sarif
+//ff:func feature=report type=test control=sequence topic=sarif
 //ff:what TestRelativeArtifactURI — empty/no-specsDir/rel-ok/abs-fallback/escape 분기 검증
 package sarif
 
 import (
-	"path/filepath"
 	"testing"
 )
 
-// TestRelativeArtifactURI covers each branch of relativeArtifactURI.
 func TestRelativeArtifactURI(t *testing.T) {
 	if got := relativeArtifactURI("", "specs", "/abs/specs"); got != "" {
 		t.Errorf("empty file: got %q, want empty", got)
@@ -21,18 +19,5 @@ func TestRelativeArtifactURI(t *testing.T) {
 	// Escape + no usable abs root → raw slashed path.
 	if got := relativeArtifactURI("other/x.ssac", "specs", ""); got != "other/x.ssac" {
 		t.Errorf("escape fallback: got %q, want other/x.ssac", got)
-	}
-}
-
-// TestRelativeArtifactURI_AbsFallback exercises the tryAbsRelativeURI success
-// path where plain Rel fails but the absolute rebase succeeds.
-func TestRelativeArtifactURI_AbsFallback(t *testing.T) {
-	dir := t.TempDir()
-	absSpecs, _ := filepath.Abs(dir)
-	file := filepath.Join(absSpecs, "sub", "x.ssac")
-
-	got := relativeArtifactURI(file, "nonmatching-specs", absSpecs)
-	if got != "sub/x.ssac" {
-		t.Errorf("abs fallback: got %q, want sub/x.ssac", got)
 	}
 }

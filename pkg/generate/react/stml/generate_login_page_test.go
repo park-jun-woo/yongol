@@ -2,7 +2,12 @@
 //ff:what 로그인 페이지 TSX 생성을 검증
 package stml
 
-import ("strings"; "testing"; stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml")
+import (
+	"strings"
+	"testing"
+
+	stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
+)
 
 func TestGenerateLoginPage(t *testing.T) {
 	page, _ := stmlparser.ParseReader("login-page.html", strings.NewReader(`<main class="flex items-center justify-center min-h-screen">

@@ -27,26 +27,7 @@ func inferResponseValueType(g *rule.Ground, funcName, value string) string {
 		return t
 	}
 	if dot := strings.IndexByte(value, '.'); dot > 0 {
-		varName := value[:dot]
-		field := value[dot+1:]
-		varType := g.Types["SSaC.var."+funcName+"."+varName]
-		if varType == "" {
-			return ""
-		}
-		// When looking up a dotted field, strip all wrapper/slice/pointer/package
-		// prefixes and normalise to <UnqualifiedTypeName>.<field>.
-		model := normalizeTypeName(varType)
-		// Prefer the DDL api-surface type (e.g. a UUID column's
-		// openapi_types.UUID) over the coarse GoTypeOf projection in
-		// Struct.* (which collapses UUID→string). Falls back to Struct.*
-		// for func-result structs and non-DDL row types, where no apifield
-		// key exists. Both keys share the same <Model>.<field> token space
-		// (populate_ddl.go and populate_ssac_symbols.go use the same casing
-		// functions — pinned by TestPopulateDDL_ApifieldStructKeyParity).
-		if apiType := g.Types["DDL.apifield."+model+"."+field]; apiType != "" {
-			return apiType
-		}
-		return g.Types["Struct."+model+"."+field]
+		return inferDottedFieldType(g, funcName, value[:dot], value[dot+1:])
 	}
 	return g.Types["SSaC.var."+funcName+"."+value]
 }

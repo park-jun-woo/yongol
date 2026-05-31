@@ -1,9 +1,10 @@
-//ff:func feature=manifest type=test control=iteration dimension=1
+//ff:func feature=manifest type=test control=sequence
 //ff:what parseCreateIndex — CREATE INDEX 파싱 (UNIQUE/USING method/no ON)
-
 package ddl
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestParseCreateIndex(t *testing.T) {
 	t.Run("basic index", func(t *testing.T) {

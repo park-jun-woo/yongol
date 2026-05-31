@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=sequence
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestInnerParensFull — 짝 맞는 ")" 까지 내부 반환 (중첩 지원)
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestInnerParensFull(t *testing.T) {
 	cases := []struct{ in, want string }{

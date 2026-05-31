@@ -37,4 +37,3 @@ func copyFuncSpecs(specsDir, artifactsDir string) error {
 		return copyFile(path, dst)
 	})
 }
-

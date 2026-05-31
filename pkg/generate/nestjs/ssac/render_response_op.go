@@ -25,15 +25,3 @@ func renderResponseOp(b *strings.Builder, op *ir.ResponseOp, indent string) {
 	}
 	b.WriteString(fmt.Sprintf("%s};\n", indent))
 }
-
-// tsSourceExpr converts a Go-style dotted access to camelCase TypeScript.
-// "token.AccessToken" → "token.accessToken", "user" → "user".
-func tsSourceExpr(source string) string {
-	dotIdx := strings.Index(source, ".")
-	if dotIdx < 0 {
-		return source
-	}
-	obj := source[:dotIdx]
-	field := source[dotIdx+1:]
-	return obj + "." + lcFirst(field)
-}

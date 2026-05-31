@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=iteration dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestAssembleRego — 헤더 고정 + non-empty 블록 추가 + clean 후 empty 블록 skip 검증
-
 package agent
 
 import (

@@ -1,9 +1,11 @@
 //ff:func feature=migration type=test control=sequence
-//ff:what TestColumnTokenizerStep — columnTokenizer.step 디스패치 커버
+//ff:what tokenizer/splitter named 테스트 — splitState/columnTokenizer/lineCommentScanner 메서드 (다중 인용/주석/타입 파라미터) 커버
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
-func TestColumnTokenizerStepMethod(t *testing.T) {
+func TestColumnTokenizerStep(t *testing.T) {
 	_ = tokenizeColumnDef(`status VARCHAR(20) NOT NULL DEFAULT 'a''b'`)
 }

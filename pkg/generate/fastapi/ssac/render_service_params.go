@@ -4,7 +4,6 @@
 package ssac
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/park-jun-woo/yongol/pkg/generate/ir"
@@ -15,11 +14,7 @@ import (
 // body, and query parameters are typed individually.
 func renderServiceParams(plan *ir.ServicePlan) string {
 	if plan.TriggerKind == ir.TriggerSubscribe {
-		base := "session: AsyncSession, payload: dict"
-		if hasPublishOp(plan.Ops) {
-			base += ", event_bus: EventBus | None = None"
-		}
-		return base
+		return renderSubscribeParams(plan)
 	}
 
 	method := strings.ToUpper(plan.HTTPMethod)
@@ -34,34 +29,10 @@ func renderServiceParams(plan *ir.ServicePlan) string {
 		bodyFallback = true
 	}
 
-	var params []string
-	params = append(params, "session: AsyncSession")
-
-	// Path parameters.
-	for _, pp := range plan.PathParams {
-		params = append(params, fmt.Sprintf("%s: int", pp))
-	}
-
-	// Body parameter.
-	if hasBody {
-		if bodyFallback {
-			params = append(params, "body: dict")
-		} else {
-			reqModel := pascalCase(plan.OperationID) + "Request"
-			params = append(params, fmt.Sprintf("body: %s", reqModel))
-		}
-	}
-
-	// Query parameters.
-	for _, qp := range plan.QueryParams {
-		pyType := openAPITypeToPython(qp.Type)
-		if qp.Required {
-			params = append(params, fmt.Sprintf("%s: %s", qp.Name, pyType))
-		} else {
-			params = append(params, fmt.Sprintf("%s: %s | None = None", qp.Name, pyType))
-		}
-	}
-
+	params := []string{"session: AsyncSession"}
+	params = append(params, renderPathParams(plan.PathParams)...)
+	params = append(params, renderBodyParam(plan, hasBody, bodyFallback)...)
+	params = append(params, renderQueryParams(plan.QueryParams)...)
 	params = append(params, "current_user: dict | None = None")
 
 	if hasPublishOp(plan.Ops) {

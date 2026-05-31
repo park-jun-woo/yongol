@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=iteration dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestGroupByFile — ERROR 진단만 파일별 그룹화하고 레이어 분류·순서 보존 검증
-
 package agent
 
 import (

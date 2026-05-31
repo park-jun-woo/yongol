@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=sequence
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestSameBaseShrink — 같은 Base VARCHAR/NUMERIC 축소 판정
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestSameBaseShrink(t *testing.T) {
 	cases := []struct {

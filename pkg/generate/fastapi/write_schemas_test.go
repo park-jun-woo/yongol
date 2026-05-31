@@ -1,6 +1,5 @@
 //ff:func feature=gen-fastapi type=test control=sequence
 //ff:what TestRenderFeatureSchemas — Pydantic BaseModel 스키마 생성 검증
-
 package fastapi
 
 import (
@@ -11,49 +10,6 @@ import (
 
 	"github.com/park-jun-woo/yongol/pkg/generate/ir"
 )
-
-//ff:func feature=gen-fastapi type=test control=sequence
-//ff:what TestWriteSchemas — feature 별 Pydantic 스키마 파일 기록 검증
-//ff:func feature=gen-fastapi type=test control=sequence
-//ff:what TestSchemaFormatToPython — OpenAPI format → Python 타입 매핑 검증
-func TestSchemaFormatToPython(t *testing.T) {
-	cases := map[string]string{
-		"email":     "str",
-		"uuid":      "str",
-		"uri":       "str",
-		"url":       "str",
-		"":          "str",
-		"date-time": "str",
-		"date":      "str",
-		"int32":     "int",
-		"int64":     "int",
-		"float":     "float",
-		"double":    "float",
-		"boolean":   "bool",
-		"unknown":   "str",
-	}
-	for format, want := range cases {
-		if got := schemaFormatToPython(format); got != want {
-			t.Errorf("schemaFormatToPython(%q) = %q, want %q", format, got, want)
-		}
-	}
-}
-
-//ff:func feature=gen-fastapi type=test control=sequence
-//ff:what TestSchemaPascalCase — camelCase/snake_case/PascalCase → PascalCase 변환 검증
-func TestSchemaPascalCase(t *testing.T) {
-	cases := map[string]string{
-		"":               "",
-		"createWorkflow": "CreateWorkflow",
-		"CreateWorkflow": "CreateWorkflow",
-		"x":              "X",
-	}
-	for in, want := range cases {
-		if got := schemaPascalCase(in); got != want {
-			t.Errorf("schemaPascalCase(%q) = %q, want %q", in, got, want)
-		}
-	}
-}
 
 func TestWriteSchemas(t *testing.T) {
 	t.Run("WritesSchemaForBodyFeatureSkipsOthers", func(t *testing.T) {
@@ -118,63 +74,6 @@ func TestWriteSchemas(t *testing.T) {
 		err := writeSchemas(plansByFeature, appDir)
 		if err == nil || !strings.Contains(err.Error(), "write schema") {
 			t.Errorf("expected write schema error, got: %v", err)
-		}
-	})
-}
-
-func TestRenderFeatureSchemas(t *testing.T) {
-	t.Run("POSTWithBody", func(t *testing.T) {
-		plans := []*ir.ServicePlan{
-			{
-				OperationID: "CreateWorkflow",
-				HTTPMethod:  "POST",
-				TriggerKind: ir.TriggerHTTP,
-				BodyFields: []ir.BodyFieldMeta{
-					{Name: "title", Required: true},
-					{Name: "description", Required: false},
-				},
-			},
-		}
-		got := renderFeatureSchemas(plans)
-		if !strings.Contains(got, "from pydantic import BaseModel") {
-			t.Errorf("expected pydantic import, got: %s", got)
-		}
-		if !strings.Contains(got, "class CreateWorkflowRequest(BaseModel):") {
-			t.Errorf("expected class definition, got: %s", got)
-		}
-		if !strings.Contains(got, "title: str") {
-			t.Errorf("expected required field, got: %s", got)
-		}
-		if !strings.Contains(got, "description: Optional[str] = None") {
-			t.Errorf("expected optional field, got: %s", got)
-		}
-	})
-
-	t.Run("GETNoBody", func(t *testing.T) {
-		plans := []*ir.ServicePlan{
-			{
-				OperationID: "GetWorkflow",
-				HTTPMethod:  "GET",
-				TriggerKind: ir.TriggerHTTP,
-			},
-		}
-		got := renderFeatureSchemas(plans)
-		if got != "" {
-			t.Errorf("expected empty for GET plan, got: %s", got)
-		}
-	})
-
-	t.Run("SubscribeNoBody", func(t *testing.T) {
-		plans := []*ir.ServicePlan{
-			{
-				OperationID: "HandleEvent",
-				TriggerKind: ir.TriggerSubscribe,
-				Topic:       "event.created",
-			},
-		}
-		got := renderFeatureSchemas(plans)
-		if got != "" {
-			t.Errorf("expected empty for subscribe plan, got: %s", got)
 		}
 	})
 }

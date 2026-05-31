@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=sequence topic=csrf
+//ff:func feature=gen-gogin type=test control=iteration dimension=1 topic=csrf
 //ff:what csrfAlwaysInactive — csrf 비활성 MainBlock 용 고정 predicate
-
 package boot
 
 import (

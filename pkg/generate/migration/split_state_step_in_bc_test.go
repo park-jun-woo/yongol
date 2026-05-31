@@ -1,9 +1,9 @@
 //ff:func feature=migration type=test control=sequence
-//ff:what TestSplitStateStepInBC — splitState.stepInBC 블록 코멘트 내부 커버
+//ff:what tokenizer/splitter named 테스트 — splitState/columnTokenizer/lineCommentScanner 메서드 (다중 인용/주석/타입 파라미터) 커버
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
-func TestSplitStateStepInBCMethod(t *testing.T) {
-	_ = splitStatements("SELECT 1 /* block ; comment */ ; SELECT 2;")
-}
+func TestSplitStateStepInBC(t *testing.T) { _ = splitStatements(richSQL) }

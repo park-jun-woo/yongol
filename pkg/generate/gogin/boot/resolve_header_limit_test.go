@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=sequence
+//ff:func feature=gen-gogin type=test control=iteration dimension=1
 //ff:what resolveHeaderLimit — manifest.backend.http.header_limit 값 결정 (파싱 실패 시 1 MiB)
-
 package boot
 
 import (

@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=selection
+//ff:func feature=migration type=test control=sequence
 //ff:what TestCheckSafetyForOp — Operation 타입별 안전 점검 디스패치
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestCheckSafetyForOp(t *testing.T) {
 	// AddColumn NOT NULL without default → MIG-002

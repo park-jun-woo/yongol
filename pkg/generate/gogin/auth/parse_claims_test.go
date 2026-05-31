@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=sequence
+//ff:func feature=gen-gogin type=test control=iteration dimension=1
 //ff:what TestParseClaims — claims 맵→정렬된 ClaimField + 기본 타입 검증
-
 package auth
 
 import (
@@ -32,11 +31,5 @@ func TestParseClaims(t *testing.T) {
 	}
 	if got[2].GoType != "string" {
 		t.Errorf("Role: expected default string GoType, got %q", got[2].GoType)
-	}
-}
-
-func TestParseClaimsEmpty(t *testing.T) {
-	if got := parseClaims(nil); len(got) != 0 {
-		t.Errorf("expected empty slice for nil claims, got: %v", got)
 	}
 }

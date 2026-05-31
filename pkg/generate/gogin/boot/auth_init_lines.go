@@ -28,4 +28,3 @@ func authInitLines(cfg authInitConfig) []string {
 	out = append(out, authInitStoreInjectionLines...)
 	return out
 }
-

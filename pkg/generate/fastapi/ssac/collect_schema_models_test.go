@@ -1,6 +1,5 @@
-//ff:func feature=gen-fastapi type=test control=iteration dimension=1
+//ff:func feature=gen-fastapi type=test control=sequence
 //ff:what TestCollectSchemaModels — request body 있는 plan에서 Pydantic 모델명 수집/중복제거
-
 package ssac
 
 import (

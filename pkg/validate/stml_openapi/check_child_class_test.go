@@ -1,6 +1,5 @@
-//ff:func feature=validate type=test control=sequence topic=stml-openapi
+//ff:func feature=validate type=test control=iteration dimension=1 topic=stml-openapi
 //ff:what TestCheckChildClass — ChildNode Kind별 디스패치 + nil 포인터/미지 Kind 분기 검증
-
 package stml_openapi
 
 import (

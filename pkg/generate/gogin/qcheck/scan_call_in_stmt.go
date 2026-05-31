@@ -14,6 +14,7 @@ import (
 //   - `if err := x.Scan(...); err != nil { ... }`
 //   - `err := x.Scan(...)` followed by err-guard
 //   - `if err = x.Scan(...); err != nil { ... }` via assignCallsAndGuarded
+//
 // pkgName is empty — any receiver ident is accepted.
 func scanCallInStmt(stmt ast.Stmt, blockList []ast.Stmt, i int, fset *token.FileSet) []DefensiveFinding {
 	if ifStmt, ok := stmt.(*ast.IfStmt); ok && ifInitCalls(ifStmt, "", "Scan") {

@@ -37,4 +37,3 @@ func inferPrimaryTable(fs *yongol.Fullstack, op *openapi3.Operation, path string
 	}
 	return ""
 }
-

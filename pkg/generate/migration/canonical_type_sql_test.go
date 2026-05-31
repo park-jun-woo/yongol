@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=selection dimension=6
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestCanonicalType_SQL — VARCHAR(N)/CHAR(N)/NUMERIC(p,s)/array 렌더
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestCanonicalType_SQL(t *testing.T) {
 	cases := []struct {

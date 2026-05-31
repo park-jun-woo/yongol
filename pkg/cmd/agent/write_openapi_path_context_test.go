@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=iteration dimension=2
+//ff:func feature=agent type=test control=sequence
 //ff:what TestWriteOpenAPIPathContext — 테이블 관련 op들의 path 블록 기록, 파일 부재 시 무기록 검증
-
 package agent
 
 import (

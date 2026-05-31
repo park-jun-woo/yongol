@@ -20,10 +20,10 @@ func TestHasColumn(t *testing.T) {
 	}
 
 	tests := []struct {
-		name   string
-		table  *gmig.Table
-		col    string
-		want   bool
+		name  string
+		table *gmig.Table
+		col   string
+		want  bool
 	}{
 		{
 			name:  "existing column found",

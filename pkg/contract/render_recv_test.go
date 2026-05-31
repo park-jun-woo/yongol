@@ -1,6 +1,5 @@
-//ff:func feature=contract type=test control=iteration dimension=1
+//ff:func feature=contract type=test control=sequence
 //ff:what test: TestRenderRecv — Ident 수신자는 이름 직반환, 그 외는 printer 문자열화 검증
-
 package contract
 
 import (

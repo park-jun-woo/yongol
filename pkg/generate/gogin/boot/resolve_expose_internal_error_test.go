@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=sequence topic=error-envelope
+//ff:func feature=gen-gogin type=test control=iteration dimension=1 topic=error-envelope
 //ff:what resolveExposeInternalError — expose_internal_error 컴파일타임 기본값 (기본 false)
-
 package boot
 
 import (

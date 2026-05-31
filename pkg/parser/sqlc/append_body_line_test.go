@@ -1,9 +1,10 @@
-//ff:func feature=parse-sqlc type=test control=sequence
+//ff:func feature=orchestrator type=test control=sequence
 //ff:what appendBodyLine test — 첫 줄 대입과 후속 줄 개행 연결 분기 검증
-
 package sqlc
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestAppendBodyLine(t *testing.T) {
 	q := &QuerySpec{}

@@ -1,6 +1,5 @@
-//ff:func feature=gen-react type=test control=sequence
+//ff:func feature=gen-react type=test control=iteration dimension=1
 //ff:what TestGenerateFrontendSetup_ZeroCov — generateFrontendSetup 을 빈 Fullstack 으로 직접 호출
-
 package react
 
 import (

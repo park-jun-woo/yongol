@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=iteration dimension=2
+//ff:func feature=agent type=test control=sequence
 //ff:what TestLogImmutableSkips — immutable ERROR 파일만 1회 요약 출력, 중복/비-immutable/warning 제외 검증
-
 package agent
 
 import (

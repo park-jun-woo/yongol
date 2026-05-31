@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=iteration dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestCleanRegoBlock — 중복 package/import/default allow 라인 제거 검증
-
 package agent
 
 import (

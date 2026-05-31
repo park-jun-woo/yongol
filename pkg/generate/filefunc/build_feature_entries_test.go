@@ -1,6 +1,5 @@
-//ff:func feature=gen-filefunc type=test control=sequence
+//ff:func feature=gen-filefunc type=test control=iteration dimension=1
 //ff:what TestBuildFeatureEntries — SSOT+internal 디렉토리 병합 feature 맵 생성 검증
-
 package filefunc
 
 import (

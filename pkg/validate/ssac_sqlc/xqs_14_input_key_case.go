@@ -28,4 +28,3 @@ func xqs14InputKeyCase(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	}
 	return diags
 }
-

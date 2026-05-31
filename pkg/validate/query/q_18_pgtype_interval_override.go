@@ -32,4 +32,3 @@ func q18PgtypeIntervalOverride(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			"      type: \"Interval\"\n",
 	})
 }
-

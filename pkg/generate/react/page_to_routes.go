@@ -13,12 +13,12 @@ import (
 //
 // Rules:
 //
-//	0. If page.Route is set (data-route), use it as-is (single route)
-//	1. Strip .html → kebab-case path (e.g. "workflows.html" → "/workflows")
-//	2. "-detail" suffix → parent resource path + /:id (single route)
-//	   e.g. "workflow-detail.html" → "/workflows/:id"
-//	3. Non-detail page with route param → two routes: base path + base/:id
-//	   e.g. "templates.html" with data-param-id="route.id" → "/templates" and "/templates/:id"
+//  0. If page.Route is set (data-route), use it as-is (single route)
+//  1. Strip .html → kebab-case path (e.g. "workflows.html" → "/workflows")
+//  2. "-detail" suffix → parent resource path + /:id (single route)
+//     e.g. "workflow-detail.html" → "/workflows/:id"
+//  3. Non-detail page with route param → two routes: base path + base/:id
+//     e.g. "templates.html" with data-param-id="route.id" → "/templates" and "/templates/:id"
 func pageToRoutes(p stml.PageSpec) []stmlRoute {
 	base := strings.TrimSuffix(p.FileName, ".html")
 	componentName := kebabToPascal(base)

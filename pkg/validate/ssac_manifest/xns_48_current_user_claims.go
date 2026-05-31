@@ -30,4 +30,3 @@ func xns48CurrentUserClaims(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		Advice:  "Enable manifest backend.auth.claims, or remove the use of currentUser",
 	}}
 }
-

@@ -6,8 +6,8 @@ package ssac
 import (
 	"fmt"
 
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	ssacparser "github.com/park-jun-woo/yongol/pkg/parser/ssac"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // generateHTTPMethod writes one StrictServerInterface method file.

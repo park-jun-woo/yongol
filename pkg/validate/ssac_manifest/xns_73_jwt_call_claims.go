@@ -64,4 +64,3 @@ func xns73JwtCallClaims(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	}
 	return diags
 }
-

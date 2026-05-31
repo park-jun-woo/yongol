@@ -5,8 +5,8 @@ package openapi_ddl
 
 import (
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	oapiparser "github.com/park-jun-woo/yongol/pkg/parser/openapi"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // xdo75CheckOpFields inspects the RequestConstraints map for a single

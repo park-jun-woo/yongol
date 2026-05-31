@@ -1,6 +1,5 @@
-//ff:func feature=validate-contract type=test control=sequence topic=preserve-safety
+//ff:func feature=validate-contract type=test control=iteration dimension=1 topic=preserve-safety
 //ff:what TestUnmarshalCallFromAssign — AssignStmt RHS 가 Unmarshal 호출이면 반환 검증
-
 package contract
 
 import (

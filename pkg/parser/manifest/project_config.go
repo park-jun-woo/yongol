@@ -4,16 +4,16 @@ package manifest
 
 // ProjectConfig represents the manifest.yaml project configuration.
 type ProjectConfig struct {
-	APIVersion string          `yaml:"apiVersion"`
-	Kind       string          `yaml:"kind"`
-	Metadata   Metadata        `yaml:"metadata"`
-	Backend    Backend         `yaml:"backend"`
-	Frontend   Frontend        `yaml:"frontend"`
-	Deploy     Deploy          `yaml:"deploy"`
-	Session    *BuiltinBackend `yaml:"session"`
-	Cache      *BuiltinBackend `yaml:"cache"`
-	File       *FileBackend    `yaml:"file"`
-	Queue      *QueueBackend   `yaml:"queue"`
-	Authz      *AuthzConfig    `yaml:"authz"`
+	APIVersion string                  `yaml:"apiVersion"`
+	Kind       string                  `yaml:"kind"`
+	Metadata   Metadata                `yaml:"metadata"`
+	Backend    Backend                 `yaml:"backend"`
+	Frontend   Frontend                `yaml:"frontend"`
+	Deploy     Deploy                  `yaml:"deploy"`
+	Session    *BuiltinBackend         `yaml:"session"`
+	Cache      *BuiltinBackend         `yaml:"cache"`
+	File       *FileBackend            `yaml:"file"`
+	Queue      *QueueBackend           `yaml:"queue"`
+	Authz      *AuthzConfig            `yaml:"authz"`
 	Domains    map[string]DomainConfig `yaml:"domains,omitempty"`
 }

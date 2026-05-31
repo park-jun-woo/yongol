@@ -1,6 +1,5 @@
-//ff:func feature=external type=test control=sequence
+//ff:func feature=external type=test control=iteration dimension=1
 //ff:what TestDoHelper — do() 헬퍼 코드 생성 검증 (수신자 타입·HTTP 흐름 포함)
-
 package external
 
 import (

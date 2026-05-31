@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=selection
+//ff:func feature=agent type=test control=sequence
 //ff:what TestResolveDescFromFile — 레이어별(SSaC/DDL/SQLc) feature desc 해석 및 미지원 레이어 검증
-
 package agent
 
 import (

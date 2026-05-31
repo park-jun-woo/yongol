@@ -1,6 +1,5 @@
-//ff:func feature=validate-contract type=test control=iteration dimension=1
+//ff:func feature=validate-contract type=test control=sequence
 //ff:what TestFlattenMissingSymbols — missingSymbols 3 범주를 카테고리 순서 Diagnostic 으로 직렬화 검증
-
 package contract
 
 import (

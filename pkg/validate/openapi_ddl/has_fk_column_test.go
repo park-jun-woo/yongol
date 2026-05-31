@@ -24,11 +24,11 @@ func TestHasFKColumn(t *testing.T) {
 	}
 
 	tests := []struct {
-		name     string
-		src      string
-		col      string
-		dst      string
-		want     bool
+		name string
+		src  string
+		col  string
+		dst  string
+		want bool
 	}{
 		{"FK found", "orders", "user_id", "users", true},
 		{"wrong ref table", "orders", "user_id", "products", false},

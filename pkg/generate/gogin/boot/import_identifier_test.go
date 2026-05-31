@@ -1,9 +1,10 @@
-//ff:func feature=gen-gogin type=test control=sequence
+//ff:func feature=gen-gogin type=test control=iteration dimension=1
 //ff:what importIdentifier — import 라인에서 패키지 식별자 (마지막 경로 세그먼트) 추출
-
 package boot
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestImportIdentifier(t *testing.T) {
 	cases := []struct {

@@ -19,10 +19,10 @@ func TestStripCRUDPrefix(t *testing.T) {
 		{"fetchData", "Data"},
 		{"searchProducts", "Products"},
 		{"findUser", "User"},
-		{"doSomething", "doSomething"},      // no known prefix
-		{"get", "get"},                       // too short (no rest)
-		{"getuser", "getuser"},               // rest doesn't start with uppercase
-		{"", ""},                              // empty
+		{"doSomething", "doSomething"}, // no known prefix
+		{"get", "get"},                 // too short (no rest)
+		{"getuser", "getuser"},         // rest doesn't start with uppercase
+		{"", ""},                       // empty
 	}
 
 	for _, tt := range tests {

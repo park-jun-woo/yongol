@@ -3,7 +3,7 @@
 package migration
 
 // step consumes one byte at position i of s and returns the index to
-// read next (may skip ahead for multi-char tokens like '/*' or ''').
+// read next (may skip ahead for multi-char tokens like '/*' or ”').
 func (st *splitState) step(s string, i int) int {
 	c := s[i]
 	switch {

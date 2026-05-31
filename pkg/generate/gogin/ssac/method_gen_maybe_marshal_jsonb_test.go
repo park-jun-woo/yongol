@@ -1,9 +1,10 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what methodGen.maybeMarshalJSONB 단위 테스트 (body JSONB 필드일 때만 json.Marshal 프리앰블)
-
 package ssac
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestMethodGenMaybeMarshalJSONB(t *testing.T) {
 	t.Run("no jsonb fields → not applicable", func(t *testing.T) {

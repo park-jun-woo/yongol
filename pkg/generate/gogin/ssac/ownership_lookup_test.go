@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what ownershipLookup 단위 테스트 (nil/zero-rid 조기반환 + UUID OwnerLookup 방출)
-
 package ssac
 
 import (

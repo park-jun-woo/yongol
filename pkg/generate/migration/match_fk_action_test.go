@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=selection
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestMatchFKAction — prefix 뒤 FK 동작 토큰 추출
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestMatchFKAction(t *testing.T) {
 	cases := []struct {

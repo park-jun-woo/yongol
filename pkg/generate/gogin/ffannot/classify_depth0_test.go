@@ -1,9 +1,10 @@
-//ff:func feature=gen-gogin type=test control=sequence
+//ff:func feature=gen-gogin type=test control=iteration dimension=1
 //ff:what TestClassifyDepth0 — depth-0 라인 for/switch/none 분류 검증
-
 package ffannot
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestClassifyDepth0(t *testing.T) {
 	cases := map[string]string{

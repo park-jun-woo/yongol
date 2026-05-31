@@ -1,4 +1,4 @@
-//ff:func feature=chain type=test control=iteration dimension=2
+//ff:func feature=chain type=test control=sequence
 //ff:what findSSaCFile 가 feature 폴더 구조 / flat 구조 / 미존재 fallback 을 올바르게 선택하는지 검증
 package chain
 

@@ -2,7 +2,12 @@
 //ff:what data-state loading/error 변수명 생성 규칙 검증
 package stml
 
-import ("strings"; "testing"; stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml")
+import (
+	"strings"
+	"testing"
+
+	stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
+)
 
 func TestStateLoadingErrorVarName(t *testing.T) {
 	page, _ := stmlparser.ParseReader("course-list-page.html", strings.NewReader(`<main>

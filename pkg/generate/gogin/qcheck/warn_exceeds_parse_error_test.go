@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=branch topic=depth-report
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what TestWarnExceeds_ParseError — 파서 에러 시 WARN 단일 메시지 반환 검증
-
 package qcheck
 
 import (

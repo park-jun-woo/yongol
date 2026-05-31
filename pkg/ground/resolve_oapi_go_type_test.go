@@ -1,6 +1,5 @@
-//ff:func feature=rule type=test control=iteration dimension=2
+//ff:func feature=rule type=test control=iteration dimension=1
 //ff:what resolveOAPIGoType test — type×format×shape×context 매트릭스 (oapi-codegen ground truth 대조)
-
 package ground
 
 import (
@@ -8,31 +7,6 @@ import (
 
 	"github.com/getkin/kin-openapi/openapi3"
 )
-
-// intSchema / numSchema / boolSchema / objSchema build leaf schema refs for the
-// matrix. strSchema / arraySchema are defined in
-// register_openapi_response_props_test.go (same package).
-func intSchema(format string) *openapi3.SchemaRef {
-	return &openapi3.SchemaRef{Value: &openapi3.Schema{
-		Type: &openapi3.Types{"integer"}, Format: format}}
-}
-
-func numSchema(format string) *openapi3.SchemaRef {
-	return &openapi3.SchemaRef{Value: &openapi3.Schema{
-		Type: &openapi3.Types{"number"}, Format: format}}
-}
-
-func boolSchema() *openapi3.SchemaRef {
-	return &openapi3.SchemaRef{Value: &openapi3.Schema{Type: &openapi3.Types{"boolean"}}}
-}
-
-func objSchema() *openapi3.SchemaRef {
-	return &openapi3.SchemaRef{Value: &openapi3.Schema{Type: &openapi3.Types{"object"}}}
-}
-
-func refSchema(name string) *openapi3.SchemaRef {
-	return &openapi3.SchemaRef{Ref: "#/components/schemas/" + name}
-}
 
 func TestResolveOAPIGoType(t *testing.T) {
 	tests := []struct {

@@ -30,14 +30,3 @@ func renderVerifyPasswordOp(b *strings.Builder, op *ir.VerifyPasswordOp, indent,
 	b.WriteString(fmt.Sprintf("%s# TODO: bcrypt.checkpw(%s, %s.%s)\n",
 		indent, pwVal, op.ResultVar, hashCol))
 }
-
-// resolveFastAPIExpr rewrites raw SSaC expressions for FastAPI. In particular,
-// "request.Xxx" is mapped to "body.xxx" (snake_case) because FastAPI service
-// methods receive the request body as a separate "body" parameter.
-func resolveFastAPIExpr(expr string) string {
-	if strings.HasPrefix(expr, "request.") {
-		field := expr[len("request."):]
-		return "body." + snakeCase(field)
-	}
-	return expr
-}

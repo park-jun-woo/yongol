@@ -1,13 +1,10 @@
-//ff:func feature=manifest type=test control=iteration dimension=1
+//ff:func feature=manifest type=test control=sequence
 //ff:what dispatchConstraint — 라인 종류별 분기 (FK / PRIMARY / UNIQUE / CHECK / column)
-
 package ddl
 
-import "testing"
-
-func newTable() *Table {
-	return &Table{Columns: map[string]Column{}}
-}
+import (
+	"testing"
+)
 
 func TestDispatchConstraint(t *testing.T) {
 	t.Run("constraint foreign key", func(t *testing.T) {

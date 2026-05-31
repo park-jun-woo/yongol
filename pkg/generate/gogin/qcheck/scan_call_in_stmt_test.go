@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=branch topic=defensive
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what TestScanCallInStmt — 미가드 .Scan() DF-02 + if-init/assign-guard/무호출 스킵 분기 검증
-
 package qcheck
 
 import (

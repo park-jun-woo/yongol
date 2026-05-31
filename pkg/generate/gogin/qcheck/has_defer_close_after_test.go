@@ -1,9 +1,10 @@
-//ff:func feature=gen-gogin type=test control=branch topic=defensive
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what TestHasDeferCloseAfter — defer name.Close() 존재/부재 + 각 스킵 분기 검증
-
 package qcheck
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestHasDeferCloseAfter(t *testing.T) {
 	t.Run("Found", func(t *testing.T) {

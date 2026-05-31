@@ -4,10 +4,10 @@
 package contract
 
 import (
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/parser/ddl"
 	sqlcparser "github.com/park-jun-woo/yongol/pkg/parser/sqlc"
 	"github.com/park-jun-woo/yongol/pkg/rule"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // buildFSForPRV02 assembles a Fullstack with a single sqlc query

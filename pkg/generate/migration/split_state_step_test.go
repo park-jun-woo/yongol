@@ -1,9 +1,9 @@
 //ff:func feature=migration type=test control=sequence
-//ff:what TestSplitStateStepMethod — splitState.step 디스패치 커버
+//ff:what tokenizer/splitter named 테스트 — splitState/columnTokenizer/lineCommentScanner 메서드 (다중 인용/주석/타입 파라미터) 커버
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
-func TestSplitStateStepMethod(t *testing.T) {
-	_ = splitStatements("CREATE TABLE \"X\" (a TEXT DEFAULT 'p;q' /* c */); CREATE INDEX i ON x(a);")
-}
+func TestSplitStateStep(t *testing.T) { _ = splitStatements(richSQL) }

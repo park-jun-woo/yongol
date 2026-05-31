@@ -6,8 +6,8 @@ package ssac
 import (
 	"strings"
 
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	ssacparser "github.com/park-jun-woo/yongol/pkg/parser/ssac"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // lookupHTTPWhat returns a short one-line description for a service handler.

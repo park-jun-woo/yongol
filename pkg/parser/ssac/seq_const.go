@@ -4,14 +4,14 @@ package ssac
 
 // sequence type constants
 const (
-	SeqGet      = "get"
-	SeqPost     = "post"
-	SeqPut      = "put"
-	SeqDelete   = "delete"
-	SeqEmpty    = "empty"
-	SeqExists   = "exists"
-	SeqState    = "state"
-	SeqAuth     = "auth"
+	SeqGet            = "get"
+	SeqPost           = "post"
+	SeqPut            = "put"
+	SeqDelete         = "delete"
+	SeqEmpty          = "empty"
+	SeqExists         = "exists"
+	SeqState          = "state"
+	SeqAuth           = "auth"
 	SeqCall           = "call"
 	SeqEval           = "eval"
 	SeqPublish        = "publish"
@@ -20,14 +20,14 @@ const (
 )
 
 var ValidSequenceTypes = map[string]bool{
-	SeqGet:      true,
-	SeqPost:     true,
-	SeqPut:      true,
-	SeqDelete:   true,
-	SeqEmpty:    true,
-	SeqExists:   true,
-	SeqState:    true,
-	SeqAuth:     true,
+	SeqGet:            true,
+	SeqPost:           true,
+	SeqPut:            true,
+	SeqDelete:         true,
+	SeqEmpty:          true,
+	SeqExists:         true,
+	SeqState:          true,
+	SeqAuth:           true,
 	SeqCall:           true,
 	SeqEval:           true,
 	SeqPublish:        true,

@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=branch topic=defensive
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what TestUnmarshalInStmt — 미가드 Unmarshal DF-01 + if-init/assign-guard/무매칭 분기 + 다중 target
-
 package qcheck
 
 import (

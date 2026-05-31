@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=selection
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestUpdateParenDepth — '(' +1, ')' -1, 그 외 유지
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestUpdateParenDepth(t *testing.T) {
 	cases := []struct {

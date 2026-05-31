@@ -1,6 +1,5 @@
-//ff:func feature=validate type=test control=selection topic=states
+//ff:func feature=validate type=test control=sequence topic=states
 //ff:what TestXsm26MissingStateGuard — XSM-26 state 전이 함수의 @state guard 누락 검증
-
 package ssac_statemachine
 
 import (

@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=sequence
+//ff:func feature=gen-gogin type=test control=iteration dimension=1
 //ff:what TestActivePorts — when 이 truthy 한 port 만 남기는지 검증
-
 package infra
 
 import (
@@ -30,11 +29,5 @@ func TestActivePorts(t *testing.T) {
 	}
 	if names["off"] {
 		t.Errorf("inactive port should be dropped")
-	}
-}
-
-func TestActivePortsEmpty(t *testing.T) {
-	if got := activePorts(nil, map[string]any{}); got != nil {
-		t.Errorf("expected nil for no ports, got: %v", got)
 	}
 }

@@ -1,9 +1,10 @@
-//ff:func feature=validate-contract type=test control=sequence topic=preserve-safety
+//ff:func feature=validate-contract type=test control=iteration dimension=1 topic=preserve-safety
 //ff:what TestIsCurrentUserAssertion — expr 가 ctx.Value("currentUser").(T) 단언인지 검증
-
 package contract
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestIsCurrentUserAssertion(t *testing.T) {
 	tests := []struct {

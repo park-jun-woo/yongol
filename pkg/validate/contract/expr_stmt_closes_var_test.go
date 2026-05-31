@@ -1,9 +1,10 @@
-//ff:func feature=validate-contract type=test control=sequence topic=preserve-safety
+//ff:func feature=validate-contract type=test control=iteration dimension=1 topic=preserve-safety
 //ff:what TestExprStmtClosesVar — ExprStmt/AssignStmt 가 varName.Close() 호출인지 검증
-
 package contract
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestExprStmtClosesVar(t *testing.T) {
 	tests := []struct {

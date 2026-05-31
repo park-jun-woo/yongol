@@ -1,14 +1,12 @@
-//ff:func feature=validate type=test control=selection topic=stml-design
+//ff:func feature=validate type=test control=sequence topic=stml-design
 //ff:what TestWalkInlineStyles — walkInlineStyles DOM 순회 inline style 색상 검사 분기 검증
-
 package stml_design
 
 import (
 	"testing"
 
-	"golang.org/x/net/html"
-
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
+	"golang.org/x/net/html"
 )
 
 func TestWalkInlineStyles(t *testing.T) {

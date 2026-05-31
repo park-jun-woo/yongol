@@ -1,9 +1,9 @@
 //ff:func feature=migration type=test control=sequence
-//ff:what TestColumnTokenizerFlush — columnTokenizer.flush 버퍼 토큰 방출 커버
+//ff:what tokenizer/splitter named 테스트 — splitState/columnTokenizer/lineCommentScanner 메서드 (다중 인용/주석/타입 파라미터) 커버
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
-func TestColumnTokenizerFlushMethod(t *testing.T) {
-	_ = tokenizeColumnDef(`note TEXT DEFAULT 'x' CHECK (note <> '')`)
-}
+func TestColumnTokenizerFlush(t *testing.T) { _ = tokenizeColumnDef(`note TEXT DEFAULT 'x'`) }

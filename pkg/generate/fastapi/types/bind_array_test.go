@@ -1,6 +1,5 @@
-//ff:func feature=gen-fastapi type=test control=selection
+//ff:func feature=gen-fastapi type=test control=sequence
 //ff:what TestBindArray — PG 배열 → SQLAlchemy ARRAY/Python list 바인딩 (지원/미지원 element)
-
 package types
 
 import (

@@ -1,9 +1,10 @@
-//ff:func feature=manifest type=test control=iteration dimension=1
+//ff:func feature=manifest type=test control=sequence
 //ff:what appendPendingHint — 유효 힌트는 누적, 비힌트는 pending 불변
-
 package ddl
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestAppendPendingHint(t *testing.T) {
 	t.Run("valid hint appended", func(t *testing.T) {

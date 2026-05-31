@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=selection dimension=3
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestAlterColumnNullable_SafetyLevel — NOT NULL 추가+backfill 없으면 Error
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestAlterColumnNullable_SafetyLevel(t *testing.T) {
 	cases := []struct {

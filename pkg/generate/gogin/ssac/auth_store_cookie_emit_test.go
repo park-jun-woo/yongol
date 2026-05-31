@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=selection
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what authStoreCookieEmit 단위 테스트 (RefreshRotate Set-Cookie / Logout clear / subscribe no-op)
-
 package ssac
 
 import (

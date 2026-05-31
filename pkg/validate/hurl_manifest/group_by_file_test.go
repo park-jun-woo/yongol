@@ -11,9 +11,9 @@ import (
 
 func TestGroupByFile(t *testing.T) {
 	cases := []struct {
-		name      string
-		entries   []hurl.HurlEntry
-		wantFiles int
+		name       string
+		entries    []hurl.HurlEntry
+		wantFiles  int
 		wantCounts map[string]int
 	}{
 		{

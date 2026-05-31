@@ -1,9 +1,10 @@
-//ff:func feature=agent type=test control=selection
+//ff:func feature=agent type=test control=iteration dimension=1
 //ff:what TestLayerExample — 알려진 레이어는 비어있지 않은 예시, unknown 은 빈 문자열 반환 검증
-
 package agent
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestLayerExample(t *testing.T) {
 	known := []layer{

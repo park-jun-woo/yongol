@@ -1,11 +1,11 @@
-//ff:func feature=report type=test control=selection topic=sarif
+//ff:func feature=report type=test control=sequence topic=sarif
 //ff:what TestRegionOrNil — 양수 line 은 *Region, 0/음수 line 은 nil 반환 검증
 package sarif
 
-import "testing"
+import (
+	"testing"
+)
 
-// TestRegionOrNil covers both branches: positive line yields a Region with
-// StartLine set, non-positive yields nil.
 func TestRegionOrNil(t *testing.T) {
 	if r := regionOrNil(0); r != nil {
 		t.Errorf("line 0: got %+v, want nil", r)

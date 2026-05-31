@@ -1,9 +1,10 @@
-//ff:func feature=validate-contract type=test control=sequence topic=preserve-safety
+//ff:func feature=validate-contract type=test control=iteration dimension=1 topic=preserve-safety
 //ff:what TestIsInitFunc — FuncDecl 이 패키지 init() 함수인지 판정 검증
-
 package contract
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestIsInitFunc(t *testing.T) {
 	tests := []struct {

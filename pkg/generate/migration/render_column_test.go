@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=selection
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestRenderColumn — NOT NULL / IDENTITY / DEFAULT 조합별 컬럼 절 렌더
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestRenderColumn(t *testing.T) {
 	cases := []struct {

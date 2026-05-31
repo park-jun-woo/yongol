@@ -12,12 +12,12 @@ import (
 // type, or returns "" when the expression references a variable/field
 // (handled separately by resolveInputType). Rules:
 //
-//   "foo"     → "string" (quoted)
-//   1, 42     → "int64"
-//   1.5, 3.14 → "float64"
-//   true/false → "bool"
-//   nil       → "nil"
-//   other     → "" (not a literal)
+//	"foo"     → "string" (quoted)
+//	1, 42     → "int64"
+//	1.5, 3.14 → "float64"
+//	true/false → "bool"
+//	nil       → "nil"
+//	other     → "" (not a literal)
 func inferLiteralType(value string) string {
 	value = strings.TrimSpace(value)
 	if value == "" {

@@ -15,10 +15,7 @@ import (
 // mapping via renderArgValueLegacy.
 func renderArgValue(a ir.FieldArg) string {
 	if a.Literal != "" {
-		if a.IsQuoted {
-			return fmt.Sprintf("'%s'", a.Literal)
-		}
-		return a.Literal
+		return renderLiteralArg(a)
 	}
 
 	col := a.ColumnName
@@ -36,61 +33,11 @@ func renderArgValue(a ir.FieldArg) string {
 	case ir.LocUser:
 		return fmt.Sprintf("user.%s", col)
 	case ir.LocVar:
-		// SourceColumn is the snake_case name on the source variable/struct.
-		// Falls back to ColumnName (target key) when Field is absent.
-		srcCol := a.SourceColumn
-		if srcCol == "" {
-			srcCol = toSnake(fieldName(a))
-		}
-		if srcCol == "" {
-			srcCol = col // fall back to target ColumnName
-		}
-		if srcCol != "" && a.Source != "" {
-			return fmt.Sprintf("%s.%s", a.Source, srcCol)
-		}
-		if a.Source != "" {
-			return a.Source
-		}
-		return srcCol
+		return renderArgValueVar(a, col)
 	case ir.LocLiteral:
 		return fmt.Sprintf("'%s'", a.Literal)
 	}
 
 	// Fallback: Location not set (no OpenAPI doc). Use source-based mapping.
 	return renderArgValueLegacy(a, col)
-}
-
-// renderArgValueLegacy maps SSaC source names when Location is empty.
-func renderArgValueLegacy(a ir.FieldArg, col string) string {
-	source := a.Source
-	if source == "" {
-		source = "params"
-	}
-	if col == "" {
-		switch source {
-		case "request":
-			return "params"
-		case "currentUser":
-			return "user"
-		default:
-			return source
-		}
-	}
-	switch source {
-	case "request":
-		return fmt.Sprintf("body.%s", col)
-	case "currentUser":
-		return fmt.Sprintf("user.%s", col)
-	default:
-		return fmt.Sprintf("%s.%s", source, col)
-	}
-}
-
-// fieldName extracts the field accessor name from a FieldArg, stripping
-// the leading dot.
-func fieldName(a ir.FieldArg) string {
-	if len(a.Field) > 0 && a.Field[0] == '.' {
-		return a.Field[1:]
-	}
-	return a.Field
 }

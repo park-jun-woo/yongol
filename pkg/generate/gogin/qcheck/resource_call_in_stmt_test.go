@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=branch topic=defensive
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what TestResourceCallInStmt — 미닫힘 리소스 DF-06 + 닫힘/비-assign/discard 등 스킵 분기 검증
-
 package qcheck
 
 import (

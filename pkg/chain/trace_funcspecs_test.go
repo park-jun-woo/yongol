@@ -1,4 +1,4 @@
-//ff:func feature=chain type=test control=iteration dimension=2
+//ff:func feature=chain type=test control=sequence
 //ff:what traceFuncSpecs 가 @call sequence 를 func spec 과 매칭하고 @call 없을 때 nil 을 반환하는지 검증
 package chain
 

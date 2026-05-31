@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=sequence
+//ff:func feature=gen-gogin type=test control=iteration dimension=1
 //ff:what blockDBInit — pgxpool 생성 + sqlc Queries 초기화
-
 package boot
 
 import (

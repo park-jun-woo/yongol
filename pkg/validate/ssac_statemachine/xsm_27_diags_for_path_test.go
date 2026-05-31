@@ -1,13 +1,11 @@
-//ff:func feature=validate type=test control=selection topic=states
+//ff:func feature=validate type=test control=sequence topic=states
 //ff:what TestXsm27DiagsForPath — xsm27DiagsForPath 단일 path XSM-27 진단 수집 분기 검증
-
 package ssac_statemachine
 
 import (
 	"testing"
 
 	"github.com/getkin/kin-openapi/openapi3"
-
 	"github.com/park-jun-woo/yongol/pkg/parser/ssac"
 	"github.com/park-jun-woo/yongol/pkg/parser/statemachine"
 	"github.com/park-jun-woo/yongol/pkg/rule"

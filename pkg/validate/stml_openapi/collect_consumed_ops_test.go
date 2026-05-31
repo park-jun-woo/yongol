@@ -1,6 +1,5 @@
-//ff:func feature=validate type=test control=sequence topic=stml-openapi
+//ff:func feature=validate type=test control=iteration dimension=1 topic=stml-openapi
 //ff:what TestCollectConsumedOps — 전 페이지 data-fetch/data-action operationId 집합 수집
-
 package stml_openapi
 
 import (

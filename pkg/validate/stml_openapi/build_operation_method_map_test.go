@@ -1,6 +1,5 @@
-//ff:func feature=validate type=test control=sequence topic=stml-openapi
+//ff:func feature=validate type=test control=iteration dimension=1 topic=stml-openapi
 //ff:what TestBuildOperationMethodMap — operationId → (method, op) 맵 생성 분기 검증
-
 package stml_openapi
 
 import (

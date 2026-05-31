@@ -2,7 +2,12 @@
 //ff:what 예약 상세 페이지 TSX 생성을 검증
 package stml
 
-import ("strings"; "testing"; stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml")
+import (
+	"strings"
+	"testing"
+
+	stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
+)
 
 func TestGenerateReservationDetailPage(t *testing.T) {
 	page, _ := stmlparser.ParseReader("reservation-detail-page.html", strings.NewReader(`<main class="max-w-2xl mx-auto p-6">

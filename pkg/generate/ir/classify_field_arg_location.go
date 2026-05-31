@@ -1,4 +1,4 @@
-//ff:func feature=gen-ir type=util control=selection
+//ff:func feature=gen-ir type=util control=sequence
 //ff:what classifyFieldArgLocation -- 단일 FieldArg 의 Source/Field 에 따라 Location 분류
 
 package ir

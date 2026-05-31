@@ -1,9 +1,9 @@
 //ff:func feature=migration type=test control=sequence
-//ff:what TestSplitStateStepInSQ — splitState.stepInSQ 단일인용 문자열 내부 커버
+//ff:what tokenizer/splitter named 테스트 — splitState/columnTokenizer/lineCommentScanner 메서드 (다중 인용/주석/타입 파라미터) 커버
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
-func TestSplitStateStepInSQMethod(t *testing.T) {
-	_ = splitStatements("INSERT INTO t VALUES ('a; b ''q'' c'); SELECT 1;")
-}
+func TestSplitStateStepInSQ(t *testing.T) { _ = splitStatements(richSQL) }

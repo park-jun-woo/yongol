@@ -1,6 +1,5 @@
-//ff:func feature=gen-fastapi type=test control=sequence
+//ff:func feature=gen-fastapi type=test control=iteration dimension=1
 //ff:what RenderEnvExample test — .env.example 기본 설정 라인 전체 검증
-
 package scaffold
 
 import (

@@ -1,9 +1,10 @@
 //ff:func feature=validate-contract type=test control=iteration dimension=1
 //ff:what TestKnownCallPackages — expCalls 키의 pkg 접두사 집합 추출 검증
-
 package contract
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestKnownCallPackages(t *testing.T) {
 	exp := map[string]bool{
@@ -25,11 +26,5 @@ func TestKnownCallPackages(t *testing.T) {
 	}
 	if got["NoDot"] || got[""] {
 		t.Fatalf("unexpected entries in %v", got)
-	}
-}
-
-func TestKnownCallPackagesEmpty(t *testing.T) {
-	if got := knownCallPackages(map[string]bool{}); len(got) != 0 {
-		t.Fatalf("expected empty, got %v", got)
 	}
 }

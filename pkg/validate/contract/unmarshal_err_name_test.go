@@ -1,6 +1,5 @@
-//ff:func feature=validate-contract type=test control=sequence topic=preserve-safety
+//ff:func feature=validate-contract type=test control=iteration dimension=1 topic=preserve-safety
 //ff:what TestUnmarshalErrName — AssignStmt LHS 에서 error 식별자 이름 추출 검증
-
 package contract
 
 import (

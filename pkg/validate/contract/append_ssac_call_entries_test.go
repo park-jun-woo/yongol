@@ -1,6 +1,5 @@
-//ff:func feature=validate-contract type=test control=iteration dimension=1
+//ff:func feature=validate-contract type=test control=sequence
 //ff:what TestAppendSSaCCallEntries — SSaC.callRef 를 camelCase + PascalCase 두 형태로 추가 검증
-
 package contract
 
 import (

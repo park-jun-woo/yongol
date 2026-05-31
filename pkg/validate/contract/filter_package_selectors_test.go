@@ -1,6 +1,5 @@
-//ff:func feature=validate-contract type=test control=iteration dimension=1
+//ff:func feature=validate-contract type=test control=sequence
 //ff:what TestFilterPackageSelectors — import 패키지 셀렉터 제거, DDL 필드 후보만 남김 검증
-
 package contract
 
 import (

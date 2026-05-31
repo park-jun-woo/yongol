@@ -8,10 +8,8 @@ import "github.com/park-jun-woo/yongol/pkg/generate/ir"
 // opsReferenceBody returns true if any FieldArg in ops has Location == LocBody.
 func opsReferenceBody(ops []ir.Op) bool {
 	for _, op := range ops {
-		for _, fa := range collectFieldArgs(op) {
-			if fa.Location == ir.LocBody {
-				return true
-			}
+		if opReferencesLocation(op, ir.LocBody) {
+			return true
 		}
 	}
 	return false

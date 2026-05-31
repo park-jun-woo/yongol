@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=iteration dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestWriteFeatureTableContext — 테이블 관련 feature 목록 기록, nil/무관련 시 무기록 검증
-
 package agent
 
 import (

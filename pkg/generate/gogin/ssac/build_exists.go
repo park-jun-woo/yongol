@@ -5,6 +5,7 @@ package ssac
 
 import (
 	"fmt"
+
 	ssacparser "github.com/park-jun-woo/yongol/pkg/parser/ssac"
 )
 

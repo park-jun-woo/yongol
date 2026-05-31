@@ -1,4 +1,4 @@
-//ff:func feature=policy type=test
+//ff:func feature=policy type=test control=sequence
 //ff:what zz_zerocov_test — rego.collectOpaErrors 0% 커버리지 단위 테스트
 package rego
 
@@ -8,7 +8,6 @@ import (
 
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/ast/location"
-
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
 )
 

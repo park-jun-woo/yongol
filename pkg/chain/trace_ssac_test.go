@@ -1,4 +1,4 @@
-//ff:func feature=chain type=test control=iteration dimension=1
+//ff:func feature=chain type=test control=sequence
 //ff:what traceSSaC 가 sequence 타입을 중복없이 요약하고 SSaC 파일 위치를 찾는지 검증
 package chain
 

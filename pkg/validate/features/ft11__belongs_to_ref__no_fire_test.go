@@ -5,6 +5,7 @@ package features
 
 import (
 	"testing"
+
 	featparser "github.com/park-jun-woo/yongol/pkg/parser/features"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )

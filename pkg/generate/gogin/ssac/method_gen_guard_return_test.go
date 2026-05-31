@@ -1,9 +1,10 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what methodGen.guardReturn 단위 테스트 (HTTP JSONResponse vs subscribe fmt.Errorf)
-
 package ssac
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestMethodGenGuardReturn(t *testing.T) {
 	t.Run("subscribe returns fmt.Errorf", func(t *testing.T) {

@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=selection dimension=3
+//ff:func feature=migration type=test control=iteration dimension=1
 //ff:what TestAfterKeyword — 키워드 이후(case-insensitive) 추출, 없으면 원본
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestAfterKeyword(t *testing.T) {
 	cases := []struct {

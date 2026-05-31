@@ -1,6 +1,5 @@
-//ff:func feature=validate type=test control=selection topic=stml-design
+//ff:func feature=validate type=test control=sequence topic=stml-design
 //ff:what TestScanInlineStyles — scanInlineStyles inline style 하드코딩 색상 검사 분기 검증
-
 package stml_design
 
 import (

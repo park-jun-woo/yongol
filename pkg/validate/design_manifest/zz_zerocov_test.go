@@ -1,4 +1,4 @@
-//ff:func feature=validate type=test topic=design-manifest
+//ff:func feature=validate type=test control=sequence topic=design-manifest
 //ff:what zz_zerocov_test — design_manifest.Run 0% 커버리지 단위 테스트
 package design_manifest
 

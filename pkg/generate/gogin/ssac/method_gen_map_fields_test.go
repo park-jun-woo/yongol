@@ -1,9 +1,10 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what methodGen.mapFields 단위 테스트 (Inputs map → 정렬된 "Key: value" 문자열)
-
 package ssac
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestMethodGenMapFields(t *testing.T) {
 	g := &methodGen{

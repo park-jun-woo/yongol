@@ -1,9 +1,10 @@
-//ff:func feature=gen-gogin type=test control=branch topic=depth-report
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what TestIfStmtDepth — else 없음 / else가 더 깊음 / body가 더 깊음 분기 검증
-
 package qcheck
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestIfStmtDepth(t *testing.T) {
 	t.Run("NoElse", func(t *testing.T) {

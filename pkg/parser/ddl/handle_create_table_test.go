@@ -1,9 +1,10 @@
-//ff:func feature=manifest type=test control=iteration dimension=1
+//ff:func feature=manifest type=test control=sequence
 //ff:what handleCreateTable — table 등록 + pendingArchived/pendingFuncManaged 반영
-
 package ddl
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestHandleCreateTable(t *testing.T) {
 	t.Run("archived and func-managed flags", func(t *testing.T) {

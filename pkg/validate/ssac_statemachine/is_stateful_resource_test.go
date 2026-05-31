@@ -1,6 +1,5 @@
-//ff:func feature=validate type=test control=selection topic=states
+//ff:func feature=validate type=test control=sequence topic=states
 //ff:what TestIsStatefulResource — isStatefulResource stateful 리소스 판정 분기 검증
-
 package ssac_statemachine
 
 import (

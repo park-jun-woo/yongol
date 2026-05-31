@@ -4,8 +4,8 @@
 package contract
 
 import (
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/rule"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // buildFSWithOp creates a minimal Fullstack whose Ground only holds the

@@ -1,9 +1,10 @@
-//ff:func feature=gen-gogin type=test control=selection
+//ff:func feature=gen-gogin type=test control=iteration dimension=1
 //ff:what authStoreCallExpr 단위 테스트 (RefreshRotate 4-arg vs 기타 3-arg 호출식)
-
 package ssac
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestAuthStoreCallExpr(t *testing.T) {
 	cases := []struct {

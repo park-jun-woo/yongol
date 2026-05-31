@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=test
+//ff:func feature=orchestrator type=test control=iteration dimension=1
 //ff:what zz_zerocov_test — hurl.CollectFiles 0% 커버리지 단위 테스트
 package hurl
 

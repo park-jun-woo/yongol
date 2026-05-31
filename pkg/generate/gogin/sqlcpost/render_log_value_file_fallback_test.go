@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=branch topic=sqlc-post
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what TestRenderLogValueFile_EmptyColumnOrder — ColumnOrder 비면 정렬된 컬럼키로 fallback 검증
-
 package sqlcpost
 
 import (

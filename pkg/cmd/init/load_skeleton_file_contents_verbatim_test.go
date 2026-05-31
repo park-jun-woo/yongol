@@ -1,0 +1,18 @@
+//ff:func feature=cli-init type=test control=sequence
+//ff:what TestLoadSkeletonFileContents — rendered/verbatim 성공 + render/read 에러 분기 검증
+package cliinit
+
+import (
+	"testing"
+)
+
+func TestLoadSkeletonFileContents_Verbatim(t *testing.T) {
+	f := skeletonFile{srcEmbed: "templates/sqlc.yaml", rendered: false}
+	out, err := loadSkeletonFileContents(templateData{}, f)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(out) == 0 {
+		t.Error("expected verbatim content")
+	}
+}

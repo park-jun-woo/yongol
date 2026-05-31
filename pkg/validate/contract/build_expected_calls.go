@@ -4,8 +4,8 @@
 package contract
 
 import (
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/rule"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // buildExpectedCalls returns the set of `<pkg>.<Func>` identifiers a

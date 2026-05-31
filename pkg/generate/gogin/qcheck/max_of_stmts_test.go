@@ -1,9 +1,10 @@
-//ff:func feature=gen-gogin type=test control=iteration topic=depth-report
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what TestMaxOfStmts — 빈 리스트/더 깊은 stmt/얕은 stmt에서 최대 depth 반환 검증
-
 package qcheck
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestMaxOfStmts(t *testing.T) {
 	t.Run("Empty", func(t *testing.T) {

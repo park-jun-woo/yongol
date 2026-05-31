@@ -14,6 +14,7 @@ import (
 //   - `if err := pkg.Unmarshal(...); err != nil { ... }`
 //   - `err := pkg.Unmarshal(...)` followed by an IfStmt err-guard
 //   - `<x>, err := pkg.Unmarshal(...)` same shape
+//
 // Anything else (ExprStmt, `_ = pkg.Unmarshal(...)`, followed by a
 // non-guard statement) is a finding.
 func unmarshalInStmt(stmt ast.Stmt, blockList []ast.Stmt, i int, targets []string, fset *token.FileSet) []DefensiveFinding {

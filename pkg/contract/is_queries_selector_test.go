@@ -1,6 +1,5 @@
-//ff:func feature=contract type=test control=iteration dimension=1
+//ff:func feature=contract type=test control=sequence
 //ff:what test: TestIsQueriesSelector — tail name "Queries" 일치/불일치/비-selector 분기 검증
-
 package contract
 
 import (

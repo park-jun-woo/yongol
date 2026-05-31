@@ -1,6 +1,5 @@
-//ff:func feature=validate-contract type=test control=iteration dimension=1
+//ff:func feature=validate-contract type=test control=sequence
 //ff:what TestReclassifyCallTargets — pkg.Func 는 pkgCalls, local.Method 는 localMethods 로 분류 검증
-
 package contract
 
 import (

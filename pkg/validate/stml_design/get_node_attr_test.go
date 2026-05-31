@@ -1,6 +1,5 @@
-//ff:func feature=validate type=test control=selection topic=stml-design
+//ff:func feature=validate type=test control=sequence topic=stml-design
 //ff:what TestGetNodeAttr — getNodeAttr HTML 노드 속성 값 조회 분기 검증
-
 package stml_design
 
 import (

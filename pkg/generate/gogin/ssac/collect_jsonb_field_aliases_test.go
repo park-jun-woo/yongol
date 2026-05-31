@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what collectJSONBFieldAliases 단위 테스트 (JSONB 프로퍼티만 alias 로 수집)
-
 package ssac
 
 import (

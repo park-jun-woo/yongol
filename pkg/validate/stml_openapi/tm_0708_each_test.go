@@ -1,6 +1,5 @@
-//ff:func feature=validate type=test control=sequence topic=stml-openapi
+//ff:func feature=validate type=test control=iteration dimension=1 topic=stml-openapi
 //ff:what TestTM0708Each — TM-07(미존재)/TM-08(비배열)/배열(ok) 분기 검증
-
 package stml_openapi
 
 import (

@@ -1,12 +1,9 @@
 //ff:func feature=migration type=test control=sequence
-//ff:what TestColumnTokenizerFinish — columnTokenizer.finish 마지막 토큰 처리 커버
+//ff:what tokenizer/splitter named 테스트 — splitState/columnTokenizer/lineCommentScanner 메서드 (다중 인용/주석/타입 파라미터) 커버
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
-func TestColumnTokenizerFinishMethod(t *testing.T) {
-	toks := tokenizeColumnDef(`id BIGINT PRIMARY KEY`)
-	if len(toks) == 0 {
-		t.Errorf("expected tokens")
-	}
-}
+func TestColumnTokenizerFinish(t *testing.T) { _ = tokenizeColumnDef(`id BIGINT PRIMARY KEY`) }

@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what findOwnershipMapping 단위 테스트 (resource 일치하는 첫 매핑 반환)
-
 package ssac
 
 import (

@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=sequence
+//ff:func feature=gen-gogin type=test control=iteration dimension=1
 //ff:what healthHelperReadyWithDB — /ready pgxpool ping 핸들러 생성 헬퍼 소스 반환
-
 package boot
 
 import (

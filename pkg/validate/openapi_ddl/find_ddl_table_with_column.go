@@ -4,8 +4,8 @@
 package openapi_ddl
 
 import (
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/parser/ddl"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // findDDLTableWithColumn returns a pointer to the first DDL table that contains

@@ -7,8 +7,8 @@ import (
 	"fmt"
 
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/rule"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // xqs15InputKeyInitialism flags SSaC input keys that violate Go initialism

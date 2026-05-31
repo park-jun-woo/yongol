@@ -5,6 +5,7 @@ package initcheck
 
 import (
 	"testing"
+
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 

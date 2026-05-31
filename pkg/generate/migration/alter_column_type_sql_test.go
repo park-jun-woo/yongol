@@ -1,8 +1,10 @@
-//ff:func feature=migration type=test control=selection dimension=2
+//ff:func feature=migration type=test control=sequence
 //ff:what TestAlterColumnType_SQL — USING 명시 / 자동 ::cast 분기
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestAlterColumnType_SQL(t *testing.T) {
 	t.Run("explicit using", func(t *testing.T) {

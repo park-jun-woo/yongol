@@ -1,9 +1,9 @@
 //ff:func feature=migration type=test control=sequence
-//ff:what TestSplitStateStepInDQ — splitState.stepInDQ 이중인용 식별자 내부 커버
+//ff:what tokenizer/splitter named 테스트 — splitState/columnTokenizer/lineCommentScanner 메서드 (다중 인용/주석/타입 파라미터) 커버
 package migration
 
-import "testing"
+import (
+	"testing"
+)
 
-func TestSplitStateStepInDQMethod(t *testing.T) {
-	_ = splitStatements("CREATE TABLE \"weird;name\" (id INT);")
-}
+func TestSplitStateStepInDQ(t *testing.T) { _ = splitStatements(richSQL) }

@@ -15,7 +15,7 @@ func TestResolveInputType_VarField(t *testing.T) {
 	g := &rule.Ground{
 		Types: map[string]string{
 			"SSaC.var.ActivateWorkflow.workflow": "Workflow",
-			"SSaC.var.ActivateWorkflow.wf":      "Workflow",
+			"SSaC.var.ActivateWorkflow.wf":       "Workflow",
 			"SSaC.var.ListWorkflows.wfs":         "[]Workflow",
 			"SSaC.var.GetUser.u":                 "*User",
 			"DDL.field.Workflow.ID":              "pgtype.UUID",
@@ -33,11 +33,11 @@ func TestResolveInputType_VarField(t *testing.T) {
 		{"ActivateWorkflow", "workflow.ID", "pgtype.UUID"},
 		{"ActivateWorkflow", "workflow.Status", "string"},
 		{"ActivateWorkflow", "wf.OrgID", "pgtype.UUID"},
-		{"ListWorkflows", "wfs.ID", "pgtype.UUID"},       // []Workflow → Workflow
-		{"GetUser", "u.Email", "string"},                  // *User → User
+		{"ListWorkflows", "wfs.ID", "pgtype.UUID"}, // []Workflow → Workflow
+		{"GetUser", "u.Email", "string"},           // *User → User
 		{"GetUser", "u.ID", "int64"},
-		{"ActivateWorkflow", "unknown.ID", ""},            // unknown var
-		{"ActivateWorkflow", "workflow.Unknown", ""},      // unknown field
+		{"ActivateWorkflow", "unknown.ID", ""},       // unknown var
+		{"ActivateWorkflow", "workflow.Unknown", ""}, // unknown field
 	}
 	for _, tt := range tests {
 		got := resolveInputType(g, tt.funcName, tt.value)

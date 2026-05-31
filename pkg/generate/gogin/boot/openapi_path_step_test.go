@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=sequence topic=path-convert
+//ff:func feature=gen-gogin type=test control=iteration dimension=1 topic=path-convert
 //ff:what openAPIPathStep — openAPIPathToGin 한 스텝: 현재 위치에서 '{name}' 또는 단일 바이트 처리
-
 package boot
 
 import (

@@ -4,7 +4,7 @@ package stml
 
 // ChildNode represents any child element inside a block, preserving DOM order.
 type ChildNode struct {
-	Kind      string         // "bind", "each", "state", "component", "static", "action", "fetch"
+	Kind      string // "bind", "each", "state", "component", "static", "action", "fetch"
 	Bind      *FieldBind
 	Each      *EachBlock
 	State     *StateBind

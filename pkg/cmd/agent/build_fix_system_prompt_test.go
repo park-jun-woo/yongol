@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=selection dimension=1
+//ff:func feature=agent type=test control=sequence
 //ff:what TestBuildFixSystemPrompt — doc 파일 존재 시 doc 반환, 없는 레이어는 system prompt fallback 검증
-
 package agent
 
 import (

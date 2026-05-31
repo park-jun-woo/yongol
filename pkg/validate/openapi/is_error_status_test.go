@@ -12,9 +12,9 @@ func TestIsErrorStatus(t *testing.T) {
 	}{
 		{"200", false},
 		{"201", false},
-		{"204", false},  // explicitly bodyless
+		{"204", false}, // explicitly bodyless
 		{"301", false},
-		{"304", false},  // explicitly bodyless
+		{"304", false}, // explicitly bodyless
 		{"400", true},
 		{"401", true},
 		{"404", true},

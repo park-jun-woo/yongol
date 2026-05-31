@@ -3,23 +3,22 @@
 package validate
 
 import (
-	"github.com/park-jun-woo/yongol/pkg/yongol"
-	"github.com/park-jun-woo/yongol/pkg/validate/initcheck"
 	"github.com/park-jun-woo/yongol/pkg/validate/ddl"
 	"github.com/park-jun-woo/yongol/pkg/validate/ddl_rego"
 	"github.com/park-jun-woo/yongol/pkg/validate/ddl_statemachine"
 	designvalidate "github.com/park-jun-woo/yongol/pkg/validate/design"
 	"github.com/park-jun-woo/yongol/pkg/validate/design_manifest"
+	"github.com/park-jun-woo/yongol/pkg/validate/domain_security"
 	featuresvalidate "github.com/park-jun-woo/yongol/pkg/validate/features"
 	"github.com/park-jun-woo/yongol/pkg/validate/features_ddl"
 	"github.com/park-jun-woo/yongol/pkg/validate/features_openapi"
 	"github.com/park-jun-woo/yongol/pkg/validate/features_statemachine"
-	"github.com/park-jun-woo/yongol/pkg/validate/domain_security"
 	"github.com/park-jun-woo/yongol/pkg/validate/funcspec"
 	"github.com/park-jun-woo/yongol/pkg/validate/hurl"
 	"github.com/park-jun-woo/yongol/pkg/validate/hurl_manifest"
 	"github.com/park-jun-woo/yongol/pkg/validate/hurl_openapi"
 	"github.com/park-jun-woo/yongol/pkg/validate/hurl_statemachine"
+	"github.com/park-jun-woo/yongol/pkg/validate/initcheck"
 	"github.com/park-jun-woo/yongol/pkg/validate/manifest"
 	"github.com/park-jun-woo/yongol/pkg/validate/manifest_ddl"
 	"github.com/park-jun-woo/yongol/pkg/validate/openapi"
@@ -41,6 +40,7 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/validate/statemachine"
 	"github.com/park-jun-woo/yongol/pkg/validate/stml_design"
 	"github.com/park-jun-woo/yongol/pkg/validate/stml_openapi"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // allSteps returns the validation steps in fixed execution order.

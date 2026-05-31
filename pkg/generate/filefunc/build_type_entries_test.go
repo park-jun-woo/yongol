@@ -1,9 +1,10 @@
-//ff:func feature=gen-filefunc type=test control=sequence
+//ff:func feature=gen-filefunc type=test control=iteration dimension=1
 //ff:what TestBuildTypeEntries — 고정 type 카테고리 맵 반환 검증
-
 package filefunc
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestBuildTypeEntries(t *testing.T) {
 	got := buildTypeEntries()

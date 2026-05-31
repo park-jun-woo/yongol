@@ -8,15 +8,15 @@ import "sort"
 // torn down before referenced tables / columns change, and so FKs are
 // re-attached only after their dependencies exist.
 //
-//   1. RenameTable / RenameColumn        (executed first so later ops use new names)
-//   2. DropForeignKey
-//   3. DropIndex
-//   4. DropCheck
-//   5. DropColumn
-//   6. DropTable
-//   7. CreateTable
-//   8. InsertSentinel                    (sentinel rows — FK targets must exist before AddForeignKey)
-//   9. AddColumn
+//  1. RenameTable / RenameColumn        (executed first so later ops use new names)
+//  2. DropForeignKey
+//  3. DropIndex
+//  4. DropCheck
+//  5. DropColumn
+//  6. DropTable
+//  7. CreateTable
+//  8. InsertSentinel                    (sentinel rows — FK targets must exist before AddForeignKey)
+//  9. AddColumn
 //  10. AlterColumn* (Type / Nullable / Default)
 //  11. AddCheck
 //  12. CreateIndex

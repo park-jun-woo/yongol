@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1
+//ff:func feature=gen-gogin type=test control=sequence
 //ff:what renderHelperSource 단위 테스트 (annotation + package + body 조립)
-
 package ssac
 
 import (

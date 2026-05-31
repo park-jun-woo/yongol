@@ -1,6 +1,5 @@
-//ff:func feature=gen-gogin type=test control=sequence
+//ff:func feature=gen-gogin type=test control=iteration dimension=1
 //ff:what authInitHelperFunc — cmd/configure_auth.go 에 emit 할 configureAuth 함수 본문 생성
-
 package boot
 
 import (

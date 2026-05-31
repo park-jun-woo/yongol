@@ -8,10 +8,8 @@ import "github.com/park-jun-woo/yongol/pkg/generate/ir"
 // opsReferencePath returns true if any FieldArg in ops has Location == LocPath.
 func opsReferencePath(ops []ir.Op) bool {
 	for _, op := range ops {
-		for _, fa := range collectFieldArgs(op) {
-			if fa.Location == ir.LocPath {
-				return true
-			}
+		if opReferencesLocation(op, ir.LocPath) {
+			return true
 		}
 	}
 	return false

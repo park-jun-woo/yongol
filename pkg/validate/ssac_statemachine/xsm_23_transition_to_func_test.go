@@ -1,6 +1,5 @@
-//ff:func feature=validate type=test control=selection topic=states
+//ff:func feature=validate type=test control=sequence topic=states
 //ff:what TestXsm23TransitionToFunc — XSM-23 transition event → SSaC 함수 매칭 검증
-
 package ssac_statemachine
 
 import (

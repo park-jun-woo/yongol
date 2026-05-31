@@ -1,6 +1,5 @@
-//ff:func feature=agent type=test control=sequence
+//ff:func feature=agent type=test control=iteration dimension=1
 //ff:what TestBuildParamsPrompt — feature op/path/desc 가 parameters 프롬프트에 포함되는지 검증
-
 package agent
 
 import (

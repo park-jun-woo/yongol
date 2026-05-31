@@ -1,9 +1,10 @@
-//ff:func feature=validate-contract type=test control=sequence topic=preserve-safety
+//ff:func feature=validate-contract type=test control=iteration dimension=1 topic=preserve-safety
 //ff:what TestAssignClobbersErr — stmt 가 errName 을 새 값으로 덮어쓰는지 판정 검증
-
 package contract
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestAssignClobbersErr(t *testing.T) {
 	tests := []struct {

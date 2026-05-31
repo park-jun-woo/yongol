@@ -3,8 +3,8 @@
 package ground
 
 import (
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/rule"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // populateSSaCQueryUsage registers the aggregate set of query fields used
