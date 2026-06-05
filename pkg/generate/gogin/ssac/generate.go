@@ -90,13 +90,22 @@ func Generate(fs *yongol.Fullstack, artifactsDir string) error {
 		}
 	}
 
+	// Classify the oapi-codegen response wrappers (alias vs embedded struct)
+	// from the already-emitted internal/api sources. The map plumbs into each
+	// methodGen so error-response literals pick the correct shape for shared
+	// `components/responses` references (BUG-106 / Phase012). A nil map (api
+	// dir absent / unreadable) triggers the alias fallback in
+	// errorResponseLiteral, preserving prior behaviour.
+	apiDir := filepath.Join(artifactsDir, "backend", "internal", "api")
+	respShapes := classifyResponseShapes(apiDir)
+
 	for _, sf := range fs.ServiceFuncs {
 		if sf.Subscribe != nil {
-			if err := generateSubscribeMethod(sf, fs, serviceDir, modulePath); err != nil {
+			if err := generateSubscribeMethod(sf, fs, serviceDir, modulePath, respShapes); err != nil {
 				return fmt.Errorf("subscribe %s: %w", sf.Name, err)
 			}
 		} else {
-			if err := generateHTTPMethod(sf, fs, serviceDir, modulePath); err != nil {
+			if err := generateHTTPMethod(sf, fs, serviceDir, modulePath, respShapes); err != nil {
 				return fmt.Errorf("method %s: %w", sf.Name, err)
 			}
 		}

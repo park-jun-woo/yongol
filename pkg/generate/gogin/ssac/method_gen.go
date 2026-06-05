@@ -122,4 +122,12 @@ type methodGen struct {
 	// fields to Go literals (Phase002-ManifestRef). Nil when manifest is
 	// absent — callers must nil-guard before use.
 	Manifest *manifest.ProjectConfig
+	// ResponseShapes maps each `<Op><Status>JSONResponse` wrapper type name
+	// to its oapi-codegen-generated shape (alias vs embedded struct). Built
+	// once per Generate run by classifyResponseShapes reading the already-
+	// emitted internal/api sources, then assigned onto each methodGen right
+	// after construction. errorResponseLiteral consults it so shared
+	// `components/responses` references (embedded form) emit valid Go
+	// (BUG-106 / Phase012). Nil/empty → alias fallback (prior behaviour).
+	ResponseShapes map[string]respShape
 }

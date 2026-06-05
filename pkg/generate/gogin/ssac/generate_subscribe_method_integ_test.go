@@ -40,7 +40,7 @@ func TestGenerateSubscribeMethod_Integ(t *testing.T) {
 
 	serviceDir := t.TempDir()
 	fs := &yongol.Fullstack{ServiceFuncs: []pssac.ServiceFunc{sf}}
-	if err := generateSubscribeMethod(sf, fs, serviceDir, "github.com/example/app"); err != nil {
+	if err := generateSubscribeMethod(sf, fs, serviceDir, "github.com/example/app", nil); err != nil {
 		t.Fatalf("generateSubscribeMethod: %v", err)
 	}
 	out := filepath.Join(serviceDir, "on_order_completed.go")

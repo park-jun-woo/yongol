@@ -11,9 +11,10 @@ import (
 )
 
 // generateHTTPMethod writes one StrictServerInterface method file.
-func generateHTTPMethod(sf ssacparser.ServiceFunc, fs *yongol.Fullstack, serviceDir, modulePath string) error {
+func generateHTTPMethod(sf ssacparser.ServiceFunc, fs *yongol.Fullstack, serviceDir, modulePath string, respShapes map[string]respShape) error {
 	useTx := needsTransaction(sf)
 	g := newMethodGen(fs.OpenAPIDoc, sf, modulePath, useTx, fs.ProjectFuncSpecs, fs.YongolPkgSpecs, tracingWrapCalls(fs), fs.StateDiagrams, collectOwnerships(fs), fs.DDLTables, fs.SQLcQueries, fs.Manifest)
+	g.ResponseShapes = respShapes
 
 	var imports []string
 	var body []string

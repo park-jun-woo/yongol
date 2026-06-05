@@ -19,10 +19,11 @@ import (
 
 // generateSubscribeMethod writes a subscribe handler method.
 // Signature: func (server *Server) OnXxx(ctx context.Context, msg []byte) error
-func generateSubscribeMethod(sf ssacparser.ServiceFunc, fs *yongol.Fullstack, serviceDir, modulePath string) error {
+func generateSubscribeMethod(sf ssacparser.ServiceFunc, fs *yongol.Fullstack, serviceDir, modulePath string, respShapes map[string]respShape) error {
 	useTx := needsTransaction(sf)
 	g := newMethodGen(fs.OpenAPIDoc, sf, modulePath, useTx, fs.ProjectFuncSpecs, fs.YongolPkgSpecs, tracingWrapCalls(fs), fs.StateDiagrams, collectOwnerships(fs), fs.DDLTables, fs.SQLcQueries, fs.Manifest)
 	g.IsSubscribe = true
+	g.ResponseShapes = respShapes
 
 	var imports []string
 	var body []string

@@ -12,6 +12,5 @@ func (g *methodGen) guardReturn(msg string, status int) string {
 	if g.IsSubscribe {
 		return fmt.Sprintf("return fmt.Errorf(%q)", msg)
 	}
-	return fmt.Sprintf("return api.%s%dJSONResponse{Error: %q, Code: %q}, nil",
-		g.FuncName, status, msg, neutralCode(status))
+	return fmt.Sprintf("return %s, nil", g.errorResponseLiteral(status, msg, neutralCode(status)))
 }

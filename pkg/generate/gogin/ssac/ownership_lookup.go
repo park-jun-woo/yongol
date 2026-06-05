@@ -44,7 +44,7 @@ func (g *methodGen) ownershipLookup(seq ssacparser.Sequence, mapping *rego.Owner
 		fmt.Sprintf("%s, err %s %s.%s(ctx, %s)", ownerVar, ownerAssign, queriesRecv, queryName, sqlcArg),
 		"if err != nil {",
 		fmt.Sprintf("\t%s(\"handler: %s\", \"op\", %q, \"status\", %d, \"err\", err)", logLevelFuncForStatus(status), logTagForStatus(status), g.FuncName, status),
-		fmt.Sprintf("\treturn api.%s%dJSONResponse{Error: %q, Code: %q}, nil", g.FuncName, status, msg, neutralCode(status)),
+		fmt.Sprintf("\treturn %s, nil", g.errorResponseLiteral(status, msg, neutralCode(status))),
 		"}",
 	}
 
