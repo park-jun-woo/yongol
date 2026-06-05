@@ -22,7 +22,16 @@ Complete catalog of rules executed by `yongol validate`. The manual (`manual-for
 | `CORS-` | manifest CORS block |
 | `V-` | DESIGN.md (design token spec) |
 | `TM-` | STML ↔ OpenAPI cross-validation |
+| `XMO-` | OpenAPI ↔ STML/frontend coverage (operationId 소비 강제 + 도메인 경계) |
+| `FT-`, `XFO-`/`XOF-`, `XFD-`, `XFS-` | features.yaml (catalog; cross with OpenAPI/DDL/stateDiagram — uses SSOT code `F`) |
+| `MIG-` | DDL migration diff |
+| `OBS-` | manifest observability (metrics / tracing) |
+| `SEC-` | manifest security (auth mode / CSRF / headers) |
+| `PRV-` | Preserve contract (generated-file edits) |
+| `XNC-` | manifest backend wiring ↔ DDL + sqlc |
+| `XOE-` | OpenAPI ErrorResponse schema |
 | `INI-` | Init check (project initialization) |
+| `M-` | (retired) `model/` SSOT rules — superseded by sqlc row type. See Deprecated section. |
 
 ### Cross SSOT — `X<target><source>-<N>`
 
