@@ -14,5 +14,5 @@ func kebabToPascal(s string) string {
 			parts[i] = strings.ToUpper(part[:1]) + part[1:]
 		}
 	}
-	return strings.Join(parts, "")
+	return sanitizeComponentName(strings.Join(parts, ""))
 }

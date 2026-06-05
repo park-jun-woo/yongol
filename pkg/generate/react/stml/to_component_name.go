@@ -10,5 +10,5 @@ func toComponentName(name string) string {
 	for i, p := range parts {
 		parts[i] = toUpperFirst(p)
 	}
-	return strings.Join(parts, "")
+	return sanitizeIdentifier(strings.Join(parts, ""))
 }

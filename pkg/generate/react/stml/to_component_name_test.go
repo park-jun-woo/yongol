@@ -9,6 +9,10 @@ func TestToComponentName(t *testing.T) {
 		{"login-page", "LoginPage"},
 		{"my-reservations-page", "MyReservationsPage"},
 		{"room-edit-page", "RoomEditPage"},
+		{"2fa-setup", "Page2faSetup"},
+		{"3d-view", "Page3dView"},
+		{"404-error", "Page404Error"},
+		{"login", "Login"},
 	}
 	for _, tt := range tests {
 		got := toComponentName(tt.in)

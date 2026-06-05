@@ -15,6 +15,9 @@ func TestKebabToPascal(t *testing.T) {
 		{"audit-logs", "AuditLogs"},
 		{"my-long-page-name", "MyLongPageName"},
 		{"dashboard", "Dashboard"},
+		{"2fa-setup", "Page2faSetup"},
+		{"3d-view", "Page3dView"},
+		{"404-error", "Page404Error"},
 	}
 	for _, tt := range tests {
 		got := kebabToPascal(tt.in)
