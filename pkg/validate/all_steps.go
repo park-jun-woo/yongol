@@ -77,7 +77,7 @@ func allSteps() []step {
 		{Name: "ddl_rego", Kinds: []yongol.SSOTKind{yongol.KindDDL, yongol.KindPolicy}, Run: ddl_rego.Run},
 		{Name: "query_rego", Kinds: []yongol.SSOTKind{yongol.KindDDL, yongol.KindPolicy}, Run: query_rego.Run},
 		{Name: "rego_manifest", Kinds: []yongol.SSOTKind{yongol.KindPolicy, yongol.KindConfig}, Run: rego_manifest.Run},
-		{Name: "stml_openapi", Kinds: []yongol.SSOTKind{yongol.KindSTML, yongol.KindOpenAPI}, Run: stml_openapi.Run},
+		{Name: "stml_openapi", Kinds: []yongol.SSOTKind{yongol.KindOpenAPI}, Run: stml_openapi.Run},
 		{Name: "stml_design", Kinds: []yongol.SSOTKind{yongol.KindSTML, yongol.KindDesign}, Run: stml_design.Run},
 		{Name: "stml_statemachine", Kinds: []yongol.SSOTKind{yongol.KindSTML, yongol.KindStates}, Run: stml_statemachine.Run},
 		{Name: "domain_security", Kinds: []yongol.SSOTKind{yongol.KindConfig, yongol.KindOpenAPI}, Run: domain_security.Run},

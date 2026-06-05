@@ -598,7 +598,9 @@ Cross-validation between STML template attributes (`data-fetch`, `data-action`, 
 | TM-16 | ERROR | `data-invalidates` operationId is not defined in OpenAPI, or is not a GET endpoint (only GET queries can be invalidated) | `pkg/validate/stml_openapi/tm_16_invalidates_op_not_found.go` |
 | TM-17 | ERROR | `data-state` guard using a combinator (`&&`, `||`, leading `!`, or parentheses) is not valid guard syntax (§3.4 EBNF; no function calls, arithmetic, or ternaries) | `pkg/validate/stml_openapi/tm_17_guard_syntax.go` |
 | TM-18 | WARNING | `data-action` transition is not legal from the state its `data-enabled-when` guard requires, per the Mermaid stateDiagram | `pkg/validate/stml_statemachine/tm_18_transition_validity.go` |
-| XMO-10 | WARNING | OpenAPI operationId is not consumed by any STML `data-fetch` or `data-action` (auth endpoints excluded) | `pkg/validate/stml_openapi/xmo_10_unconsumed.go` |
+| XMO-10 | ERROR | Frontend ON & OpenAPI operationId is never consumed by any STML `data-fetch`, `data-action`, or component `api.<Op>(` call, and is not tagged `no-front` (auth endpoints are no longer auto-excluded) | `pkg/validate/stml_openapi/xmo_10_unconsumed.go` |
+| XMO-11 | ERROR | Frontend ON but no STML pages were found (set `frontend.enabled: false` for a backend-only project) | `pkg/validate/stml_openapi/xmo_11_no_stml.go` |
+| XMO-12 | WARNING | OpenAPI operationId is tagged `no-front` but is actually consumed by an STML page or component (stale or wrong tag) | `pkg/validate/stml_openapi/xmo_12_no_front_consumed.go` |
 
 ## V. Features Internal (`FT-*`)
 

@@ -1,5 +1,5 @@
 //ff:func feature=validate type=test control=sequence topic=stml-openapi
-//ff:what TestXMO10_Unconsumed_Negative_AuthEndpointExcluded
+//ff:what TestXMO10_AuthUnconsumed_IsError — auth(security:[]) 미소비도 ERROR (자동제외 폐지)
 
 package stml_openapi
 
@@ -10,15 +10,11 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/parser/stml"
 )
 
-func TestXMO10_Unconsumed_Negative_AuthEndpointExcluded(t *testing.T) {
-	// Auth endpoint (security: []) is excluded from XMO-10.
+func TestXMO10_AuthUnconsumed_IsError(t *testing.T) {
 	pages := []stml.PageSpec{{
 		FileName: "dashboard.html",
-		Fetches: []stml.FetchBlock{{
-			OperationID: "GetDashboard",
-		}},
+		Fetches:  []stml.FetchBlock{{OperationID: "GetDashboard"}},
 	}}
-	// Login op has explicit empty security → auth endpoint → excluded
 	loginOp := &openapi3.Operation{
 		OperationID: "Login",
 		Security:    &openapi3.SecurityRequirements{},
@@ -29,7 +25,7 @@ func TestXMO10_Unconsumed_Negative_AuthEndpointExcluded(t *testing.T) {
 		"/auth/login": {Post: loginOp},
 	})
 	diags := Run(makeFS(pages, doc))
-	if hasDiag(diags, "[XMO-10]") {
-		t.Errorf("unexpected XMO-10 for auth endpoint Login, got %v", diags)
+	if countDiag(diags, "[XMO-10]") != 1 {
+		t.Fatalf("expected XMO-10 for unconsumed auth op Login, got %v", diags)
 	}
 }

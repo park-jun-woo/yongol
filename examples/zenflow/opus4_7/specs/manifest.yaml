@@ -32,6 +32,7 @@ queue:
 session:
   backend: postgres
 frontend:
+  enabled: false                  # STML 미작성 — 백엔드 전용 예제 (XMO-11)
   lang: typescript
   framework: react
   bundler: vite

@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=stml-openapi
-//ff:what Run — STML<->OpenAPI 교차 검증 실행 (TM-01 ~ TM-14, TM-16, TM-17, XMO-10)
+//ff:what Run — STML<->OpenAPI 교차 검증 실행 (TM-01 ~ TM-14, TM-16, TM-17, XMO-10/11/12)
 
 package stml_openapi
 
@@ -8,9 +8,15 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
-// Run executes all STML<->OpenAPI cross-validation rules.
+// Run executes all STML<->OpenAPI cross-validation rules. OpenAPIDoc nil makes
+// cross-validation impossible, so that branch early-returns. STML 0 pages is no
+// longer an early-return when the frontend is ON: the page loop becomes a no-op
+// while the coverage rules (XMO-10/11/12) still run to close the gozhip gap.
 func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
-	if fs.OpenAPIDoc == nil || len(fs.STMLPages) == 0 {
+	if fs.OpenAPIDoc == nil {
+		return nil
+	}
+	if len(fs.STMLPages) == 0 && !frontendEnabled(fs) {
 		return nil
 	}
 
@@ -33,7 +39,9 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	}
 
 	diags = append(diags, tm10ClassProhibited(fs.STMLPages)...)
-	diags = append(diags, xmo10Unconsumed(fs.STMLPages, fs.OpenAPIDoc)...)
+	diags = append(diags, xmo10Unconsumed(fs)...)
+	diags = append(diags, xmo11NoStml(fs)...)
+	diags = append(diags, xmo12NoFrontConsumed(fs)...)
 
 	if len(fs.Layouts) > 0 || (fs.Manifest != nil && fs.Manifest.Frontend.DefaultLayout != "") {
 		diags = append(diags, tm11LayoutNotFound(fs.STMLPages, fs.Layouts)...)

@@ -58,6 +58,23 @@ Configure in `backend.<block>`; full field list and validation errors surface vi
 | `queue.backend` | `postgres` or `memory` |
 | `authz.package` | Custom authz package (default `github.com/park-jun-woo/ssac/pkg/authz`) |
 
+## Frontend Block (`frontend.enabled`)
+
+The `frontend:` block declares the React/TSX target. To declare a **backend-only**
+project (no frontend), set `frontend.enabled: false`:
+
+```yaml
+frontend:
+  enabled: false
+```
+
+When OFF, STML pages are not required, frontend codegen is skipped, and the
+STML↔OpenAPI coverage rules (XMO-10/11/12) are not run. An omitted or completely
+empty `frontend:` block is also treated as OFF. The frontend is considered ON
+only when `enabled` is not `false` **and** the block has content (`lang` or
+`framework` set); a frontend that is ON with zero STML pages is an **XMO-11
+ERROR** — finish the pages or set `enabled: false`.
+
 ### CORS env overrides
 
 `CORS_ALLOW_ORIGINS`, `CORS_ALLOW_METHODS`, `CORS_ALLOW_CREDENTIALS` override the corresponding YAML values at runtime.

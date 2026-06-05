@@ -10,7 +10,7 @@ import (
 
 func TestCollectConsumedOps(t *testing.T) {
 	// Empty input.
-	if got := collectConsumedOps(nil); len(got) != 0 {
+	if got := collectConsumedOps(nil, "", nil); len(got) != 0 {
 		t.Fatalf("expected empty, got %+v", got)
 	}
 
@@ -19,7 +19,7 @@ func TestCollectConsumedOps(t *testing.T) {
 		Fetches: []stml.FetchBlock{{OperationID: "ListItems"}},
 		Actions: []stml.ActionBlock{{OperationID: "CreateItem"}},
 	}}
-	out := collectConsumedOps(pages)
+	out := collectConsumedOps(pages, "", nil)
 	for _, id := range []string{"ListItems", "CreateItem"} {
 		if _, ok := out[id]; !ok {
 			t.Errorf("missing operationId %q", id)

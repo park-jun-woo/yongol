@@ -84,6 +84,14 @@ and validated by TM-17.
 | TM-16 | ERROR | OpenAPI | `data-invalidates` operationId is defined in OpenAPI and is a GET |
 | TM-17 | ERROR | STML internal | `data-state` guard with a combinator parses under the guard EBNF |
 | TM-18 | WARNING | stateDiagram | the `data-action` transition is legal from the state its `data-enabled-when` requires |
+| XMO-10 | ERROR | OpenAPI | Frontend ON & operationId is consumed by some STML page/component **or** tagged `no-front` |
+| XMO-11 | ERROR | manifest | Frontend ON requires at least one STML page (else `frontend.enabled: false`) |
+| XMO-12 | WARNING | OpenAPI | operationId tagged `no-front` must not actually be consumed (stale tag) |
+
+An operationId counts as **consumed** when an STML `data-fetch`/`data-action`
+references it, **or** when a referenced `data-component` calls
+`api.<operationId>(` inside its `.tsx` file under `frontend/components/`. So a
+form whose inner widget is a custom component still consumes the op it calls.
 
 TM-14, TM-16, TM-17 are implemented in `pkg/validate/stml_openapi/`; the
 stateDiagram cross-checks TM-15 and TM-18 in `pkg/validate/stml_statemachine/`.

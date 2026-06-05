@@ -7,6 +7,7 @@ package manifest
 // to the tailwind.config.js `theme.extend.colors` block that yongol emits;
 // absent fields fall back to shadcn defaults.
 type Frontend struct {
+	Enabled       *bool          `yaml:"enabled,omitempty"`
 	Lang          string         `yaml:"lang"`
 	Framework     string         `yaml:"framework"`
 	Bundler       string         `yaml:"bundler"`

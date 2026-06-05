@@ -1,42 +1,36 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=stml-openapi
-//ff:what XMO-10 — OpenAPI operationId가 STML data-fetch/data-action에서 소비되지 않음 (WARNING)
+//ff:what XMO-10 — Frontend ON에서 OpenAPI operationId가 STML/컴포넌트에 미소비이며 no-front도 아님 (ERROR)
 
 package stml_openapi
 
 import (
-	"fmt"
-
-	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
-	"github.com/park-jun-woo/yongol/pkg/parser/stml"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
-// xmo10Unconsumed detects OpenAPI operationIds that are never referenced
-// from any STML data-fetch or data-action block. Auth endpoints (those
-// with an empty security requirement, i.e. security: []) are excluded.
-func xmo10Unconsumed(pages []stml.PageSpec, doc *openapi3.T) []diagnostic.Diagnostic {
-	if doc == nil || doc.Paths == nil || len(pages) == 0 {
+// xmo10Unconsumed detects OpenAPI operationIds that are never referenced from
+// any STML data-fetch, data-action, or component api.<Op>( call while the
+// frontend is ON. Operations tagged "no-front" are explicit backend-only
+// decisions and are skipped. Frontend OFF skips the rule entirely. STML 0 pages
+// is yielded to XMO-11 (single ERROR) rather than flooding one ERROR per op.
+func xmo10Unconsumed(fs *yongol.Fullstack) []diagnostic.Diagnostic {
+	if !frontendEnabled(fs) {
+		return nil
+	}
+	if len(fs.STMLPages) == 0 {
+		return nil
+	}
+	doc := fs.OpenAPIDoc
+	if doc == nil || doc.Paths == nil {
 		return nil
 	}
 
-	consumed := collectConsumedOps(pages)
+	ops := collectOpIDs(doc)
+	consumed := collectConsumedOps(fs.STMLPages, fs.SpecsDir, ops)
 
 	var diags []diagnostic.Diagnostic
 	for _, item := range doc.Paths.Map() {
-		for _, op := range []*openapi3.Operation{item.Get, item.Post, item.Put, item.Delete, item.Patch} {
-			if op == nil || op.OperationID == "" || isAuthEndpoint(op) {
-				continue
-			}
-			if _, ok := consumed[op.OperationID]; !ok {
-				diags = append(diags, diagnostic.Diagnostic{
-					File:    "openapi.yaml",
-					Phase:   diagnostic.PhaseValidate,
-					Level:   diagnostic.LevelWarning,
-					Message: fmt.Sprintf("[XMO-10] operationId %q is defined in OpenAPI but never consumed by any STML data-fetch or data-action", op.OperationID),
-					Advice:  fmt.Sprintf("Either add a data-fetch or data-action referencing %q in an STML page, or remove the endpoint from OpenAPI if it is unused", op.OperationID),
-				})
-			}
-		}
+		diags = append(diags, xmo10ItemDiags(item, consumed)...)
 	}
 	return diags
 }

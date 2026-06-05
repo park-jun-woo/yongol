@@ -66,6 +66,12 @@ backend:
 frontend: { lang: typescript, framework: react, bundler: vite, name: <app> }
 ```
 
+Set `frontend.enabled: false` to declare a **backend-only** project (no React
+frontend). When OFF, STML pages are not required, frontend codegen is skipped,
+and the STML↔OpenAPI coverage rules (XMO-10/11/12) are not run. An omitted or
+empty `frontend:` block is also treated as OFF — ON requires `enabled != false`
+**and** content (`lang` or `framework` set).
+
 Claim type declaration is **required** (XDN-05). Allowed types: `string`,
 `int64`, `int32`, `bool`, `uuid`. The generated `@auth` middleware uses
 `currentUser.ID` and `currentUser.Role`; both field names must exist.
@@ -151,6 +157,13 @@ Standard OpenAPI 3.x. yongol-specific conventions: see
   204 / 304 are exempt. RFC 7807 recommended but not enforced.
 - **ErrorResponse 스키마의 `error`, `code` 필드는 `required` 필수** (XOE-01).
   required에 빠지면 oapi-codegen이 `*string`으로 생성하여 codegen 빌드 실패.
+- **`tags: ["no-front"]`** marks an operation as backend-only — never consumed by
+  any STML page or component. With the frontend ON, every operationId must be
+  consumed by an STML `data-fetch`/`data-action` or component `api.<Op>(` call,
+  **or** carry the `no-front` tag; otherwise **XMO-10** errors. `no-front` is a
+  standard OpenAPI tag, not an `x-*` extension. Auth endpoints are no longer
+  auto-excluded: a `/auth/refresh` or `/auth/logout` op with no consuming page
+  needs `tags: ["no-front"]`.
 
 ## DDL + sqlc
 
@@ -616,8 +629,21 @@ blocks at the top level. Nesting rules:
 | `TM-16` | ERROR | OpenAPI | `data-invalidates` operationId exists in OpenAPI and is a GET |
 | `TM-17` | ERROR | STML internal | `data-state` guard with a combinator parses under the §guard-syntax EBNF |
 | `TM-18` | WARNING | stateDiagram | the `data-action` transition is legal from the state its `data-enabled-when` requires |
+| `XMO-10` | ERROR | OpenAPI | Frontend ON & operationId is consumed by some STML page/component **or** tagged `no-front` |
+| `XMO-11` | ERROR | manifest | Frontend ON requires at least one STML page (else set `frontend.enabled: false`) |
+| `XMO-12` | WARNING | OpenAPI | operationId tagged `no-front` must not actually be consumed (stale tag) |
 
-Unused OpenAPI operations are intentionally not reported.
+An operation counts as **consumed** when an STML `data-fetch`/`data-action`
+references it, or when a referenced `data-component` (including a form's inner
+widget) calls `api.<operationId>(` inside its `.tsx`. Coverage rules run only
+while the frontend is ON; backend-only projects (`frontend.enabled: false`)
+skip them.
+
+**Migration:** auth endpoints are no longer auto-excluded, so a page-less auth
+op (`refresh`/`logout`) now needs `tags: ["no-front"]` to clear XMO-10
+(login/register usually have a form page that consumes them). A backend-only
+project with zero STML pages should set `frontend.enabled: false` to clear
+XMO-11 and skip frontend codegen.
 
 ## Hurl tests
 
@@ -701,7 +727,7 @@ invalid → 401. Permission checks are handled by `@auth`.
 
 ## Validation
 
-`yongol validate` runs 349 rules across 60 prefix categories (C-*, D-*, M-*, T-*,
+`yongol validate` runs 351 rules across 60 prefix categories (C-*, D-*, M-*, T-*,
 S-*, XOT-*, XPS-*, XDM-*, XPD-*, XNS-*, PRV-*, MIG-*, CORS-*, SEC-*, OBS-*,
 H-*, …). AI authors do not memorise IDs — the validator prints rule ID, level,
 file, line, message. Catalog: [`rulebook.md`](rulebook.md). `yongol generate`

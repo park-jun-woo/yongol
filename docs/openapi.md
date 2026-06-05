@@ -12,6 +12,37 @@
 - Response `required` must include all fields that are NOT NULL in DDL.
 - Response schemas must be inline. Do NOT use `$ref` for response schemas. Only `$ref: '#/components/schemas/Error'` is allowed (for error responses).
 
+## Backend-only operations (`no-front` tag)
+
+When the frontend is ON, every `operationId` must be consumed by an STML page or
+component, **or** be explicitly marked backend-only with the standard OpenAPI tag
+`tags: ["no-front"]`. yongol uses a standard tag here, not an `x-*` extension —
+consistent with its preference for standard OpenAPI fields over custom
+extensions. An unconsumed operation that is not tagged `no-front` is an
+**XMO-10 ERROR**. Auth endpoints are not auto-excluded: a `/auth/refresh` or
+`/auth/logout` op without a consuming page needs the tag.
+
+```yaml
+/auth/refresh:
+  post:
+    operationId: RefreshToken
+    tags: ["no-front"]          # backend-only — not consumed by any STML page
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [access_token]
+              properties:
+                access_token:
+                  type: string
+```
+
+A `no-front` operation that *is* actually consumed is an **XMO-12 WARNING**
+(stale or wrong tag).
+
 ## DDL → OpenAPI type mapping
 
 | DDL type | OpenAPI type | OpenAPI format |
