@@ -5,9 +5,16 @@ package stml
 import (
 	"fmt"
 	"strings"
+
+	parserstml "github.com/park-jun-woo/yongol/pkg/parser/stml"
 )
 
 func resolveStateCondition(condition, dataVar string) string {
+	if parserstml.HasGuardCombinator(condition) {
+		if expr, err := parserstml.ParseGuard(condition); err == nil {
+			return guardToJSX(expr, dataVar)
+		}
+	}
 	switch {
 	case strings.HasSuffix(condition, ".empty"):
 		field := strings.TrimSuffix(condition, ".empty")

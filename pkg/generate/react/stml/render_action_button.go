@@ -23,8 +23,9 @@ func renderActionButton(a stmlparser.ActionBlock, indent int, noBodyOps map[stri
 	if noBodyOps[a.OperationID] {
 		mutateArg = ""
 	}
+	disabledExpr := mergeDisabledExpr(mutName+".isPending", a.EnabledWhen, "data")
 	if tag == "button" {
-		return fmt.Sprintf(`%s<Button%s onClick={() => %s.mutate(%s)} disabled={%s.isPending}%s>%s</Button>`, ind, variant, mutName, mutateArg, mutName, cls, pendingExpr)
+		return fmt.Sprintf(`%s<Button%s onClick={() => %s.mutate(%s)} disabled={%s}%s>%s</Button>`, ind, variant, mutName, mutateArg, disabledExpr, cls, pendingExpr)
 	}
-	return fmt.Sprintf(`%s<%s%s><Button%s onClick={() => %s.mutate(%s)} disabled={%s.isPending}>%s</Button></%s>`, ind, tag, cls, variant, mutName, mutateArg, mutName, pendingExpr, tag)
+	return fmt.Sprintf(`%s<%s%s><Button%s onClick={() => %s.mutate(%s)} disabled={%s}>%s</Button></%s>`, ind, tag, cls, variant, mutName, mutateArg, disabledExpr, pendingExpr, tag)
 }

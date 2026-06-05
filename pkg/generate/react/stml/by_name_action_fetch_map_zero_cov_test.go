@@ -19,7 +19,7 @@ func TestByNameActionFetchMap_ZeroCov(t *testing.T) {
 	recordActionFetchMapping("CreateItem", []string{"ListItems"}, rm) // already present
 	recordActionFetchMapping("NoFetch", nil, rm)
 
-	ops := resolveInvalidateOps("CreateItem", []string{"ListItems"}, m)
+	ops := resolveInvalidateOps("CreateItem", []string{"ListItems"}, m, nil)
 	_ = ops
-	_ = resolveInvalidateOps("Unknown", []string{"ListItems"}, m)
+	_ = resolveInvalidateOps("Unknown", []string{"ListItems"}, m, nil)
 }

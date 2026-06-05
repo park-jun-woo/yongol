@@ -11,4 +11,6 @@ type ActionBlock struct {
 	Fields      []FieldBind // descendant data-field attributes (for validation)
 	Children    []ChildNode // all children in DOM order (for codegen)
 	SubmitText  string      // text of button[type=submit]
+	EnabledWhen string      // data-enabled-when guard condition (empty if unset)
+	Invalidates []string    // data-invalidates operationIds to refetch on success (empty if unset)
 }

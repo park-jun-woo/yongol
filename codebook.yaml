@@ -141,6 +141,7 @@ optional:
     design-manifest: "DESIGN.md ↔ manifest 교차 검증 (XNV-01~XNV-02) — pkg/validate/design_manifest"
     domain-security: "multi-domain 보안 교차 검증 (XDS-80~82, XDO-90, XMO-20~22) — pkg/validate/domain_security"
     stml-design: "STML ↔ DESIGN.md 교차 검증 (XVM-01~06, XMV-10~12) — pkg/validate/stml_design"
+    stml-statemachine: "STML data-enabled-when 가드 ↔ Mermaid stateDiagram 교차 검증 (TM-15 상태값 존재, TM-18 전이 합법성) — pkg/validate/stml_statemachine"
     query-structural: "SQL 쿼리 구조 검증 (Q-* 규칙) — pkg/validate/query"
     manifest-cors: "manifest CORS 설정 검증 — pkg/validate/manifest/cors_01_wildcard_credentials.go"
     manifest-observability: "manifest backend.observability.metrics 검증 — pkg/validate/manifest/obs_*.go"

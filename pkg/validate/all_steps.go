@@ -40,6 +40,7 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/validate/statemachine"
 	"github.com/park-jun-woo/yongol/pkg/validate/stml_design"
 	"github.com/park-jun-woo/yongol/pkg/validate/stml_openapi"
+	"github.com/park-jun-woo/yongol/pkg/validate/stml_statemachine"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
@@ -78,6 +79,7 @@ func allSteps() []step {
 		{Name: "rego_manifest", Kinds: []yongol.SSOTKind{yongol.KindPolicy, yongol.KindConfig}, Run: rego_manifest.Run},
 		{Name: "stml_openapi", Kinds: []yongol.SSOTKind{yongol.KindSTML, yongol.KindOpenAPI}, Run: stml_openapi.Run},
 		{Name: "stml_design", Kinds: []yongol.SSOTKind{yongol.KindSTML, yongol.KindDesign}, Run: stml_design.Run},
+		{Name: "stml_statemachine", Kinds: []yongol.SSOTKind{yongol.KindSTML, yongol.KindStates}, Run: stml_statemachine.Run},
 		{Name: "domain_security", Kinds: []yongol.SSOTKind{yongol.KindConfig, yongol.KindOpenAPI}, Run: domain_security.Run},
 		{Name: "design_manifest", Kinds: []yongol.SSOTKind{yongol.KindConfig}, Run: design_manifest.Run},
 		{Name: "features_openapi", Kinds: []yongol.SSOTKind{yongol.KindFeatures, yongol.KindOpenAPI}, Run: features_openapi.Run},

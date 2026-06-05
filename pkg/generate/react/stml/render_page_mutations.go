@@ -15,7 +15,7 @@ func renderPageMutations(allActions []stmlparser.ActionBlock, fetchOps []string,
 		if len(a.Fields) > 0 {
 			sb.WriteString(fmt.Sprintf("  %s\n", renderFormHook(a, constraints)))
 		}
-		targetOps := resolveInvalidateOps(a.OperationID, fetchOps, actionFetchMap)
+		targetOps := resolveInvalidateOps(a.OperationID, fetchOps, actionFetchMap, a.Invalidates)
 		sb.WriteString(fmt.Sprintf("  %s\n\n", renderUseMutation(a, targetOps, hasAuthz, noBodyOps, pathParamTypes, constraints)))
 	}
 }

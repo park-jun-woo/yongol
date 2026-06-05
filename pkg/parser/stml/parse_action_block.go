@@ -2,7 +2,11 @@
 //ff:what data-action 요소에서 ActionBlock 구성
 package stml
 
-import "golang.org/x/net/html"
+import (
+	"strings"
+
+	"golang.org/x/net/html"
+)
 
 // parseActionBlock builds an ActionBlock from a data-action element.
 func parseActionBlock(n *html.Node, operationID string) ActionBlock {
@@ -11,6 +15,8 @@ func parseActionBlock(n *html.Node, operationID string) ActionBlock {
 		ClassName:   getAttr(n, "class"),
 		OperationID: operationID,
 		Params:      extractParams(n),
+		EnabledWhen: getAttr(n, "data-enabled-when"),
+		Invalidates: strings.Fields(getAttr(n, "data-invalidates")),
 	}
 	if n.Data == "button" {
 		ab.SubmitText = directText(n)

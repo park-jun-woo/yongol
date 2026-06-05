@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=stml-openapi
-//ff:what Run — STML<->OpenAPI 교차 검증 실행 (TM-01 ~ TM-13, XMO-10)
+//ff:what Run — STML<->OpenAPI 교차 검증 실행 (TM-01 ~ TM-14, TM-16, TM-17, XMO-10)
 
 package stml_openapi
 
@@ -21,8 +21,14 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		for _, f := range page.Fetches {
 			diags = append(diags, validateFetchBlock(f, page.FileName, opMap, fs)...)
 		}
+		modelFetchMap := buildModelFetchMap(page.Fetches, opMap)
 		for _, a := range page.Actions {
 			diags = append(diags, validateActionBlock(a, page.FileName, opMap, fs)...)
+			diags = append(diags, tm14EnabledWhenRefNotFound(a, page.FileName, modelFetchMap)...)
+			diags = append(diags, tm16InvalidatesOpNotFound(a, page.FileName, opMap)...)
+		}
+		for _, cond := range collectStateConditions(page.Children) {
+			diags = append(diags, tm17GuardSyntax(cond, page.FileName)...)
 		}
 	}
 
