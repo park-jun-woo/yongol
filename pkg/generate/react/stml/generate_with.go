@@ -11,7 +11,20 @@ import (
 )
 
 // GenerateWith produces files using the given Target.
-func GenerateWith(t Target, pages []stmlparser.PageSpec, specsDir, outDir string, opts ...GenerateOptions) (*GenerateResult, error) {
+func GenerateWith(t Target, pages []stmlparser.PageSpec, specsDir, outDir string, opts ...GenerateOptions) (result *GenerateResult, err error) {
+	// Recover the explicit zod-emitter failure (unsupported field type) that is
+	// panicked from deep within the string-returning render chain, and surface
+	// it as a returned error instead of crashing the process.
+	defer func() {
+		if r := recover(); r != nil {
+			if ze, ok := r.(*zodGenError); ok {
+				result, err = nil, ze
+				return
+			}
+			panic(r)
+		}
+	}()
+
 	opt := DefaultOptions()
 	if len(opts) > 0 {
 		opt = mergeOpt(opt, opts[0])

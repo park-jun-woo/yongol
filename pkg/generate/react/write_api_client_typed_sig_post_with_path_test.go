@@ -29,8 +29,10 @@ func TestWriteAPIClient_TypedSig_PostWithPathParams(t *testing.T) {
 	}
 	content := string(data)
 
+	// Path key is read from the typed `args` by its OpenAPI name, so a casing
+	// mismatch fails tsc (BUG-109). No blanket `args as any` / init `as any`.
 	assertContains(t, content, "ActivateItem: (args: Req<'ActivateItem'>) => {")
-	assertContains(t, content, "const a = args as any")
-	assertContains(t, content, "if (a && a['id'] !== undefined)")
-	assertContains(t, content, "} as any).then(r => r.data as Res<'ActivateItem'>)")
+	assertContains(t, content, "const path = { id: args.id }")
+	assertContains(t, content, "{ params: { path }, body: body as any }).then(r => r.data as Res<'ActivateItem'>)")
+	assertNotContains(t, content, "const a = args as any")
 }

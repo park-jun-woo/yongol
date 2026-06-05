@@ -1,4 +1,4 @@
-//ff:func feature=stml-gen type=generator control=sequence
+//ff:func feature=stml-gen type=generator control=selection
 //ff:what 단일 필드 제약조건에서 zod 유효성 체인을 생성한다
 package stml
 
@@ -15,9 +15,12 @@ func zodChain(fc oapiparser.FieldConstraint) string {
 	}
 
 	var base string
-	if fc.Type == "array" {
+	switch fc.Type {
+	case "array":
 		base = zodBaseTypeArray(fc.ItemType)
-	} else {
+	case "object":
+		base = zodBaseTypeRecord(fc.MapValueType)
+	default:
 		base = zodBaseType(fc.Type)
 	}
 	parts := []string{base}

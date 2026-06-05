@@ -41,5 +41,8 @@ func buildFieldConstraint(prop *openapi3.Schema, required bool) FieldConstraint 
 			fc.ItemType = itemTypes[0]
 		}
 	}
+	if typeName == "object" {
+		fc.MapValueType = mapValueType(prop.AdditionalProperties)
+	}
 	return fc
 }

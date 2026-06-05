@@ -31,10 +31,6 @@ func TestByNamePureHelpers_ZeroCov(t *testing.T) {
 	for _, name := range []string{"Button", "Input", "Select", "Textarea", "Form", "Table", "Label", "Link", "Card"} {
 		_ = inferHTMLTag(name)
 	}
-	if lcFirst("ItemID") == "" {
-		t.Errorf("lcFirst empty")
-	}
-
 	dspec := &design.DesignSpec{Colors: map[string]string{"primary": "#fff"}}
 	if got := designColor(dspec, "primary", "def"); got != "#fff" {
 		t.Errorf("designColor = %q", got)

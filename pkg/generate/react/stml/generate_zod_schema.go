@@ -29,7 +29,7 @@ func generateZodSchema(operationID string, fields map[string]oapiparser.FieldCon
 	var fieldLines []string
 	for _, name := range names {
 		fc := fields[name]
-		fieldLines = append(fieldLines, fmt.Sprintf("  %s: %s,", name, zodChain(fc)))
+		fieldLines = append(fieldLines, fmt.Sprintf("  %s: %s,", name, zodChainFor(operationID, name, fc)))
 	}
 
 	return fmt.Sprintf("const %s = z.object({\n%s\n})", schemaName, strings.Join(fieldLines, "\n"))

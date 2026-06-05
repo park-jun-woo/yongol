@@ -29,7 +29,9 @@ func TestWriteAPIClient_TypedSig_GetNoPathParams(t *testing.T) {
 	}
 	content := string(data)
 
+	// No path params: query fallback value carries a narrow cast, but the init
+	// itself is typed (no blanket `} as any`).
 	assertContains(t, content, "ListItems: (args?: Req<'ListItems'>) => {")
-	assertContains(t, content, "{ params: { query: args ?? {} } } as any")
+	assertContains(t, content, "{ params: { query: (args ?? {}) as any } }")
 	assertContains(t, content, "as Res<'ListItems'>")
 }

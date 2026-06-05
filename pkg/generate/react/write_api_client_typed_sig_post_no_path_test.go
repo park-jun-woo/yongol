@@ -29,8 +29,10 @@ func TestWriteAPIClient_TypedSig_PostNoPathParams(t *testing.T) {
 	}
 	content := string(data)
 
+	// No path params: body fallback value carries a narrow cast, but the init
+	// itself is typed (no blanket `} as any`).
 	assertContains(t, content, "CreateItem: (args: Req<'CreateItem'>) => {")
-	assertContains(t, content, "{ body: args ?? {} } as any")
+	assertContains(t, content, "{ body: (args ?? {}) as any }")
 	assertContains(t, content, "as Res<'CreateItem'>")
 	assertNotContains(t, content, "Record<string, any>)")
 }
