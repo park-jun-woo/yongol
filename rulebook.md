@@ -58,6 +58,18 @@ Example: SSaC → OpenAPI (SSaC is the claim, OpenAPI is the ground truth) → `
 
 The `Source` column of each rule row is a Go file path relative to the repo root. Example: `pkg/validate/ssac/s_27_var_declared.go`.
 
+## Rule count
+
+**This catalog is the single source of truth for the rule set.** The official
+total is the count of distinct rule IDs in the tables below — **353 rules across
+60 prefixes**. This includes ~25 retired rules (Deprecated section; no Go
+`Source`); the **active** subset (rows with a Go `Source`) is ~328.
+
+Counting note: a rule's ID is emitted either as a `[ID]` literal in the
+diagnostic message **or** via a `RuleID:` field / builder. A naive
+`grep '\[ID\]'` over `pkg/` therefore undercounts. Use this catalog — not source
+grep — for the official total.
+
 ---
 
 ## INI. Init Check
@@ -161,6 +173,7 @@ SSaC self-consistency — required fields, variable flow, model references, @sub
 | C-6 | ERROR | `backend.auth` is required — yongol does not support auth-free backends (use a static site generator + CDN for public dynamic content) | `pkg/validate/manifest/c_06_backend_auth_required.go` |
 | C-7 | ERROR | `backend.auth` requires `backend.rate_limit` — brute-force defense is mandatory | `pkg/validate/manifest/c_07_auth_requires_rate_limit.go` |
 | C-8 | ERROR | `backend.rate_limit` requires a `Login` entry (primary brute-force target) | `pkg/validate/manifest/c_08_rate_limit_login_required.go` |
+| C-9 | ERROR | Unsupported `backend.lang` + `backend.framework` combination | `pkg/validate/manifest/c_09_backend_lang_framework.go` |
 | CORS-01 | ERROR | `allow_origins=["*"]` combined with `allow_credentials=true` is forbidden | `pkg/validate/manifest/cors_01_wildcard_credentials.go` |
 | OBS-001 | ERROR | `backend.observability.metrics.path` must be an absolute path starting with `/` | `pkg/validate/manifest/obs_01_metrics_path.go` |
 | OBS-002 | ERROR | `backend.observability.metrics.path` must not collide with an OpenAPI path | `pkg/validate/manifest/obs_02_metrics_path_not_openapi.go` |
@@ -376,6 +389,7 @@ Cross-consistency between `manifest.backend.auth` (user_table + claims mapping) 
 | XDN-01 | ERROR | `backend.auth.user_table` is required when auth is active (`auth.type != "none"`) | `pkg/validate/manifest_ddl/xdn_01_user_table_required.go` |
 | XDN-02 | ERROR | `backend.auth.user_table` must reference a table parsed from `db/*.sql` | `pkg/validate/manifest_ddl/xdn_02_user_table_exists.go` |
 | XDN-03 | ERROR | Each `backend.auth.claims.<Field>: <col>[:<type>]` mapping's column must exist on the user_table | `pkg/validate/manifest_ddl/xdn_03_claim_column_exists.go` |
+| XDN-04 | ERROR | A claim's declared Go type does not match the user_table column's DDL type (per-claim mismatch) | `pkg/validate/manifest_ddl/xdn_04_check_claim.go` |
 | ~~XDN-04~~ | ~~ERROR~~ | ~~Each claim's Go type must match the user_table column's DDL-derived Go type~~ **(deprecated — superseded by XDN-06)** | `pkg/validate/manifest_ddl/xdn_04_claim_column_type.go` |
 | XDN-05 | ERROR | Each `backend.auth.claims.<Field>` value must use `<col>:<type>` format (type declaration required). Allowed types: `string`, `int64`, `int32`, `bool`, `uuid` | `pkg/validate/manifest_ddl/xdn_05_claim_type_required.go` |
 | XDN-06 | ERROR | Each claim's declared type must match the user_table column's DDL type per the compatibility matrix (uuid↔UUID, string↔TEXT/VARCHAR, int64↔BIGINT/INT8, int32↔INTEGER/INT/INT4, bool↔BOOLEAN/BOOL) | `pkg/validate/manifest_ddl/xdn_06_claim_ddl_type.go` |
