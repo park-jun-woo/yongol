@@ -574,9 +574,9 @@ Rules collected during the DDL migration phase of `yongol generate` (`pkg/genera
 | MIG-005 | WARNING | Risky type change (`INTEGER↔TEXT`, narrowing `VARCHAR(N)`, etc.) has no `@cast using=<expr>` hint | `pkg/validate/migration/mig_005_cast_missing.go` |
 | MIG-006 | ERROR | The `-- YONGOL_SCHEMA_HASH:` header in `specs/db/.generated_schema.sql` does not match the sha256 of the body (user-edited = drift) | `pkg/validate/migration/mig_006_snapshot_drift.go` |
 
-## U. STML ↔ OpenAPI (`TM-*`)
+## U. STML ↔ OpenAPI / stateDiagram (`TM-*`)
 
-Cross-validation between STML template attributes (`data-fetch`, `data-action`, `data-param`, `data-field`, `data-bind`, `data-each`, `data-component`) and the OpenAPI spec. Ensures that STML references resolve to valid OpenAPI operations, parameters, request/response fields, and component files.
+Cross-validation between STML template attributes (`data-fetch`, `data-action`, `data-param`, `data-field`, `data-bind`, `data-each`, `data-component`, `data-layout`, `data-state`, `data-enabled-when`, `data-invalidates`) and the OpenAPI spec, layouts, and Mermaid stateDiagrams. Ensures that STML references resolve to valid OpenAPI operations, parameters, request/response fields, component files, layouts, and statechart states/transitions. Most rules live in `pkg/validate/stml_openapi/`; the stateDiagram cross-checks (TM-15, TM-18) live in `pkg/validate/stml_statemachine/`.
 
 | Rule ID | Level | Description | Source |
 |---|---|---|---|
@@ -593,6 +593,11 @@ Cross-validation between STML template attributes (`data-fetch`, `data-action`, 
 | TM-11 | ERROR | `data-layout` value on a page does not match any layout defined in `layouts/` | `pkg/validate/stml_openapi/tm_11_layout_not_found.go` |
 | TM-12 | ERROR | `manifest.frontend.defaultLayout` value does not match any layout defined in `layouts/` | `pkg/validate/stml_openapi/tm_12_default_layout_not_found.go` |
 | TM-13 | WARNING | Layout defined in `layouts/` is not referenced by any page's `data-layout` or `manifest.frontend.defaultLayout` | `pkg/validate/stml_openapi/tm_13_unused_layout.go` |
+| TM-14 | ERROR | `data-enabled-when` guard references a model that is not a top-level property of any page `data-fetch` response schema | `pkg/validate/stml_openapi/tm_14_enabled_when_ref_not_found.go` |
+| TM-15 | ERROR | `data-enabled-when` guard comparison references a state value that does not exist in the matching Mermaid stateDiagram | `pkg/validate/stml_statemachine/tm_15_state_value_in_diagram.go` |
+| TM-16 | ERROR | `data-invalidates` operationId is not defined in OpenAPI, or is not a GET endpoint (only GET queries can be invalidated) | `pkg/validate/stml_openapi/tm_16_invalidates_op_not_found.go` |
+| TM-17 | ERROR | `data-state` guard using a combinator (`&&`, `||`, leading `!`, or parentheses) is not valid guard syntax (§3.4 EBNF; no function calls, arithmetic, or ternaries) | `pkg/validate/stml_openapi/tm_17_guard_syntax.go` |
+| TM-18 | WARNING | `data-action` transition is not legal from the state its `data-enabled-when` guard requires, per the Mermaid stateDiagram | `pkg/validate/stml_statemachine/tm_18_transition_validity.go` |
 | XMO-10 | WARNING | OpenAPI operationId is not consumed by any STML `data-fetch` or `data-action` (auth endpoints excluded) | `pkg/validate/stml_openapi/xmo_10_unconsumed.go` |
 
 ## V. Features Internal (`FT-*`)

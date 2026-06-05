@@ -493,7 +493,7 @@ the source of truth, the generated `.tsx` files are disposable artifacts.
 
 Location: `frontend/*.html` (flat, no subdirectories).
 
-### data-* Attributes (8)
+### data-* Attributes (10)
 
 | Attribute | Purpose | Example |
 |---|---|---|
@@ -503,8 +503,42 @@ Location: `frontend/*.html` (flat, no subdirectories).
 | `data-bind` | Response field display | `<span data-bind="status"></span>` |
 | `data-param-*` | Path/query parameter | `data-param-id="route.id"` |
 | `data-each` | Array iteration | `<ul data-each="workflows">` |
-| `data-state` | Conditional display | `data-state="workflow.status=draft"` |
+| `data-state` | Conditional display (guard, see below) | `data-state="workflow.status=draft"` |
 | `data-component` | Custom component delegation | `<div data-component="DatePicker" data-field="StartAt" />` |
+| `data-enabled-when` | Action enablement decision (guard) | `<button data-action="ActivateWorkflow" data-enabled-when="workflow.status=draft">` |
+| `data-invalidates` | Effect declaration: queries to refetch on action success (space-separated operationIds) | `<div data-action="CreateWorkflow" data-invalidates="ListWorkflows">` |
+
+`data-enabled-when` declares *when an action is available*: the button renders
+`disabled` unless the guard holds. `data-invalidates` declares *what goes stale*
+on success — each listed GET operationId is refetched (TanStack Query
+invalidation). Both are decisions, not implementation; codegen renders the
+wiring as a disposable projection.
+
+### Guard syntax (`data-state` / `data-enabled-when`)
+
+Guards are a deliberately restricted, Turing-incomplete expression language —
+comparisons, logical combinators, negation, and parentheses only (no function
+calls, arithmetic, or ternaries), so they stay statically verifiable. EBNF:
+
+```
+guard     := term (("&&" | "||") term)*
+term      := "!"? atom
+atom      := ref op value | ref "." lifecycle | "(" guard ")"
+ref       := <model> "." <Field>            // workflow.status, currentUser.Role
+op        := "=" | "!=" | ">" | "<" | ">=" | "<="
+value     := <state-id> | <number> | <quoted-string> | <enum-literal>
+lifecycle := "loading" | "error" | "empty"
+```
+
+Examples: `workflow.status = active`,
+`workflow.status=active && currentUser.Role=owner`,
+`!(workflow.status = archived)`, `workflows.empty`, `.loading`.
+
+**Backward compatibility**: a single comparison (`field=value`), a lifecycle
+suffix (`.loading` / `.error` / `.empty` / `items.empty`), and a bare field keep
+their existing behavior unchanged. Only conditions containing a combinator
+(`&&`, `||`), a leading `!`, or parentheses are routed through the guard parser
+and validated by TM-17.
 
 ### Page Structure
 
@@ -560,19 +594,28 @@ blocks at the top level. Nesting rules:
 </main>
 ```
 
-### Cross-validation (STML → OpenAPI)
+### Cross-validation (STML → OpenAPI / stateDiagram)
 
-| Rule | Level | Contract |
-|---|---|---|
-| `TM-01` | ERROR | `data-fetch` operationId exists in OpenAPI |
-| `TM-02` | ERROR | `data-action` operationId exists in OpenAPI |
-| `TM-03` | ERROR | `data-action` must not reference a GET endpoint |
-| `TM-04` | ERROR | `data-param-*` name matches OpenAPI parameter |
-| `TM-05` | ERROR | `data-field` name matches OpenAPI request body field |
-| `TM-06` | ERROR | `data-bind` field matches OpenAPI response schema |
-| `TM-07` | ERROR | `data-each` field exists in OpenAPI response schema |
-| `TM-08` | ERROR | `data-each` field is an array type |
-| `TM-09` | ERROR | `data-component` references an existing `.tsx` component file |
+| Rule | Level | Cross target | Contract |
+|---|---|---|---|
+| `TM-01` | ERROR | OpenAPI | `data-fetch` operationId exists in OpenAPI |
+| `TM-02` | ERROR | OpenAPI | `data-action` operationId exists in OpenAPI |
+| `TM-03` | ERROR | OpenAPI | `data-action` must not reference a GET endpoint |
+| `TM-04` | ERROR | OpenAPI | `data-param-*` name matches OpenAPI parameter |
+| `TM-05` | ERROR | OpenAPI | `data-field` name matches OpenAPI request body field |
+| `TM-06` | ERROR | OpenAPI | `data-bind` field matches OpenAPI response schema |
+| `TM-07` | ERROR | OpenAPI | `data-each` field exists in OpenAPI response schema |
+| `TM-08` | ERROR | OpenAPI | `data-each` field is an array type |
+| `TM-09` | ERROR | filesystem | `data-component` references an existing `.tsx` component file |
+| `TM-10` | ERROR | STML internal | element must not use a `class` attribute (use `<!-- @override class="..." -->`) |
+| `TM-11` | ERROR | layouts | page `data-layout` matches a layout in `layouts/` |
+| `TM-12` | ERROR | layouts | `manifest.frontend.defaultLayout` matches a layout in `layouts/` |
+| `TM-13` | WARNING | layouts | layout in `layouts/` is referenced by some page or defaultLayout |
+| `TM-14` | ERROR | OpenAPI | `data-enabled-when` guard ref model is a top-level property of some page fetch response |
+| `TM-15` | ERROR | stateDiagram | guard comparison state value exists in the matching stateDiagram |
+| `TM-16` | ERROR | OpenAPI | `data-invalidates` operationId exists in OpenAPI and is a GET |
+| `TM-17` | ERROR | STML internal | `data-state` guard with a combinator parses under the §guard-syntax EBNF |
+| `TM-18` | WARNING | stateDiagram | the `data-action` transition is legal from the state its `data-enabled-when` requires |
 
 Unused OpenAPI operations are intentionally not reported.
 
@@ -658,7 +701,7 @@ invalid → 401. Permission checks are handled by `@auth`.
 
 ## Validation
 
-`yongol validate` runs 344 rules across 60 prefix categories (C-*, D-*, M-*, T-*,
+`yongol validate` runs 349 rules across 60 prefix categories (C-*, D-*, M-*, T-*,
 S-*, XOT-*, XPS-*, XDM-*, XPD-*, XNS-*, PRV-*, MIG-*, CORS-*, SEC-*, OBS-*,
 H-*, …). AI authors do not memorise IDs — the validator prints rule ID, level,
 file, line, message. Catalog: [`rulebook.md`](rulebook.md). `yongol generate`
