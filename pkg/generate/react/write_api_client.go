@@ -36,7 +36,21 @@ func writeAPIClient(srcDir string, doc *openapi3.T, hasAuthz bool) error {
 	b.WriteString("import createClient from 'openapi-fetch'\n")
 	b.WriteString("import type { paths, operations } from '../types/api'\n\n")
 	writeReqResTypes(&b)
-	b.WriteString("const client = createClient<paths>({ baseUrl: '/api' })\n")
+
+	// baseUrl is intentionally empty: OpenAPI path keys already carry the
+	// '/api' prefix, so a non-empty baseUrl here would double-prefix the
+	// request URL ('/api' + '/api/...' = '/api/api/...'). See BUG-110.
+	const baseURL = ""
+	var paths []string
+	if doc != nil && doc.Paths != nil {
+		for path := range doc.Paths.Map() {
+			paths = append(paths, path)
+		}
+	}
+	if err := detectDoublePrefix(baseURL, paths); err != nil {
+		return err
+	}
+	b.WriteString("const client = createClient<paths>({ baseUrl: '" + baseURL + "' })\n")
 
 	if hasAuthz {
 		writeAuthzMiddleware(&b)
