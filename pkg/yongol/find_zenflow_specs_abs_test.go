@@ -10,7 +10,7 @@ import (
 )
 
 // findZenflowSpecsAbs resolves the absolute path of the shared zenflow fixture
-// (`dummys/zenflow/try-02/specs`) relative to *this* test file, so the tests
+// (`examples/zenflow/try-02/specs`) relative to *this* test file, so the tests
 // work regardless of the caller's CWD and survive repo relocation.
 func findZenflowSpecsAbs(t *testing.T) string {
 	t.Helper()
@@ -21,7 +21,7 @@ func findZenflowSpecsAbs(t *testing.T) string {
 	// thisFile: <repo>/pkg/yongol/test_find_zenflow_specs_abs_test.go
 	pkgYongol := filepath.Dir(thisFile)
 	repoRoot := filepath.Dir(filepath.Dir(pkgYongol))
-	specs := filepath.Join(repoRoot, "dummys", "zenflow", "try-02", "specs")
+	specs := filepath.Join(repoRoot, "examples", "zenflow", "try-02", "specs")
 	if _, err := os.Stat(specs); err != nil {
 		t.Skipf("zenflow fixture unavailable at %s: %v", specs, err)
 	}

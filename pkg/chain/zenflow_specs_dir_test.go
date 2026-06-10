@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-// zenflowSpecsDir resolves dummys/zenflow/try-02/specs relative to the module
+// zenflowSpecsDir resolves examples/zenflow/try-02/specs relative to the module
 // root by walking up from the test file. Returns "" if not found.
 func zenflowSpecsDir(t *testing.T) string {
 	t.Helper()
@@ -19,7 +19,7 @@ func zenflowSpecsDir(t *testing.T) string {
 	}
 	dir := filepath.Dir(thisFile)
 	for i := 0; i < 10; i++ {
-		candidate := filepath.Join(dir, "dummys", "zenflow", "try-02", "specs")
+		candidate := filepath.Join(dir, "examples", "zenflow", "try-02", "specs")
 		if info, err := os.Stat(candidate); err == nil && info.IsDir() {
 			return candidate
 		}

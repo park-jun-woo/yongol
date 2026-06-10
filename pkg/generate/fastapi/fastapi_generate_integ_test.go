@@ -9,7 +9,7 @@ import (
 )
 
 func TestFastapiGenerate_Integ(t *testing.T) {
-	root := "/home/parkjunwoo/.clari/repos/fullend/dummys/zenflow/try-03/specs"
+	root := "/home/parkjunwoo/.clari/repos/fullend/examples/zenflow/try-03/specs"
 	if _, err := os.Stat(root); err != nil {
 		t.Skipf("dummy specs not present: %v", err)
 	}

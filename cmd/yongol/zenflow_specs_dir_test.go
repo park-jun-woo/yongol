@@ -1,5 +1,5 @@
 //ff:func feature=cli type=test-helper control=sequence
-//ff:what zenflowSpecsDir — dummys/zenflow/try-02/specs 경로 반환 (없으면 skip)
+//ff:what zenflowSpecsDir — examples/zenflow/try-02/specs 경로 반환 (없으면 skip)
 
 package main
 
@@ -9,11 +9,11 @@ import (
 	"testing"
 )
 
-// zenflowSpecsDir returns the absolute path to dummys/zenflow/try-02/specs or
+// zenflowSpecsDir returns the absolute path to examples/zenflow/try-02/specs or
 // calls t.Skip when the dummy tree is absent (CI trimmed / non-dev checkout).
 func zenflowSpecsDir(t *testing.T) string {
 	t.Helper()
-	dir := filepath.Join(repoRoot(t), "dummys", "zenflow", "try-02", "specs")
+	dir := filepath.Join(repoRoot(t), "examples", "zenflow", "try-02", "specs")
 	info, err := os.Stat(dir)
 	if err != nil || !info.IsDir() {
 		t.Skipf("zenflow dummy specs not available at %s", dir)
