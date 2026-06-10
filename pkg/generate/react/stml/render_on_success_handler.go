@@ -14,7 +14,10 @@ import (
 //  1. data-capture (bearer mode) → commit response fields to the session
 //     store, guarded against a 2xx response missing the token field — the
 //     guard returns early so a later redirect is also aborted (BUG-113 (3))
-//  2. data-redirect → navigate(path) (combinable with 1)
+//  2. data-redirect → navigate (combinable with 1): a static "/"-prefixed
+//     path verbatim, or a page-name reference with data-redirect-params
+//     response fields substituted into the target route, each guarded
+//     against a missing field (renderRedirectNavigate, page-flow Phase008)
 //  3. neither → the default invalidateQueries()/data-invalidates path
 //
 // The error-state reset lives in onMutate (page-flow Phase004) — every
@@ -27,7 +30,11 @@ func renderOnSuccessHandler(a stmlparser.ActionBlock, captures []stmlparser.Capt
 		lines = append(lines, renderCaptureCommit(captures, errorStateVar(a))...)
 	}
 	if a.Redirect != "" {
-		lines = append(lines, fmt.Sprintf("navigate('%s')", a.Redirect))
+		nav, usesData := renderRedirectNavigate(a)
+		if usesData {
+			param = "(data)"
+		}
+		lines = append(lines, nav...)
 	}
 	if len(captures) == 0 && a.Redirect == "" {
 		lines = append(lines, renderInvalidateExpr(fetchOps))

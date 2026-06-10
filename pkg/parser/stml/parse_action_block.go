@@ -11,19 +11,24 @@ import (
 // parseActionBlock builds an ActionBlock from a data-action element.
 func parseActionBlock(n *html.Node, operationID string) ActionBlock {
 	ab := ActionBlock{
-		Tag:         n.Data,
-		ClassName:   getAttr(n, "class"),
-		OperationID: operationID,
-		Params:      extractParams(n),
-		EnabledWhen: getAttr(n, "data-enabled-when"),
-		Invalidates: strings.Fields(getAttr(n, "data-invalidates")),
-		CaptureRaw:  getAttr(n, "data-capture"),
-		Redirect:    getAttr(n, "data-redirect"),
-		OnErrorNode: hasDescendantOnError(n),
+		Tag:               n.Data,
+		ClassName:         getAttr(n, "class"),
+		OperationID:       operationID,
+		Params:            extractParams(n),
+		EnabledWhen:       getAttr(n, "data-enabled-when"),
+		Invalidates:       strings.Fields(getAttr(n, "data-invalidates")),
+		CaptureRaw:        getAttr(n, "data-capture"),
+		Redirect:          getAttr(n, "data-redirect"),
+		RedirectParamsRaw: getAttr(n, "data-redirect-params"),
+		OnErrorNode:       hasDescendantOnError(n),
 	}
 	if ab.CaptureRaw != "" {
 		// Syntax errors are surfaced by TM-20 at validate time (re-parse).
 		ab.Captures, _ = ParseCapture(ab.CaptureRaw)
+	}
+	if ab.RedirectParamsRaw != "" {
+		// Syntax errors are surfaced by TM-33 at validate time (re-parse).
+		ab.RedirectParams, _ = ParseRedirectParams(ab.RedirectParamsRaw)
 	}
 	if n.Data == "button" {
 		ab.SubmitText = directText(n)

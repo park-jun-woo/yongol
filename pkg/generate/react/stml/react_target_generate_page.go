@@ -32,6 +32,10 @@ func (r *ReactTarget) GeneratePage(page stmlparser.PageSpec, specsDir string, op
 	allActions := append([]stmlparser.ActionBlock{}, page.Actions...)
 	allActions = append(allActions, collectAllActions(page.Children)...)
 	allActions = deduplicateActions(allActions)
+	// Pre-resolve page-name data-redirect target route patterns (Phase008)
+	for i := range allActions {
+		setRedirectPattern(&allActions[i], opt.RoutePatterns)
+	}
 
 	is.useForm = anyActionHasFields(allActions)
 	is.useZod = is.useForm && anyActionHasZodConstraints(allActions, opt.RequestConstraints)
@@ -55,6 +59,11 @@ func (r *ReactTarget) GeneratePage(page stmlparser.PageSpec, specsDir string, op
 	for _, a := range allActions {
 		if a.Redirect != "" {
 			is.useNavigate = true
+		}
+		// route.<Name> redirect params read the useParams() variable
+		// (page-flow Phase008, same need as data-link route.* sources).
+		if redirectUsesRouteParams(a) {
+			is.useParams = true
 		}
 		if len(actionFlowCaptures(a, opt.BearerAuth)) > 0 {
 			is.useAuthStore = true

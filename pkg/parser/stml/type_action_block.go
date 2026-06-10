@@ -15,12 +15,21 @@ type ActionBlock struct {
 	Invalidates []string      // data-invalidates operationIds to refetch on success (empty if unset)
 	CaptureRaw  string        // raw data-capture attribute value (TM-20 re-parses it for syntax diagnostics)
 	Captures    []CaptureBind // parsed data-capture bindings (empty when absent or syntactically invalid)
-	Redirect    string        // data-redirect static path navigated to on action success (empty if unset)
+	Redirect    string        // data-redirect target navigated to on action success: "/"-prefixed static path, or an STML page-name reference (empty if unset)
 	OnErrorNode bool          // true when a descendant element carries data-on-error
+
+	RedirectParamsRaw string          // raw data-redirect-params value (TM-33 re-parses it for syntax diagnostics)
+	RedirectParams    []LinkParamBind // parsed data-redirect-params bindings (empty when absent or syntactically invalid)
 
 	// RowMutateArg is codegen-populated (pkg/generate/react/stml, like
 	// EachBlock.KeyField): the call-site mutate() argument object for a row
 	// action inside data-each whose params use item.<Field> sources. The
 	// parser always leaves it empty.
 	RowMutateArg string
+
+	// RedirectPattern is codegen-populated (pkg/generate/react/stml, like
+	// LinkRef.TargetPattern): when Redirect is a page-name reference, the
+	// target page's resolved route pattern (stml.RoutePaths first pattern).
+	// The parser always leaves it empty.
+	RedirectPattern string
 }

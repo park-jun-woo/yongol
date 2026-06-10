@@ -506,7 +506,7 @@ the source of truth, the generated `.tsx` files are disposable artifacts.
 
 Location: `frontend/*.html` (flat, no subdirectories).
 
-### data-* Attributes (16)
+### data-* Attributes (17)
 
 | Attribute | Purpose | Example |
 |---|---|---|
@@ -521,7 +521,8 @@ Location: `frontend/*.html` (flat, no subdirectories).
 | `data-enabled-when` | Action enablement decision (guard) | `<button data-action="ActivateWorkflow" data-enabled-when="workflow.status=draft">` |
 | `data-invalidates` | Effect declaration: queries to refetch on action success (space-separated operationIds) | `<div data-action="CreateWorkflow" data-invalidates="ListWorkflows">` |
 | `data-capture` | Auth flow: store response fields into auth sinks on action success | `<section data-action="Login" data-capture="access_token -> auth.token, refresh_token -> auth.refresh">` |
-| `data-redirect` | Auth flow: static path navigated to on action success | `<section data-action="Login" data-redirect="/">` |
+| `data-redirect` | Flow: target navigated to on action success — a `/`-prefixed **static path**, or an STML **page-name reference** (filename without `.html`) whose resolved route gets `data-redirect-params` substituted | `<section data-action="Login" data-redirect="/">`, `<div data-action="CreateContract" data-redirect="contract-edit" data-redirect-params="id -> ContractID">` |
+| `data-redirect-params` | Flow: binds the redirect target route's segments — `<source> -> <SegmentName>` pairs (comma-separated, `data-capture`-style value grammar). Sources: unprefixed 2xx **response fields** of the action operation (the only data in scope after success) or `route.<Name>` (forwarding a current-page param). `-> <SegmentName>` may be elided when the target has exactly one required segment | `data-redirect-params="id -> ContractID"` |
 | `data-on-error` | Auth flow: marker for the element shown when the action fails (4xx/5xx rejects with the server ErrorResponse body; its `message` is displayed, falling back to a stringified error when `message` is absent). When absent, a default error element (`role="alert"`) is emitted right next to the submit button — declaring `data-on-error` decides the display element and position instead | `<p data-on-error></p>` |
 | `data-route` | Explicit route path override on the page's top-level element (`:Name` pattern params merge into `useParams()`) | `<main data-route="/buildings/:BuildingID/units/:UnitID">` |
 | `data-link` | Navigation: clicking this element goes to another page. The value is a **page name** (STML filename without `.html`), not a path — route paths are a derived projection | `<li data-link="building-detail" data-link-params="item.id -> BuildingID">` |
@@ -538,8 +539,33 @@ The three flow attributes declare the auth session flow (plans/stml/auth-flow):
 `data-on-error` on an element *inside* a `data-action` block (TM-25 enforces
 placement). The capture sink namespace is restricted to `auth.token` and
 `auth.refresh` (`session.*` collides with the SSaC built-in session package).
-`data-redirect` takes a static path only and must resolve to an STML page
-route, `/` being the index route (TM-26).
+`data-redirect` takes a `/`-prefixed static path (which must resolve to an
+STML page route, `/` being the index route) or a page-name reference; either
+way the target must exist (TM-26).
+
+### Dynamic redirect (`data-redirect` page-name reference + `data-redirect-params`)
+
+A non-`/`-prefixed `data-redirect` value is a **page-name reference**
+(plans/stml/page-flow Phase008) — the same target vocabulary as `data-link`.
+Codegen resolves it to the target page's route (the `RoutePaths` table) and
+substitutes `data-redirect-params` sources into the segments, so a create
+flow can land on the resource it just made:
+
+```html
+<div data-action="CreateContract"
+     data-redirect="contract-edit"
+     data-redirect-params="id -> ContractID">
+```
+
+emits `navigate(`/contract-edit/${data.id}`)` in the mutation's `onSuccess`.
+Sources are unprefixed 2xx response fields (`data-capture` left-hand-side
+tier; validated against the operation's response schema) or `route.<Name>`
+(forwarding a current-page param to the target). Each substituted response
+field is guarded like the capture commit: a 2xx response missing the field
+aborts the navigate and surfaces through the action's error state instead of
+baking `undefined` into the URL. Unmapped **optional** segments are omitted;
+every **required** segment must be mapped, and params on a static path are a
+contradiction (TM-33). The static-path form is unchanged.
 
 ### Page links (`data-link` / `data-link-params`)
 
@@ -726,13 +752,14 @@ automatically.
 | `TM-23` | WARNING | stateDiagram | the `data-redirect` target page's `=` state guard must accept an arrival state of the action's transition |
 | `TM-24` | WARNING | manifest | cookie mode must not declare `auth.*` captures or a `frontend.auth` block (httpOnly cookies cannot be captured) |
 | `TM-25` | ERROR | STML internal | `data-on-error` only inside a `data-action` block; `data-capture`/`data-redirect` only on a `data-action` element |
-| `TM-26` | ERROR | STML internal | `data-redirect` path resolves to an STML page route (`/` allowed as index) |
+| `TM-26` | ERROR | STML internal | `data-redirect` resolves to an STML page: a `/`-prefixed static path against the resolved routes (`/` allowed as index), any other value as a page-name reference (filename without `.html`) |
 | `TM-27` | ERROR | STML internal | every consumed `route.<Name>` appears as a same-named `:Name`/`:Name?` segment in the page's resolved route (case-exact) |
 | `TM-28` | WARNING | STML internal | every `:Name`/`:Name?` segment of the page's resolved route is consumed by some `data-param-*` binding |
 | `TM-29` | WARNING | OpenAPI | an action whose operation declares a 4xx/5xx response should declare a `data-on-error` element — without it the server error falls back to the default inline slot (`role="alert"`) |
 | `TM-30` | ERROR | OpenAPI | `item.<Field>` param source only inside a `data-each` block, and the field must exist in the enclosing each's item schema (OpenAPI response) |
 | `TM-31` | ERROR | STML internal | `data-link` target names an existing STML page (filename without `.html`) |
 | `TM-32` | ERROR | STML/OpenAPI | `data-link-params` is well-formed and satisfies the target route: every required segment mapped, SegmentNames exist in the target route, `item.*` sources inside `data-each` against the item schema, `route.*` sources in this page's resolved route, elided form only against a single required segment |
+| `TM-33` | ERROR | STML/OpenAPI | `data-redirect-params` is well-formed and satisfies the redirect target route: not declared on a static path (contradiction), respField sources exist in the action operation's 2xx response schema (`route.*` exempt), SegmentNames exist in the target route, every required segment mapped, elided form only against a single required segment |
 | `XMO-10` | ERROR | OpenAPI | Frontend ON & operationId is consumed by some STML page/component **or** tagged `no-front` |
 | `XMO-11` | ERROR | manifest | Frontend ON requires at least one STML page (else set `frontend.enabled: false`) |
 | `XMO-12` | WARNING | OpenAPI | operationId tagged `no-front` must not actually be consumed (stale tag) |

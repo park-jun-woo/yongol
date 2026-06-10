@@ -66,6 +66,19 @@ func TestTM23RedirectStateConflict(t *testing.T) {
 		t.Errorf("unresolved redirect: expected 0 diagnostics, got %+v", d)
 	}
 
+	// Page-name reference (page-flow Phase008) reaches the same verdict:
+	// the target page requires "draft" but the action arrives at "active".
+	namedPages := []stml.PageSpec{{
+		Name:     "board",
+		FileName: "board.html",
+		Children: []stml.ChildNode{{Kind: "state", State: &stml.StateBind{Condition: "workflow.status=draft"}}},
+	}}
+	named := stml.ActionBlock{OperationID: "ActivateWorkflow", Redirect: "board"}
+	got = tm23RedirectStateConflict(named, "login.html", diagrams, namedPages)
+	if len(got) != 1 || got[0].Level != diagnostic.LevelWarning {
+		t.Errorf("page-name conflict: expected 1 WARNING, got %+v", got)
+	}
+
 	// No redirect → silent.
 	if d := tm23RedirectStateConflict(stml.ActionBlock{OperationID: "ActivateWorkflow"}, "login.html", diagrams, pages); len(d) != 0 {
 		t.Errorf("no redirect: expected 0 diagnostics, got %+v", d)
