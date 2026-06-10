@@ -1,5 +1,5 @@
 //ff:func feature=gen-react type=test control=sequence
-//ff:what writeAppTSX 인증 가드 + flat 라우트 검증
+//ff:what writeAppTSX 전부 보호 페이지 — flat 라우트 페이지별 가드 + /login 인덱스 폴백 검증
 
 package react
 
@@ -17,7 +17,8 @@ func TestWriteAppTSX_Authz_FlatRoutes(t *testing.T) {
 		{Name: "about", FileName: "about.html"},
 		{Name: "settings", FileName: "settings.html"},
 	}
-	if err := writeAppTSX(dir, pages, nil, "", true); err != nil {
+	protected := map[string]bool{"about.html": true, "settings.html": true}
+	if err := writeAppTSX(dir, pages, nil, "", protected); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))
@@ -29,4 +30,7 @@ func TestWriteAppTSX_Authz_FlatRoutes(t *testing.T) {
 	assertContains(t, content, "import ProtectedRoute from './components/ProtectedRoute'")
 	assertContains(t, content, `<Route path="/about" element={<ProtectedRoute><About /></ProtectedRoute>} />`)
 	assertContains(t, content, `<Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />`)
+	// every page is protected → the "/" index falls back to /login
+	assertContains(t, content, `<Route path="/" element={<Navigate to="/login" replace />} />`)
+	assertContains(t, content, `<Route path="*" element={<Navigate to="/" replace />} />`)
 }

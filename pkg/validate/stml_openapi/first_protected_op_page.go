@@ -7,7 +7,7 @@ import "github.com/park-jun-woo/yongol/pkg/yongol"
 
 // firstProtectedOpPage scans the STML pages in order and returns the file
 // name of the first page whose data-fetch or data-action consumes a
-// security-protected OpenAPI operation (opRequiresAuth), and whether any
+// security-protected OpenAPI operation (OpRequiresAuth), and whether any
 // such page exists. TM-21/22 use it to decide if the captured token has a
 // consumer and where to point the diagnostic.
 func firstProtectedOpPage(fs *yongol.Fullstack, opMap map[string]operationEntry) (string, bool) {
@@ -24,7 +24,7 @@ func firstProtectedOpPage(fs *yongol.Fullstack, opMap map[string]operationEntry)
 			if !ok {
 				continue
 			}
-			if opRequiresAuth(entry.op, fs.OpenAPIDoc) {
+			if OpRequiresAuth(entry.op, fs.OpenAPIDoc) {
 				return page.FileName, true
 			}
 		}

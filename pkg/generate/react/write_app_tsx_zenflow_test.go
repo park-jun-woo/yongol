@@ -30,7 +30,7 @@ func TestWriteAppTSX_FullZenflow(t *testing.T) {
 		{Name: "webhooks", FileName: "webhooks.html"},
 		{Name: "audit-logs", FileName: "audit-logs.html"},
 	}
-	if err := writeAppTSX(dir, pages, nil, "", false); err != nil {
+	if err := writeAppTSX(dir, pages, nil, "", nil); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))
@@ -47,5 +47,5 @@ func TestWriteAppTSX_FullZenflow(t *testing.T) {
 	assertContains(t, content, `<Route path="/webhooks" element={<Webhooks />} />`)
 	assertContains(t, content, `<Route path="/workflows" element={<Workflows />} />`)
 	assertContains(t, content, `<Route path="/workflows/:id" element={<WorkflowDetail />} />`)
-	assertContains(t, content, "import { Routes, Route } from 'react-router-dom'")
+	assertContains(t, content, "import { Routes, Route, Navigate } from 'react-router-dom'")
 }

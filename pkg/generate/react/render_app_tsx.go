@@ -1,41 +1,68 @@
 //ff:func feature=gen-react type=generator control=iteration dimension=1
-//ff:what stmlRoute 목록에서 전체 App.tsx 소스를 생성한다
+//ff:what stmlRoute 목록에서 전체 App.tsx 소스를 생성한다 (페이지별 가드 + "/" 인덱스 + catch-all)
 
 package react
 
 import (
+	"fmt"
 	"strings"
 )
 
 // renderAppTSX generates the full App.tsx source from a list of routes.
 // layoutSet contains layout names that have LayoutSpec definitions.
-// Routes with a non-empty Layout field are grouped under a layout wrapper route.
-// When hasAuth is true, non-auth layout groups and flat routes are wrapped
-// with <ProtectedRoute>.
-func renderAppTSX(routes []stmlRoute, layoutSet map[string]bool, hasAuth bool) string {
+// Routes with a non-empty Layout field are grouped under a layout wrapper
+// route. Protected routes (page consumes a security-protected op) are
+// wrapped with <ProtectedRoute> individually (Phase005 — replaces the
+// blanket hasAuth wrap). indexTarget, when non-empty, emits a "/" index
+// route redirecting there; a trailing catch-all path="*" redirects to "/"
+// unless a page already claims "*".
+func renderAppTSX(routes []stmlRoute, layoutSet map[string]bool, indexTarget string) string {
 	grouped := groupRoutesByLayout(routes)
 
+	anyProtected := false
+	catchAll := true
+	for _, r := range routes {
+		if r.Protected {
+			anyProtected = true
+		}
+		if r.Path == "*" {
+			catchAll = false
+		}
+	}
+
 	var sb strings.Builder
-	sb.WriteString("import { Routes, Route } from 'react-router-dom'\n")
+	if indexTarget != "" || catchAll {
+		sb.WriteString("import { Routes, Route, Navigate } from 'react-router-dom'\n")
+	} else {
+		sb.WriteString("import { Routes, Route } from 'react-router-dom'\n")
+	}
 
 	writePageImports(&sb, routes)
 
 	layoutNames := sortedLayoutNames(grouped)
 	writeLayoutImports(&sb, layoutNames)
 
-	if hasAuth {
+	if anyProtected {
 		sb.WriteString("import ProtectedRoute from './components/ProtectedRoute'\n")
 	}
 
 	sb.WriteString("\nexport default function App() {\n  return (\n    <Routes>\n")
 
+	if indexTarget != "" {
+		fmt.Fprintf(&sb, "      <Route path=\"/\" element={<Navigate to=\"%s\" replace />} />\n", indexTarget)
+	}
+
 	for _, name := range layoutNames {
 		rs := grouped[name]
 		if name == "" {
-			writeFlatRoutes(&sb, rs, hasAuth)
+			writeFlatRoutes(&sb, rs)
 			continue
 		}
-		writeLayoutGroupRoutes(&sb, name, rs, hasAuth)
+		writeLayoutGroupRoutes(&sb, name, rs)
+	}
+
+	if catchAll {
+		sb.WriteString("      <Route path=\"*\" element={<Navigate to=\"/\" replace />} />\n")
 	}
 
 	sb.WriteString("    </Routes>\n  )\n}\n")

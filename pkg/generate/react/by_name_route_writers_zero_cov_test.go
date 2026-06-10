@@ -10,21 +10,21 @@ import (
 func TestByNameRouteWriters_ZeroCov(t *testing.T) {
 	routes := []stmlRoute{
 		{Path: "/", ComponentName: "Home", ImportPath: "./pages/home", Layout: ""},
-		{Path: "/items", ComponentName: "Items", ImportPath: "./pages/items", Layout: "app"},
+		{Path: "/items", ComponentName: "Items", ImportPath: "./pages/items", Layout: "app", Protected: true},
 	}
 	layoutSet := map[string]bool{"app": true}
 
-	app := renderAppTSX(routes, layoutSet, true)
+	app := renderAppTSX(routes, layoutSet, "")
 	if !strings.Contains(app, "Routes") {
 		t.Errorf("renderAppTSX missing Routes")
 	}
-	_ = renderAppTSX(routes, layoutSet, false)
+	_ = renderAppTSX(routes, layoutSet, "/items")
 
 	var sb strings.Builder
 	writeLayoutImports(&sb, []string{"app", "auth"})
 	writePageImports(&sb, routes)
-	writeFlatRoutes(&sb, []stmlRoute{routes[0]}, true)
-	writeLayoutGroupRoutes(&sb, "app", []stmlRoute{routes[1]}, true)
+	writeFlatRoutes(&sb, []stmlRoute{routes[0]})
+	writeLayoutGroupRoutes(&sb, "app", []stmlRoute{routes[1]})
 	writeAuthzMiddleware(&sb, false)
 	if sb.Len() == 0 {
 		t.Errorf("route writers empty")

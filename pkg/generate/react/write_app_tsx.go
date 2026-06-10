@@ -1,5 +1,5 @@
 //ff:func feature=gen-react type=generator control=sequence
-//ff:what App.tsx — STML 페이지 목록에서 React Router 라우트 자동 생성
+//ff:what App.tsx — STML 페이지 목록에서 React Router 라우트 자동 생성 (페이지별 보호 가드 포함)
 
 package react
 
@@ -18,15 +18,18 @@ import (
 //   - page.Layout == "" → grouped under defaultLayout (if non-empty)
 //   - defaultLayout == "" and page.Layout == "" → flat route (no wrapper)
 //
-// When hasAuth is true, non-auth layout groups and flat routes are wrapped
-// with <ProtectedRoute>. The "auth" layout is always public.
-func writeAppTSX(srcDir string, pages []stml.PageSpec, layouts []stml.LayoutSpec, defaultLayout string, hasAuth bool) error {
+// protectedPages (Phase005 — resolveProtectedPages, keyed by FileName) flags
+// pages whose ops carry OpenAPI security; their routes are wrapped with
+// <ProtectedRoute> per page. A "/" index route redirecting to the first
+// public page and a catch-all path="*" are emitted alongside (BUG-111 (5)).
+func writeAppTSX(srcDir string, pages []stml.PageSpec, layouts []stml.LayoutSpec, defaultLayout string, protectedPages map[string]bool) error {
 	if len(pages) == 0 {
 		return writeAppTSXPlaceholder(srcDir)
 	}
 
-	routes := buildRoutes(pages, defaultLayout)
+	routes := buildRoutes(pages, defaultLayout, protectedPages)
 	layoutSet := buildLayoutSet(layouts)
-	src := renderAppTSX(routes, layoutSet, hasAuth)
+	indexTarget := resolveIndexRedirect(pages, protectedPages)
+	src := renderAppTSX(routes, layoutSet, indexTarget)
 	return os.WriteFile(filepath.Join(srcDir, "App.tsx"), []byte(src), 0644)
 }

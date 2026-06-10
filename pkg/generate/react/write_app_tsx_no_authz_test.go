@@ -1,5 +1,5 @@
 //ff:func feature=gen-react type=test control=sequence
-//ff:what writeAppTSX 인증 가드 미적용 시 ProtectedRoute 미포함 검증
+//ff:what writeAppTSX 인증 부재 시 ProtectedRoute 미포함 + 인덱스/catch-all 방출 검증
 
 package react
 
@@ -21,7 +21,7 @@ func TestWriteAppTSX_NoAuthz_NoProtectedRoute(t *testing.T) {
 		{Name: "app", HasOutlet: true},
 		{Name: "auth", HasOutlet: true},
 	}
-	if err := writeAppTSX(dir, pages, layouts, "", false); err != nil {
+	if err := writeAppTSX(dir, pages, layouts, "", nil); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))
@@ -33,4 +33,7 @@ func TestWriteAppTSX_NoAuthz_NoProtectedRoute(t *testing.T) {
 	assertNotContains(t, content, "ProtectedRoute")
 	assertContains(t, content, "<Route element={<AppLayout />}>")
 	assertContains(t, content, "<Route element={<AuthLayout />}>")
+	// index/catch-all are emitted regardless of auth (BUG-111 (5) UX gap)
+	assertContains(t, content, `<Route path="/" element={<Navigate to="/login" replace />} />`)
+	assertContains(t, content, `<Route path="*" element={<Navigate to="/" replace />} />`)
 }

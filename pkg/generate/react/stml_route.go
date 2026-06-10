@@ -8,4 +8,5 @@ type stmlRoute struct {
 	ComponentName string // e.g. "WorkflowDetail"
 	ImportPath    string // e.g. "./pages/workflow-detail"
 	Layout        string // layout name (e.g. "app", "auth"); empty = no layout
+	Protected     bool   // page consumes a security-protected op → wrap with ProtectedRoute
 }

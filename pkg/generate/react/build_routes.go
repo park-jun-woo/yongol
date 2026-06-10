@@ -11,7 +11,11 @@ import (
 
 // buildRoutes converts STML PageSpecs into sorted route definitions.
 // defaultLayout is applied to pages that have no explicit Layout set.
-func buildRoutes(pages []stml.PageSpec, defaultLayout string) []stmlRoute {
+// protectedPages flags pages (by FileName) that consume a security-protected
+// OpenAPI op (Phase005 — resolveProtectedPages); their routes get
+// Protected=true so the renderer wraps them with <ProtectedRoute>. A nil map
+// leaves every route public.
+func buildRoutes(pages []stml.PageSpec, defaultLayout string, protectedPages map[string]bool) []stmlRoute {
 	routes := make([]stmlRoute, 0, len(pages))
 	for _, p := range pages {
 		rs := pageToRoutes(p)
@@ -21,6 +25,7 @@ func buildRoutes(pages []stml.PageSpec, defaultLayout string) []stmlRoute {
 		}
 		for i := range rs {
 			rs[i].Layout = resolvedLayout
+			rs[i].Protected = protectedPages[p.FileName]
 		}
 		routes = append(routes, rs...)
 	}

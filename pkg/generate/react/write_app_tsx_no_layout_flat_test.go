@@ -17,7 +17,7 @@ func TestWriteAppTSX_NoLayoutNoDefault_FlatRoutes(t *testing.T) {
 		{Name: "login", FileName: "login.html"},
 		{Name: "dashboard", FileName: "dashboard.html"},
 	}
-	if err := writeAppTSX(dir, pages, nil, "", false); err != nil {
+	if err := writeAppTSX(dir, pages, nil, "", nil); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))

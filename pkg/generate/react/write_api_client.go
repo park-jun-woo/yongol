@@ -76,6 +76,9 @@ func writeAPIClient(srcDir string, doc *openapi3.T, plan apiClientPlan) error {
 	if plan.cookie && plan.csrf {
 		writeCSRFMiddleware(&b, plan.csrfCookieName, plan.csrfHeaderName)
 	}
+	if plan.cookie {
+		writeCookie401Redirect(&b)
+	}
 
 	b.WriteString("\n")
 

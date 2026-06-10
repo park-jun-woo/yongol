@@ -1,5 +1,5 @@
 //ff:func feature=gen-react type=test control=sequence
-//ff:what writeAppTSX 인증 가드 + 레이아웃 그룹핑 검증
+//ff:what writeAppTSX 레이아웃 그룹 내 페이지별 가드 검증 (래퍼 비가드)
 
 package react
 
@@ -23,7 +23,8 @@ func TestWriteAppTSX_Authz_LayoutGrouping(t *testing.T) {
 		{Name: "app", HasOutlet: true, NavItems: []stml.NavItem{{Path: "/workflows", Label: "Workflows"}}},
 		{Name: "auth", HasOutlet: true},
 	}
-	if err := writeAppTSX(dir, pages, layouts, "", true); err != nil {
+	protected := map[string]bool{"workflows.html": true, "dashboard.html": true}
+	if err := writeAppTSX(dir, pages, layouts, "", protected); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))
@@ -33,9 +34,13 @@ func TestWriteAppTSX_Authz_LayoutGrouping(t *testing.T) {
 	content := string(data)
 
 	assertContains(t, content, "import ProtectedRoute from './components/ProtectedRoute'")
-	assertContains(t, content, "<Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>")
+	// layout wrappers stay unguarded — each protected page wraps itself
+	assertContains(t, content, "<Route element={<AppLayout />}>")
 	assertContains(t, content, "<Route element={<AuthLayout />}>")
+	assertNotContains(t, content, "<ProtectedRoute><AppLayout /></ProtectedRoute>")
 	assertNotContains(t, content, "<ProtectedRoute><AuthLayout /></ProtectedRoute>")
-	assertContains(t, content, `        <Route path="/workflows" element={<Workflows />} />`)
+	assertContains(t, content, `        <Route path="/workflows" element={<ProtectedRoute><Workflows /></ProtectedRoute>} />`)
+	assertContains(t, content, `        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />`)
 	assertContains(t, content, `        <Route path="/login" element={<Login />} />`)
+	assertContains(t, content, `        <Route path="/register" element={<Register />} />`)
 }

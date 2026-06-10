@@ -1,5 +1,5 @@
 //ff:func feature=gen-react type=test control=sequence
-//ff:what writeAppTSX 인증 가드 + zenflow 전체 검증
+//ff:what writeAppTSX zenflow 전체 — 보호 페이지별 가드 + 공개 로그인/회원가입 + 인덱스/catch-all 검증
 
 package react
 
@@ -43,7 +43,15 @@ func TestWriteAppTSX_Authz_ZenflowFull(t *testing.T) {
 		},
 		{Name: "auth", HasOutlet: true},
 	}
-	if err := writeAppTSX(dir, pages, layouts, "app", true); err != nil {
+	protected := map[string]bool{
+		"workflows.html":       true,
+		"workflow-detail.html": true,
+		"dashboard.html":       true,
+		"templates.html":       true,
+		"webhooks.html":        true,
+		"audit-logs.html":      true,
+	}
+	if err := writeAppTSX(dir, pages, layouts, "app", protected); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))
@@ -52,16 +60,20 @@ func TestWriteAppTSX_Authz_ZenflowFull(t *testing.T) {
 	}
 	content := string(data)
 
-	assertContains(t, content, "<Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>")
-	assertContains(t, content, `        <Route path="/audit-logs" element={<AuditLogs />} />`)
-	assertContains(t, content, `        <Route path="/dashboard" element={<Dashboard />} />`)
-	assertContains(t, content, `        <Route path="/workflows" element={<Workflows />} />`)
-	assertContains(t, content, `        <Route path="/workflows/:id" element={<WorkflowDetail />} />`)
+	assertContains(t, content, "<Route element={<AppLayout />}>")
+	assertNotContains(t, content, "<ProtectedRoute><AppLayout /></ProtectedRoute>")
+	assertContains(t, content, `        <Route path="/audit-logs" element={<ProtectedRoute><AuditLogs /></ProtectedRoute>} />`)
+	assertContains(t, content, `        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />`)
+	assertContains(t, content, `        <Route path="/workflows" element={<ProtectedRoute><Workflows /></ProtectedRoute>} />`)
+	assertContains(t, content, `        <Route path="/workflows/:id" element={<ProtectedRoute><WorkflowDetail /></ProtectedRoute>} />`)
 	assertContains(t, content, "<Route element={<AuthLayout />}>")
 	assertNotContains(t, content, "<ProtectedRoute><AuthLayout /></ProtectedRoute>")
 	assertContains(t, content, `        <Route path="/login" element={<Login />} />`)
 	assertContains(t, content, `        <Route path="/register" element={<Register />} />`)
 	assertContains(t, content, "import ProtectedRoute from './components/ProtectedRoute'")
+	// first public page in file-name order is login → "/" redirects there
+	assertContains(t, content, `<Route path="/" element={<Navigate to="/login" replace />} />`)
+	assertContains(t, content, `<Route path="*" element={<Navigate to="/" replace />} />`)
 
 	importCount := strings.Count(content, "import ProtectedRoute from")
 	if importCount != 1 {

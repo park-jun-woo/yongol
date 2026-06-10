@@ -75,7 +75,7 @@ func generateFrontendSetup(fs *yongol.Fullstack, artifactsDir string) error {
 		return err
 	}
 	if hasAuth {
-		if err := writeProtectedRoute(srcDir); err != nil {
+		if err := writeProtectedRoute(srcDir, bearerAuth); err != nil {
 			return err
 		}
 	}
@@ -84,7 +84,7 @@ func generateFrontendSetup(fs *yongol.Fullstack, artifactsDir string) error {
 			return err
 		}
 	}
-	if err := writeAppTSX(srcDir, stmlPages, stmlLayouts, defaultLayout, hasAuth); err != nil {
+	if err := writeAppTSX(srcDir, stmlPages, stmlLayouts, defaultLayout, resolveProtectedPages(fs)); err != nil {
 		return err
 	}
 	if err := writeLibUtils(srcDir); err != nil {
