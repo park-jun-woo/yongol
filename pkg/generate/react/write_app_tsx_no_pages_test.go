@@ -12,7 +12,7 @@ import (
 
 func TestWriteAppTSX_NoPages_Placeholder(t *testing.T) {
 	dir := t.TempDir()
-	if err := writeAppTSX(dir, nil, nil, "", nil); err != nil {
+	if err := writeAppTSX(dir, nil, nil, "", nil, ""); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))

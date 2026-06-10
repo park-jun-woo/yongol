@@ -36,7 +36,7 @@ func generateFrontendSetup(fs *yongol.Fullstack, artifactsDir string) error {
 
 	var stmlPages []stml.PageSpec
 	var stmlLayouts []stml.LayoutSpec
-	var defaultLayout string
+	var defaultLayout, indexPage string
 	hasAuth, bearerAuth, authStore := resolveAuthGates(fs)
 	// Resolve the api.ts mode plan up front: an ambiguous refresh-op
 	// inference is a generate ERROR and must abort before any file is
@@ -49,7 +49,7 @@ func generateFrontendSetup(fs *yongol.Fullstack, artifactsDir string) error {
 		stmlPages = fs.STMLPages
 		stmlLayouts = fs.Layouts
 		if fs.Manifest != nil {
-			defaultLayout = fs.Manifest.Frontend.DefaultLayout
+			defaultLayout, indexPage = fs.Manifest.Frontend.DefaultLayout, fs.Manifest.Frontend.Index
 		}
 	}
 
@@ -84,7 +84,7 @@ func generateFrontendSetup(fs *yongol.Fullstack, artifactsDir string) error {
 			return err
 		}
 	}
-	if err := writeAppTSX(srcDir, stmlPages, stmlLayouts, defaultLayout, resolveProtectedPages(fs)); err != nil {
+	if err := writeAppTSX(srcDir, stmlPages, stmlLayouts, defaultLayout, resolveProtectedPages(fs), indexPage); err != nil {
 		return err
 	}
 	if err := writeLibUtils(srcDir); err != nil {

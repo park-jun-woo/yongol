@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=stml-openapi
-//ff:what Run — STML<->OpenAPI 교차 검증 실행 (TM-01 ~ TM-14, TM-16, TM-17, TM-19 ~ TM-22, TM-24 ~ TM-33, XMO-10/11/12)
+//ff:what Run — STML<->OpenAPI 교차 검증 실행 (TM-01 ~ TM-14, TM-16, TM-17, TM-19 ~ TM-22, TM-24 ~ TM-35, XMO-10/11/12)
 
 package stml_openapi
 
@@ -59,6 +59,10 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	diags = append(diags, xmo10Unconsumed(fs)...)
 	diags = append(diags, xmo11NoStml(fs)...)
 	diags = append(diags, xmo12NoFrontConsumed(fs)...)
+	if fs.Manifest != nil {
+		diags = append(diags, tm34IndexTarget(fs)...)
+		diags = append(diags, tm35IndexFallback(fs, opMap)...)
+	}
 
 	if len(fs.Layouts) > 0 || (fs.Manifest != nil && fs.Manifest.Frontend.DefaultLayout != "") {
 		diags = append(diags, tm11LayoutNotFound(fs.STMLPages, fs.Layouts)...)

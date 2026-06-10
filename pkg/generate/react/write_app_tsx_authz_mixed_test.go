@@ -23,7 +23,7 @@ func TestWriteAppTSX_Authz_MixedLayoutAndFlat(t *testing.T) {
 		{Name: "auth", HasOutlet: true},
 	}
 	protected := map[string]bool{"about.html": true, "workflows.html": true}
-	if err := writeAppTSX(dir, pages, layouts, "", protected); err != nil {
+	if err := writeAppTSX(dir, pages, layouts, "", protected, ""); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))

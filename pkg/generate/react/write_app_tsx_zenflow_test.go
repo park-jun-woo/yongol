@@ -30,7 +30,7 @@ func TestWriteAppTSX_FullZenflow(t *testing.T) {
 		{Name: "webhooks", FileName: "webhooks.html"},
 		{Name: "audit-logs", FileName: "audit-logs.html"},
 	}
-	if err := writeAppTSX(dir, pages, nil, "", nil); err != nil {
+	if err := writeAppTSX(dir, pages, nil, "", nil, ""); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))

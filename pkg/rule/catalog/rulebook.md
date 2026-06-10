@@ -63,9 +63,9 @@ The `Source` column of each rule row is a Go file path relative to the repo root
 ## Rule count
 
 **This catalog is the single source of truth for the rule set.** The official
-total is the count of distinct rule IDs in the tables below — **374 rules across
+total is the count of distinct rule IDs in the tables below — **376 rules across
 60 prefixes**. This includes 26 retired rules (Deprecated section); the
-**active** subset (rows in the non-deprecated tables) is **348**.
+**active** subset (rows in the non-deprecated tables) is **350**.
 
 Counting note: a rule's ID is emitted either as a `[ID]` literal in the
 diagnostic message **or** via a `RuleID:` field / builder. A naive
@@ -644,6 +644,8 @@ Cross-validation between STML template attributes (`data-fetch`, `data-action`, 
 | TM-31 | ERROR | `data-link` target page name does not match any STML page (filename without `.html`) — the emitted `<Link>` would navigate into the void | `pkg/validate/stml_openapi/tm_31_link_target_not_found.go` |
 | TM-32 | ERROR | `data-link-params` violation: syntax (`<source> -> <SegmentName>`, comma-separated; sources `item.*`/`route.*` only), a **required** segment of the target page's resolved route left unmapped, a SegmentName absent from the target route, an `item.*` source outside `data-each` or not in the enclosing each's item schema (TM-30 infrastructure), a `route.*` source absent from this page's resolved route (TM-27 infrastructure), or the elided form (`item.id`) used when the target route does not have exactly one required segment; unmapped **optional** segments are legal | `pkg/validate/stml_openapi/tm_32_link_params_unsatisfied.go` |
 | TM-33 | ERROR | `data-redirect-params` violation: declared on a static (`/`-prefixed) `data-redirect` (contradiction — substitution applies only to page-name references), syntax (`<respField> -> <SegmentName>`, comma-separated; sources are unprefixed 2xx respFields or `route.*`), a respField absent from the action operation's OpenAPI 2xx response schema (TM-20 infrastructure; `route.*` sources are exempt), a SegmentName absent from the redirect target page's resolved route, a **required** target segment left unmapped (also when no params are declared at all), or the elided form used when the target route does not have exactly one required segment; unmapped **optional** segments are legal | `pkg/validate/stml_openapi/tm_33_redirect_params.go` |
+| TM-34 | ERROR | `manifest.frontend.index` violation: the page name (STML filename without `.html`) matches no STML page, the target page's resolved route carries a **required** parameter segment (a redirect has no value to fill it; optional-only `:Name?` pages are legal — segments are stripped), or a page already mounts `/` via `data-route` (mount vs redirect declared at once — contradiction) | `pkg/validate/stml_openapi/tm_34_index_target.go` |
+| TM-35 | WARNING | frontend ON with at least one STML page, but no index is declared (no page mounts `/` and `manifest.frontend.index` is absent) — the `/` route falls back to the first public page in file-name sort order, so an accident, not a declaration, decides the first screen; the advice names the picked fallback page and both declaration vehicles | `pkg/validate/stml_openapi/tm_35_index_fallback.go` |
 | XMO-10 | ERROR | Frontend ON & OpenAPI operationId is never consumed by any STML `data-fetch`, `data-action`, or component `api.<Op>(` call, and is not tagged `no-front` (auth endpoints are no longer auto-excluded) | `pkg/validate/stml_openapi/xmo_10_unconsumed.go` |
 | XMO-11 | ERROR | Frontend ON but no STML pages were found (set `frontend.enabled: false` for a backend-only project) | `pkg/validate/stml_openapi/xmo_11_no_stml.go` |
 | XMO-12 | WARNING | OpenAPI operationId is tagged `no-front` but is actually consumed by an STML page or component (stale or wrong tag) | `pkg/validate/stml_openapi/xmo_12_no_front_consumed.go` |

@@ -18,7 +18,7 @@ func TestWriteAppTSX_BasicPages(t *testing.T) {
 		{Name: "register", FileName: "register.html"},
 		{Name: "dashboard", FileName: "dashboard.html"},
 	}
-	if err := writeAppTSX(dir, pages, nil, "", nil); err != nil {
+	if err := writeAppTSX(dir, pages, nil, "", nil, ""); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))

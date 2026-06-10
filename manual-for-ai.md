@@ -72,6 +72,18 @@ and the STML↔OpenAPI coverage rules (XMO-10/11/12) are not run. An omitted or
 empty `frontend:` block is also treated as OFF — ON requires `enabled != false`
 **and** content (`lang` or `framework` set).
 
+`frontend.index: <page-name>` declares what the `/` index route **redirects**
+to — an STML page name (filename without `.html`, the same page-name
+reference as `data-link`), not a path. The page keeps its own route
+(`frontend.index: dashboard` → `<Navigate to="/dashboard" replace />`); a
+protected index page is legal — `<ProtectedRoute>` bounces unauthenticated
+visits to `/login` (the dashboard-as-index admin pattern). TM-34 rejects an
+unknown page name, a target route with a required parameter segment, and a
+simultaneous `data-route="/"` mount (mount vs redirect are different
+decisions — declare one). When neither is declared, the emitter falls back to
+the first public page in file-name sort order and TM-35 flags the accident
+(see the STML "Index route" rules).
+
 Claim type declaration is **required** (XDN-05). Allowed types: `string`,
 `int64`, `int32`, `bool`, `uuid`. The generated `@auth` middleware uses
 `currentUser.ID` and `currentUser.Role`; both field names must exist.
@@ -685,6 +697,21 @@ nested resource paths like `/buildings/:BuildingID/units/:UnitID`), declare
 `data-route` — its `:Name` pattern params are merged into `useParams()`
 automatically.
 
+### Index route
+
+What `/` shows is decided in three tiers (plans/stml/page-flow Phase009):
+
+1. A page with `data-route="/"` **mounts** at `/` — no redirect is emitted.
+2. `manifest.frontend.index: <page-name>` — `/` **redirects** to that page's
+   resolved route (the page keeps its own path). Optional segments
+   (`:Name?`) are stripped from the emitted `<Navigate to>` (a redirect has
+   no value to fill them); a route with a **required** segment cannot be the
+   index (TM-34). Declaring both tiers at once is a contradiction (TM-34).
+3. Neither declared — fallback: the first **public** page in file-name sort
+   order (`/login` when every candidate is protected or parameterized).
+   TM-35 warns that an accident, not a declaration, decides the first
+   screen, and names the picked page.
+
 ### Example: List + Create
 
 ```html
@@ -760,6 +787,8 @@ automatically.
 | `TM-31` | ERROR | STML internal | `data-link` target names an existing STML page (filename without `.html`) |
 | `TM-32` | ERROR | STML/OpenAPI | `data-link-params` is well-formed and satisfies the target route: every required segment mapped, SegmentNames exist in the target route, `item.*` sources inside `data-each` against the item schema, `route.*` sources in this page's resolved route, elided form only against a single required segment |
 | `TM-33` | ERROR | STML/OpenAPI | `data-redirect-params` is well-formed and satisfies the redirect target route: not declared on a static path (contradiction), respField sources exist in the action operation's 2xx response schema (`route.*` exempt), SegmentNames exist in the target route, every required segment mapped, elided form only against a single required segment |
+| `TM-34` | ERROR | manifest | `manifest.frontend.index` names an existing STML page whose resolved route has no required parameter segment, and no page simultaneously mounts `/` via `data-route` |
+| `TM-35` | WARNING | manifest | frontend ON with pages but no index declared (no `/` mount, no `frontend.index`) — the file-name-sort fallback decides the first screen; declare one of the two vehicles |
 | `XMO-10` | ERROR | OpenAPI | Frontend ON & operationId is consumed by some STML page/component **or** tagged `no-front` |
 | `XMO-11` | ERROR | manifest | Frontend ON requires at least one STML page (else set `frontend.enabled: false`) |
 | `XMO-12` | WARNING | OpenAPI | operationId tagged `no-front` must not actually be consumed (stale tag) |

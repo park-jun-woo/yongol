@@ -15,7 +15,7 @@ func TestResolveIndexRedirect(t *testing.T) {
 			{FileName: "settings.html"},
 			{FileName: "dashboard.html"},
 		}
-		if got := resolveIndexRedirect(pages, nil); got != "/dashboard" {
+		if got := resolveIndexRedirect(pages, nil, ""); got != "/dashboard" {
 			t.Errorf("got %q, want /dashboard", got)
 		}
 	})
@@ -26,7 +26,7 @@ func TestResolveIndexRedirect(t *testing.T) {
 			{FileName: "settings.html"},
 		}
 		protected := map[string]bool{"dashboard.html": true}
-		if got := resolveIndexRedirect(pages, protected); got != "/settings" {
+		if got := resolveIndexRedirect(pages, protected, ""); got != "/settings" {
 			t.Errorf("got %q, want /settings", got)
 		}
 	})
@@ -42,7 +42,7 @@ func TestResolveIndexRedirect(t *testing.T) {
 			},
 			{FileName: "items.html"},
 		}
-		if got := resolveIndexRedirect(pages, nil); got != "/items" {
+		if got := resolveIndexRedirect(pages, nil, ""); got != "/items" {
 			t.Errorf("got %q, want /items", got)
 		}
 	})
@@ -52,7 +52,7 @@ func TestResolveIndexRedirect(t *testing.T) {
 			{FileName: "about.html"},
 			{FileName: "home.html", Route: "/"},
 		}
-		if got := resolveIndexRedirect(pages, nil); got != "" {
+		if got := resolveIndexRedirect(pages, nil, ""); got != "" {
 			t.Errorf("got %q, want empty (page already routes /)", got)
 		}
 	})
@@ -60,7 +60,7 @@ func TestResolveIndexRedirect(t *testing.T) {
 	t.Run("all protected falls back to /login", func(t *testing.T) {
 		pages := []stml.PageSpec{{FileName: "admin.html"}}
 		protected := map[string]bool{"admin.html": true}
-		if got := resolveIndexRedirect(pages, protected); got != "/login" {
+		if got := resolveIndexRedirect(pages, protected, ""); got != "/login" {
 			t.Errorf("got %q, want /login", got)
 		}
 	})
