@@ -63,9 +63,9 @@ The `Source` column of each rule row is a Go file path relative to the repo root
 ## Rule count
 
 **This catalog is the single source of truth for the rule set.** The official
-total is the count of distinct rule IDs in the tables below — **369 rules across
+total is the count of distinct rule IDs in the tables below — **370 rules across
 60 prefixes**. This includes 26 retired rules (Deprecated section); the
-**active** subset (rows in the non-deprecated tables) is **343**.
+**active** subset (rows in the non-deprecated tables) is **344**.
 
 Counting note: a rule's ID is emitted either as a `[ID]` literal in the
 diagnostic message **or** via a `RuleID:` field / builder. A naive
@@ -639,6 +639,7 @@ Cross-validation between STML template attributes (`data-fetch`, `data-action`, 
 | TM-26 | ERROR | `data-redirect` path does not resolve to any STML page route (`/` is allowed as the index route) | `pkg/validate/stml_openapi/tm_26_redirect_route_exists.go` |
 | TM-27 | ERROR | a `route.<Name>` param the page consumes has no same-named `:Name`/`:Name?` segment in the page's resolved route (`stml.RoutePaths`; case-exact) — the param is always `undefined` at runtime | `pkg/validate/stml_openapi/tm_27_route_param_missing.go` |
 | TM-28 | WARNING | a `:Name`/`:Name?` segment of the page's resolved route is consumed by no `data-param-*` binding — dead segment (URL design vs page implementation drift) | `pkg/validate/stml_openapi/tm_28_route_segment_unused.go` |
+| TM-29 | WARNING | the `data-action` operation declares a 4xx/5xx response but the action block has no `data-on-error` element — the server error falls back to the default inline slot (`role="alert"`); declare `data-on-error` to decide where it appears | `pkg/validate/stml_openapi/tm_29_action_on_error_missing.go` |
 | XMO-10 | ERROR | Frontend ON & OpenAPI operationId is never consumed by any STML `data-fetch`, `data-action`, or component `api.<Op>(` call, and is not tagged `no-front` (auth endpoints are no longer auto-excluded) | `pkg/validate/stml_openapi/xmo_10_unconsumed.go` |
 | XMO-11 | ERROR | Frontend ON but no STML pages were found (set `frontend.enabled: false` for a backend-only project) | `pkg/validate/stml_openapi/xmo_11_no_stml.go` |
 | XMO-12 | WARNING | OpenAPI operationId is tagged `no-front` but is actually consumed by an STML page or component (stale or wrong tag) | `pkg/validate/stml_openapi/xmo_12_no_front_consumed.go` |
