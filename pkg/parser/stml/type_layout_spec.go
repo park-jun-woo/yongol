@@ -5,8 +5,9 @@ package stml
 // LayoutSpec represents a single STML layout parsed from an HTML file
 // in the specs/frontend/layouts/ directory.
 type LayoutSpec struct {
-	Name      string    // layout name derived from filename (e.g., "app")
-	File      string    // original file path
-	NavItems  []NavItem // data-nav navigation links
-	HasOutlet bool      // whether slot data-outlet exists
+	Name      string      // layout name derived from filename (e.g., "app")
+	File      string      // original file path
+	NavItems  []NavItem   // data-nav navigation links
+	HasOutlet bool        // whether slot data-outlet exists
+	Logout    *LogoutSpec // data-logout session-ending element (nil when absent; first occurrence wins)
 }

@@ -9,8 +9,9 @@ import (
 )
 
 // xmo12NoFrontConsumed warns when an operation tagged "no-front" is actually
-// consumed by an STML page or component. The tag claims the endpoint is
-// backend-only, so a real consumption means the tag is stale or wrong.
+// consumed by an STML page, a layout data-logout, or a component. The tag
+// claims the endpoint is backend-only, so a real consumption means the tag is
+// stale or wrong.
 func xmo12NoFrontConsumed(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	if !frontendEnabled(fs) {
 		return nil
@@ -21,7 +22,7 @@ func xmo12NoFrontConsumed(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	}
 
 	ops := collectOpIDs(doc)
-	consumed := collectConsumedOps(fs.STMLPages, fs.SpecsDir, ops)
+	consumed := collectConsumedOps(fs.STMLPages, fs.Layouts, fs.SpecsDir, ops)
 
 	var diags []diagnostic.Diagnostic
 	for _, item := range doc.Paths.Map() {

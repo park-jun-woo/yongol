@@ -516,9 +516,12 @@ attributes describe what data each page fetches, displays, and submits.
 `yongol generate` compiles STML into React TSX pages; the `.html` files are
 the source of truth, the generated `.tsx` files are disposable artifacts.
 
-Location: `frontend/*.html` (flat, no subdirectories).
+Location: `frontend/*.html` (flat, no subdirectories — except
+`frontend/layouts/*.html`, the layout vocabulary, see §Layouts below). The
+attribute vocabulary splits in two: **page attributes** (this table) and
+**layout attributes** (`data-nav` / `data-outlet` / `data-logout`, §Layouts).
 
-### data-* Attributes (17)
+### Page data-* Attributes (18)
 
 | Attribute | Purpose | Example |
 |---|---|---|
@@ -537,6 +540,7 @@ Location: `frontend/*.html` (flat, no subdirectories).
 | `data-redirect-params` | Flow: binds the redirect target route's segments — `<source> -> <SegmentName>` pairs (comma-separated, `data-capture`-style value grammar). Sources: unprefixed 2xx **response fields** of the action operation (the only data in scope after success) or `route.<Name>` (forwarding a current-page param). `-> <SegmentName>` may be elided when the target has exactly one required segment | `data-redirect-params="id -> ContractID"` |
 | `data-on-error` | Auth flow: marker for the element shown when the action fails (4xx/5xx rejects with the server ErrorResponse body; its `message` is displayed, falling back to a stringified error when `message` is absent). When absent, a default error element (`role="alert"`) is emitted right next to the submit button — declaring `data-on-error` decides the display element and position instead | `<p data-on-error></p>` |
 | `data-route` | Explicit route path override on the page's top-level element (`:Name` pattern params merge into `useParams()`) | `<main data-route="/buildings/:BuildingID/units/:UnitID">` |
+| `data-layout` | Layout opt-in on the page's top-level element — the page renders inside `layouts/<name>.html` (overrides `manifest.frontend.defaultLayout`) | `<main data-layout="app">` |
 | `data-link` | Navigation: clicking this element goes to another page. The value is a **page name** (STML filename without `.html`), not a path — route paths are a derived projection | `<li data-link="building-detail" data-link-params="item.id -> BuildingID">` |
 | `data-link-params` | Navigation: binds the target route's segments — `<source> -> <SegmentName>` pairs (comma-separated, `data-capture`-style value grammar). Sources: `item.<Field>` (inside `data-each`) or `route.<Name>` (own page route). `-> <SegmentName>` may be elided when the target has exactly one required segment | `data-link-params="item.id -> BuildingID"` |
 
@@ -712,6 +716,45 @@ What `/` shows is decided in three tiers (plans/stml/page-flow Phase009):
    TM-35 warns that an accident, not a declaration, decides the first
    screen, and names the picked page.
 
+### Layouts (`frontend/layouts/*.html`)
+
+A layout is the shared shell pages render inside — global menu, logout, and
+an outlet slot. Filename = layout name (`app.html` → `app`). A page opts in
+with `data-layout="<name>"` on its top-level element, or every page at once
+via `manifest.frontend.defaultLayout: <name>` (TM-11/12 validate the
+references, TM-13 warns on unused layouts).
+
+| Attribute | Purpose | Example |
+|---|---|---|
+| `data-nav` (on `<a>`) | Global menu entry. The value is an STML **page-name reference** (recommended — resolved to the page's route, the `data-redirect` dual rule) or a `/`-prefixed static path. The target must resolve, and a page-name target's route must carry no **required** parameter segment — a static menu link has no value to fill it (TM-36) | `<a data-nav="building-list">건물</a>` |
+| `data-outlet` (on `<slot>`) | Where the active page renders inside the layout (`<Outlet />`) | `<slot data-outlet></slot>` |
+| `data-logout` | Marks the element that ends the session. The optional value names the server logout operation (must exist and be non-GET — TM-37). bearer mode: op call (best-effort) → session store clear → `/login`; cookie mode: the server op *is* the logout (a valueless `data-logout` cannot end an httpOnly cookie session — TM-38) → `/login`. Without backend.auth the declaration is dead — TM-38 warns and nothing is emitted | `<button data-logout="Logout">로그아웃</button>` |
+
+Admin layout example (Gozhip-style):
+
+```html
+<!-- frontend/layouts/app.html -->
+<div>
+  <nav>
+    <a data-nav="dashboard">대시보드</a>
+    <a data-nav="building-list">건물</a>
+    <a data-nav="member-list">멤버</a>
+    <button data-logout="Logout">로그아웃</button>
+  </nav>
+  <slot data-outlet></slot>
+</div>
+```
+
+With `manifest.frontend.defaultLayout: app` every page without its own
+`data-layout` renders inside this shell: menu navigation across the
+parameter-less list pages plus a working logout. A menu entry into a page
+whose resolved route carries a required segment (e.g. a `contract-list`
+whose fetch consumes `route.BuildingID` → `/contract-list/:BuildingID`) is
+rejected statically (TM-36) — that navigation belongs to `data-link` with
+`data-link-params`. The emitted layout component is the only component
+class that imports the api client (`@/lib/api`) and, in bearer mode, the
+session store (`@/stores/auth`) — the same import convention as pages.
+
 ### Example: List + Create
 
 ```html
@@ -789,6 +832,9 @@ What `/` shows is decided in three tiers (plans/stml/page-flow Phase009):
 | `TM-33` | ERROR | STML/OpenAPI | `data-redirect-params` is well-formed and satisfies the redirect target route: not declared on a static path (contradiction), respField sources exist in the action operation's 2xx response schema (`route.*` exempt), SegmentNames exist in the target route, every required segment mapped, elided form only against a single required segment |
 | `TM-34` | ERROR | manifest | `manifest.frontend.index` names an existing STML page whose resolved route has no required parameter segment, and no page simultaneously mounts `/` via `data-route` |
 | `TM-35` | WARNING | manifest | frontend ON with pages but no index declared (no `/` mount, no `frontend.index`) — the file-name-sort fallback decides the first screen; declare one of the two vehicles |
+| `TM-36` | ERROR | STML internal | layout `data-nav` resolves: a `/`-prefixed static path matches some page route (`/` allowed as index), a page-name reference names an existing page whose route has no required parameter segment |
+| `TM-37` | ERROR | OpenAPI | layout `data-logout` operationId exists in OpenAPI and is not a GET (session-ending ops are mutations) |
+| `TM-38` | WARNING | manifest | `data-logout` mode fitness: no backend.auth → dead declaration (emission skipped); non-bearer mode + valueless `data-logout` → an httpOnly cookie session needs a server op to end |
 | `XMO-10` | ERROR | OpenAPI | Frontend ON & operationId is consumed by some STML page/component **or** tagged `no-front` |
 | `XMO-11` | ERROR | manifest | Frontend ON requires at least one STML page (else set `frontend.enabled: false`) |
 | `XMO-12` | WARNING | OpenAPI | operationId tagged `no-front` must not actually be consumed (stale tag) |

@@ -9,10 +9,11 @@ import (
 )
 
 // xmo10Unconsumed detects OpenAPI operationIds that are never referenced from
-// any STML data-fetch, data-action, or component api.<Op>( call while the
-// frontend is ON. Operations tagged "no-front" are explicit backend-only
-// decisions and are skipped. Frontend OFF skips the rule entirely. STML 0 pages
-// is yielded to XMO-11 (single ERROR) rather than flooding one ERROR per op.
+// any STML data-fetch, data-action, layout data-logout, or component
+// api.<Op>( call while the frontend is ON. Operations tagged "no-front" are
+// explicit backend-only decisions and are skipped. Frontend OFF skips the rule
+// entirely. STML 0 pages is yielded to XMO-11 (single ERROR) rather than
+// flooding one ERROR per op.
 func xmo10Unconsumed(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	if !frontendEnabled(fs) {
 		return nil
@@ -26,7 +27,7 @@ func xmo10Unconsumed(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	}
 
 	ops := collectOpIDs(doc)
-	consumed := collectConsumedOps(fs.STMLPages, fs.SpecsDir, ops)
+	consumed := collectConsumedOps(fs.STMLPages, fs.Layouts, fs.SpecsDir, ops)
 
 	var diags []diagnostic.Diagnostic
 	for _, item := range doc.Paths.Map() {

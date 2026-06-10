@@ -11,7 +11,7 @@ import (
 
 func TestLayoutImports_Empty(t *testing.T) {
 	layout := stml.LayoutSpec{}
-	imports := layoutImports(layout)
+	imports := layoutImports(layout, false)
 	if len(imports) != 0 {
 		t.Errorf("expected empty imports, got %v", imports)
 	}

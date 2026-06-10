@@ -71,7 +71,7 @@ func generateFrontendSetup(fs *yongol.Fullstack, artifactsDir string) error {
 	if err := writeMainTSX(srcDir); err != nil {
 		return err
 	}
-	if err := writeLayoutsTSX(srcDir, stmlLayouts); err != nil {
+	if err := writeLayoutsTSX(srcDir, stmlLayouts, navRoutePatterns(stmlPages), resolveLayoutAuthMode(hasAuth, bearerAuth)); err != nil {
 		return err
 	}
 	if hasAuth {

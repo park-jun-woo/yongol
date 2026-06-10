@@ -11,7 +11,7 @@ import (
 
 func TestLayoutImports_OutletOnly(t *testing.T) {
 	layout := stml.LayoutSpec{HasOutlet: true}
-	imports := layoutImports(layout)
+	imports := layoutImports(layout, false)
 	if len(imports) != 1 || imports[0] != "Outlet" {
 		t.Errorf("expected [Outlet], got %v", imports)
 	}

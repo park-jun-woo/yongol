@@ -6,9 +6,11 @@ package react
 import "github.com/park-jun-woo/yongol/pkg/parser/stml"
 
 // writeLayoutsTSX emits layout TSX files for all provided LayoutSpecs.
-func writeLayoutsTSX(srcDir string, layouts []stml.LayoutSpec) error {
+// routePatterns resolves data-nav page-name references and authMode wires
+// the data-logout emission (page-flow Phase010).
+func writeLayoutsTSX(srcDir string, layouts []stml.LayoutSpec, routePatterns map[string]string, authMode string) error {
 	for _, l := range layouts {
-		if err := writeLayoutTSX(srcDir, l); err != nil {
+		if err := writeLayoutTSX(srcDir, l, routePatterns, authMode); err != nil {
 			return err
 		}
 	}
