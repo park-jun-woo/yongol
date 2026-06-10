@@ -19,9 +19,10 @@ import (
 // ERROR, printReport yields a non-nil err and Generate is never called.
 func TestIntegrationGenerate_ValidationBlock(t *testing.T) {
 	tmp := t.TempDir()
-	// Minimal manifest.yaml — missing fields still parse; absent model/
-	// directory triggers M-1 error.
-	manifest := []byte("name: test\nmodule: example.com/test\n")
+	// Minimal, schema-valid manifest.yaml — it parses cleanly (no unknown
+	// keys, so strict decoding accepts it); the absent model/ directory then
+	// triggers M-1 as a validation ERROR, which is what this test exercises.
+	manifest := []byte("apiVersion: yongol/v1\nkind: Project\nmetadata:\n  name: test\nbackend:\n  module: example.com/test\n")
 	if err := os.WriteFile(filepath.Join(tmp, "manifest.yaml"), manifest, 0644); err != nil {
 		t.Fatalf("write manifest: %v", err)
 	}

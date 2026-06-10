@@ -3,6 +3,9 @@
 package manifest
 
 import (
+	"bytes"
+	"errors"
+	"io"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -30,7 +33,15 @@ func Load(specsDir string) (*ProjectConfig, []diagnostic.Diagnostic) {
 	}
 
 	var cfg ProjectConfig
-	if err := yaml.Unmarshal(data, &cfg); err != nil {
+	// Strict decoding: KnownFields(true) makes yaml.v3 reject any key that
+	// does not map to a struct field (e.g. a misspelled rate_limit key such
+	// as `requests`/`window`). Without it those keys are silently dropped and
+	// surface later as zero-value config (BUG-115). io.EOF means the file is
+	// empty, which leaves cfg at its zero value — the same outcome as the
+	// previous yaml.Unmarshal, so it is not treated as an error.
+	dec := yaml.NewDecoder(bytes.NewReader(data))
+	dec.KnownFields(true)
+	if err := dec.Decode(&cfg); err != nil && !errors.Is(err, io.EOF) {
 		line := 0
 		if m := reYAMLLine.FindStringSubmatch(err.Error()); len(m) == 2 {
 			line, _ = strconv.Atoi(m[1])

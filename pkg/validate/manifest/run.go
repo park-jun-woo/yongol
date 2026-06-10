@@ -19,6 +19,7 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	diags = append(diags, c06BackendAuthRequired(fs)...)
 	diags = append(diags, c07AuthRequiresRateLimit(fs)...)
 	diags = append(diags, c08RateLimitLoginRequired(fs)...)
+	diags = append(diags, c10RateLimitValueValid(fs)...)
 	diags = append(diags, c09BackendLangFramework(fs)...)
 	diags = append(diags, cors01WildcardCredentials(fs)...)
 	diags = append(diags, obs01MetricsPath(fs)...)

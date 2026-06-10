@@ -35,11 +35,17 @@ func blockRateLimit(fs *yongol.Fullstack, modulePath string) MainBlock {
 	for opID, entry := range fs.Manifest.Backend.RateLimit {
 		route, ok := opToRoute[opID]
 		if !ok {
-			continue
+			// Defensive guard: SEC-05 (validate) rejects rate_limit
+			// operationIds with no OpenAPI route before codegen runs.
+			// Reaching here means a validation invariant was skipped — fail
+			// loudly instead of silently dropping the rate limiter (BUG-115).
+			panic(fmt.Sprintf("unreachable: rate_limit operationId %q has no route; SEC-05 must reject this before codegen", opID))
 		}
 		period, err := time.ParseDuration(entry.Period)
 		if err != nil {
-			continue
+			// Defensive guard: C-10 (validate) rejects unparseable
+			// rate_limit periods before codegen. See BUG-115.
+			panic(fmt.Sprintf("unreachable: rate_limit operationId %q has unparseable period %q; C-10 must reject this before codegen", opID, entry.Period))
 		}
 		key := entry.Key
 		if key == "" {
