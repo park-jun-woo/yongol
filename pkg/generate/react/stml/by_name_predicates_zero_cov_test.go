@@ -4,8 +4,6 @@ package stml
 
 import (
 	"testing"
-
-	stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
 )
 
 func TestByNamePredicates_ZeroCov(t *testing.T) {
@@ -20,8 +18,6 @@ func TestByNamePredicates_ZeroCov(t *testing.T) {
 	for _, a := range actions {
 		_ = actionHasInputField(a)
 	}
-	_ = allLoginActions(actions)
-	_ = allLoginActions([]stmlparser.ActionBlock{{OperationID: "Login"}})
 	cons := byNameConstraints()
 	if !anyActionHasZodConstraints(actions, cons) {
 		t.Errorf("anyActionHasZodConstraints = false")

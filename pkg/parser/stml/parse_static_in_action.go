@@ -10,6 +10,7 @@ func parseStaticInAction(n *html.Node, ab *ActionBlock) StaticElement {
 		Tag:       n.Data,
 		ClassName: getAttr(n, "class"),
 		Text:      directText(n),
+		OnError:   hasAttr(n, "data-on-error"),
 	}
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		if c.Type != html.ElementNode {

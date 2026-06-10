@@ -1,5 +1,5 @@
 //ff:func feature=stml-gen type=generator control=sequence
-//ff:what ActionBlock에 대한 useMutation 훅 호출 코드를 생성한다
+//ff:what ActionBlock에 대한 useMutation 훅 호출 코드를 선언(data-capture/redirect/on-error) 기반으로 생성한다
 package stml
 
 import (
@@ -9,8 +9,11 @@ import (
 	stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
 )
 
-// renderUseMutation generates a useMutation hook call.
-func renderUseMutation(a stmlparser.ActionBlock, fetchOps []string, hasAuthz bool, noBodyOps map[string]bool, pathParamTypes map[string]map[string]string, constraints map[string]map[string]oapiparser.FieldConstraint) string {
+// renderUseMutation generates a useMutation hook call. The onSuccess body is
+// driven entirely by the action's STML flow declarations (data-capture →
+// session-store commit in bearer mode, data-redirect → navigate, neither →
+// invalidateQueries) and onError by data-on-error.
+func renderUseMutation(a stmlparser.ActionBlock, fetchOps []string, bearerAuth bool, noBodyOps map[string]bool, pathParamTypes map[string]map[string]string, constraints map[string]map[string]oapiparser.FieldConstraint) string {
 	mutName := toLowerFirst(a.OperationID) + "Mutation"
 	paramArgs := renderParamArgs(a.Params, a.OperationID, pathParamTypes)
 	isVoid := noBodyOps[a.OperationID]
@@ -19,26 +22,11 @@ func renderUseMutation(a stmlparser.ActionBlock, fetchOps []string, hasAuthz boo
 
 	mutationFn := renderMutationFnExpr(fnParam, a.OperationID, apiArgs)
 
-	// Login + authz: store tokens and navigate to '/'
-	if hasAuthz && isLoginAction(a.OperationID) {
-		return fmt.Sprintf(`const %s = useMutation({
-    mutationFn: %s,
-    onSuccess: (data) => {
-      localStorage.setItem('access_token', data.access_token)
-      if (data.refresh_token) {
-        localStorage.setItem('refresh_token', data.refresh_token)
-      }
-      navigate('/')
-    },
-  })`, mutName, mutationFn)
-	}
-
-	invalidate := renderInvalidateExpr(fetchOps)
+	captures := actionFlowCaptures(a, bearerAuth)
+	onSuccess := renderOnSuccessHandler(a, captures, fetchOps)
+	onError := renderOnErrorHandler(a)
 
 	return fmt.Sprintf(`const %s = useMutation({
     mutationFn: %s,
-    onSuccess: () => {
-      %s
-    },
-  })`, mutName, mutationFn, invalidate)
+%s%s  })`, mutName, mutationFn, onSuccess, onError)
 }

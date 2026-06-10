@@ -1,5 +1,5 @@
 //ff:func feature=stml-gen type=test control=sequence
-//ff:what Login + HasAuthz 시 토큰 저장 + navigate('/') + body only 직접 참조 방출 검증
+//ff:what data-capture+data-redirect 선언 시 store 커밋 + navigate 방출 검증 (bearer)
 package stml
 
 import (
@@ -9,9 +9,9 @@ import (
 	stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
 )
 
-func TestGenerateLoginPage_Authz_TokenStore(t *testing.T) {
+func TestGeneratePage_CaptureRedirect_StoreCommitAndNavigate(t *testing.T) {
 	page, _ := stmlparser.ParseReader("login-page.html", strings.NewReader(`<main>
-  <div data-action="Login">
+  <div data-action="Login" data-capture="access_token -> auth.token, refresh_token -> auth.refresh" data-redirect="/">
     <input data-field="Email" type="email" />
     <input data-field="Password" type="password" />
     <button type="submit">로그인</button>
@@ -19,24 +19,24 @@ func TestGenerateLoginPage_Authz_TokenStore(t *testing.T) {
 </main>`))
 	code := GeneratePage(page, "", GenerateOptions{
 		APIImportPath: "@/lib/api",
-		HasAuthz:      true,
+		BearerAuth:    true,
 	})
 
 	// body only: api function passed directly
 	assertContains(t, code, "mutationFn: api.Login")
-	assertNotContains(t, code, "(data) => api.Login(data)")
 
-	// Token storage in onSuccess
-	assertContains(t, code, "localStorage.setItem('access_token', data.access_token)")
-	assertContains(t, code, "localStorage.setItem('refresh_token', data.refresh_token)")
+	// declared captures commit to the session store
+	assertContains(t, code, "useAuthStore.getState().setAuth(data.access_token, data.refresh_token)")
+	assertContains(t, code, "import { useAuthStore } from '@/stores/auth'")
+	assertNotContains(t, code, "localStorage.setItem")
+
+	// declared redirect navigates
 	assertContains(t, code, "navigate('/')")
-
-	// useNavigate import
 	assertContains(t, code, "useNavigate")
 	assertContains(t, code, "from 'react-router-dom'")
 	assertContains(t, code, "const navigate = useNavigate()")
 
-	// Should NOT have queryClient (only Login action, no invalidation needed)
+	// flow-success path replaces invalidation entirely
 	assertNotContains(t, code, "useQueryClient")
 	assertNotContains(t, code, "queryClient")
 	assertNotContains(t, code, "invalidateQueries")

@@ -9,9 +9,9 @@ import (
 )
 
 // writeFlatRoutes writes flat (no layout) route elements.
-func writeFlatRoutes(sb *strings.Builder, rs []stmlRoute, hasAuthz bool) {
+func writeFlatRoutes(sb *strings.Builder, rs []stmlRoute, hasAuth bool) {
 	for _, r := range rs {
-		if hasAuthz {
+		if hasAuth {
 			fmt.Fprintf(sb, "      <Route path=\"%s\" element={<ProtectedRoute><%s /></ProtectedRoute>} />\n", r.Path, r.ComponentName)
 		} else {
 			fmt.Fprintf(sb, "      <Route path=\"%s\" element={<%s />} />\n", r.Path, r.ComponentName)

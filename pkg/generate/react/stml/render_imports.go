@@ -50,6 +50,11 @@ func renderImports(is importSet, opt GenerateOptions) string {
 		lines = append(lines, "import { useForm } from 'react-hook-form'")
 	}
 
+	// bearer session store (zustand)
+	if is.useAuthStore {
+		lines = append(lines, "import { useAuthStore } from '@/stores/auth'")
+	}
+
 	// zod + zodResolver
 	if is.useZod {
 		lines = append(lines, "import { z } from 'zod'")

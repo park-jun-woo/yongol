@@ -20,7 +20,7 @@ func renderActionForm(a stmlparser.ActionBlock, indent int) string {
 	lines = append(lines, fmt.Sprintf(`%s<form onSubmit={%s.handleSubmit((data) => %s.mutate(data))}%s>`, ind, formName, mutName, cls))
 
 	if len(a.Children) > 0 {
-		lines = append(lines, renderActionChildNodes(a.Children, formName, indent+2)...)
+		lines = append(lines, renderActionChildNodes(a.Children, formName, errorStateVar(a), indent+2)...)
 	} else {
 		for _, f := range a.Fields {
 			lines = append(lines, renderFieldJSX(f, formName, indent+2))

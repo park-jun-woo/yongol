@@ -18,15 +18,15 @@ import (
 //   - page.Layout == "" → grouped under defaultLayout (if non-empty)
 //   - defaultLayout == "" and page.Layout == "" → flat route (no wrapper)
 //
-// When hasAuthz is true, non-auth layout groups and flat routes are wrapped
+// When hasAuth is true, non-auth layout groups and flat routes are wrapped
 // with <ProtectedRoute>. The "auth" layout is always public.
-func writeAppTSX(srcDir string, pages []stml.PageSpec, layouts []stml.LayoutSpec, defaultLayout string, hasAuthz bool) error {
+func writeAppTSX(srcDir string, pages []stml.PageSpec, layouts []stml.LayoutSpec, defaultLayout string, hasAuth bool) error {
 	if len(pages) == 0 {
 		return writeAppTSXPlaceholder(srcDir)
 	}
 
 	routes := buildRoutes(pages, defaultLayout)
 	layoutSet := buildLayoutSet(layouts)
-	src := renderAppTSX(routes, layoutSet, hasAuthz)
+	src := renderAppTSX(routes, layoutSet, hasAuth)
 	return os.WriteFile(filepath.Join(srcDir, "App.tsx"), []byte(src), 0644)
 }

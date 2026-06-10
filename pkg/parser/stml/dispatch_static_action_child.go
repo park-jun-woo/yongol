@@ -14,7 +14,9 @@ func dispatchStaticActionChild(c *html.Node, ab *ActionBlock) *ChildNode {
 	case c.Data == "button" && getAttr(c, "type") == "submit":
 		ab.SubmitText = directText(c)
 		return nil
-	case hasContent(c) || hasDescendantField(c):
+	case hasContent(c) || hasDescendantField(c) || hasAttr(c, "data-on-error"):
+		// data-on-error markers are kept even when empty: codegen wraps
+		// them in a conditional error-message render (Phase003).
 		childSe := parseStaticInAction(c, ab)
 		return &ChildNode{Kind: "static", Static: &childSe}
 	default:

@@ -28,7 +28,7 @@ func TestByNameRenderJSX_ZeroCov(t *testing.T) {
 	if s := renderActionButton(a, 1, noBody); s == "" {
 		t.Errorf("renderActionButton empty")
 	}
-	_ = renderActionChildNodes(a.Children, "form", 2)
+	_ = renderActionChildNodes(a.Children, "form", "", 2)
 	_ = renderChildNodes(f.Children, "data", "item", 2, noBody)
 
 	if len(f.Eaches) > 0 {

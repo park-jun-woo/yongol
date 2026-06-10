@@ -9,9 +9,9 @@ import (
 )
 
 // writeLayoutGroupRoutes writes a layout wrapper route with child routes.
-func writeLayoutGroupRoutes(sb *strings.Builder, name string, rs []stmlRoute, hasAuthz bool) {
+func writeLayoutGroupRoutes(sb *strings.Builder, name string, rs []stmlRoute, hasAuth bool) {
 	compName := layoutComponentName(name)
-	if hasAuthz && !isAuthLayout(name) {
+	if hasAuth && !isAuthLayout(name) {
 		fmt.Fprintf(sb, "      <Route element={<ProtectedRoute><%s /></ProtectedRoute>}>\n", compName)
 	} else {
 		fmt.Fprintf(sb, "      <Route element={<%s />}>\n", compName)

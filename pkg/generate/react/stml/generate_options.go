@@ -8,9 +8,12 @@ import oapiparser "github.com/park-jun-woo/yongol/pkg/parser/openapi"
 type GenerateOptions struct {
 	APIImportPath string // import path for api module (default: "@/lib/api")
 	UseClient     bool   // emit 'use client' directive (default: false)
-	// HasAuthz indicates that authz is configured in manifest. When true,
-	// Login mutation stores tokens in localStorage and navigates to '/'.
-	HasAuthz bool
+	// BearerAuth indicates backend.auth is declared with
+	// ResolvedMode() == "bearer". When true, data-capture declarations
+	// commit response fields to the generated session store
+	// (src/stores/auth.ts). In cookie mode (or without backend.auth)
+	// captures are not emitted — only data-redirect/data-on-error apply.
+	BearerAuth bool
 	// RequestConstraints maps operationId → field name → FieldConstraint.
 	// When non-nil, zod schemas are generated for actions that have fields.
 	RequestConstraints map[string]map[string]oapiparser.FieldConstraint

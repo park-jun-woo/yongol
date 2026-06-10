@@ -13,6 +13,7 @@ type importSet struct {
 	useForm        bool
 	useZod         bool // zod + @hookform/resolvers/zod
 	useState       bool
+	useAuthStore   bool     // @/stores/auth (bearer session store)
 	useButton      bool     // @/components/ui/Button
 	useInput       bool     // @/components/ui/Input
 	useTable       bool     // @/components/ui/Table

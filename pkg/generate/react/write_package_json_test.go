@@ -11,7 +11,7 @@ import (
 
 func TestWritePackageJSON(t *testing.T) {
 	dir := t.TempDir()
-	if err := writePackageJSON(dir); err != nil {
+	if err := writePackageJSON(dir, false); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "package.json"))
@@ -48,5 +48,8 @@ func TestWritePackageJSON(t *testing.T) {
 	}
 	if pkg.Scripts["gen:api"] == "" {
 		t.Error("missing gen:api script")
+	}
+	if _, ok := pkg.Dependencies["zustand"]; ok {
+		t.Error("zustand must not be a dependency without the auth store")
 	}
 }

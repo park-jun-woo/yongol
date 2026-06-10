@@ -8,4 +8,5 @@ type StaticElement struct {
 	ClassName string      // class attribute value
 	Text      string      // direct text content
 	Children  []ChildNode // nested children
+	OnError   bool        // true when the element carries the data-on-error marker (action error slot)
 }

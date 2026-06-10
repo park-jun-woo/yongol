@@ -10,9 +10,9 @@ import (
 // renderAppTSX generates the full App.tsx source from a list of routes.
 // layoutSet contains layout names that have LayoutSpec definitions.
 // Routes with a non-empty Layout field are grouped under a layout wrapper route.
-// When hasAuthz is true, non-auth layout groups and flat routes are wrapped
+// When hasAuth is true, non-auth layout groups and flat routes are wrapped
 // with <ProtectedRoute>.
-func renderAppTSX(routes []stmlRoute, layoutSet map[string]bool, hasAuthz bool) string {
+func renderAppTSX(routes []stmlRoute, layoutSet map[string]bool, hasAuth bool) string {
 	grouped := groupRoutesByLayout(routes)
 
 	var sb strings.Builder
@@ -23,7 +23,7 @@ func renderAppTSX(routes []stmlRoute, layoutSet map[string]bool, hasAuthz bool) 
 	layoutNames := sortedLayoutNames(grouped)
 	writeLayoutImports(&sb, layoutNames)
 
-	if hasAuthz {
+	if hasAuth {
 		sb.WriteString("import ProtectedRoute from './components/ProtectedRoute'\n")
 	}
 
@@ -32,10 +32,10 @@ func renderAppTSX(routes []stmlRoute, layoutSet map[string]bool, hasAuthz bool) 
 	for _, name := range layoutNames {
 		rs := grouped[name]
 		if name == "" {
-			writeFlatRoutes(&sb, rs, hasAuthz)
+			writeFlatRoutes(&sb, rs, hasAuth)
 			continue
 		}
-		writeLayoutGroupRoutes(&sb, name, rs, hasAuthz)
+		writeLayoutGroupRoutes(&sb, name, rs, hasAuth)
 	}
 
 	sb.WriteString("    </Routes>\n  )\n}\n")

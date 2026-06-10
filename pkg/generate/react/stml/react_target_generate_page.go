@@ -34,21 +34,32 @@ func (r *ReactTarget) GeneratePage(page stmlparser.PageSpec, specsDir string, op
 
 	if len(allActions) > 0 {
 		is.useMutation = true
-		is.useQueryClient = true
 		is.useButton = true
 	}
 	if anyActionHasInputFields(allActions) {
 		is.useInput = true
 	}
 
-	// Login + authz: navigate on success instead of invalidate
-	if opt.HasAuthz && hasLoginAction(allActions) {
-		is.useNavigate = true
-		// Drop queryClient only when every action is Login (no invalidation needed)
-		if allLoginActions(allActions) {
-			is.useQueryClient = false
+	// STML flow declarations drive imports: data-redirect → useNavigate,
+	// data-capture (bearer) → session store, data-on-error → useState.
+	// queryClient is needed only when at least one action keeps the
+	// default invalidateQueries() path.
+	needsInvalidate := false
+	for _, a := range allActions {
+		if a.Redirect != "" {
+			is.useNavigate = true
+		}
+		if len(actionFlowCaptures(a, opt.BearerAuth)) > 0 {
+			is.useAuthStore = true
+		}
+		if a.OnErrorNode {
+			is.useState = true
+		}
+		if !actionHasFlowSuccess(a, opt.BearerAuth) {
+			needsInvalidate = true
 		}
 	}
+	is.useQueryClient = len(allActions) > 0 && needsInvalidate
 
 	var sb strings.Builder
 	sb.WriteString(renderImports(is, opt))
@@ -58,7 +69,7 @@ func (r *ReactTarget) GeneratePage(page stmlparser.PageSpec, specsDir string, op
 	sb.WriteString(fmt.Sprintf("export default function %s() {\n", componentName))
 
 	renderPageHooks(page, is, opt.PathParamTypes, &sb)
-	renderPageMutations(allActions, fetchOps, actionFetchMap, opt.RequestConstraints, opt.HasAuthz, opt.NoBodyOps, opt.PathParamTypes, &sb)
+	renderPageMutations(allActions, fetchOps, actionFetchMap, opt.RequestConstraints, opt.BearerAuth, opt.NoBodyOps, opt.PathParamTypes, &sb)
 	renderPageJSX(page, &sb, opt.NoBodyOps)
 
 	sb.WriteString("}\n")

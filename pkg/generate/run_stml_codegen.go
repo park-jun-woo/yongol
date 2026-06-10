@@ -18,16 +18,16 @@ func runSTMLCodegen(fs *yongol.Fullstack, artifactsDir string) error {
 		return nil
 	}
 	pagesDir := filepath.Join(artifactsDir, "frontend", "src", "pages")
-	var hasAuthz bool
-	if fs.Manifest != nil {
-		hasAuthz = fs.Manifest.Authz != nil
+	var bearerAuth bool
+	if fs.Manifest != nil && fs.Manifest.Backend.Auth != nil {
+		bearerAuth = fs.Manifest.Backend.Auth.ResolvedMode() == "bearer"
 	}
 	constraints := fillDefaultRequestConstraints(fs.STMLPages, fs.OpenAPIDoc, fs.RequestConstraints)
 	noBodyOps := oapiparser.ExtractNoBodyOps(fs.OpenAPIDoc)
 	// STML field-less actions are also body-less (no form data to send).
 	mergeFieldlessOps(noBodyOps, collectFieldlessActionOps(fs.STMLPages))
 	opt := stmlgen.GenerateOptions{
-		HasAuthz:                hasAuthz,
+		BearerAuth:              bearerAuth,
 		RequestConstraints:      constraints,
 		ResponseArrayItemFields: oapiparser.ExtractResponseArrayItemFields(fs.OpenAPIDoc),
 		NoBodyOps:               noBodyOps,

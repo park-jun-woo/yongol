@@ -34,7 +34,19 @@ func generateFrontendSetup(fs *yongol.Fullstack, artifactsDir string) error {
 		dspec = fs.DesignSpec
 	}
 
-	if err := writePackageJSON(frontendDir); err != nil {
+	var stmlPages []stml.PageSpec
+	var stmlLayouts []stml.LayoutSpec
+	var defaultLayout string
+	hasAuth, bearerAuth, authStore := resolveAuthGates(fs)
+	if fs != nil {
+		stmlPages = fs.STMLPages
+		stmlLayouts = fs.Layouts
+		if fs.Manifest != nil {
+			defaultLayout = fs.Manifest.Frontend.DefaultLayout
+		}
+	}
+
+	if err := writePackageJSON(frontendDir, bearerAuth); err != nil {
 		return err
 	}
 	if err := writeViteConfig(frontendDir); err != nil {
@@ -52,27 +64,20 @@ func generateFrontendSetup(fs *yongol.Fullstack, artifactsDir string) error {
 	if err := writeMainTSX(srcDir); err != nil {
 		return err
 	}
-	var stmlPages []stml.PageSpec
-	var stmlLayouts []stml.LayoutSpec
-	var defaultLayout string
-	var hasAuthz bool
-	if fs != nil {
-		stmlPages = fs.STMLPages
-		stmlLayouts = fs.Layouts
-		if fs.Manifest != nil {
-			defaultLayout = fs.Manifest.Frontend.DefaultLayout
-			hasAuthz = fs.Manifest.Authz != nil
-		}
-	}
 	if err := writeLayoutsTSX(srcDir, stmlLayouts); err != nil {
 		return err
 	}
-	if hasAuthz {
+	if hasAuth {
 		if err := writeProtectedRoute(srcDir); err != nil {
 			return err
 		}
 	}
-	if err := writeAppTSX(srcDir, stmlPages, stmlLayouts, defaultLayout, hasAuthz); err != nil {
+	if bearerAuth {
+		if err := writeSessionStore(srcDir, authStore); err != nil {
+			return err
+		}
+	}
+	if err := writeAppTSX(srcDir, stmlPages, stmlLayouts, defaultLayout, hasAuth); err != nil {
 		return err
 	}
 	if err := writeLibUtils(srcDir); err != nil {
@@ -102,7 +107,7 @@ func generateFrontendSetup(fs *yongol.Fullstack, artifactsDir string) error {
 		_ = os.WriteFile(typesDest, []byte("export type paths = Record<string, any>\nexport type operations = Record<string, any>\n"), 0o644)
 	}
 
-	if err := writeAPIClient(srcDir, fsOpenAPIDoc(fs), hasAuthz); err != nil {
+	if err := writeAPIClient(srcDir, fsOpenAPIDoc(fs), bearerAuth); err != nil {
 		return err
 	}
 	return deferredErr

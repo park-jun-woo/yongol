@@ -18,7 +18,7 @@ func TestByNameLookupMerge_ZeroCov(t *testing.T) {
 	merged := mergeOpt(base, GenerateOptions{
 		APIImportPath:           "@/api",
 		UseClient:               true,
-		HasAuthz:                true,
+		BearerAuth:              true,
 		RequestConstraints:      cons,
 		ResponseArrayItemFields: map[string]map[string]map[string]bool{"ListItems": {"items": {"id": true}}},
 		NoBodyOps:               map[string]bool{"X": true},

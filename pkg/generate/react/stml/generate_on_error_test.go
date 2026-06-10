@@ -1,0 +1,36 @@
+//ff:func feature=stml-gen type=test control=sequence
+//ff:what data-on-error 선언 시 에러 상태 + onError 핸들러 + 조건부 렌더 방출 검증
+package stml
+
+import (
+	"strings"
+	"testing"
+
+	stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
+)
+
+func TestGeneratePage_OnError_StateHandlerConditionalRender(t *testing.T) {
+	page, _ := stmlparser.ParseReader("login-page.html", strings.NewReader(`<main>
+  <div data-action="Login" data-redirect="/">
+    <input data-field="Email" type="email" />
+    <button type="submit">로그인</button>
+    <p class="error" data-on-error></p>
+  </div>
+</main>`))
+	code := GeneratePage(page, "", GenerateOptions{
+		APIImportPath: "@/lib/api",
+		BearerAuth:    true,
+	})
+
+	// error message state + useState import
+	assertContains(t, code, "const [loginError, setLoginError] = useState<string | null>(null)")
+	assertContains(t, code, "import { useState } from 'react'")
+
+	// onError handler feeds the state; onSuccess clears it
+	assertContains(t, code, "onError: (err) => {")
+	assertContains(t, code, "setLoginError(err instanceof Error ? err.message : String(err))")
+	assertContains(t, code, "setLoginError(null)")
+
+	// the data-on-error element renders conditionally with the message bound
+	assertContains(t, code, `{loginError && <p className="error">{loginError}</p>}`)
+}

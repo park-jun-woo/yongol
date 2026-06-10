@@ -1,5 +1,5 @@
 //ff:func feature=stml-gen type=test control=sequence
-//ff:what Login + HasAuthz=false 시 기존 invalidateQueries 동작 유지 검증
+//ff:what 흐름 속성 없는 액션은 bearer여도 기존 invalidateQueries 경로 불변 검증
 package stml
 
 import (
@@ -9,7 +9,7 @@ import (
 	stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
 )
 
-func TestGenerateLoginPage_NoAuthz_DefaultBehavior(t *testing.T) {
+func TestGeneratePage_NoFlowAttrs_DefaultInvalidate(t *testing.T) {
 	page, _ := stmlparser.ParseReader("login-page.html", strings.NewReader(`<main>
   <div data-action="Login">
     <input data-field="Email" type="email" />
@@ -19,14 +19,15 @@ func TestGenerateLoginPage_NoAuthz_DefaultBehavior(t *testing.T) {
 </main>`))
 	code := GeneratePage(page, "", GenerateOptions{
 		APIImportPath: "@/lib/api",
-		HasAuthz:      false,
+		BearerAuth:    true,
 	})
 
-	// Default behavior: invalidateQueries
+	// No data-capture/data-redirect → the default invalidation path stays.
+	// "Login" gets no special treatment (hardcode removed in Phase003).
 	assertContains(t, code, "queryClient.invalidateQueries()")
 	assertContains(t, code, "useQueryClient")
 
-	// Should NOT have token storage or navigate
+	assertNotContains(t, code, "useAuthStore")
 	assertNotContains(t, code, "localStorage.setItem")
 	assertNotContains(t, code, "navigate('/')")
 	assertNotContains(t, code, "useNavigate")

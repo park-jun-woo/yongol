@@ -1,5 +1,5 @@
 //ff:func feature=gen-react type=test control=sequence
-//ff:what writeAPIClient JWT 미들웨어 포함 검증
+//ff:what writeAPIClient bearer 미들웨어 포함 검증 — Bearer 토큰을 세션 store에서 읽는다
 
 package react
 
@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestWriteAPIClient_Authz_JWTMiddleware(t *testing.T) {
+func TestWriteAPIClient_Bearer_AuthMiddleware(t *testing.T) {
 	dir := t.TempDir()
 	if err := writeAPIClient(dir, nil, true); err != nil {
 		t.Fatal(err)
@@ -22,6 +22,8 @@ func TestWriteAPIClient_Authz_JWTMiddleware(t *testing.T) {
 
 	assertContains(t, content, "client.use({")
 	assertContains(t, content, "async onRequest({ request })")
-	assertContains(t, content, "localStorage.getItem('access_token')")
+	assertContains(t, content, "import { useAuthStore } from '../stores/auth'")
+	assertContains(t, content, "const token = useAuthStore.getState().token")
 	assertContains(t, content, "request.headers.set('Authorization', `Bearer ${token}`)")
+	assertNotContains(t, content, "localStorage")
 }

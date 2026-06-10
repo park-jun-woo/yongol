@@ -14,7 +14,9 @@ func dispatchActionChild(n *html.Node, ab *ActionBlock) bool {
 	case n.Data == "button" && getAttr(n, "type") == "submit":
 		ab.SubmitText = directText(n)
 		return true
-	case hasContent(n) || hasDescendantField(n):
+	case hasContent(n) || hasDescendantField(n) || hasAttr(n, "data-on-error"):
+		// data-on-error markers are kept even when empty: codegen wraps
+		// them in a conditional error-message render (Phase003).
 		se := parseStaticInAction(n, ab)
 		ab.Children = append(ab.Children, ChildNode{Kind: "static", Static: &se})
 		return true

@@ -19,7 +19,24 @@ import (
 //     also re-runs it from `yongol generate` so generated docs are fresh.
 //   - tailwindcss 3.x + clsx + tailwind-merge — shadcn/ui primitives rely on
 //     the cn() utility.
-func writePackageJSON(dir string) error {
+//   - zustand 5 (withAuthStore only) — the bearer session store emitted as
+//     src/stores/auth.ts depends on it.
+func writePackageJSON(dir string, withAuthStore bool) error {
+	deps := map[string]string{
+		"react":                 "^19",
+		"react-dom":             "^19",
+		"react-router-dom":      "^7",
+		"@tanstack/react-query": "^5",
+		"react-hook-form":       "^7",
+		"zod":                   "^3",
+		"@hookform/resolvers":   "^3",
+		"openapi-fetch":         "^0.13",
+		"clsx":                  "^2",
+		"tailwind-merge":        "^2",
+	}
+	if withAuthStore {
+		deps["zustand"] = "^5"
+	}
 	pkg := map[string]interface{}{
 		"private": true,
 		"type":    "module",
@@ -29,18 +46,7 @@ func writePackageJSON(dir string) error {
 			"preview": "vite preview",
 			"gen:api": "openapi-typescript ../specs/api/openapi.yaml -o ./src/types/api.d.ts",
 		},
-		"dependencies": map[string]string{
-			"react":                 "^19",
-			"react-dom":             "^19",
-			"react-router-dom":      "^7",
-			"@tanstack/react-query": "^5",
-			"react-hook-form":       "^7",
-			"zod":                   "^3",
-			"@hookform/resolvers":   "^3",
-			"openapi-fetch":         "^0.13",
-			"clsx":                  "^2",
-			"tailwind-merge":        "^2",
-		},
+		"dependencies": deps,
 		"devDependencies": map[string]string{
 			"@types/react":         "^19",
 			"@types/react-dom":     "^19",
