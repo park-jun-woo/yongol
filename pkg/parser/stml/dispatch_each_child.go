@@ -1,21 +1,19 @@
 //ff:func feature=stml-parse type=parser control=selection
-//ff:what each 블록 내 단일 요소를 분기 처리 (data-action 거부 포함)
+//ff:what each 블록 내 단일 요소를 분기 처리 (행 단위 data-action 파싱 포함)
 package stml
 
-import (
-	"golang.org/x/net/html"
-
-	"github.com/park-jun-woo/yongol/pkg/diagnostic"
-)
+import "golang.org/x/net/html"
 
 func dispatchEachChild(n *html.Node, eb *EachBlock) bool {
 	switch {
 	case getAttr(n, "data-action") != "":
-		eb.Diags = append(eb.Diags, diagnostic.Diagnostic{
-			Phase:   diagnostic.PhaseParse,
-			Level:   diagnostic.LevelError,
-			Message: "TM-10: data-action is not allowed inside data-each; move it to the parent data-fetch",
-		})
+		// Row-level action (page-flow Phase006): the action may reference
+		// the current row's fields via item.<Field> param sources. The
+		// mutation itself is hoisted to the page level; the row supplies
+		// the arguments at the call site.
+		ab := parseActionBlock(n, getAttr(n, "data-action"))
+		eb.Actions = append(eb.Actions, ab)
+		eb.Children = append(eb.Children, ChildNode{Kind: "action", Action: &ab})
 		return true
 	case getAttr(n, "data-bind") != "":
 		field := getAttr(n, "data-bind")

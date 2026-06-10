@@ -1,10 +1,11 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=stml-openapi
-//ff:what Run — STML<->OpenAPI 교차 검증 실행 (TM-01 ~ TM-14, TM-16, TM-17, TM-19 ~ TM-22, TM-24 ~ TM-29, XMO-10/11/12)
+//ff:what Run — STML<->OpenAPI 교차 검증 실행 (TM-01 ~ TM-14, TM-16, TM-17, TM-19 ~ TM-22, TM-24 ~ TM-30, XMO-10/11/12)
 
 package stml_openapi
 
 import (
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
+	oapiparser "github.com/park-jun-woo/yongol/pkg/parser/openapi"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
@@ -21,6 +22,9 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	}
 
 	opMap := buildOperationMethodMap(fs.OpenAPIDoc)
+	// item schema of each response array field — TM-30 resolves item.<Field>
+	// sources against it (same extraction the react emitter keys rows with).
+	raif := oapiparser.ExtractResponseArrayItemFields(fs.OpenAPIDoc)
 
 	var diags []diagnostic.Diagnostic
 	for _, page := range fs.STMLPages {
@@ -42,6 +46,7 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		diags = append(diags, tm25FlowAttrPlacement(page)...)
 		diags = append(diags, tm27RouteParamMissing(page)...)
 		diags = append(diags, tm28RouteSegmentUnused(page)...)
+		diags = append(diags, tm30ItemSource(page, raif)...)
 	}
 
 	diags = append(diags, tm10ClassProhibited(fs.STMLPages)...)

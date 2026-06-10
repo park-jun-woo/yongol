@@ -12,5 +12,10 @@ func paramSourceExpr(p stmlparser.ParamBind) string {
 	if strings.HasPrefix(p.Source, "route.") {
 		return strings.TrimPrefix(p.Source, "route.")
 	}
+	if strings.HasPrefix(p.Source, "item.") {
+		// Row-context source (page-flow Phase006): valid as-is inside the
+		// data-each map callback scope ((item) => ...).
+		return p.Source
+	}
 	return p.Source
 }

@@ -32,7 +32,7 @@ func TestByNameRenderJSX_ZeroCov(t *testing.T) {
 	_ = renderChildNodes(f.Children, "data", "item", 2, noBody)
 
 	if len(f.Eaches) > 0 {
-		if s := renderEachJSX(f.Eaches[0], "data", 1); s == "" {
+		if s := renderEachJSX(f.Eaches[0], "data", 1, noBody); s == "" {
 			t.Errorf("renderEachJSX empty")
 		}
 	}

@@ -6,6 +6,11 @@ import "golang.org/x/net/html"
 
 func dispatchStaticEachChild(c *html.Node, eb *EachBlock) ChildNode {
 	switch {
+	case getAttr(c, "data-action") != "":
+		// Row-level action nested in a static wrapper (page-flow Phase006).
+		ab := parseActionBlock(c, getAttr(c, "data-action"))
+		eb.Actions = append(eb.Actions, ab)
+		return ChildNode{Kind: "action", Action: &ab}
 	case getAttr(c, "data-bind") != "":
 		bf := getAttr(c, "data-bind")
 		bind := FieldBind{Name: bf, Tag: c.Data, Type: getAttr(c, "type"), ClassName: getAttr(c, "class")}

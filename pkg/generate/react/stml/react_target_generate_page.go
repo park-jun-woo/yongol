@@ -12,6 +12,8 @@ import (
 func (r *ReactTarget) GeneratePage(page stmlparser.PageSpec, specsDir string, opt GenerateOptions) string {
 	// Pre-populate EachBlock.KeyField from response schema
 	populateEachKeyFields(&page, opt.ResponseArrayItemFields)
+	// Pre-populate row-action mutate arguments (item.* sources, Phase006)
+	populateRowActionArgs(&page, opt.ResponseArrayItemTypes, opt.PathParamTypes)
 
 	is := collectImports(page, specsDir)
 

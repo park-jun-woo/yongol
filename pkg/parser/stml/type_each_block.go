@@ -11,6 +11,7 @@ type EachBlock struct {
 	ItemTag       string                  // repeated item tag (e.g. "li")
 	ItemClassName string                  // repeated item class
 	Field         string                  // array field name (e.g. "reservations")
+	Actions       []ActionBlock           // row-level data-action inside the loop (for validation; item.* param sources)
 	Binds         []FieldBind             // data-bind inside the loop (for validation)
 	States        []StateBind             // data-state inside the loop (for validation)
 	Components    []ComponentRef          // data-component inside the loop (for validation)

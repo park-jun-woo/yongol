@@ -23,6 +23,12 @@ func renderActionButton(a stmlparser.ActionBlock, indent int, noBodyOps map[stri
 	if noBodyOps[a.OperationID] {
 		mutateArg = ""
 	}
+	if a.RowMutateArg != "" {
+		// Row action inside data-each (page-flow Phase006): the call site
+		// supplies route.* and item.* arguments; the hoisted mutationFn is
+		// a pass-through ((vars) => api.X(vars)).
+		mutateArg = a.RowMutateArg
+	}
 	disabledExpr := mergeDisabledExpr(mutName+".isPending", a.EnabledWhen, "data")
 	// The button path drops static children, so the error slot is rendered
 	// right after the button (conditional on the state). data-on-error keeps

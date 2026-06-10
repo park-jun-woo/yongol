@@ -12,7 +12,7 @@ func renderChildNodes(nodes []stmlparser.ChildNode, dataVar, itemVar string, ind
 		case "bind":
 			lines = append(lines, renderBindJSX(*ch.Bind, dataVar, indent))
 		case "each":
-			lines = append(lines, renderEachJSX(*ch.Each, dataVar, indent))
+			lines = append(lines, renderEachJSX(*ch.Each, dataVar, indent, noBodyOps))
 		case "state":
 			lines = append(lines, renderStateJSX(*ch.State, dataVar, indent, noBodyOps))
 		case "component":

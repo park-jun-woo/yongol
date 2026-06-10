@@ -1,5 +1,5 @@
 //ff:func feature=validate type=test control=iteration dimension=1 topic=stml-openapi
-//ff:what TestCollectChildOps — ChildNode action/fetch/state에서 operationId 재귀 수집
+//ff:what TestCollectChildOps — ChildNode action/fetch/state/each/static에서 operationId 재귀 수집
 package stml_openapi
 
 import (
@@ -28,8 +28,21 @@ func TestCollectChildOps(t *testing.T) {
 			{Kind: "action", Action: &stml.ActionBlock{OperationID: "RetryItem"}},
 		},
 	}}, out)
+	// Each branch with a row action (page-flow Phase006).
+	collectChildOps(stml.ChildNode{Kind: "each", Each: &stml.EachBlock{
+		Field: "photos",
+		Children: []stml.ChildNode{
+			{Kind: "action", Action: &stml.ActionBlock{OperationID: "DeletePhoto"}},
+		},
+	}}, out)
+	// Static branch with a nested action.
+	collectChildOps(stml.ChildNode{Kind: "static", Static: &stml.StaticElement{
+		Children: []stml.ChildNode{
+			{Kind: "action", Action: &stml.ActionBlock{OperationID: "StarPhoto"}},
+		},
+	}}, out)
 
-	for _, id := range []string{"CreateItem", "ListItems", "RetryItem"} {
+	for _, id := range []string{"CreateItem", "ListItems", "RetryItem", "DeletePhoto", "StarPhoto"} {
 		if _, ok := out[id]; !ok {
 			t.Errorf("missing operationId %q", id)
 		}

@@ -21,6 +21,16 @@ func renderUseMutation(a stmlparser.ActionBlock, fetchOps []string, bearerAuth b
 	isVoid := noBodyOps[a.OperationID]
 
 	fnParam, apiArgs := resolveMutationArgs(a.OperationID, paramArgs, isVoid, constraints)
+	if actionHasItemParam(a) {
+		// Row action (page-flow Phase006): item.<Field> is only in scope
+		// inside the data-each map callback, so the closure cannot bake the
+		// params — the call site supplies the full argument object via
+		// mutation.mutate({...}) and the mutationFn passes it through. The
+		// param type mirrors the generated api signature (strict tsconfig:
+		// an untyped vars would be an implicit any).
+		fnParam = fmt.Sprintf("(vars: Parameters<typeof api.%s>[0])", a.OperationID)
+		apiArgs = "vars"
+	}
 
 	mutationFn := renderMutationFnExpr(fnParam, a.OperationID, apiArgs)
 

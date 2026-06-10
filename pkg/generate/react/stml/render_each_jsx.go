@@ -1,5 +1,5 @@
 //ff:func feature=stml-gen type=generator control=iteration dimension=1
-//ff:what EachBlock의 배열 순회 JSX를 Table 구조로 생성한다
+//ff:what EachBlock의 배열 순회 JSX를 Table 구조로 생성한다 (행 액션 셀 포함)
 package stml
 
 import (
@@ -9,8 +9,11 @@ import (
 	stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
 )
 
-// renderEachJSX generates JSX for an EachBlock as a Table.
-func renderEachJSX(e stmlparser.EachBlock, dataVar string, indent int) string {
+// renderEachJSX generates JSX for an EachBlock as a Table. Row-level
+// actions (page-flow Phase006) are rendered as one trailing cell per
+// action inside the map callback, where `item` is in scope for the
+// item.<Field> mutate arguments.
+func renderEachJSX(e stmlparser.EachBlock, dataVar string, indent int, noBodyOps map[string]bool) string {
 	ind := indentStr(indent)
 	cls := clsAttr(e.ClassName)
 
@@ -30,6 +33,9 @@ func renderEachJSX(e stmlparser.EachBlock, dataVar string, indent int) string {
 		}
 	}
 
+	// Row actions in DOM order (direct children and static-nested)
+	rowActions := collectAllActions(e.Children)
+
 	var lines []string
 	lines = append(lines, fmt.Sprintf("%s<Table%s>", ind, cls))
 
@@ -38,6 +44,9 @@ func renderEachJSX(e stmlparser.EachBlock, dataVar string, indent int) string {
 	lines = append(lines, fmt.Sprintf("%s    <TR>", ind))
 	for _, f := range fields {
 		lines = append(lines, fmt.Sprintf("%s      <TH>%s</TH>", ind, toLabel(f)))
+	}
+	for range rowActions {
+		lines = append(lines, fmt.Sprintf("%s      <TH></TH>", ind))
 	}
 	lines = append(lines, fmt.Sprintf("%s    </TR>", ind))
 	lines = append(lines, fmt.Sprintf("%s  </THead>", ind))
@@ -48,6 +57,11 @@ func renderEachJSX(e stmlparser.EachBlock, dataVar string, indent int) string {
 	lines = append(lines, fmt.Sprintf("%s      <TR key={%s}>", ind, keyExpr))
 	for _, f := range fields {
 		lines = append(lines, fmt.Sprintf("%s        <TD>{item.%s}</TD>", ind, optionalChainPath(f)))
+	}
+	for _, a := range rowActions {
+		lines = append(lines, fmt.Sprintf("%s        <TD>", ind))
+		lines = append(lines, renderActionJSX(a, indent+10, noBodyOps))
+		lines = append(lines, fmt.Sprintf("%s        </TD>", ind))
 	}
 	lines = append(lines, fmt.Sprintf("%s      </TR>", ind))
 	lines = append(lines, fmt.Sprintf("%s    ))}", ind))

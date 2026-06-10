@@ -31,6 +31,7 @@ func runSTMLCodegen(fs *yongol.Fullstack, artifactsDir string) error {
 		BearerAuth:              bearerAuth,
 		RequestConstraints:      constraints,
 		ResponseArrayItemFields: oapiparser.ExtractResponseArrayItemFields(fs.OpenAPIDoc),
+		ResponseArrayItemTypes:  oapiparser.ExtractResponseArrayItemTypes(fs.OpenAPIDoc),
 		NoBodyOps:               noBodyOps,
 		PathParamTypes:          oapiparser.ExtractPathParamTypes(fs.OpenAPIDoc),
 	}

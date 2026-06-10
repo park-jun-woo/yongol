@@ -20,6 +20,12 @@ type GenerateOptions struct {
 	// ResponseArrayItemFields maps operationId → array field name → set of item field names.
 	// Used to determine whether list items have an "id" field for React key.
 	ResponseArrayItemFields map[string]map[string]map[string]bool
+	// ResponseArrayItemTypes maps operationId → array field name → item field
+	// name → OpenAPI type. Row actions inside data-each consult it: an
+	// item.<Field> mutate argument bound to an integer path parameter is
+	// wrapped with Number(...) only when the item field is not already
+	// numeric in the response schema.
+	ResponseArrayItemTypes map[string]map[string]map[string]string
 	// NoBodyOps is the set of operationIds whose OpenAPI definition has no
 	// requestBody. Void mutations use mutate() instead of mutate({}).
 	NoBodyOps map[string]bool

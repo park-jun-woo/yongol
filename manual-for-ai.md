@@ -514,7 +514,7 @@ Location: `frontend/*.html` (flat, no subdirectories).
 | `data-action` | POST/PUT/DELETE submission (operationId) | `<div data-action="CreateWorkflow">` |
 | `data-field` | Request body field binding | `<input data-field="title" />` |
 | `data-bind` | Response field display | `<span data-bind="status"></span>` |
-| `data-param-*` | Path/query parameter | `data-param-id="route.id"` |
+| `data-param-*` | Path/query parameter (`route.<Name>`, or `item.<Field>` inside `data-each`) | `data-param-id="route.id"`, `data-param-photo-id="item.id"` |
 | `data-each` | Array iteration | `<ul data-each="workflows">` |
 | `data-state` | Conditional display (guard, see below) | `data-state="workflow.status=draft"` |
 | `data-component` | Custom component delegation | `<div data-component="DatePicker" data-field="StartAt" />` |
@@ -573,13 +573,29 @@ blocks at the top level. Nesting rules:
 - `data-fetch` can contain `data-bind`, `data-each`, `data-state`, and nested
   `data-action` (e.g. action buttons inside a detail view).
 - `data-each` iterates an array field from the parent `data-fetch` response.
-  Children inside `data-each` use `data-bind` to display item fields.
+  Children inside `data-each` use `data-bind` to display item fields, and may
+  declare row-level `data-action` buttons (e.g. delete-this-row) whose
+  `data-param-*` sources reference the current row via `item.<Field>`.
 - `data-action` can contain `data-field` inputs and a submit button.
 - `data-state` conditionally shows its children based on a field value
   (e.g. `data-state="status=draft"` or `data-state="items.empty"`).
 - `data-param-*` passes path/query parameters. The `*` suffix is kebab-case
   and maps to camelCase (`data-param-reservation-id` → `reservationId`).
-  Source is `route.<Name>` for URL params.
+  Source is `route.<Name>` for URL params, or `item.<Field>` for the current
+  row's field inside a `data-each` block (TM-30: `item.*` is only legal
+  inside `data-each`, against the innermost each's item schema; it
+  contributes no route segment). Example:
+
+  ```html
+  <ul data-each="photos">
+    <li>
+      <span data-bind="caption"></span>
+      <button data-action="DeletePhoto"
+              data-param-building-id="route.BuildingID"
+              data-param-photo-id="item.id">삭제</button>
+    </li>
+  </ul>
+  ```
 
 ### Route paths
 
@@ -600,6 +616,9 @@ the page's `route.<Name>` consumption** so the route pattern and the page's
    segments come first.
    Example: `unit-info.html` fetching with `route.BuildingID`/`route.UnitID`
    and deleting with `route.PhotoID` → `/unit-info/:BuildingID/:UnitID/:PhotoID?`.
+   (Row-context IDs are better expressed as `item.<Field>` inside `data-each`
+   — `item.*` contributes no route segment, so the delete above declared with
+   `data-param-photo-id="item.id"` drops the `:PhotoID?` segment.)
 3. A page that consumes no `route.*` keeps the bare base path. A page whose
    fetch requires params has **no** bare-path route — a list+detail hybrid
    needs two pages or an explicit `data-route`.
@@ -681,6 +700,7 @@ automatically.
 | `TM-27` | ERROR | STML internal | every consumed `route.<Name>` appears as a same-named `:Name`/`:Name?` segment in the page's resolved route (case-exact) |
 | `TM-28` | WARNING | STML internal | every `:Name`/`:Name?` segment of the page's resolved route is consumed by some `data-param-*` binding |
 | `TM-29` | WARNING | OpenAPI | an action whose operation declares a 4xx/5xx response should declare a `data-on-error` element — without it the server error falls back to the default inline slot (`role="alert"`) |
+| `TM-30` | ERROR | OpenAPI | `item.<Field>` param source only inside a `data-each` block, and the field must exist in the enclosing each's item schema (OpenAPI response) |
 | `XMO-10` | ERROR | OpenAPI | Frontend ON & operationId is consumed by some STML page/component **or** tagged `no-front` |
 | `XMO-11` | ERROR | manifest | Frontend ON requires at least one STML page (else set `frontend.enabled: false`) |
 | `XMO-12` | WARNING | OpenAPI | operationId tagged `no-front` must not actually be consumed (stale tag) |

@@ -17,4 +17,10 @@ type ActionBlock struct {
 	Captures    []CaptureBind // parsed data-capture bindings (empty when absent or syntactically invalid)
 	Redirect    string        // data-redirect static path navigated to on action success (empty if unset)
 	OnErrorNode bool          // true when a descendant element carries data-on-error
+
+	// RowMutateArg is codegen-populated (pkg/generate/react/stml, like
+	// EachBlock.KeyField): the call-site mutate() argument object for a row
+	// action inside data-each whose params use item.<Field> sources. The
+	// parser always leaves it empty.
+	RowMutateArg string
 }

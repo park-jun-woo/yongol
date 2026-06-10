@@ -11,7 +11,7 @@ func renderFetchJSXFlatChildren(f stmlparser.FetchBlock, alias string, indent in
 		lines = append(lines, renderBindJSX(b, alias, indent))
 	}
 	for _, e := range f.Eaches {
-		lines = append(lines, renderEachJSX(e, alias, indent))
+		lines = append(lines, renderEachJSX(e, alias, indent, noBodyOps))
 	}
 	for _, s := range f.States {
 		lines = append(lines, renderStateJSX(s, alias, indent, noBodyOps))
