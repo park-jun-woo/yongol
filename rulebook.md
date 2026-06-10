@@ -63,9 +63,9 @@ The `Source` column of each rule row is a Go file path relative to the repo root
 ## Rule count
 
 **This catalog is the single source of truth for the rule set.** The official
-total is the count of distinct rule IDs in the tables below — **356 rules across
+total is the count of distinct rule IDs in the tables below — **363 rules across
 60 prefixes**. This includes 26 retired rules (Deprecated section); the
-**active** subset (rows in the non-deprecated tables) is **330**.
+**active** subset (rows in the non-deprecated tables) is **337**.
 
 Counting note: a rule's ID is emitted either as a `[ID]` literal in the
 diagnostic message **or** via a `RuleID:` field / builder. A naive
@@ -603,7 +603,7 @@ Rules collected during the DDL migration phase of `yongol generate` (`pkg/genera
 
 ## U. STML ↔ OpenAPI / stateDiagram (`TM-*`)
 
-Cross-validation between STML template attributes (`data-fetch`, `data-action`, `data-param`, `data-field`, `data-bind`, `data-each`, `data-component`, `data-layout`, `data-state`, `data-enabled-when`, `data-invalidates`) and the OpenAPI spec, layouts, and Mermaid stateDiagrams. Ensures that STML references resolve to valid OpenAPI operations, parameters, request/response fields, component files, layouts, and statechart states/transitions. Most rules live in `pkg/validate/stml_openapi/`; the stateDiagram cross-checks (TM-15, TM-18) live in `pkg/validate/stml_statemachine/`.
+Cross-validation between STML template attributes (`data-fetch`, `data-action`, `data-param`, `data-field`, `data-bind`, `data-each`, `data-component`, `data-layout`, `data-state`, `data-enabled-when`, `data-invalidates`, `data-capture`, `data-redirect`, `data-on-error`) and the OpenAPI spec, layouts, and Mermaid stateDiagrams. Ensures that STML references resolve to valid OpenAPI operations, parameters, request/response fields, component files, layouts, and statechart states/transitions. Most rules live in `pkg/validate/stml_openapi/`; the stateDiagram cross-checks (TM-15, TM-18, TM-23) live in `pkg/validate/stml_statemachine/`. TM-20~26 are the runtime twins of the Hurl flow rules (XOH-05/06/07/08/09) for the auth session flow (plans/stml/auth-flow Phase002).
 
 | Rule ID | Level | Description | Source |
 |---|---|---|---|
@@ -626,6 +626,13 @@ Cross-validation between STML template attributes (`data-fetch`, `data-action`, 
 | TM-17 | ERROR | `data-state` guard using a combinator (`&&`, `||`, leading `!`, or parentheses) is not valid guard syntax (§3.4 EBNF; no function calls, arithmetic, or ternaries) | `pkg/validate/stml_openapi/tm_17_guard_syntax.go` |
 | TM-18 | WARNING | `data-action` transition is not legal from the state its `data-enabled-when` guard requires, per the Mermaid stateDiagram | `pkg/validate/stml_statemachine/tm_18_transition_validity.go` |
 | TM-19 | WARNING | `data-field` binds an `object`(map) type request body field to a plain text input — the generated key-value data cannot be entered through a single text input | `pkg/validate/stml_openapi/tm_19_map_field_text_input.go` |
+| TM-20 | ERROR | `data-capture` syntax violation (must be `<respField> -> <sink>` with sink `auth.token`/`auth.refresh`), or a captured respField is not in the operation's OpenAPI 2xx response schema (↔ XOH-08) | `pkg/validate/stml_openapi/tm_20_capture_field_in_response.go` |
+| TM-21 | WARNING | bearer mode but no STML page captures `auth.token`, or captures exist but no page calls a security-protected operation — the captured token is never consumed (↔ XOH-09) | `pkg/validate/stml_openapi/tm_21_capture_sink_unused.go` |
+| TM-22 | ERROR | bearer mode + a page calls a `security`-protected operation + no STML page captures `auth.token` — every protected screen is guaranteed a 401 (↔ XOH-06) | `pkg/validate/stml_openapi/tm_22_protected_op_no_token_supply.go` |
+| TM-23 | WARNING | `data-redirect` target page's `data-state` guard (`=` comparison on the same stateDiagram) requires a state that is not an arrival state of the action's transition (↔ XOH-05); not-comparable guards stay silent | `pkg/validate/stml_statemachine/tm_23_redirect_state_conflict.go` |
+| TM-24 | WARNING | cookie mode but an `auth.*` `data-capture` or a manifest `frontend.auth` block is declared — httpOnly cookies cannot be captured (↔ XOH-07 mode consistency) | `pkg/validate/stml_openapi/tm_24_cookie_mode_capture_conflict.go` |
+| TM-25 | ERROR | `data-on-error` is outside any `data-action` block, or `data-capture`/`data-redirect` sits on an element without `data-action` | `pkg/validate/stml_openapi/tm_25_flow_attr_placement.go` |
+| TM-26 | ERROR | `data-redirect` path does not resolve to any STML page route (`/` is allowed as the index route) | `pkg/validate/stml_openapi/tm_26_redirect_route_exists.go` |
 | XMO-10 | ERROR | Frontend ON & OpenAPI operationId is never consumed by any STML `data-fetch`, `data-action`, or component `api.<Op>(` call, and is not tagged `no-front` (auth endpoints are no longer auto-excluded) | `pkg/validate/stml_openapi/xmo_10_unconsumed.go` |
 | XMO-11 | ERROR | Frontend ON but no STML pages were found (set `frontend.enabled: false` for a backend-only project) | `pkg/validate/stml_openapi/xmo_11_no_stml.go` |
 | XMO-12 | WARNING | OpenAPI operationId is tagged `no-front` but is actually consumed by an STML page or component (stale or wrong tag) | `pkg/validate/stml_openapi/xmo_12_no_front_consumed.go` |

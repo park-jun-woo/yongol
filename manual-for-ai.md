@@ -506,7 +506,7 @@ the source of truth, the generated `.tsx` files are disposable artifacts.
 
 Location: `frontend/*.html` (flat, no subdirectories).
 
-### data-* Attributes (10)
+### data-* Attributes (13)
 
 | Attribute | Purpose | Example |
 |---|---|---|
@@ -520,12 +520,23 @@ Location: `frontend/*.html` (flat, no subdirectories).
 | `data-component` | Custom component delegation | `<div data-component="DatePicker" data-field="StartAt" />` |
 | `data-enabled-when` | Action enablement decision (guard) | `<button data-action="ActivateWorkflow" data-enabled-when="workflow.status=draft">` |
 | `data-invalidates` | Effect declaration: queries to refetch on action success (space-separated operationIds) | `<div data-action="CreateWorkflow" data-invalidates="ListWorkflows">` |
+| `data-capture` | Auth flow: store response fields into auth sinks on action success | `<section data-action="Login" data-capture="access_token -> auth.token, refresh_token -> auth.refresh">` |
+| `data-redirect` | Auth flow: static path navigated to on action success | `<section data-action="Login" data-redirect="/">` |
+| `data-on-error` | Auth flow: marker for the element shown (with the server error message) when the action fails | `<p data-on-error></p>` |
 
 `data-enabled-when` declares *when an action is available*: the button renders
 `disabled` unless the guard holds. `data-invalidates` declares *what goes stale*
 on success — each listed GET operationId is refetched (TanStack Query
 invalidation). Both are decisions, not implementation; codegen renders the
 wiring as a disposable projection.
+
+The three flow attributes declare the auth session flow (plans/stml/auth-flow):
+`data-capture` and `data-redirect` belong on the `data-action` element itself,
+`data-on-error` on an element *inside* a `data-action` block (TM-25 enforces
+placement). The capture sink namespace is restricted to `auth.token` and
+`auth.refresh` (`session.*` collides with the SSaC built-in session package).
+`data-redirect` takes a static path only and must resolve to an STML page
+route, `/` being the index route (TM-26).
 
 ### Guard syntax (`data-state` / `data-enabled-when`)
 
@@ -630,6 +641,13 @@ blocks at the top level. Nesting rules:
 | `TM-17` | ERROR | STML internal | `data-state` guard with a combinator parses under the §guard-syntax EBNF |
 | `TM-18` | WARNING | stateDiagram | the `data-action` transition is legal from the state its `data-enabled-when` requires |
 | `TM-19` | WARNING | OpenAPI | `data-field` must not bind an `object`(map) request body field to a plain text input |
+| `TM-20` | ERROR | OpenAPI | `data-capture` is well-formed (sink `auth.token`/`auth.refresh`) and every respField exists in the operation's 2xx response schema |
+| `TM-21` | WARNING | manifest/OpenAPI | bearer mode needs an `auth.token` capture, and declared captures need a page that calls a protected operation |
+| `TM-22` | ERROR | manifest/OpenAPI | bearer mode + a page calls a `security`-protected operation requires some page to capture `auth.token` |
+| `TM-23` | WARNING | stateDiagram | the `data-redirect` target page's `=` state guard must accept an arrival state of the action's transition |
+| `TM-24` | WARNING | manifest | cookie mode must not declare `auth.*` captures or a `frontend.auth` block (httpOnly cookies cannot be captured) |
+| `TM-25` | ERROR | STML internal | `data-on-error` only inside a `data-action` block; `data-capture`/`data-redirect` only on a `data-action` element |
+| `TM-26` | ERROR | STML internal | `data-redirect` path resolves to an STML page route (`/` allowed as index) |
 | `XMO-10` | ERROR | OpenAPI | Frontend ON & operationId is consumed by some STML page/component **or** tagged `no-front` |
 | `XMO-11` | ERROR | manifest | Frontend ON requires at least one STML page (else set `frontend.enabled: false`) |
 | `XMO-12` | WARNING | OpenAPI | operationId tagged `no-front` must not actually be consumed (stale tag) |
@@ -730,7 +748,7 @@ invalid → 401. Permission checks are handled by `@auth`.
 
 ## Validation
 
-`yongol validate` runs 330 active rules from a catalog of 356 rule IDs across
+`yongol validate` runs 337 active rules from a catalog of 363 rule IDs across
 60 prefix categories (C-*, D-*, O-*, S-*, TM-*, XOS-*, XPS-*, XDM-*, XDP-*,
 XNS-*, PRV-*, MIG-*, CORS-*, SEC-*, OBS-*, H-*, …; the remaining 26 IDs are
 retired — see the rulebook's Deprecated section). AI authors do not memorise IDs — the validator prints rule ID, level,

@@ -11,4 +11,6 @@ type PageSpec struct {
 	Fetches  []FetchBlock  // data-fetch blocks (for validation)
 	Actions  []ActionBlock // data-action blocks (for validation)
 	Children []ChildNode   // all top-level children in DOM order (for codegen)
+
+	FlowAttrMisplaced []FlowAttrMisplaced // flow attrs found on illegal positions (TM-25)
 }
