@@ -28,7 +28,7 @@ func TestPrepareAuth(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			fs := &yongol.Fullstack{Manifest: &pmanifest.ProjectConfig{Backend: pmanifest.Backend{Auth: tc.auth}}}
-			got := authFor(fs)
+			got := AuthFor(fs)
 			if got.Present != tc.wantOK {
 				t.Fatalf("Present=%v want %v", got.Present, tc.wantOK)
 			}

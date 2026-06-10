@@ -38,6 +38,13 @@ func generateFrontendSetup(fs *yongol.Fullstack, artifactsDir string) error {
 	var stmlLayouts []stml.LayoutSpec
 	var defaultLayout string
 	hasAuth, bearerAuth, authStore := resolveAuthGates(fs)
+	// Resolve the api.ts mode plan up front: an ambiguous refresh-op
+	// inference is a generate ERROR and must abort before any file is
+	// written (the advice asks for an explicit frontend.auth.refresh_op).
+	apiPlan, err := resolveAPIClientPlan(fs)
+	if err != nil {
+		return err
+	}
 	if fs != nil {
 		stmlPages = fs.STMLPages
 		stmlLayouts = fs.Layouts
@@ -87,9 +94,6 @@ func generateFrontendSetup(fs *yongol.Fullstack, artifactsDir string) error {
 		return err
 	}
 
-	// types/api.d.ts must exist before api.ts is written (import resolution).
-	// Best-effort: if openapi-typescript fails, a stub is written and the
-	// error is propagated so the caller knows.
 	// openapi-typescript must run before api.ts emission because api.ts
 	// imports `../types/api` at the type level. If the tool is missing, a
 	// stub is still written (inside runOpenAPITypescript's error path) so
@@ -107,7 +111,7 @@ func generateFrontendSetup(fs *yongol.Fullstack, artifactsDir string) error {
 		_ = os.WriteFile(typesDest, []byte("export type paths = Record<string, any>\nexport type operations = Record<string, any>\n"), 0o644)
 	}
 
-	if err := writeAPIClient(srcDir, fsOpenAPIDoc(fs), bearerAuth); err != nil {
+	if err := writeAPIClient(srcDir, fsOpenAPIDoc(fs), apiPlan); err != nil {
 		return err
 	}
 	return deferredErr

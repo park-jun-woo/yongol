@@ -11,7 +11,7 @@ import (
 
 func TestWriteAPIClient_BaseUrlEmpty(t *testing.T) {
 	dir := t.TempDir()
-	if err := writeAPIClient(dir, nil, false); err != nil {
+	if err := writeAPIClient(dir, nil, apiClientPlan{}); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "lib", "api.ts"))

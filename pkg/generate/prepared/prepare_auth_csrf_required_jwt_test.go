@@ -22,7 +22,7 @@ func TestPrepareAuthCsrfRequired_Jwt(t *testing.T) {
 			},
 		},
 	}
-	got := authFor(fs)
+	got := AuthFor(fs)
 	if !got.Present {
 		t.Fatalf("Present=false; expected true")
 	}

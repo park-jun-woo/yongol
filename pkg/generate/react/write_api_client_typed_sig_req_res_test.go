@@ -20,7 +20,7 @@ func TestWriteAPIClient_TypedSig_ReqResHelpers(t *testing.T) {
 			}),
 		),
 	}
-	if err := writeAPIClient(dir, doc, false); err != nil {
+	if err := writeAPIClient(dir, doc, apiClientPlan{}); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "lib", "api.ts"))

@@ -1,11 +1,11 @@
 //ff:func feature=generate type=util control=sequence
-//ff:what authFor — manifest.backend.auth 파생 (Mode 기본값 해석 + type=jwt → bearer 매핑)
+//ff:what AuthFor — manifest.backend.auth 파생 (Mode 기본값 해석 + type=jwt → bearer 매핑)
 
 package prepared
 
 import "github.com/park-jun-woo/yongol/pkg/yongol"
 
-// authFor collapses the raw manifest.Auth into prepared.Auth with Mode
+// AuthFor collapses the raw manifest.Auth into prepared.Auth with Mode
 // already defaulted via manifest.Auth.ResolvedMode(). Every emitter
 // that previously read a.Mode or a.ResolvedMode() now reads
 // state.Auth.Mode, eliminating the BUG-009 class of inconsistency.
@@ -21,7 +21,11 @@ import "github.com/park-jun-woo/yongol/pkg/yongol"
 // false. Emitters gate all CSRF code on this flag so JWT-only
 // projects emit no CSRF block, no csrf.go file, and no
 // middleware.Csrf import.
-func authFor(fs *yongol.Fullstack) Auth {
+//
+// Exported since Phase004 (plans/stml/auth-flow): the react emitter
+// consumes the same derived mode so the frontend client (bearer vs
+// cookie/CSRF) can never diverge from the backend middleware it talks to.
+func AuthFor(fs *yongol.Fullstack) Auth {
 	if fs == nil || fs.Manifest == nil || fs.Manifest.Backend.Auth == nil {
 		return Auth{}
 	}

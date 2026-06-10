@@ -11,7 +11,7 @@ import (
 
 func TestWriteAPIClient_Bearer_AuthMiddleware(t *testing.T) {
 	dir := t.TempDir()
-	if err := writeAPIClient(dir, nil, true); err != nil {
+	if err := writeAPIClient(dir, nil, apiClientPlan{bearer: true}); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "lib", "api.ts"))

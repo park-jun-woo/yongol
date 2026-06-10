@@ -25,7 +25,7 @@ func TestByNameRouteWriters_ZeroCov(t *testing.T) {
 	writePageImports(&sb, routes)
 	writeFlatRoutes(&sb, []stmlRoute{routes[0]}, true)
 	writeLayoutGroupRoutes(&sb, "app", []stmlRoute{routes[1]}, true)
-	writeAuthzMiddleware(&sb)
+	writeAuthzMiddleware(&sb, false)
 	if sb.Len() == 0 {
 		t.Errorf("route writers empty")
 	}

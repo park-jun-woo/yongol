@@ -30,7 +30,7 @@ func TestByNameEndpoints_ZeroCov(t *testing.T) {
 	}
 
 	var b strings.Builder
-	writeApiClientEntry(&b, eps[0])
+	writeApiClientEntry(&b, eps[0], false)
 	if b.Len() == 0 {
 		t.Errorf("writeApiClientEntry empty")
 	}

@@ -21,7 +21,12 @@ import (
 // shape cannot be statically split into openapi-fetch's per-channel query/body
 // types (query may be `never`), so only the query/body *value* is cast — never
 // the path object or the whole init. This preserves the static path-key check.
-func writeApiClientEntry(b *strings.Builder, ep endpoint) {
+//
+// withRetry (Phase004, bearer+refresh) wraps the client call in
+// withAuthRetry(() => ...) so a 401 triggers the single-flight refresh and
+// re-invokes the closure once — the request is rebuilt from args, which is
+// why retry lives here and not in the openapi-fetch middleware.
+func writeApiClientEntry(b *strings.Builder, ep endpoint, withRetry bool) {
 	method := strings.ToUpper(ep.method)
 	pathLit := ep.path
 	opQ := fmt.Sprintf("'%s'", ep.opID) // quoted operationId for type arg
@@ -55,9 +60,11 @@ func writeApiClientEntry(b *strings.Builder, ep endpoint) {
 			b.WriteString("      if (v == null) continue\n")
 			b.WriteString("      if (!(k in path)) query[k] = v\n")
 			b.WriteString("    }\n")
-			b.WriteString(fmt.Sprintf("    return client.GET('%s', { params: { path, query: query as any } }).then(r => r.data as Res<%s>)\n", pathLit, opQ))
+			call := wrapAuthRetry(fmt.Sprintf("client.GET('%s', { params: { path, query: query as any } })", pathLit), withRetry)
+			b.WriteString(fmt.Sprintf("    return %s.then(r => r.data as Res<%s>)\n", call, opQ))
 		} else {
-			b.WriteString(fmt.Sprintf("    return client.GET('%s', { params: { query: (args ?? {}) as any } }).then(r => r.data as Res<%s>)\n", pathLit, opQ))
+			call := wrapAuthRetry(fmt.Sprintf("client.GET('%s', { params: { query: (args ?? {}) as any } })", pathLit), withRetry)
+			b.WriteString(fmt.Sprintf("    return %s.then(r => r.data as Res<%s>)\n", call, opQ))
 		}
 	} else {
 		verbCall := "POST"
@@ -70,9 +77,11 @@ func writeApiClientEntry(b *strings.Builder, ep endpoint) {
 			b.WriteString("    for (const [k, v] of Object.entries(a)) {\n")
 			b.WriteString("      if (!(k in path)) body[k] = v\n")
 			b.WriteString("    }\n")
-			b.WriteString(fmt.Sprintf("    return client.%s('%s', { params: { path }, body: body as any }).then(r => r.data as Res<%s>)\n", verbCall, pathLit, opQ))
+			call := wrapAuthRetry(fmt.Sprintf("client.%s('%s', { params: { path }, body: body as any })", verbCall, pathLit), withRetry)
+			b.WriteString(fmt.Sprintf("    return %s.then(r => r.data as Res<%s>)\n", call, opQ))
 		} else {
-			b.WriteString(fmt.Sprintf("    return client.%s('%s', { body: (args ?? {}) as any }).then(r => r.data as Res<%s>)\n", verbCall, pathLit, opQ))
+			call := wrapAuthRetry(fmt.Sprintf("client.%s('%s', { body: (args ?? {}) as any })", verbCall, pathLit), withRetry)
+			b.WriteString(fmt.Sprintf("    return %s.then(r => r.data as Res<%s>)\n", call, opQ))
 		}
 	}
 	b.WriteString("  },\n")

@@ -38,4 +38,13 @@ func TestResolveAuthGates(t *testing.T) {
 	if has, bearer, store := resolveAuthGates(cookieFs); !has || bearer || store != "localStorage" {
 		t.Errorf("cookie = (%v,%v,%q), want (true,false,\"localStorage\")", has, bearer, store)
 	}
+
+	// jwt type without mode -> prepared mode is bearer (BUG-014 rule via
+	// prepared.AuthFor), not the raw ResolvedMode() cookie default (Phase004)
+	jwtFs := &yongol.Fullstack{Manifest: &manifest.ProjectConfig{
+		Backend: manifest.Backend{Auth: &manifest.Auth{Type: "jwt"}},
+	}}
+	if has, bearer, store := resolveAuthGates(jwtFs); !has || !bearer || store != "localStorage" {
+		t.Errorf("jwt no-mode = (%v,%v,%q), want (true,true,\"localStorage\")", has, bearer, store)
+	}
 }

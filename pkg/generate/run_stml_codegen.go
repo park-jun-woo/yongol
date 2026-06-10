@@ -6,6 +6,7 @@ package generate
 import (
 	"path/filepath"
 
+	"github.com/park-jun-woo/yongol/pkg/generate/prepared"
 	stmlgen "github.com/park-jun-woo/yongol/pkg/generate/react/stml"
 	oapiparser "github.com/park-jun-woo/yongol/pkg/parser/openapi"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
@@ -18,10 +19,10 @@ func runSTMLCodegen(fs *yongol.Fullstack, artifactsDir string) error {
 		return nil
 	}
 	pagesDir := filepath.Join(artifactsDir, "frontend", "src", "pages")
-	var bearerAuth bool
-	if fs.Manifest != nil && fs.Manifest.Backend.Auth != nil {
-		bearerAuth = fs.Manifest.Backend.Auth.ResolvedMode() == "bearer"
-	}
+	// Prepared mode, not raw ResolvedMode(): keeps the capture-commit gate
+	// aligned with the backend emitters and the react auth gates (Phase004
+	// — including the BUG-014 jwt-without-mode → bearer rule).
+	bearerAuth := prepared.AuthFor(fs).Mode == "bearer"
 	constraints := fillDefaultRequestConstraints(fs.STMLPages, fs.OpenAPIDoc, fs.RequestConstraints)
 	noBodyOps := oapiparser.ExtractNoBodyOps(fs.OpenAPIDoc)
 	// STML field-less actions are also body-less (no form data to send).

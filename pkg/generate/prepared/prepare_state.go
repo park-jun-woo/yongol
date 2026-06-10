@@ -16,7 +16,7 @@ import "github.com/park-jun-woo/yongol/pkg/yongol"
 func New(fs *yongol.Fullstack) State {
 	return State{
 		ActiveBackends: activeBackendsFor(fs),
-		Auth:           authFor(fs),
+		Auth:           AuthFor(fs),
 		Middlewares:    middlewaresFor(fs),
 		Routes:         routesFor(fs),
 	}

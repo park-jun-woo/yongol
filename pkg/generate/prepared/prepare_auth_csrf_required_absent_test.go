@@ -20,7 +20,7 @@ func TestPrepareAuthCsrfRequired_Absent(t *testing.T) {
 			Backend: pmanifest.Backend{Auth: nil},
 		},
 	}
-	got := authFor(fs)
+	got := AuthFor(fs)
 	if got.Present {
 		t.Fatalf("Present=true; expected false when auth is absent")
 	}

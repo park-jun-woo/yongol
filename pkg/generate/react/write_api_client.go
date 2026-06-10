@@ -1,5 +1,5 @@
 //ff:func feature=gen-react type=generator control=iteration dimension=1
-//ff:what writeAPIClient — src/lib/api.ts 에 operationId 기반 api 객체 방출
+//ff:what writeAPIClient — src/lib/api.ts 에 operationId 기반 api 객체 방출 (bearer/cookie 모드 분기)
 
 package react
 
@@ -23,10 +23,14 @@ import (
 // camelCase — preserved). This is the contract XOT-1 checks against at
 // validate time.
 //
-// When bearerAuth is true (backend.auth.ResolvedMode() == "bearer"), an auth
-// middleware is registered on the client that attaches the Bearer token read
-// from the session store (src/stores/auth.ts) to every outgoing request.
-func writeAPIClient(srcDir string, doc *openapi3.T, bearerAuth bool) error {
+// plan selects the auth mode wiring (Phase004):
+//   - bearer: Bearer-injection middleware reading the session store. With
+//     plan.refresh, 401s go through the single-flight refresh + retry-once
+//     wrapper (withAuthRetry) instead of the immediate clear+/login.
+//   - cookie/hybrid: createClient gets credentials: 'include' and, when
+//     plan.csrf, the double-submit CSRF header middleware. No store, no
+//     Bearer, no refresh flow.
+func writeAPIClient(srcDir string, doc *openapi3.T, plan apiClientPlan) error {
 	if err := os.MkdirAll(filepath.Join(srcDir, "lib"), 0o755); err != nil {
 		return err
 	}
@@ -36,7 +40,7 @@ func writeAPIClient(srcDir string, doc *openapi3.T, bearerAuth bool) error {
 	b.WriteString("// Source of truth: specs/api/openapi.yaml (operationId-keyed).\n")
 	b.WriteString("import createClient from 'openapi-fetch'\n")
 	b.WriteString("import type { paths, operations } from '../types/api'\n")
-	if bearerAuth {
+	if plan.bearer {
 		b.WriteString("import { useAuthStore } from '../stores/auth'\n")
 	}
 	b.WriteString("\n")
@@ -55,10 +59,22 @@ func writeAPIClient(srcDir string, doc *openapi3.T, bearerAuth bool) error {
 	if err := detectDoublePrefix(baseURL, paths); err != nil {
 		return err
 	}
-	b.WriteString("const client = createClient<paths>({ baseUrl: '" + baseURL + "' })\n")
+	clientInit := "{ baseUrl: '" + baseURL + "' }"
+	if plan.cookie {
+		// httpOnly session cookies must travel with every request.
+		clientInit = "{ baseUrl: '" + baseURL + "', credentials: 'include' }"
+	}
+	b.WriteString("const client = createClient<paths>(" + clientInit + ")\n")
 
-	if bearerAuth {
-		writeAuthzMiddleware(&b)
+	withRetry := plan.bearer && plan.refresh != nil
+	if plan.bearer {
+		writeAuthzMiddleware(&b, withRetry)
+		if withRetry {
+			writeRefreshFlow(&b, plan.refresh)
+		}
+	}
+	if plan.cookie && plan.csrf {
+		writeCSRFMiddleware(&b, plan.csrfCookieName, plan.csrfHeaderName)
 	}
 
 	b.WriteString("\n")
@@ -73,7 +89,7 @@ func writeAPIClient(srcDir string, doc *openapi3.T, bearerAuth bool) error {
 
 	b.WriteString("export const api = {\n")
 	for _, ep := range entries {
-		writeApiClientEntry(&b, ep)
+		writeApiClientEntry(&b, ep, withRetry)
 	}
 	b.WriteString("}\n")
 
