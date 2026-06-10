@@ -13,6 +13,7 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	diags = append(diags, xno50SecuritySchemeMiddleware(fs)...)
 	diags = append(diags, xno52SecurityMiddleware(fs)...)
 	diags = append(diags, xon51MiddlewareSecurityScheme(fs)...)
+	diags = append(diags, xon60FrontendAuthTokenField(fs)...)
 	diags = append(diags, sec04HTTPOverridesOperationID(fs)...)
 	return diags
 }

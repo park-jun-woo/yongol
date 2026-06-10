@@ -629,6 +629,7 @@ blocks at the top level. Nesting rules:
 | `TM-16` | ERROR | OpenAPI | `data-invalidates` operationId exists in OpenAPI and is a GET |
 | `TM-17` | ERROR | STML internal | `data-state` guard with a combinator parses under the §guard-syntax EBNF |
 | `TM-18` | WARNING | stateDiagram | the `data-action` transition is legal from the state its `data-enabled-when` requires |
+| `TM-19` | WARNING | OpenAPI | `data-field` must not bind an `object`(map) request body field to a plain text input |
 | `XMO-10` | ERROR | OpenAPI | Frontend ON & operationId is consumed by some STML page/component **or** tagged `no-front` |
 | `XMO-11` | ERROR | manifest | Frontend ON requires at least one STML page (else set `frontend.enabled: false`) |
 | `XMO-12` | WARNING | OpenAPI | operationId tagged `no-front` must not actually be consumed (stale tag) |
@@ -662,7 +663,9 @@ Standard Hurl — [`docs/scenario.md`](docs/scenario.md). yongol adds no DSL.
   jsonpath (XOH-04, ERROR), state order (XOH-05, WARNING), auth
   precondition (XOH-06, WARNING), CSRF on mutation (XOH-07, WARNING),
   capture jsonpath (XOH-08, ERROR), unused capture (XOH-09, WARNING),
-  status code coverage (XOH-12, WARNING), SSaC guard+happy path coverage (XOH-13, WARNING).
+  smoke.hurl required (XOH-10, ERROR), smoke operationId coverage
+  (XOH-11, ERROR), status code coverage (XOH-12, WARNING), SSaC
+  guard+happy path coverage (XOH-13, WARNING).
 
 ### Authoring quick-start
 
@@ -727,9 +730,10 @@ invalid → 401. Permission checks are handled by `@auth`.
 
 ## Validation
 
-`yongol validate` runs 353 rules across 60 prefix categories (C-*, D-*, M-*, T-*,
-S-*, XOT-*, XPS-*, XDM-*, XPD-*, XNS-*, PRV-*, MIG-*, CORS-*, SEC-*, OBS-*,
-H-*, …). AI authors do not memorise IDs — the validator prints rule ID, level,
+`yongol validate` runs 330 active rules from a catalog of 356 rule IDs across
+60 prefix categories (C-*, D-*, O-*, S-*, TM-*, XOS-*, XPS-*, XDM-*, XDP-*,
+XNS-*, PRV-*, MIG-*, CORS-*, SEC-*, OBS-*, H-*, …; the remaining 26 IDs are
+retired — see the rulebook's Deprecated section). AI authors do not memorise IDs — the validator prints rule ID, level,
 file, line, message. Catalog: [`rulebook.md`](rulebook.md). `yongol generate`
 refuses to run while any ERROR or WARNING remains.
 

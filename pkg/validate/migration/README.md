@@ -20,7 +20,7 @@ DDL 마이그레이션 안전성 검증. 이전 스냅샷 (`arts/db/.latest_sche
 | MIG-003 | `mig_003_data_migration_missing` | `@data_migration file=...` 가 가리키는 sidecar SQL 이 없음 (ERROR) | IF-ELSE | ✓ |
 | MIG-004 | `mig_004_destructive_without_allow` | DROP TABLE / DROP COLUMN 인데 `@allow_destructive` 없음 (WARNING) | IF-ELSE | ✓ |
 | MIG-005 | `mig_005_cast_missing` | `INTEGER↔TEXT` 등 위험한 타입 변경에 `@cast using=...` 힌트 없음 (WARNING) | IF-ELSE | ✓ |
-| MIG-006 | `mig_006_snapshot_drift` | `.generated_schema.sql` 의 `YONGOL_SCHEMA_HASH` 헤더가 본문 sha256 과 불일치 (ERROR) | IF-ELSE | ✓ |
+| MIG-006 | `mig_006_snapshot_drift` | `arts/db/.latest_schema.sql` 의 `YONGOL_SCHEMA_HASH` 헤더가 본문 sha256 과 불일치 (ERROR) | IF-ELSE | ✓ |
 
 ## 주요 함수
 

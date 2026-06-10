@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=migration-snapshot
-//ff:what MIG-006 — .generated_schema.sql 의 YONGOL_SCHEMA_HASH 헤더가 본문 sha256 과 불일치 → ERROR
+//ff:what MIG-006 — arts/db/.latest_schema.sql 의 YONGOL_SCHEMA_HASH 헤더가 본문 sha256 과 불일치 → ERROR
 package migration
 
 import (

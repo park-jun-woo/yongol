@@ -47,6 +47,8 @@ Complete catalog of rules executed by `yongol validate`. The manual (`manual-for
 | STML | `T` | Design | `V` |
 
 Example: SSaC → OpenAPI (SSaC is the claim, OpenAPI is the ground truth) → `XOS-`.
+
+> **Known prefix collision**: Func and features.yaml both use SSOT code `F`, so the `XFS-` prefix is shared by two categories — SSaC ↔ Func (`XFS-39` ~ `XFS-73`, section H) and Features ↔ stateDiagram (`XFS-01`, section Y). Rule IDs themselves are unique; resolve the category by the rule number.
 ## Level
 
 | Level | Behavior | Meaning |
@@ -61,9 +63,9 @@ The `Source` column of each rule row is a Go file path relative to the repo root
 ## Rule count
 
 **This catalog is the single source of truth for the rule set.** The official
-total is the count of distinct rule IDs in the tables below — **354 rules across
-60 prefixes**. This includes ~25 retired rules (Deprecated section; no Go
-`Source`); the **active** subset (rows with a Go `Source`) is ~329.
+total is the count of distinct rule IDs in the tables below — **356 rules across
+60 prefixes**. This includes 26 retired rules (Deprecated section); the
+**active** subset (rows in the non-deprecated tables) is **330**.
 
 Counting note: a rule's ID is emitted either as a `[ID]` literal in the
 diagnostic message **or** via a `RuleID:` field / builder. A naive
@@ -185,6 +187,7 @@ SSaC self-consistency — required fields, variable flow, model references, @sub
 | SEC-401 | ERROR | Literal `backend.auth.secret` is forbidden (git leak / rotation impossible) — only `secret_env` is allowed | `pkg/validate/manifest/sec_401_jwt_secret_env_required.go` |
 | SEC-402 | WARNING | `backend.auth.access_token_ttl > 30m` exceeds the OWASP recommended upper bound (expanded blast radius) | `pkg/validate/manifest/sec_402_access_ttl_upper_bound.go` |
 | SEC-403 | ERROR | `backend.auth.mode` must be one of `cookie` / `bearer` / `hybrid` (defaults to `cookie` when unspecified) | `pkg/validate/manifest/sec_403_auth_mode_enum.go` |
+| SEC-404 | ERROR | `frontend.auth.store` must be one of `localStorage` / `memory` (defaults to `localStorage` when unspecified); `cookie` is a mode, not a store — rejected with a pointer to `backend.auth.mode: cookie` | `pkg/validate/manifest/sec_404_frontend_auth_store_enum.go` |
 
 ## C. OpenAPI Internal
 
@@ -377,6 +380,7 @@ Cross-consistency between OpenAPI security schemes and manifest middleware confi
 | XNO-50 | ERROR | OpenAPI securityScheme must map to existing manifest middleware | `pkg/validate/openapi_manifest/xno_50_security_scheme_middleware.go` |
 | XNO-52 | ERROR | Endpoint security must reference an existing manifest middleware name, and the middleware block itself must exist | `pkg/validate/openapi_manifest/xno_52_security_middleware.go` |
 | XON-51 | ERROR | manifest middleware must map to an existing OpenAPI securityScheme (coverage) | `pkg/validate/openapi_manifest/xon_51_middleware_security_scheme.go` |
+| XON-60 | ERROR | `frontend.auth.token_field` (and `refresh_field` when declared) must exist as a property of at least one OpenAPI 2xx response schema; `refresh_op` (when declared) must name an existing operationId whose 2xx response carries `token_field` | `pkg/validate/openapi_manifest/xon_60_frontend_auth_token_field.go` |
 | SEC-04 | ERROR | The `<key>` of `backend.http.overrides.<key>` must exist as an OpenAPI operationId | `pkg/validate/openapi_manifest/sec_04_http_overrides_operation_id.go` |
 | SEC-101 | ERROR | generate-time: the generated main.go must register the request_id and error_envelope middleware immediately after the router, in that order | `pkg/generate/gogin/boot/collect_active_blocks.go` |
 
@@ -389,10 +393,10 @@ Cross-consistency between `manifest.backend.auth` (user_table + claims mapping) 
 | XDN-01 | ERROR | `backend.auth.user_table` is required when auth is active (`auth.type != "none"`) | `pkg/validate/manifest_ddl/xdn_01_user_table_required.go` |
 | XDN-02 | ERROR | `backend.auth.user_table` must reference a table parsed from `db/*.sql` | `pkg/validate/manifest_ddl/xdn_02_user_table_exists.go` |
 | XDN-03 | ERROR | Each `backend.auth.claims.<Field>: <col>[:<type>]` mapping's column must exist on the user_table | `pkg/validate/manifest_ddl/xdn_03_claim_column_exists.go` |
-| XDN-04 | ERROR | A claim's declared Go type does not match the user_table column's DDL type (per-claim mismatch) | `pkg/validate/manifest_ddl/xdn_04_check_claim.go` |
-| ~~XDN-04~~ | ~~ERROR~~ | ~~Each claim's Go type must match the user_table column's DDL-derived Go type~~ **(deprecated — superseded by XDN-06)** | `pkg/validate/manifest_ddl/xdn_04_claim_column_type.go` |
 | XDN-05 | ERROR | Each `backend.auth.claims.<Field>` value must use `<col>:<type>` format (type declaration required). Allowed types: `string`, `int64`, `int32`, `bool`, `uuid` | `pkg/validate/manifest_ddl/xdn_05_claim_type_required.go` |
 | XDN-06 | ERROR | Each claim's declared type must match the user_table column's DDL type per the compatibility matrix (uuid↔UUID, string↔TEXT/VARCHAR, int64↔BIGINT/INT8, int32↔INTEGER/INT/INT4, bool↔BOOLEAN/BOOL) | `pkg/validate/manifest_ddl/xdn_06_claim_ddl_type.go` |
+
+> XDN-04 (claim Go type ↔ column DDL-derived Go type) is **deprecated — superseded by XDN-06** and is not registered in `manifest_ddl.Run`. See the Deprecated section.
 
 ## O. SSaC ↔ sqlc
 
@@ -595,7 +599,7 @@ Rules collected during the DDL migration phase of `yongol generate` (`pkg/genera
 | MIG-003 | ERROR | The sidecar SQL file referenced by `@data_migration file=<path>` does not exist | `pkg/validate/migration/mig_003_data_migration_missing.go` |
 | MIG-004 | WARNING | DROP TABLE / DROP COLUMN occurs but the target table has no `@allow_destructive` (intent reconfirmation recommended) | `pkg/validate/migration/mig_004_destructive_without_allow.go` |
 | MIG-005 | WARNING | Risky type change (`INTEGER↔TEXT`, narrowing `VARCHAR(N)`, etc.) has no `@cast using=<expr>` hint | `pkg/validate/migration/mig_005_cast_missing.go` |
-| MIG-006 | ERROR | The `-- YONGOL_SCHEMA_HASH:` header in `specs/db/.generated_schema.sql` does not match the sha256 of the body (user-edited = drift) | `pkg/validate/migration/mig_006_snapshot_drift.go` |
+| MIG-006 | ERROR | The `-- YONGOL_SCHEMA_HASH:` header in `arts/db/.latest_schema.sql` does not match the sha256 of the body (user-edited = drift) | `pkg/validate/migration/mig_006_snapshot_drift.go` |
 
 ## U. STML ↔ OpenAPI / stateDiagram (`TM-*`)
 
@@ -662,7 +666,7 @@ Cross-validation between `features.yaml` tables section and DDL. Ensures that de
 
 ## Y. Features ↔ StateMachine (`XFS-*`)
 
-Cross-validation between `features.yaml` tables section and Mermaid stateDiagram. Ensures that declared state values exist in the corresponding stateDiagram.
+Cross-validation between `features.yaml` tables section and Mermaid stateDiagram. Ensures that declared state values exist in the corresponding stateDiagram. (Note: the `XFS-` prefix here collides with section H's SSaC ↔ Func rules — see the prefix-collision note in the legend.)
 
 | Rule ID | Level | Description | Source |
 |---|---|---|---|
@@ -699,6 +703,7 @@ Rules that have already been removed from the code or are scheduled for removal.
 | S-54 | `Page[T]`/`Cursor[T]` wrapper → `x-pagination` required | Page/Cursor wrapper types retired. |
 | S-55 | `x-pagination` option matching | Wrapper and `x-pagination` retired. |
 | S-56 | `x-pagination` option matching (auxiliary) | Same as above. |
+| XDN-04 | Each claim's Go type must match the user_table column's DDL-derived Go type (ERROR) | Superseded by XDN-06 (compatibility-matrix based). Not registered in `manifest_ddl.Run`; source files (`xdn_04_*.go`) remain but are unreachable. |
 | XDS-13 | SSaC input not present in DDL column (WARNING) | Replaced by XQS-14/16 — the sqlc Params basis is stricter. |
 | XDS-14 | SSaC CRUD Input key does not match sqlc Go field name (PascalCase) (ERROR) | Replaced by XQS-14/15/16 — the actual sqlc Params set is a stricter basis. |
 | M-1 | `model/` directory and `*.go` files exist | `model/` SSOT and `@dto` fully retired — the sqlc-synthesized row type takes over the model role. |
@@ -716,4 +721,4 @@ Rules that have already been removed from the code or are scheduled for removal.
 
 - Rule design philosophy, Toulmin defeats graph, Ground mapping: `pkg/validate/README.md`
 - Per-category detail: `pkg/validate/<domain>/README.md`
-- SSOT syntax and cross-validation rule summary: `manual-for-ai.md` → "Cross-Validation Rules Catalog" section
+- SSOT syntax and cross-validation rule summary: `manual-for-ai.md` → "Validation" section

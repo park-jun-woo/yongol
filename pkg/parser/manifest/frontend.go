@@ -13,6 +13,7 @@ type Frontend struct {
 	Bundler       string         `yaml:"bundler"`
 	Name          string         `yaml:"name"`
 	Theme         *FrontendTheme `yaml:"theme,omitempty"`
+	Auth          *FrontendAuth  `yaml:"auth,omitempty"`
 	Design        string         `yaml:"design,omitempty"`
 	DefaultLayout string         `yaml:"defaultLayout,omitempty"`
 }
