@@ -22,10 +22,16 @@ func TestParseCanonicalRulebook(t *testing.T) {
 	// Spot-checks that protect against regressions.
 	cat := NewCatalog(rules)
 	spot := map[string]string{
-		"S-27":   "A. SSaC Internal",
-		"C-2":    "B. Manifest",
-		"Q-1":    "D. Query / sqlc",
-		"PRV-01": "S. Preserve",
+		"INI-01":  "INI. Init Check",
+		"S-27":    "A. SSaC Internal",
+		"C-2":     "B. Manifest",
+		"SEC-404": "B. Manifest",
+		"Q-01":    "D. Query / sqlc",
+		"V-01":    "Z1. Design Internal",
+		"PRV-01":  "S. Preserve",
+		"TM-17":   "U. STML",
+		"TM-26":   "U. STML",
+		"FT-01":   "V. Features Internal",
 	}
 	for id, wantSection := range spot {
 		meta, ok := cat.Lookup(id)
@@ -45,6 +51,18 @@ func TestParseCanonicalRulebook(t *testing.T) {
 		}
 		if meta.Source == "" {
 			t.Errorf("rule %q source is empty", id)
+		}
+	}
+
+	// TM-17 regression: the rulebook row escapes its pipes as `\|\|` (GFM);
+	// splitRow must restore the literal `||` code span instead of splitting
+	// the description cell and blanking the source.
+	if meta, ok := cat.Lookup("TM-17"); ok {
+		if !strings.Contains(meta.Description, "`||`") {
+			t.Errorf("TM-17 description lost its `||` code span: %q", meta.Description)
+		}
+		if meta.Source != "pkg/validate/stml_openapi/tm_17_guard_syntax.go" {
+			t.Errorf("TM-17 source = %q, want tm_17_guard_syntax.go path", meta.Source)
 		}
 	}
 }

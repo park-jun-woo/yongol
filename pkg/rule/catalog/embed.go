@@ -10,8 +10,10 @@ import (
 )
 
 // rulebookSource is the canonical rulebook.md shipped with the yongol
-// binary. Keep this file in sync with repo root rulebook.md — see the
-// top-level note and the commit-time copy rule in CLAUDE.md.
+// binary. It is a verbatim copy of the repo root rulebook.md, refreshed via
+// `go generate ./pkg/rule/catalog` (see generate.go). Drift is caught by
+// TestEmbedInSyncWithRootRulebook, which byte-compares the copy against the
+// root file on every `go test`.
 //
 //go:embed rulebook.md
 var rulebookSource []byte

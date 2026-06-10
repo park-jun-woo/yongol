@@ -3,10 +3,13 @@
 ## 변경이력
 
 - 2026-04-28: 초기 작성
+- 2026-06-10: 내장 사본을 루트 `rulebook.md` 와 재동기화 (328 → 337 규칙). `splitRow` 가 GFM `\|` 이스케이프를 인식·복원하도록 확장. 동기 가드 테스트 `TestEmbedInSyncWithRootRulebook` 추가 (byte-equal, 어긋나면 `go generate ./pkg/rule/catalog` 안내). `//go:embed` 는 심볼릭링크(irregular file)를 거부하므로 사본 + go:generate 구조 유지.
 
 ## 역할
 
 저장소 루트의 `rulebook.md` 를 `//go:embed` 로 내장하고 H2 섹션 + `| Rule ID | Level | Description | Source |` 테이블을 파싱해 Rule ID 기준 lookup table 로 노출한다. SARIF emitter 등이 카탈로그 전체 규칙 메타에 접근할 때 사용. `## Deprecated` 섹션은 자동으로 제외.
+
+내장 사본(`rulebook.md`)은 수동 편집 금지 — 루트 `rulebook.md` 수정 후 `go generate ./pkg/rule/catalog` 로 재복사한다. 드리프트는 `TestEmbedInSyncWithRootRulebook` (byte-equal 가드)가 `go test` 시점에 잡는다.
 
 > 상위 문서: [`pkg/rule/README.md`](../README.md)
 
