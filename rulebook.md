@@ -63,9 +63,9 @@ The `Source` column of each rule row is a Go file path relative to the repo root
 ## Rule count
 
 **This catalog is the single source of truth for the rule set.** The official
-total is the count of distinct rule IDs in the tables below — **366 rules across
+total is the count of distinct rule IDs in the tables below — **367 rules across
 60 prefixes**. This includes 26 retired rules (Deprecated section); the
-**active** subset (rows in the non-deprecated tables) is **340**.
+**active** subset (rows in the non-deprecated tables) is **341**.
 
 Counting note: a rule's ID is emitted either as a `[ID]` literal in the
 diagnostic message **or** via a `RuleID:` field / builder. A naive
@@ -177,6 +177,7 @@ SSaC self-consistency — required fields, variable flow, model references, @sub
 | C-8 | ERROR | `backend.rate_limit` requires a `Login` entry (primary brute-force target) | `pkg/validate/manifest/c_08_rate_limit_login_required.go` |
 | C-9 | ERROR | Unsupported `backend.lang` + `backend.framework` combination | `pkg/validate/manifest/c_09_backend_lang_framework.go` |
 | C-10 | ERROR | Every `backend.rate_limit` entry must have `rate` >= 1 and a `period` parseable by `time.ParseDuration` (blocks zero-value entries codegen would silently drop) | `pkg/validate/manifest/c_10_rate_limit_value_valid.go` |
+| C-11 | WARNING | `backend.rate_limit` entry keyed by `ip` (or key unset → default `ip`) with `backend.http.trusted_proxies` unset — behind a reverse proxy `c.ClientIP()` always returns the proxy address, collapsing the IP-keyed limiter onto one key (BUG-117); directly exposed deployments may ignore | `pkg/validate/manifest/c_11_ipkey_requires_proxy.go` |
 | CORS-01 | ERROR | `allow_origins=["*"]` combined with `allow_credentials=true` is forbidden | `pkg/validate/manifest/cors_01_wildcard_credentials.go` |
 | OBS-001 | ERROR | `backend.observability.metrics.path` must be an absolute path starting with `/` | `pkg/validate/manifest/obs_01_metrics_path.go` |
 | OBS-002 | ERROR | `backend.observability.metrics.path` must not collide with an OpenAPI path | `pkg/validate/manifest/obs_02_metrics_path_not_openapi.go` |

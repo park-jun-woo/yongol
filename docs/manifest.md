@@ -51,12 +51,37 @@ Configure in `backend.<block>`; full field list and validation errors surface vi
 | Field | Purpose |
 |---|---|
 | `backend.cors` | CORS (gin-contrib/cors). `enabled: false` or unset -> block omitted |
+| `backend.http.trusted_proxies` | Reverse-proxy CIDR ranges trusted for `X-Forwarded-For` (see below) |
 | `backend.auth.roles` | Role literals used by Rego |
 | `session.backend` | `postgres` or `memory` |
 | `cache.backend` | `postgres` or `memory` |
 | `file.backend` | `s3` or `local` |
 | `queue.backend` | `postgres` or `memory` |
 | `authz.package` | Custom authz package (default `github.com/park-jun-woo/ssac/pkg/authz`) |
+
+### Trusted proxies (`backend.http.trusted_proxies`)
+
+The generated backend always calls `r.SetTrustedProxies(...)` right after
+`gin.Default()`. The default is **nil — trust no proxy**: `c.ClientIP()`
+ignores client-supplied `X-Forwarded-For` / `X-Real-IP` and uses the TCP
+`RemoteAddr`, so clients cannot spoof their IP against IP-keyed rate
+limiters, IP logging, or IP policies.
+
+Deployments behind a reverse proxy declare the proxy's CIDR ranges so the
+real client IP propagates:
+
+```yaml
+backend:
+  http:
+    trusted_proxies:
+      - 10.0.0.0/8
+      - 172.16.0.0/12
+```
+
+Resolution order is **env > manifest > default(nil)**: the env var
+`BACKEND_HTTP_TRUSTED_PROXIES` (comma-separated CIDRs) overrides the
+manifest value at runtime. An invalid CIDR makes `SetTrustedProxies`
+return an error and the server exits at bootstrap (fail-fast).
 
 ## Frontend Block (`frontend.enabled`)
 

@@ -1,5 +1,5 @@
 //ff:func feature=manifest type=test control=sequence topic=http-config
-//ff:what Load — backend.http 블록이 있으면 body/multipart/overrides 파싱
+//ff:what Load — backend.http 블록이 있으면 body/multipart/trusted_proxies/overrides 파싱
 
 package manifest
 
@@ -20,6 +20,9 @@ backend:
   http:
     body_limit: 2MiB
     multipart_limit: 64MiB
+    trusted_proxies:
+      - 10.0.0.0/8
+      - 172.16.0.0/12
     overrides:
       UploadAvatar:
         body_limit: 5MiB
@@ -42,6 +45,10 @@ backend:
 	}
 	if cfg.Backend.HTTP.MultipartLimit != "64MiB" {
 		t.Errorf("MultipartLimit = %q, want 64MiB", cfg.Backend.HTTP.MultipartLimit)
+	}
+	tp := cfg.Backend.HTTP.TrustedProxies
+	if len(tp) != 2 || tp[0] != "10.0.0.0/8" || tp[1] != "172.16.0.0/12" {
+		t.Errorf("TrustedProxies = %v, want [10.0.0.0/8 172.16.0.0/12]", tp)
 	}
 	if len(cfg.Backend.HTTP.Overrides) != 2 {
 		t.Fatalf("Overrides len = %d, want 2", len(cfg.Backend.HTTP.Overrides))
