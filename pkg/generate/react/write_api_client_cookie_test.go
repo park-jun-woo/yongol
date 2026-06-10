@@ -44,4 +44,11 @@ func TestWriteAPIClient_Cookie_CSRF(t *testing.T) {
 	assertNotContains(t, content, "refreshInFlight")
 	assertNotContains(t, content, "withAuthRetry")
 	assertNotContains(t, content, "localStorage")
+
+	// BUG-113 order guarantee (cookie mode): the 401 convergence middleware
+	// (onResponse) runs first and passes the response through; the wrapper
+	// then promotes r.error to a throw on the final result — both coexist.
+	assertContains(t, content, "async onResponse({ response })")
+	assertContains(t, content, ".then(r => { const d = r.data; const e = r.error; if (e !== undefined) throw e; return d as Res<'ListItems'> })")
+	assertContains(t, content, ".then(r => { const d = r.data; const e = r.error; if (e !== undefined) throw e; return d as Res<'CreateItem'> })")
 }

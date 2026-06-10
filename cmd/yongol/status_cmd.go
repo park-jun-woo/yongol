@@ -10,9 +10,9 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/park-jun-woo/yongol/pkg/contract"
-	"github.com/park-jun-woo/yongol/pkg/yongol"
 	"github.com/park-jun-woo/yongol/pkg/validate"
 	vcontract "github.com/park-jun-woo/yongol/pkg/validate/contract"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // statusCmd wires `yongol status <specs-dir> [<arts-dir>]`. The command

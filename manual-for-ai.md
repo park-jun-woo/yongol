@@ -522,7 +522,7 @@ Location: `frontend/*.html` (flat, no subdirectories).
 | `data-invalidates` | Effect declaration: queries to refetch on action success (space-separated operationIds) | `<div data-action="CreateWorkflow" data-invalidates="ListWorkflows">` |
 | `data-capture` | Auth flow: store response fields into auth sinks on action success | `<section data-action="Login" data-capture="access_token -> auth.token, refresh_token -> auth.refresh">` |
 | `data-redirect` | Auth flow: static path navigated to on action success | `<section data-action="Login" data-redirect="/">` |
-| `data-on-error` | Auth flow: marker for the element shown (with the server error message) when the action fails | `<p data-on-error></p>` |
+| `data-on-error` | Auth flow: marker for the element shown when the action fails (4xx/5xx rejects with the server ErrorResponse body; its `message` is displayed, falling back to a stringified error when `message` is absent) | `<p data-on-error></p>` |
 | `data-route` | Explicit route path override on the page's top-level element (`:Name` pattern params merge into `useParams()`) | `<main data-route="/buildings/:BuildingID/units/:UnitID">` |
 
 `data-enabled-when` declares *when an action is available*: the button renders

@@ -15,7 +15,8 @@ import (
 // writeAPIClient emits src/lib/api.ts shaped as
 //
 //	export const api = {
-//	  <OperationID>: (args: Req<'OperationID'>) => client.METHOD(path, { ... } as any).then(r => r.data as Res<'OperationID'>),
+//	  <OperationID>: (args: Req<'OperationID'>) => client.METHOD(path, { ... } as any)
+//	    .then(r => { const d = r.data; const e = r.error; if (e !== undefined) throw e; return d as Res<'OperationID'> }),
 //	  ...
 //	}
 //

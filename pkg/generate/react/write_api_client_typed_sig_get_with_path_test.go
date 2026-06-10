@@ -31,8 +31,9 @@ func TestWriteAPIClient_TypedSig_GetWithPathParams(t *testing.T) {
 
 	// Typed path object catches path-key casing mismatch at tsc (BUG-109);
 	// only the query value carries a narrow cast (flat Req can't be split).
+	// The .then promotes resolve-with-error to a throw (BUG-113).
 	assertContains(t, content, "GetItem: (args: Req<'GetItem'>) => {")
 	assertContains(t, content, "const path = { id: args.id }")
-	assertContains(t, content, "{ params: { path, query: query as any } }).then(r => r.data as Res<'GetItem'>)")
+	assertContains(t, content, "{ params: { path, query: query as any } }).then(r => { const d = r.data; const e = r.error; if (e !== undefined) throw e; return d as Res<'GetItem'> })")
 	assertNotContains(t, content, "const a = args as any")
 }

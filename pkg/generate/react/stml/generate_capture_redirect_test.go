@@ -1,5 +1,5 @@
 //ff:func feature=stml-gen type=test control=sequence
-//ff:what data-capture+data-redirect 선언 시 store 커밋 + navigate 방출 검증 (bearer)
+//ff:what data-capture+data-redirect 선언 시 토큰 가드 + store 커밋 + navigate 방출 검증 (bearer)
 package stml
 
 import (
@@ -24,6 +24,13 @@ func TestGeneratePage_CaptureRedirect_StoreCommitAndNavigate(t *testing.T) {
 
 	// body only: api function passed directly
 	assertContains(t, code, "mutationFn: api.Login")
+
+	// defensive commit (BUG-113 (3)): a 2xx response missing the token
+	// aborts the commit and the redirect; no data-on-error here, so the
+	// violation surfaces via console.error
+	assertContains(t, code, "if (data?.access_token == null) {")
+	assertContains(t, code, "console.error('Unexpected response: missing access_token')")
+	assertContains(t, code, "return")
 
 	// declared captures commit to the session store
 	assertContains(t, code, "useAuthStore.getState().setAuth(data.access_token, data.refresh_token)")

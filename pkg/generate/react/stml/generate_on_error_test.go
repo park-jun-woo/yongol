@@ -26,9 +26,12 @@ func TestGeneratePage_OnError_StateHandlerConditionalRender(t *testing.T) {
 	assertContains(t, code, "const [loginError, setLoginError] = useState<string | null>(null)")
 	assertContains(t, code, "import { useState } from 'react'")
 
-	// onError handler feeds the state; onSuccess clears it
+	// onError handler feeds the state; onSuccess clears it. The thrown
+	// ErrorResponse is a plain object — message is extracted defensively
+	// (no schema guarantee; XOE-01 checks only error/code).
 	assertContains(t, code, "onError: (err) => {")
-	assertContains(t, code, "setLoginError(err instanceof Error ? err.message : String(err))")
+	assertContains(t, code, "const msg = (err as any)?.message")
+	assertContains(t, code, "setLoginError(typeof msg === 'string' && msg !== '' ? msg : String(err))")
 	assertContains(t, code, "setLoginError(null)")
 
 	// the data-on-error element renders conditionally with the message bound

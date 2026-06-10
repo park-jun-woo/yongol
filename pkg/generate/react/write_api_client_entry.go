@@ -1,5 +1,5 @@
 //ff:func feature=gen-react type=generator control=sequence
-//ff:what writeApiClientEntry — api.<OperationID>(args) 엔트리 1건 방출 (path/query/body 분기)
+//ff:what writeApiClientEntry — api.<OperationID>(args) 엔트리 1건 방출 (path/query/body 분기 + r.error throw 승격)
 
 package react
 
@@ -26,10 +26,30 @@ import (
 // withAuthRetry(() => ...) so a 401 triggers the single-flight refresh and
 // re-invokes the closure once — the request is rebuilt from args, which is
 // why retry lives here and not in the openapi-fetch middleware.
+//
+// Error promotion (BUG-113): openapi-fetch resolves 4xx/5xx as
+// { data: undefined, error: <body> } instead of rejecting. Every entry's
+// .then promotes that resolve-with-error to a throw, so TanStack Query's
+// onError/error fires with the typed server ErrorResponse and onSuccess
+// never sees undefined. The .then sits *outside* wrapAuthRetry: the
+// 401→refresh→retry flow completes first and only the final result is
+// inspected. Network-level rejects propagate unchanged.
+//
+// `r.data`/`r.error` are read into `d`/`e` *before* the error check, for
+// two tsc reasons. (a) The check would narrow the openapi-fetch result
+// union to its success branch, dropping the `| undefined` arm from
+// `r.data` — and Res<K> is void for ops whose success status is not 200
+// (201/204), a type only `T | undefined` (not bare `T`) can be cast to;
+// `d` freezes the pre-narrowing type. (b) For ops declaring no error
+// responses the error branch's `error` is `never`, so the check narrows
+// `r` itself to `never` and `throw r.error` would not compile; throwing
+// the captured `e` stays legal for every op shape.
 func writeApiClientEntry(b *strings.Builder, ep endpoint, withRetry bool) {
 	method := strings.ToUpper(ep.method)
 	pathLit := ep.path
 	opQ := fmt.Sprintf("'%s'", ep.opID) // quoted operationId for type arg
+	// Shared resolve handler: reject on error, otherwise unwrap typed data.
+	thenClause := fmt.Sprintf(".then(r => { const d = r.data; const e = r.error; if (e !== undefined) throw e; return d as Res<%s> })", opQ)
 
 	// --- function signature: typed Req<K> ---
 	// GET without path params: all query keys are optional, so args itself is optional.
@@ -61,10 +81,10 @@ func writeApiClientEntry(b *strings.Builder, ep endpoint, withRetry bool) {
 			b.WriteString("      if (!(k in path)) query[k] = v\n")
 			b.WriteString("    }\n")
 			call := wrapAuthRetry(fmt.Sprintf("client.GET('%s', { params: { path, query: query as any } })", pathLit), withRetry)
-			b.WriteString(fmt.Sprintf("    return %s.then(r => r.data as Res<%s>)\n", call, opQ))
+			b.WriteString(fmt.Sprintf("    return %s%s\n", call, thenClause))
 		} else {
 			call := wrapAuthRetry(fmt.Sprintf("client.GET('%s', { params: { query: (args ?? {}) as any } })", pathLit), withRetry)
-			b.WriteString(fmt.Sprintf("    return %s.then(r => r.data as Res<%s>)\n", call, opQ))
+			b.WriteString(fmt.Sprintf("    return %s%s\n", call, thenClause))
 		}
 	} else {
 		verbCall := "POST"
@@ -78,10 +98,10 @@ func writeApiClientEntry(b *strings.Builder, ep endpoint, withRetry bool) {
 			b.WriteString("      if (!(k in path)) body[k] = v\n")
 			b.WriteString("    }\n")
 			call := wrapAuthRetry(fmt.Sprintf("client.%s('%s', { params: { path }, body: body as any })", verbCall, pathLit), withRetry)
-			b.WriteString(fmt.Sprintf("    return %s.then(r => r.data as Res<%s>)\n", call, opQ))
+			b.WriteString(fmt.Sprintf("    return %s%s\n", call, thenClause))
 		} else {
 			call := wrapAuthRetry(fmt.Sprintf("client.%s('%s', { body: (args ?? {}) as any })", verbCall, pathLit), withRetry)
-			b.WriteString(fmt.Sprintf("    return %s.then(r => r.data as Res<%s>)\n", call, opQ))
+			b.WriteString(fmt.Sprintf("    return %s%s\n", call, thenClause))
 		}
 	}
 	b.WriteString("  },\n")

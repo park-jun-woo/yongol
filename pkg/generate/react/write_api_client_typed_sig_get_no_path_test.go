@@ -31,7 +31,8 @@ func TestWriteAPIClient_TypedSig_GetNoPathParams(t *testing.T) {
 
 	// No path params: query fallback value carries a narrow cast, but the init
 	// itself is typed (no blanket `} as any`).
+	// The .then promotes resolve-with-error to a throw (BUG-113).
 	assertContains(t, content, "ListItems: (args?: Req<'ListItems'>) => {")
 	assertContains(t, content, "{ params: { query: (args ?? {}) as any } }")
-	assertContains(t, content, "as Res<'ListItems'>")
+	assertContains(t, content, ".then(r => { const d = r.data; const e = r.error; if (e !== undefined) throw e; return d as Res<'ListItems'> })")
 }

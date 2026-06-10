@@ -31,5 +31,5 @@ func TestWriteAPIClient_TypedSig_DeleteWithPathParams(t *testing.T) {
 
 	assertContains(t, content, "DeleteItem: (args: Req<'DeleteItem'>) => {")
 	assertContains(t, content, "client.DELETE('/api/items/{id}',")
-	assertContains(t, content, "as Res<'DeleteItem'>")
+	assertContains(t, content, ".then(r => { const d = r.data; const e = r.error; if (e !== undefined) throw e; return d as Res<'DeleteItem'> })")
 }
