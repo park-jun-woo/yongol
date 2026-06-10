@@ -11,6 +11,9 @@ func dispatchStaticEachChild(c *html.Node, eb *EachBlock) ChildNode {
 		ab := parseActionBlock(c, getAttr(c, "data-action"))
 		eb.Actions = append(eb.Actions, ab)
 		return ChildNode{Kind: "action", Action: &ab}
+	case getAttr(c, "data-link") != "":
+		lr := parseLinkInEach(c, eb)
+		return ChildNode{Kind: "link", Link: &lr}
 	case getAttr(c, "data-bind") != "":
 		bf := getAttr(c, "data-bind")
 		bind := FieldBind{Name: bf, Tag: c.Data, Type: getAttr(c, "type"), ClassName: getAttr(c, "class")}

@@ -21,6 +21,10 @@ func dispatchFetchChild(n *html.Node, fb *FetchBlock) bool {
 		fb.Eaches = append(fb.Eaches, eb)
 		fb.Children = append(fb.Children, ChildNode{Kind: "each", Each: &eb})
 		return true
+	case getAttr(n, "data-link") != "":
+		lr := parseLinkInFetch(n, fb)
+		fb.Children = append(fb.Children, ChildNode{Kind: "link", Link: &lr})
+		return true
 	case getAttr(n, "data-bind") != "":
 		field := getAttr(n, "data-bind")
 		bind := FieldBind{

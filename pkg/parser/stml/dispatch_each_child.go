@@ -15,6 +15,12 @@ func dispatchEachChild(n *html.Node, eb *EachBlock) bool {
 		eb.Actions = append(eb.Actions, ab)
 		eb.Children = append(eb.Children, ChildNode{Kind: "action", Action: &ab})
 		return true
+	case getAttr(n, "data-link") != "":
+		// Row-child link (page-flow Phase007): emitted as a <Link> to the
+		// target page with item.* / route.* segment bindings.
+		lr := parseLinkInEach(n, eb)
+		eb.Children = append(eb.Children, ChildNode{Kind: "link", Link: &lr})
+		return true
 	case getAttr(n, "data-bind") != "":
 		field := getAttr(n, "data-bind")
 		bind := FieldBind{

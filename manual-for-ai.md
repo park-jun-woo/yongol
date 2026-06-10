@@ -506,7 +506,7 @@ the source of truth, the generated `.tsx` files are disposable artifacts.
 
 Location: `frontend/*.html` (flat, no subdirectories).
 
-### data-* Attributes (14)
+### data-* Attributes (16)
 
 | Attribute | Purpose | Example |
 |---|---|---|
@@ -524,6 +524,8 @@ Location: `frontend/*.html` (flat, no subdirectories).
 | `data-redirect` | Auth flow: static path navigated to on action success | `<section data-action="Login" data-redirect="/">` |
 | `data-on-error` | Auth flow: marker for the element shown when the action fails (4xx/5xx rejects with the server ErrorResponse body; its `message` is displayed, falling back to a stringified error when `message` is absent). When absent, a default error element (`role="alert"`) is emitted right next to the submit button — declaring `data-on-error` decides the display element and position instead | `<p data-on-error></p>` |
 | `data-route` | Explicit route path override on the page's top-level element (`:Name` pattern params merge into `useParams()`) | `<main data-route="/buildings/:BuildingID/units/:UnitID">` |
+| `data-link` | Navigation: clicking this element goes to another page. The value is a **page name** (STML filename without `.html`), not a path — route paths are a derived projection | `<li data-link="building-detail" data-link-params="item.id -> BuildingID">` |
+| `data-link-params` | Navigation: binds the target route's segments — `<source> -> <SegmentName>` pairs (comma-separated, `data-capture`-style value grammar). Sources: `item.<Field>` (inside `data-each`) or `route.<Name>` (own page route). `-> <SegmentName>` may be elided when the target has exactly one required segment | `data-link-params="item.id -> BuildingID"` |
 
 `data-enabled-when` declares *when an action is available*: the button renders
 `disabled` unless the guard holds. `data-invalidates` declares *what goes stale*
@@ -538,6 +540,34 @@ placement). The capture sink namespace is restricted to `auth.token` and
 `auth.refresh` (`session.*` collides with the SSaC built-in session package).
 `data-redirect` takes a static path only and must resolve to an STML page
 route, `/` being the index route (TM-26).
+
+### Page links (`data-link` / `data-link-params`)
+
+`data-link` declares "clicking here goes to that page" (plans/stml/page-flow
+Phase007). The target is a page-name reference; codegen resolves it to the
+target page's route (the same `RoutePaths` table the router uses) and emits a
+react-router `<Link to={...}>`. Placement: on a `data-each` item template
+(whole-row link — every field cell's content is wrapped), as a row child or
+`data-fetch` child, or in static context (plain navigation link). The same
+element must not also declare `data-action` — click semantics conflict,
+rejected at parse time. List → detail row link:
+
+```html
+<ul data-each="buildings">
+  <li data-link="building-detail" data-link-params="item.id -> BuildingID">
+    <span data-bind="name"></span>
+  </li>
+</ul>
+
+<a data-link="settings-parsing-rules">파싱 규칙</a>
+```
+
+`building-detail` is a `-detail` page, so its derived route is
+`/buildings/:BuildingID/...` — the emitted path differs from the page name by
+design (the SSOT records only *which page*). Unmapped **optional** segments
+(`:Name?`) are omitted from the emitted path; every **required** segment must
+be mapped (TM-32). A target page that does not exist is a broken link,
+blocked statically (TM-31) — an advantage hand-written code does not have.
 
 ### Guard syntax (`data-state` / `data-enabled-when`)
 
@@ -701,6 +731,8 @@ automatically.
 | `TM-28` | WARNING | STML internal | every `:Name`/`:Name?` segment of the page's resolved route is consumed by some `data-param-*` binding |
 | `TM-29` | WARNING | OpenAPI | an action whose operation declares a 4xx/5xx response should declare a `data-on-error` element — without it the server error falls back to the default inline slot (`role="alert"`) |
 | `TM-30` | ERROR | OpenAPI | `item.<Field>` param source only inside a `data-each` block, and the field must exist in the enclosing each's item schema (OpenAPI response) |
+| `TM-31` | ERROR | STML internal | `data-link` target names an existing STML page (filename without `.html`) |
+| `TM-32` | ERROR | STML/OpenAPI | `data-link-params` is well-formed and satisfies the target route: every required segment mapped, SegmentNames exist in the target route, `item.*` sources inside `data-each` against the item schema, `route.*` sources in this page's resolved route, elided form only against a single required segment |
 | `XMO-10` | ERROR | OpenAPI | Frontend ON & operationId is consumed by some STML page/component **or** tagged `no-front` |
 | `XMO-11` | ERROR | manifest | Frontend ON requires at least one STML page (else set `frontend.enabled: false`) |
 | `XMO-12` | WARNING | OpenAPI | operationId tagged `no-front` must not actually be consumed (stale tag) |

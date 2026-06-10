@@ -32,7 +32,10 @@ func ParseReader(filename string, r io.Reader) (PageSpec, []diagnostic.Diagnosti
 	walkTopLevel(doc, &page)
 	collectFlowAttrMisplaced(doc, false, &page)
 
-	if diags := collectEachDiags(&page, filename); len(diags) > 0 {
+	var diags []diagnostic.Diagnostic
+	collectLinkActionConflicts(doc, filename, &diags)
+	diags = append(diags, collectEachDiags(&page, filename)...)
+	if len(diags) > 0 {
 		return page, diags
 	}
 	return page, nil

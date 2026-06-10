@@ -14,6 +14,8 @@ func (r *ReactTarget) GeneratePage(page stmlparser.PageSpec, specsDir string, op
 	populateEachKeyFields(&page, opt.ResponseArrayItemFields)
 	// Pre-populate row-action mutate arguments (item.* sources, Phase006)
 	populateRowActionArgs(&page, opt.ResponseArrayItemTypes, opt.PathParamTypes)
+	// Pre-resolve data-link target route patterns (Phase007)
+	populateLinkTargets(&page, opt.RoutePatterns)
 
 	is := collectImports(page, specsDir)
 

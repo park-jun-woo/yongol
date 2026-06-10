@@ -29,6 +29,7 @@ func collectImports(page stmlparser.PageSpec, specsDir string) importSet {
 	for _, a := range page.Actions {
 		collectActionImports(a, &is, compSet)
 	}
+	collectLinkImports(page.Children, &is)
 
 	for comp := range compSet {
 		is.components = append(is.components, comp)

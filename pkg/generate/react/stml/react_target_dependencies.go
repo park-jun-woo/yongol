@@ -14,7 +14,7 @@ func (r *ReactTarget) Dependencies(pages []stmlparser.PageSpec) map[string]strin
 		if is.useForm {
 			deps["react-hook-form"] = "^7"
 		}
-		if is.useParams {
+		if is.useParams || is.useLink {
 			deps["react-router-dom"] = "^6"
 		}
 		if is.useZod {

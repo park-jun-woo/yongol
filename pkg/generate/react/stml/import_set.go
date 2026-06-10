@@ -10,6 +10,7 @@ type importSet struct {
 	useQueryClient bool
 	useParams      bool
 	useNavigate    bool
+	useLink        bool // react-router-dom <Link> (data-link emission)
 	useForm        bool
 	useZod         bool // zod + @hookform/resolvers/zod
 	useState       bool

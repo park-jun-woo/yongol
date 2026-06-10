@@ -17,6 +17,10 @@ func dispatchTopLevelElement(n *html.Node, page *PageSpec) bool {
 		page.Actions = append(page.Actions, ab)
 		page.Children = append(page.Children, ChildNode{Kind: "action", Action: &ab})
 		return true
+	case getAttr(n, "data-link") != "":
+		lr := parseLinkStatic(n)
+		page.Children = append(page.Children, ChildNode{Kind: "link", Link: &lr})
+		return true
 	case hasDescendantData(n):
 		se := parseStaticWithDataChildren(n, page)
 		page.Children = append(page.Children, ChildNode{Kind: "static", Static: &se})

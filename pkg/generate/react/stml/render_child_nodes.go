@@ -23,6 +23,8 @@ func renderChildNodes(nodes []stmlparser.ChildNode, dataVar, itemVar string, ind
 			lines = append(lines, renderActionJSX(*ch.Action, indent, noBodyOps))
 		case "fetch":
 			lines = append(lines, renderFetchJSX(*ch.Fetch, indent, noBodyOps))
+		case "link":
+			lines = append(lines, renderLinkJSX(*ch.Link, dataVar, itemVar, indent, noBodyOps))
 		}
 	}
 	return lines

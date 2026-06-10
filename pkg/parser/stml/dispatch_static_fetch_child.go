@@ -18,6 +18,9 @@ func dispatchStaticFetchChild(c *html.Node, fb *FetchBlock) *ChildNode {
 		eb := parseEachBlock(c, getAttr(c, "data-each"))
 		fb.Eaches = append(fb.Eaches, eb)
 		return &ChildNode{Kind: "each", Each: &eb}
+	case getAttr(c, "data-link") != "":
+		lr := parseLinkInFetch(c, fb)
+		return &ChildNode{Kind: "link", Link: &lr}
 	case getAttr(c, "data-bind") != "":
 		field := getAttr(c, "data-bind")
 		bind := FieldBind{Name: field, Tag: c.Data, Type: getAttr(c, "type"), ClassName: getAttr(c, "class")}

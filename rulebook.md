@@ -63,9 +63,9 @@ The `Source` column of each rule row is a Go file path relative to the repo root
 ## Rule count
 
 **This catalog is the single source of truth for the rule set.** The official
-total is the count of distinct rule IDs in the tables below — **371 rules across
+total is the count of distinct rule IDs in the tables below — **373 rules across
 60 prefixes**. This includes 26 retired rules (Deprecated section); the
-**active** subset (rows in the non-deprecated tables) is **345**.
+**active** subset (rows in the non-deprecated tables) is **347**.
 
 Counting note: a rule's ID is emitted either as a `[ID]` literal in the
 diagnostic message **or** via a `RuleID:` field / builder. A naive
@@ -607,7 +607,7 @@ Rules collected during the DDL migration phase of `yongol generate` (`pkg/genera
 
 ## U. STML ↔ OpenAPI / stateDiagram (`TM-*`)
 
-Cross-validation between STML template attributes (`data-fetch`, `data-action`, `data-param`, `data-field`, `data-bind`, `data-each`, `data-component`, `data-layout`, `data-state`, `data-enabled-when`, `data-invalidates`, `data-capture`, `data-redirect`, `data-on-error`) and the OpenAPI spec, layouts, and Mermaid stateDiagrams. Ensures that STML references resolve to valid OpenAPI operations, parameters, request/response fields, component files, layouts, and statechart states/transitions. Most rules live in `pkg/validate/stml_openapi/`; the stateDiagram cross-checks (TM-15, TM-18, TM-23) live in `pkg/validate/stml_statemachine/`. TM-20~26 are the runtime twins of the Hurl flow rules (XOH-05/06/07/08/09) for the auth session flow (plans/stml/auth-flow Phase002).
+Cross-validation between STML template attributes (`data-fetch`, `data-action`, `data-param`, `data-field`, `data-bind`, `data-each`, `data-component`, `data-layout`, `data-state`, `data-enabled-when`, `data-invalidates`, `data-capture`, `data-redirect`, `data-on-error`, `data-link`, `data-link-params`) and the OpenAPI spec, layouts, and Mermaid stateDiagrams. Ensures that STML references resolve to valid OpenAPI operations, parameters, request/response fields, component files, layouts, and statechart states/transitions. Most rules live in `pkg/validate/stml_openapi/`; the stateDiagram cross-checks (TM-15, TM-18, TM-23) live in `pkg/validate/stml_statemachine/`. TM-20~26 are the runtime twins of the Hurl flow rules (XOH-05/06/07/08/09) for the auth session flow (plans/stml/auth-flow Phase002).
 
 | Rule ID | Level | Description | Source |
 |---|---|---|---|
@@ -641,6 +641,8 @@ Cross-validation between STML template attributes (`data-fetch`, `data-action`, 
 | TM-28 | WARNING | a `:Name`/`:Name?` segment of the page's resolved route is consumed by no `data-param-*` binding — dead segment (URL design vs page implementation drift) | `pkg/validate/stml_openapi/tm_28_route_segment_unused.go` |
 | TM-29 | WARNING | the `data-action` operation declares a 4xx/5xx response but the action block has no `data-on-error` element — the server error falls back to the default inline slot (`role="alert"`); declare `data-on-error` to decide where it appears | `pkg/validate/stml_openapi/tm_29_action_on_error_missing.go` |
 | TM-30 | ERROR | an `item.<Field>` `data-param-*` source is used outside any `data-each` block (no row is in scope), or the field is not in the item schema of the enclosing `data-each` array (OpenAPI response; innermost each) | `pkg/validate/stml_openapi/tm_30_item_source.go` |
+| TM-31 | ERROR | `data-link` target page name does not match any STML page (filename without `.html`) — the emitted `<Link>` would navigate into the void | `pkg/validate/stml_openapi/tm_31_link_target_not_found.go` |
+| TM-32 | ERROR | `data-link-params` violation: syntax (`<source> -> <SegmentName>`, comma-separated; sources `item.*`/`route.*` only), a **required** segment of the target page's resolved route left unmapped, a SegmentName absent from the target route, an `item.*` source outside `data-each` or not in the enclosing each's item schema (TM-30 infrastructure), a `route.*` source absent from this page's resolved route (TM-27 infrastructure), or the elided form (`item.id`) used when the target route does not have exactly one required segment; unmapped **optional** segments are legal | `pkg/validate/stml_openapi/tm_32_link_params_unsatisfied.go` |
 | XMO-10 | ERROR | Frontend ON & OpenAPI operationId is never consumed by any STML `data-fetch`, `data-action`, or component `api.<Op>(` call, and is not tagged `no-front` (auth endpoints are no longer auto-excluded) | `pkg/validate/stml_openapi/xmo_10_unconsumed.go` |
 | XMO-11 | ERROR | Frontend ON but no STML pages were found (set `frontend.enabled: false` for a backend-only project) | `pkg/validate/stml_openapi/xmo_11_no_stml.go` |
 | XMO-12 | WARNING | OpenAPI operationId is tagged `no-front` but is actually consumed by an STML page or component (stale or wrong tag) | `pkg/validate/stml_openapi/xmo_12_no_front_consumed.go` |

@@ -33,4 +33,9 @@ type GenerateOptions struct {
 	// "integer"). When a path parameter is "integer", the generated code
 	// wraps the useParams() value with Number() to satisfy TypeScript.
 	PathParamTypes map[string]map[string]string
+	// RoutePatterns maps STML page name (filename without .html) to the
+	// page's resolved route pattern (stml.RoutePaths first pattern).
+	// data-link emission substitutes the link's param sources into the
+	// target page's pattern (page-flow Phase007).
+	RoutePatterns map[string]string
 }

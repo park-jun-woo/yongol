@@ -14,6 +14,9 @@ func dispatchStaticDataChild(c *html.Node, page *PageSpec) *ChildNode {
 		ab := parseActionBlock(c, getAttr(c, "data-action"))
 		page.Actions = append(page.Actions, ab)
 		return &ChildNode{Kind: "action", Action: &ab}
+	case getAttr(c, "data-link") != "":
+		lr := parseLinkStatic(c)
+		return &ChildNode{Kind: "link", Link: &lr}
 	case hasDescendantData(c):
 		child := parseStaticWithDataChildren(c, page)
 		return &ChildNode{Kind: "static", Static: &child}

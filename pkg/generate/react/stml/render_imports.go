@@ -35,6 +35,9 @@ func renderImports(is importSet, opt GenerateOptions) string {
 
 	// react-router
 	var routerImports []string
+	if is.useLink {
+		routerImports = append(routerImports, "Link")
+	}
 	if is.useParams {
 		routerImports = append(routerImports, "useParams")
 	}

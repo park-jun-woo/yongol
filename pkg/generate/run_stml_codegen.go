@@ -34,6 +34,7 @@ func runSTMLCodegen(fs *yongol.Fullstack, artifactsDir string) error {
 		ResponseArrayItemTypes:  oapiparser.ExtractResponseArrayItemTypes(fs.OpenAPIDoc),
 		NoBodyOps:               noBodyOps,
 		PathParamTypes:          oapiparser.ExtractPathParamTypes(fs.OpenAPIDoc),
+		RoutePatterns:           collectRoutePatterns(fs.STMLPages),
 	}
 	_, err := stmlgen.Generate(fs.STMLPages, fs.SpecsDir, pagesDir, opt)
 	return err

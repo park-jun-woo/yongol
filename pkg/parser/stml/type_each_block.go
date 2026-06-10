@@ -16,6 +16,7 @@ type EachBlock struct {
 	States        []StateBind             // data-state inside the loop (for validation)
 	Components    []ComponentRef          // data-component inside the loop (for validation)
 	Children      []ChildNode             // item children in DOM order (for codegen)
+	RowLink       *LinkRef                // data-link on the item template element (whole row links to a page)
 	KeyField      string                  // item key field (e.g. "id"); empty → use index
 	Diags         []diagnostic.Diagnostic // parse-time diagnostics collected inside data-each
 }
