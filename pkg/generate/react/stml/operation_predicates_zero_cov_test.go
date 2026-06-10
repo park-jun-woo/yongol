@@ -28,7 +28,8 @@ func TestOperationPredicates_ZeroCov(t *testing.T) {
 	if got := errorStateVar(stmlparser.ActionBlock{OperationID: "Login", OnErrorNode: true}); got != "loginError" {
 		t.Errorf("errorStateVar = %q", got)
 	}
-	if got := errorStateVar(stmlparser.ActionBlock{OperationID: "Login"}); got != "" {
+	// page-flow Phase004: the error state is derived regardless of OnErrorNode
+	if got := errorStateVar(stmlparser.ActionBlock{OperationID: "Login"}); got != "loginError" {
 		t.Errorf("errorStateVar without OnErrorNode = %q", got)
 	}
 	types := map[string]map[string]string{"GetX": {"id": "integer"}}

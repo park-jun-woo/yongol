@@ -12,7 +12,9 @@ import (
 // renderUseMutation generates a useMutation hook call. The onSuccess body is
 // driven entirely by the action's STML flow declarations (data-capture →
 // session-store commit in bearer mode, data-redirect → navigate, neither →
-// invalidateQueries) and onError by data-on-error.
+// invalidateQueries). onMutate resets the action's error state on every
+// (re)submission and onError feeds it — always emitted since page-flow
+// Phase004 so a rejected mutation is never silent (BUG-113 (2)).
 func renderUseMutation(a stmlparser.ActionBlock, fetchOps []string, bearerAuth bool, noBodyOps map[string]bool, pathParamTypes map[string]map[string]string, constraints map[string]map[string]oapiparser.FieldConstraint) string {
 	mutName := toLowerFirst(a.OperationID) + "Mutation"
 	paramArgs := renderParamArgs(a.Params, a.OperationID, pathParamTypes)
@@ -23,10 +25,11 @@ func renderUseMutation(a stmlparser.ActionBlock, fetchOps []string, bearerAuth b
 	mutationFn := renderMutationFnExpr(fnParam, a.OperationID, apiArgs)
 
 	captures := actionFlowCaptures(a, bearerAuth)
+	onMutate := fmt.Sprintf("    onMutate: () => set%s(null),\n", toUpperFirst(errorStateVar(a)))
 	onSuccess := renderOnSuccessHandler(a, captures, fetchOps)
 	onError := renderOnErrorHandler(a)
 
 	return fmt.Sprintf(`const %s = useMutation({
     mutationFn: %s,
-%s%s  })`, mutName, mutationFn, onSuccess, onError)
+%s%s%s  })`, mutName, mutationFn, onMutate, onSuccess, onError)
 }

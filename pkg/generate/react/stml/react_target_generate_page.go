@@ -35,15 +35,18 @@ func (r *ReactTarget) GeneratePage(page stmlparser.PageSpec, specsDir string, op
 	if len(allActions) > 0 {
 		is.useMutation = true
 		is.useButton = true
+		// page-flow Phase004: every action keeps an error-message state
+		// (default onError emission), so useState is needed regardless of
+		// data-on-error declarations.
+		is.useState = true
 	}
 	if anyActionHasInputFields(allActions) {
 		is.useInput = true
 	}
 
 	// STML flow declarations drive imports: data-redirect → useNavigate,
-	// data-capture (bearer) → session store, data-on-error → useState.
-	// queryClient is needed only when at least one action keeps the
-	// default invalidateQueries() path.
+	// data-capture (bearer) → session store. queryClient is needed only
+	// when at least one action keeps the default invalidateQueries() path.
 	needsInvalidate := false
 	for _, a := range allActions {
 		if a.Redirect != "" {
@@ -51,9 +54,6 @@ func (r *ReactTarget) GeneratePage(page stmlparser.PageSpec, specsDir string, op
 		}
 		if len(actionFlowCaptures(a, opt.BearerAuth)) > 0 {
 			is.useAuthStore = true
-		}
-		if a.OnErrorNode {
-			is.useState = true
 		}
 		if !actionHasFlowSuccess(a, opt.BearerAuth) {
 			needsInvalidate = true

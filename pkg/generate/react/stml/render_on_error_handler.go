@@ -1,5 +1,5 @@
 //ff:func feature=stml-gen type=generator control=sequence
-//ff:what data-on-error 선언 시 mutation onError 핸들러(에러 메시지 상태 갱신)를 렌더링한다
+//ff:what 모든 액션의 mutation onError 핸들러(에러 메시지 상태 갱신)를 렌더링한다
 package stml
 
 import (
@@ -9,8 +9,9 @@ import (
 )
 
 // renderOnErrorHandler renders the mutation onError handler that feeds the
-// action's data-on-error slot. Empty when the action declares no
-// data-on-error element (no handler is emitted — current behavior kept).
+// action's error state. Always emitted since page-flow Phase004 — without a
+// data-on-error declaration the state feeds the default error slot instead,
+// so a rejected mutation never fails silently (BUG-113 (2)).
 //
 // Since BUG-113 the api wrapper throws the server ErrorResponse as a plain
 // object, so `err` is usually not an Error instance. `message` is read
@@ -19,9 +20,6 @@ import (
 // non-empty string `message` first, fall back to String(err).
 func renderOnErrorHandler(a stmlparser.ActionBlock) string {
 	errVar := errorStateVar(a)
-	if errVar == "" {
-		return ""
-	}
 	return fmt.Sprintf(`    onError: (err) => {
       const msg = (err as any)?.message
       set%s(typeof msg === 'string' && msg !== '' ? msg : String(err))

@@ -1,5 +1,5 @@
 //ff:func feature=stml-gen type=test control=sequence
-//ff:what renderOnSuccessHandler — onError 리셋·토큰 가드·캡처 커밋·리다이렉트·invalidate 분기 렌더 검증
+//ff:what renderOnSuccessHandler — 토큰 가드·캡처 커밋·리다이렉트·invalidate 분기 렌더 검증 (에러 리셋은 onMutate 로 이동)
 package stml
 
 import (
@@ -9,12 +9,12 @@ import (
 )
 
 func TestRenderOnSuccessHandler(t *testing.T) {
-	// error reset + token guard + capture commit + redirect: (data) param;
-	// the guard's early return aborts both the commit and the navigate
+	// token guard + capture commit + redirect: (data) param; the guard's
+	// early return aborts both the commit and the navigate. The error reset
+	// lives in onMutate since page-flow Phase004, not here.
 	a := stmlparser.ActionBlock{OperationID: "Login", OnErrorNode: true, Redirect: "/home"}
 	captures := []stmlparser.CaptureBind{{RespField: "access_token", Sink: "auth.token"}}
 	want := "    onSuccess: (data) => {\n" +
-		"      setLoginError(null)\n" +
 		"      if (data?.access_token == null) {\n" +
 		"        setLoginError('Unexpected response: missing access_token')\n" +
 		"        return\n" +

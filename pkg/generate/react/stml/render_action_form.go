@@ -29,6 +29,11 @@ func renderActionForm(a stmlparser.ActionBlock, indent int) string {
 
 	disabledExpr := mergeDisabledExpr(mutName+".isPending", a.EnabledWhen, "data")
 	lines = append(lines, fmt.Sprintf(`%s  <Button type="submit" disabled={%s}>{%s.isPending ? '처리 중...' : '%s'}</Button>`, ind, disabledExpr, mutName, submitText))
+	// page-flow Phase004: no data-on-error declared — emit the default error
+	// slot right after the submit button so a rejected mutation stays visible.
+	if !a.OnErrorNode {
+		lines = append(lines, renderDefaultOnErrorElement(errorStateVar(a), indent+2))
+	}
 	lines = append(lines, fmt.Sprintf(`%s</form>`, ind))
 
 	return strings.Join(lines, "\n")

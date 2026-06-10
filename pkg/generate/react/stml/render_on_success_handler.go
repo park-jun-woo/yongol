@@ -16,16 +16,15 @@ import (
 //     guard returns early so a later redirect is also aborted (BUG-113 (3))
 //  2. data-redirect → navigate(path) (combinable with 1)
 //  3. neither → the default invalidateQueries()/data-invalidates path
+//
+// The error-state reset lives in onMutate (page-flow Phase004) — every
+// (re)submission clears the previous message, so onSuccess no longer resets.
 func renderOnSuccessHandler(a stmlparser.ActionBlock, captures []stmlparser.CaptureBind, fetchOps []string) string {
-	errVar := errorStateVar(a)
 	var lines []string
-	if errVar != "" {
-		lines = append(lines, fmt.Sprintf("set%s(null)", toUpperFirst(errVar)))
-	}
 	param := "()"
 	if len(captures) > 0 {
 		param = "(data)"
-		lines = append(lines, renderCaptureCommit(captures, errVar)...)
+		lines = append(lines, renderCaptureCommit(captures, errorStateVar(a))...)
 	}
 	if a.Redirect != "" {
 		lines = append(lines, fmt.Sprintf("navigate('%s')", a.Redirect))

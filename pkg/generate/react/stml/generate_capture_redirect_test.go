@@ -26,10 +26,10 @@ func TestGeneratePage_CaptureRedirect_StoreCommitAndNavigate(t *testing.T) {
 	assertContains(t, code, "mutationFn: api.Login")
 
 	// defensive commit (BUG-113 (3)): a 2xx response missing the token
-	// aborts the commit and the redirect; no data-on-error here, so the
-	// violation surfaces via console.error
+	// aborts the commit and the redirect; the error state always exists
+	// (page-flow Phase004), so the violation surfaces through it
 	assertContains(t, code, "if (data?.access_token == null) {")
-	assertContains(t, code, "console.error('Unexpected response: missing access_token')")
+	assertContains(t, code, "setLoginError('Unexpected response: missing access_token')")
 	assertContains(t, code, "return")
 
 	// declared captures commit to the session store

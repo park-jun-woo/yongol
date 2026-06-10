@@ -24,15 +24,20 @@ func renderActionButton(a stmlparser.ActionBlock, indent int, noBodyOps map[stri
 		mutateArg = ""
 	}
 	disabledExpr := mergeDisabledExpr(mutName+".isPending", a.EnabledWhen, "data")
-	// data-on-error: the button path drops static children, so the error
-	// slot is rendered right after the button (conditional on the state).
-	errJSX := ""
-	if errVar := errorStateVar(a); errVar != "" {
+	// The button path drops static children, so the error slot is rendered
+	// right after the button (conditional on the state). data-on-error keeps
+	// the declared element; otherwise the Phase004 default slot is emitted so
+	// a rejected mutation stays visible.
+	errVar := errorStateVar(a)
+	var errJSX string
+	if a.OnErrorNode {
 		se := findOnErrorStatic(a.Children)
 		if se == nil {
 			se = &stmlparser.StaticElement{Tag: "p"}
 		}
 		errJSX = "\n" + renderOnErrorElement(*se, errVar, indent)
+	} else {
+		errJSX = "\n" + renderDefaultOnErrorElement(errVar, indent)
 	}
 	if tag == "button" {
 		return fmt.Sprintf(`%s<Button%s onClick={() => %s.mutate(%s)} disabled={%s}%s>%s</Button>%s`, ind, variant, mutName, mutateArg, disabledExpr, cls, pendingExpr, errJSX)

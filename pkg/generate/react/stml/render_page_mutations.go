@@ -15,9 +15,10 @@ func renderPageMutations(allActions []stmlparser.ActionBlock, fetchOps []string,
 		if len(a.Fields) > 0 {
 			sb.WriteString(fmt.Sprintf("  %s\n", renderFormHook(a, constraints)))
 		}
-		if errVar := errorStateVar(a); errVar != "" {
-			sb.WriteString(fmt.Sprintf("  const [%s, set%s] = useState<string | null>(null)\n", errVar, toUpperFirst(errVar)))
-		}
+		// page-flow Phase004: the error state is emitted for every action
+		// (data-on-error only decides the display element/position).
+		errVar := errorStateVar(a)
+		sb.WriteString(fmt.Sprintf("  const [%s, set%s] = useState<string | null>(null)\n", errVar, toUpperFirst(errVar)))
 		targetOps := resolveInvalidateOps(a.OperationID, fetchOps, actionFetchMap, a.Invalidates)
 		sb.WriteString(fmt.Sprintf("  %s\n\n", renderUseMutation(a, targetOps, bearerAuth, noBodyOps, pathParamTypes, constraints)))
 	}
