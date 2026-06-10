@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=stml-openapi
-//ff:what Run — STML<->OpenAPI 교차 검증 실행 (TM-01 ~ TM-14, TM-16, TM-17, TM-19 ~ TM-22, TM-24 ~ TM-26, XMO-10/11/12)
+//ff:what Run — STML<->OpenAPI 교차 검증 실행 (TM-01 ~ TM-14, TM-16, TM-17, TM-19 ~ TM-22, TM-24 ~ TM-28, XMO-10/11/12)
 
 package stml_openapi
 
@@ -39,6 +39,8 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 			diags = append(diags, tm17GuardSyntax(cond, page.FileName)...)
 		}
 		diags = append(diags, tm25FlowAttrPlacement(page)...)
+		diags = append(diags, tm27RouteParamMissing(page)...)
+		diags = append(diags, tm28RouteSegmentUnused(page)...)
 	}
 
 	diags = append(diags, tm10ClassProhibited(fs.STMLPages)...)

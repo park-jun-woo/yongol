@@ -678,6 +678,8 @@ automatically.
 | `TM-24` | WARNING | manifest | cookie mode must not declare `auth.*` captures or a `frontend.auth` block (httpOnly cookies cannot be captured) |
 | `TM-25` | ERROR | STML internal | `data-on-error` only inside a `data-action` block; `data-capture`/`data-redirect` only on a `data-action` element |
 | `TM-26` | ERROR | STML internal | `data-redirect` path resolves to an STML page route (`/` allowed as index) |
+| `TM-27` | ERROR | STML internal | every consumed `route.<Name>` appears as a same-named `:Name`/`:Name?` segment in the page's resolved route (case-exact) |
+| `TM-28` | WARNING | STML internal | every `:Name`/`:Name?` segment of the page's resolved route is consumed by some `data-param-*` binding |
 | `XMO-10` | ERROR | OpenAPI | Frontend ON & operationId is consumed by some STML page/component **or** tagged `no-front` |
 | `XMO-11` | ERROR | manifest | Frontend ON requires at least one STML page (else set `frontend.enabled: false`) |
 | `XMO-12` | WARNING | OpenAPI | operationId tagged `no-front` must not actually be consumed (stale tag) |
