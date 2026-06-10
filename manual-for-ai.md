@@ -506,7 +506,7 @@ the source of truth, the generated `.tsx` files are disposable artifacts.
 
 Location: `frontend/*.html` (flat, no subdirectories).
 
-### data-* Attributes (13)
+### data-* Attributes (14)
 
 | Attribute | Purpose | Example |
 |---|---|---|
@@ -523,6 +523,7 @@ Location: `frontend/*.html` (flat, no subdirectories).
 | `data-capture` | Auth flow: store response fields into auth sinks on action success | `<section data-action="Login" data-capture="access_token -> auth.token, refresh_token -> auth.refresh">` |
 | `data-redirect` | Auth flow: static path navigated to on action success | `<section data-action="Login" data-redirect="/">` |
 | `data-on-error` | Auth flow: marker for the element shown (with the server error message) when the action fails | `<p data-on-error></p>` |
+| `data-route` | Explicit route path override on the page's top-level element (`:Name` pattern params merge into `useParams()`) | `<main data-route="/buildings/:BuildingID/units/:UnitID">` |
 
 `data-enabled-when` declares *when an action is available*: the button renders
 `disabled` unless the guard holds. `data-invalidates` declares *what goes stale*
@@ -579,6 +580,35 @@ blocks at the top level. Nesting rules:
 - `data-param-*` passes path/query parameters. The `*` suffix is kebab-case
   and maps to camelCase (`data-param-reservation-id` → `reservationId`).
   Source is `route.<Name>` for URL params.
+
+### Route paths
+
+Each page resolves to exactly one route path. An explicit `data-route` on the
+page's top-level element always wins; without it the path is **derived from
+the page's `route.<Name>` consumption** so the route pattern and the page's
+`useParams()` destructuring agree in name and arity:
+
+1. Base path: filename without `.html` → `/<kebab>` (`workflows.html` →
+   `/workflows`); a `-detail` suffix maps to the pluralized parent resource
+   (`workflow-detail.html` → `/workflows`).
+2. Every `route.<Name>` the page consumes becomes a path segment after the
+   base, in first-appearance order (fetch blocks → page-level actions →
+   child actions): params consumed by some `data-fetch` are **required**
+   segments (`:Name` — the page cannot render without them), params consumed
+   only by `data-action` blocks are trailing **optional** segments (`:Name?`,
+   react-router v6.5+ — the page must stay reachable without them). Required
+   segments come first.
+   Example: `unit-info.html` fetching with `route.BuildingID`/`route.UnitID`
+   and deleting with `route.PhotoID` → `/unit-info/:BuildingID/:UnitID/:PhotoID?`.
+3. A page that consumes no `route.*` keeps the bare base path. A page whose
+   fetch requires params has **no** bare-path route — a list+detail hybrid
+   needs two pages or an explicit `data-route`.
+
+All `route.<Name>` sources are path segments, even when the bound OpenAPI
+parameter is a query parameter. When the derivation is unsuitable (e.g.
+nested resource paths like `/buildings/:BuildingID/units/:UnitID`), declare
+`data-route` — its `:Name` pattern params are merged into `useParams()`
+automatically.
 
 ### Example: List + Create
 

@@ -43,11 +43,6 @@ func TestByNamePureHelpers_ZeroCov(t *testing.T) {
 		t.Errorf("buildLayoutSet missing app")
 	}
 
-	if !hasRouteSource([]stml.ParamBind{{Name: "ID", Source: "route.ID"}}) {
-		t.Errorf("hasRouteSource = false")
-	}
-	_ = hasRouteSource([]stml.ParamBind{{Name: "X", Source: "state.X"}})
-
 	grp := groupRoutesByLayout([]stmlRoute{{Path: "/a", Layout: "app"}, {Path: "/b", Layout: "app"}})
 	if len(grp["app"]) != 2 {
 		t.Errorf("groupRoutesByLayout = %v", grp)

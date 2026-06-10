@@ -13,7 +13,13 @@ func TestTM26RedirectRouteExists(t *testing.T) {
 	pages := []stml.PageSpec{
 		{FileName: "login.html"},
 		{FileName: "dashboard.html"},
-		{FileName: "workflow-detail.html"},
+		{
+			FileName: "workflow-detail.html",
+			Fetches: []stml.FetchBlock{{
+				OperationID: "GetWorkflow",
+				Params:      []stml.ParamBind{{Name: "id", Source: "route.id"}},
+			}},
+		},
 		{FileName: "settings.html", Route: "/account/settings"},
 	}
 

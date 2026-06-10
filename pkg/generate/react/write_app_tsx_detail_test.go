@@ -38,5 +38,7 @@ func TestWriteAppTSX_DetailPage(t *testing.T) {
 	assertContains(t, content, "import Workflows from './pages/workflows'")
 	assertContains(t, content, "import WorkflowDetail from './pages/workflow-detail'")
 	assertContains(t, content, `<Route path="/workflows" element={<Workflows />} />`)
-	assertContains(t, content, `<Route path="/workflows/:id" element={<WorkflowDetail />} />`)
+	// route segment name is derived from the consumed route.* declaration,
+	// matching the useParams() destructuring the page emitter produces
+	assertContains(t, content, `<Route path="/workflows/:WorkflowID" element={<WorkflowDetail />} />`)
 }

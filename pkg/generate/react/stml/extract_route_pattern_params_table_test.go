@@ -18,6 +18,9 @@ func TestExtractRoutePatternParams(t *testing.T) {
 		{"/buildings/:buildingId/units/:id", []string{"buildingId", "id"}},
 		{"/workflows/:id", []string{"id"}},
 		{"/a/:x/b/:y/c/:z", []string{"x", "y", "z"}},
+		// optional segment markers are stripped so useParams gets exact names
+		{"/unit-info/:BuildingID/:UnitID/:PhotoID?", []string{"BuildingID", "UnitID", "PhotoID"}},
+		{"/webhooks/:id?", []string{"id"}},
 	}
 	for _, tt := range tests {
 		got := extractRoutePatternParams(tt.route)

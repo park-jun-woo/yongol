@@ -1,5 +1,5 @@
 //ff:func feature=gen-react type=test control=sequence
-//ff:what writeAppTSX non-detail 페이지의 route 파라미터 이중 라우트 생성 검증
+//ff:what writeAppTSX non-detail 페이지의 route 파라미터 유도 라우트(필수 세그먼트·액션 전용 optional) 생성 검증
 
 package react
 
@@ -49,10 +49,15 @@ func TestWriteAppTSX_NonDetailPageWithRouteParam(t *testing.T) {
 	}
 	content := string(data)
 
-	assertContains(t, content, `<Route path="/templates" element={<Templates />} />`)
+	// fetch-consumed param → single route with a required segment;
+	// the bare base path is no longer emitted (it would render with
+	// undefined params — the NaN-call false positive of BUG-112).
 	assertContains(t, content, `<Route path="/templates/:id" element={<Templates />} />`)
-	assertContains(t, content, `<Route path="/webhooks" element={<Webhooks />} />`)
-	assertContains(t, content, `<Route path="/webhooks/:id" element={<Webhooks />} />`)
+	assertNotContains(t, content, `<Route path="/templates" element=`)
+
+	// action-only param → optional trailing segment, page stays reachable
+	assertContains(t, content, `<Route path="/webhooks/:id?" element={<Webhooks />} />`)
+	assertNotContains(t, content, `<Route path="/webhooks" element=`)
 
 	importCount := strings.Count(content, "import Templates from")
 	if importCount != 1 {

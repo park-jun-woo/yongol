@@ -33,7 +33,13 @@ func TestResolveIndexRedirect(t *testing.T) {
 
 	t.Run("param-only route is skipped", func(t *testing.T) {
 		pages := []stml.PageSpec{
-			{FileName: "item-detail.html"},
+			{
+				FileName: "item-detail.html",
+				Fetches: []stml.FetchBlock{{
+					OperationID: "GetItem",
+					Params:      []stml.ParamBind{{Name: "id", Source: "route.ItemID"}},
+				}},
+			},
 			{FileName: "items.html"},
 		}
 		if got := resolveIndexRedirect(pages, nil); got != "/items" {
