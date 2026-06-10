@@ -27,6 +27,7 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	diags = append(diags, obs03TracingExporter(fs)...)
 	diags = append(diags, obs04TracingSampleRate(fs)...)
 	diags = append(diags, sec201CookieWithoutCsrf(fs)...)
+	diags = append(diags, sec202RuntimeModeCsrf(fs)...)
 	diags = append(diags, sec301CspPermissive(fs)...)
 	diags = append(diags, sec302HSTSShort(fs)...)
 	diags = append(diags, sec401JWTSecretEnvRequired(fs)...)

@@ -14,13 +14,17 @@ import "github.com/park-jun-woo/yongol/pkg/parser/manifest"
 // Present when manifest.backend.auth is declared; Present==false means
 // the generator should emit no auth-dependent wiring.
 //
-// CsrfRequired is the derived "must the generator emit CSRF wiring?"
-// flag (Phase001 debug01 / BUG-013). It is true only when the
-// resolved Mode is "cookie" or "hybrid"; bearer-only (including
-// JWT-typed-but-mode-unspecified) projects are CSRF-immune because
-// the Authorization header is not auto-sent cross-origin. Emitters
-// MUST gate CSRF block/middleware emission on this field, not on the
-// raw manifest.
+// CsrfRequired is the derived "is the build-time resolved mode
+// cookie/hybrid?" flag (Phase001 debug01 / BUG-013). It is true only when
+// the resolved Mode is "cookie" or "hybrid".
+//
+// BUG-116 / Phase-B1 — this flag no longer gates backend CSRF *emission*.
+// Because the generated authMode() switch lets BACKEND_AUTH_MODE flip a
+// bearer build to cookie/hybrid at runtime, the gogin emitters now mount
+// CSRF whenever auth is Present and gate it at runtime inside the
+// middleware. CsrfRequired survives as the build-time-default signal still
+// consumed by the react client plan (resolve_api_client_plan.go) and is
+// the natural anchor for the Phase-B2 validate guard.
 type Auth struct {
 	Present      bool
 	Mode         string

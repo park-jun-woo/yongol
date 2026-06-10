@@ -1,5 +1,5 @@
 //ff:func feature=gen-gogin type=generator control=sequence topic=csrf
-//ff:what blockCsrf — middleware.Csrf 등록 (쿠키 인증 조건부, Phase005)
+//ff:what blockCsrf — middleware.Csrf 등록 (auth 선언 시, BUG-116: bearer 빌드도 런타임 게이트로 방출)
 
 package boot
 
@@ -9,15 +9,15 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/generate/prepared"
 )
 
-// blockCsrf emits the middleware.Csrf registration when the resolved
-// auth mode is "cookie" or "hybrid" AND csrf.enabled. On the default
-// bearer configuration the block is inert (empty Lines) and
-// collectActiveBlocks drops it via hasCsrf — no imports or code land
-// in main.go, keeping bearer deployments unchanged.
+// blockCsrf emits the middleware.Csrf registration whenever auth is
+// declared and CSRF is not explicitly disabled (hasCsrf). When auth is
+// absent the block is inert (empty Lines) and collectActiveBlocks drops it.
 //
-// Phase005 dormant: hasCsrf returns false for default manifests today.
-// Phase020 (CookieSessionAuth) will flip projects to mode=cookie, at
-// which point this block lights up automatically.
+// BUG-116 / Phase-B1 — the block is registered regardless of the build-time
+// resolved mode (bearer included). The emitted middleware no-ops at runtime
+// in bearer mode (csrfRuntimeActive), so bearer deployments are byte-for-
+// byte unchanged in behavior, while a BACKEND_AUTH_MODE=cookie/hybrid
+// override on the same binary now actually reaches a live CSRF check.
 //
 // Placement: registered before blockBodyLimit / blockRegisterHandlers so
 // the CSRF check fires early in the chain, ahead of body reads. In

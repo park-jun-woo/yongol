@@ -1,5 +1,5 @@
 //ff:func feature=gen-gogin type=generator control=sequence topic=csrf
-//ff:what GenerateCsrf — internal/middleware/csrf.go 기록 (auth.mode=cookie|hybrid 시)
+//ff:what GenerateCsrf — internal/middleware/csrf.go 기록 (auth 선언 시, bearer 는 런타임 게이트로 no-op)
 
 package middleware
 
@@ -11,15 +11,15 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/generate/prepared"
 )
 
-// GenerateCsrf emits internal/middleware/csrf.go when the resolved auth
-// mode is "cookie" or "hybrid" AND csrf.enabled=true. On bearer-only
-// projects (default) the file is skipped entirely — no dead code in the
-// artifacts tree.
+// GenerateCsrf emits internal/middleware/csrf.go whenever auth is declared
+// and CSRF is not explicitly disabled (csrfActive). On bearer builds the
+// file is still emitted, but the runtime gate (csrfRuntimeActive) keeps it
+// inert until BACKEND_AUTH_MODE selects cookie/hybrid.
 //
-// Phase005 remains dormant: with the default bearer mode active, this
-// function early-returns without writing the file. Once Phase020 lands
-// the cookie-session infrastructure, flipping auth.mode will auto-emit
-// the middleware source.
+// BUG-116 / Phase-B1 — the build-time resolved mode (a.Mode) is injected as
+// the csrfAuthMode() fallback so that, with BACKEND_AUTH_MODE unset, the
+// middleware matches the manifest default (cookie/hybrid → active, bearer →
+// no-op). Only when an operator overrides the env does the gate flip.
 func GenerateCsrf(a prepared.Auth, artifactsDir string) error {
 	if !csrfActive(a) {
 		return nil
@@ -29,7 +29,8 @@ func GenerateCsrf(a prepared.Auth, artifactsDir string) error {
 		return fmt.Errorf("mkdir middleware: %w", err)
 	}
 	path := filepath.Join(mwDir, "csrf.go")
-	if err := os.WriteFile(path, []byte(csrfSourceTemplate), 0o644); err != nil {
+	source := fmt.Sprintf(csrfSourceTemplate, a.Mode)
+	if err := os.WriteFile(path, []byte(source), 0o644); err != nil {
 		return fmt.Errorf("write csrf.go: %w", err)
 	}
 	return nil

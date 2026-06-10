@@ -18,9 +18,14 @@ import "github.com/park-jun-woo/yongol/pkg/yongol"
 //
 // Phase001 debug01 (BUG-013) — CsrfRequired is derived from the
 // resolved Mode: cookie/hybrid → true, bearer (and auth-absent) →
-// false. Emitters gate all CSRF code on this flag so JWT-only
-// projects emit no CSRF block, no csrf.go file, and no
-// middleware.Csrf import.
+// false.
+//
+// BUG-116 / Phase-B1 — CsrfRequired no longer gates gogin CSRF emission.
+// Since BACKEND_AUTH_MODE can flip a bearer build to cookie/hybrid at
+// runtime, the gogin emitters now mount CSRF whenever auth is Present and
+// gate it at runtime inside the middleware (csrfRuntimeActive). CsrfRequired
+// remains the build-time-default signal for the react client plan and the
+// anchor for the Phase-B2 validate guard.
 //
 // Exported since Phase004 (plans/stml/auth-flow): the react emitter
 // consumes the same derived mode so the frontend client (bearer vs

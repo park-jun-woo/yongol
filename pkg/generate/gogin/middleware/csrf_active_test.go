@@ -1,5 +1,5 @@
-//ff:func feature=gen-gogin type=test control=iteration dimension=1
-//ff:what TestMiddlewareExtras — csrf/prometheus/rate-limit/request-id/writeFiles 유틸 검증
+//ff:func feature=gen-gogin type=test control=iteration dimension=1 topic=csrf
+//ff:what TestCsrfActive — auth 선언 여부 기반 csrf.go 방출 게이트 검증 (BUG-116: bearer 포함)
 package middleware
 
 import (
@@ -15,12 +15,15 @@ func TestCsrfActive(t *testing.T) {
 		auth prepared.Auth
 		want bool
 	}{
-		{"not-required", prepared.Auth{CsrfRequired: false}, false},
-		{"required-but-absent", prepared.Auth{CsrfRequired: true, Present: false}, false},
-		{"required-nil-raw", prepared.Auth{CsrfRequired: true, Present: true, Raw: nil}, false},
-		{"required-nil-csrf-defaults-on", prepared.Auth{CsrfRequired: true, Present: true, Raw: &pmanifest.Auth{}}, true},
-		{"required-csrf-enabled", prepared.Auth{CsrfRequired: true, Present: true, Raw: &pmanifest.Auth{Csrf: &pmanifest.CsrfConfig{Enabled: true}}}, true},
-		{"required-csrf-disabled", prepared.Auth{CsrfRequired: true, Present: true, Raw: &pmanifest.Auth{Csrf: &pmanifest.CsrfConfig{Enabled: false}}}, false},
+		{"auth-absent", prepared.Auth{Present: false}, false},
+		{"present-nil-raw", prepared.Auth{Present: true, Raw: nil}, false},
+		{"present-nil-csrf-defaults-on", prepared.Auth{CsrfRequired: true, Present: true, Mode: "cookie", Raw: &pmanifest.Auth{}}, true},
+		{"csrf-enabled", prepared.Auth{CsrfRequired: true, Present: true, Mode: "cookie", Raw: &pmanifest.Auth{Csrf: &pmanifest.CsrfConfig{Enabled: true}}}, true},
+		{"csrf-disabled", prepared.Auth{CsrfRequired: true, Present: true, Mode: "cookie", Raw: &pmanifest.Auth{Csrf: &pmanifest.CsrfConfig{Enabled: false}}}, false},
+		// BUG-116 / Phase-B1 — manifest=bearer build (CsrfRequired=false) still
+		// emits csrf.go: BACKEND_AUTH_MODE can flip the binary to cookie/hybrid
+		// at runtime, and the emitted middleware no-ops in bearer mode.
+		{"bearer-present-runtime-reachable", prepared.Auth{CsrfRequired: false, Present: true, Mode: "bearer", Raw: &pmanifest.Auth{Mode: "bearer"}}, true},
 	}
 	for _, c := range cases {
 		if got := csrfActive(c.auth); got != c.want {

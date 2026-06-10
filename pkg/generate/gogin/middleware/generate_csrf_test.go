@@ -1,10 +1,11 @@
-//ff:func feature=gen-gogin type=test control=sequence
-//ff:what TestMiddlewareExtras — csrf/prometheus/rate-limit/request-id/writeFiles 유틸 검증
+//ff:func feature=gen-gogin type=test control=sequence topic=csrf
+//ff:what TestGenerateCsrf — csrf.go 기록/스킵/모드 주입/에러 경로 검증
 package middleware
 
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/park-jun-woo/yongol/pkg/generate/prepared"
@@ -12,24 +13,51 @@ import (
 )
 
 func TestGenerateCsrf(t *testing.T) {
-	t.Run("SkipsWhenInactive", func(t *testing.T) {
+	t.Run("SkipsWhenAuthAbsent", func(t *testing.T) {
 		arts := t.TempDir()
-		if err := GenerateCsrf(prepared.Auth{CsrfRequired: false}, arts); err != nil {
+		if err := GenerateCsrf(prepared.Auth{Present: false}, arts); err != nil {
 			t.Fatalf("error: %v", err)
 		}
 		if _, err := os.Stat(filepath.Join(arts, "backend")); !os.IsNotExist(err) {
-			t.Errorf("expected no output when csrf inactive")
+			t.Errorf("expected no output when auth absent")
 		}
 	})
 
-	t.Run("WritesWhenActive", func(t *testing.T) {
+	t.Run("CookieWritesWithCookieDefault", func(t *testing.T) {
 		arts := t.TempDir()
-		a := prepared.Auth{CsrfRequired: true, Present: true, Raw: &pmanifest.Auth{}}
+		a := prepared.Auth{CsrfRequired: true, Present: true, Mode: "cookie", Raw: &pmanifest.Auth{}}
 		if err := GenerateCsrf(a, arts); err != nil {
 			t.Fatalf("error: %v", err)
 		}
-		if _, err := os.Stat(filepath.Join(arts, "backend", "internal", "middleware", "csrf.go")); err != nil {
-			t.Errorf("expected csrf.go: %v", err)
+		body, err := os.ReadFile(filepath.Join(arts, "backend", "internal", "middleware", "csrf.go"))
+		if err != nil {
+			t.Fatalf("expected csrf.go: %v", err)
+		}
+		// cookie build regression guard: with BACKEND_AUTH_MODE unset the
+		// runtime gate falls back to "cookie", so CSRF stays active.
+		if !strings.Contains(string(body), `return "cookie"`) {
+			t.Errorf("cookie build must inject \"cookie\" as csrfAuthMode fallback")
+		}
+	})
+
+	// BUG-116 / Phase-B1 — a manifest=bearer build (CsrfRequired=false) must
+	// still write csrf.go, with "bearer" injected as the csrfAuthMode()
+	// fallback so the middleware no-ops until BACKEND_AUTH_MODE selects
+	// cookie/hybrid at runtime.
+	t.Run("BearerWritesRuntimeGated", func(t *testing.T) {
+		arts := t.TempDir()
+		a := prepared.Auth{CsrfRequired: false, Present: true, Mode: "bearer", Raw: &pmanifest.Auth{Mode: "bearer"}}
+		if err := GenerateCsrf(a, arts); err != nil {
+			t.Fatalf("error: %v", err)
+		}
+		body, err := os.ReadFile(filepath.Join(arts, "backend", "internal", "middleware", "csrf.go"))
+		if err != nil {
+			t.Fatalf("bearer build must still write csrf.go: %v", err)
+		}
+		for _, must := range []string{`return "bearer"`, "csrfRuntimeActive", "BACKEND_AUTH_MODE"} {
+			if !strings.Contains(string(body), must) {
+				t.Errorf("bearer csrf.go missing %q", must)
+			}
 		}
 	})
 

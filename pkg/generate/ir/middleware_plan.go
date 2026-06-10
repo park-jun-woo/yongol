@@ -21,7 +21,9 @@ type MiddlewarePlan struct {
 	// RateLimit configures per-route rate limiting. nil when no rules exist.
 	RateLimit *RateLimitConfig
 
-	// CSRF configures double-submit cookie defense. nil for bearer-only.
+	// CSRF configures double-submit cookie defense. nil only when auth is
+	// absent or csrf is explicitly disabled — bearer builds carry it too
+	// (BUG-116: runtime-gated, no-op until BACKEND_AUTH_MODE=cookie/hybrid).
 	CSRF *CSRFConfig
 
 	// Prometheus is true when metrics middleware is active (default true).

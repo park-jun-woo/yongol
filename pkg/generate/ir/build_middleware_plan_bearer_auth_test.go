@@ -1,5 +1,5 @@
 //ff:func feature=gen-ir type=test control=sequence
-//ff:what TestBuildMiddlewarePlanBearerAuth -- bearer 인증 → BearerAuth 설정 + CSRF nil 검증
+//ff:what TestBuildMiddlewarePlanBearerAuth -- bearer 인증 → BearerAuth 설정 + CSRF 런타임 게이트 방출 검증
 
 package ir
 
@@ -45,7 +45,10 @@ func TestBuildMiddlewarePlanBearerAuth(t *testing.T) {
 	if !plan.BearerAuth.HasClaims {
 		t.Error("BearerAuth.HasClaims should be true")
 	}
-	if plan.CSRF != nil {
-		t.Error("CSRF should be nil for bearer-only auth")
+	// BUG-116 / Phase-B1 — CSRF is now emitted even for a manifest=bearer
+	// build (auth present → runtime authMode() switch can reach cookie/
+	// hybrid). The emitted middleware no-ops at runtime in bearer mode.
+	if plan.CSRF == nil {
+		t.Error("CSRF should be non-nil for bearer auth (runtime-reachable cookie/hybrid)")
 	}
 }

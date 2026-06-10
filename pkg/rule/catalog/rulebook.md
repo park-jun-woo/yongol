@@ -63,9 +63,9 @@ The `Source` column of each rule row is a Go file path relative to the repo root
 ## Rule count
 
 **This catalog is the single source of truth for the rule set.** The official
-total is the count of distinct rule IDs in the tables below — **365 rules across
+total is the count of distinct rule IDs in the tables below — **366 rules across
 60 prefixes**. This includes 26 retired rules (Deprecated section); the
-**active** subset (rows in the non-deprecated tables) is **339**.
+**active** subset (rows in the non-deprecated tables) is **340**.
 
 Counting note: a rule's ID is emitted either as a `[ID]` literal in the
 diagnostic message **or** via a `RuleID:` field / builder. A naive
@@ -183,6 +183,7 @@ SSaC self-consistency — required fields, variable flow, model references, @sub
 | OBS-003 | ERROR | `backend.observability.tracing.exporter` must be one of `otlp`/`stdout`/`noop` (when enabled=true) | `pkg/validate/manifest/obs_03_tracing_exporter.go` |
 | OBS-004 | ERROR | `backend.observability.tracing.sample_rate` must be within `[0.0, 1.0]` (when enabled=true) | `pkg/validate/manifest/obs_04_tracing_sample_rate.go` |
 | SEC-201 | ERROR | `backend.auth.mode=cookie\|hybrid` combined with `csrf.enabled=false` is forbidden (leaves CSRF attack surface exposed) | `pkg/validate/manifest/sec_201_cookie_without_csrf.go` |
+| SEC-202 | WARNING | `backend.auth.mode=bearer` combined with `csrf.enabled=false` removes the runtime CSRF gate — the generated `BACKEND_AUTH_MODE` switch can flip the build to cookie/hybrid auth with no CSRF defense (BUG-116) | `pkg/validate/manifest/sec_202_runtime_mode_csrf.go` |
 | SEC-301 | WARNING | `backend.security_headers.csp.directives.default-src` containing `*` or `'unsafe-eval'` weakens CSP protection | `pkg/validate/manifest/sec_301_csp_permissive.go` |
 | SEC-302 | WARNING | `backend.security_headers.hsts.max_age < 15552000` (180 days) fails the HSTS preload minimum | `pkg/validate/manifest/sec_302_hsts_short.go` |
 | SEC-401 | ERROR | Literal `backend.auth.secret` is forbidden (git leak / rotation impossible) — only `secret_env` is allowed | `pkg/validate/manifest/sec_401_jwt_secret_env_required.go` |

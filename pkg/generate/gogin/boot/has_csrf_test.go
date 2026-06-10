@@ -1,5 +1,5 @@
 //ff:func feature=gen-gogin type=test control=iteration dimension=1 topic=csrf
-//ff:what hasCsrf — prepared.Auth.Mode=cookie|hybrid && csrf.enabled 여부
+//ff:what TestHasCsrf — auth 선언 && csrf 미비활성 시 CSRF 블록 마운트 (BUG-116: bearer 포함)
 package boot
 
 import (
@@ -15,23 +15,31 @@ func TestHasCsrf(t *testing.T) {
 		a    prepared.Auth
 		want bool
 	}{
-		{"csrf not required (bearer)", prepared.Auth{CsrfRequired: false}, false},
-		{"required but auth absent", prepared.Auth{CsrfRequired: true, Present: false}, false},
-		{"required but nil raw", prepared.Auth{CsrfRequired: true, Present: true, Raw: nil}, false},
+		{"auth absent", prepared.Auth{Present: false}, false},
+		{"present but nil raw", prepared.Auth{Present: true, Raw: nil}, false},
 		{
-			"required, raw csrf unset → default enabled",
-			prepared.Auth{CsrfRequired: true, Present: true, Raw: &pmanifest.Auth{Csrf: nil}},
+			"raw csrf unset → default enabled",
+			prepared.Auth{CsrfRequired: true, Present: true, Mode: "cookie", Raw: &pmanifest.Auth{Csrf: nil}},
 			true,
 		},
 		{
-			"required, csrf explicitly enabled",
-			prepared.Auth{CsrfRequired: true, Present: true, Raw: &pmanifest.Auth{Csrf: &pmanifest.CsrfConfig{Enabled: true}}},
+			"csrf explicitly enabled",
+			prepared.Auth{CsrfRequired: true, Present: true, Mode: "cookie", Raw: &pmanifest.Auth{Csrf: &pmanifest.CsrfConfig{Enabled: true}}},
 			true,
 		},
 		{
-			"required, csrf explicitly disabled",
-			prepared.Auth{CsrfRequired: true, Present: true, Raw: &pmanifest.Auth{Csrf: &pmanifest.CsrfConfig{Enabled: false}}},
+			"csrf explicitly disabled",
+			prepared.Auth{CsrfRequired: true, Present: true, Mode: "cookie", Raw: &pmanifest.Auth{Csrf: &pmanifest.CsrfConfig{Enabled: false}}},
 			false,
+		},
+		{
+			// BUG-116 / Phase-B1 — manifest=bearer build (CsrfRequired=false)
+			// still mounts the CSRF block: BACKEND_AUTH_MODE can flip the
+			// binary to cookie/hybrid at runtime, and the emitted middleware
+			// no-ops in bearer mode (csrfRuntimeActive).
+			"bearer present → runtime-reachable cookie/hybrid",
+			prepared.Auth{CsrfRequired: false, Present: true, Mode: "bearer", Raw: &pmanifest.Auth{Mode: "bearer"}},
+			true,
 		},
 	}
 	for _, c := range cases {
