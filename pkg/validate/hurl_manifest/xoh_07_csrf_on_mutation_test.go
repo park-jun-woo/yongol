@@ -84,10 +84,49 @@ func TestXoh07CSRFOnMutation(t *testing.T) {
 				Manifest: &manifest.ProjectConfig{Backend: manifest.Backend{Auth: cookieAuth}},
 				HurlEntries: []hurl.HurlEntry{
 					{Method: "POST", Path: "/api/orders", File: "t.hurl", Line: 1,
-						Headers: []hurl.HurlHeader{{Name: "X-CSRF-Token", Value: "tok"}}},
+						Headers: []hurl.HurlHeader{{Name: "X-XSRF-TOKEN", Value: "tok"}}},
 				},
 			},
 			wantCount: 0,
+		},
+		{
+			name: "custom_header_name_only_that_header_accepted",
+			fs: &yongol.Fullstack{
+				Manifest: &manifest.ProjectConfig{Backend: manifest.Backend{
+					Auth: &manifest.Auth{Mode: "cookie", Csrf: &manifest.CsrfConfig{HeaderName: "X-My-CSRF"}},
+				}},
+				HurlEntries: []hurl.HurlEntry{
+					{Method: "POST", Path: "/api/orders", File: "t.hurl", Line: 1,
+						Headers: []hurl.HurlHeader{{Name: "X-My-CSRF", Value: "tok"}}},
+					{Method: "POST", Path: "/api/orders", File: "t.hurl", Line: 9,
+						Headers: []hurl.HurlHeader{{Name: "X-XSRF-TOKEN", Value: "tok"}}},
+				},
+			},
+			wantCount:       1,
+			wantMsgContains: "X-My-CSRF",
+		},
+		{
+			name: "legacy_csrf_header_warns_with_resolved_name",
+			fs: &yongol.Fullstack{
+				Manifest: &manifest.ProjectConfig{Backend: manifest.Backend{Auth: cookieAuth}},
+				HurlEntries: []hurl.HurlEntry{
+					{Method: "POST", Path: "/api/orders", File: "t.hurl", Line: 1,
+						Headers: []hurl.HurlHeader{{Name: "X-CSRF-Token", Value: "tok"}}},
+				},
+			},
+			wantCount:       1,
+			wantMsgContains: "X-XSRF-TOKEN",
+		},
+		{
+			name: "default_header_name_in_message",
+			fs: &yongol.Fullstack{
+				Manifest: &manifest.ProjectConfig{Backend: manifest.Backend{Auth: cookieAuth}},
+				HurlEntries: []hurl.HurlEntry{
+					{Method: "POST", Path: "/api/orders", File: "t.hurl", Line: 1},
+				},
+			},
+			wantCount:       1,
+			wantMsgContains: "X-XSRF-TOKEN",
 		},
 		{
 			name: "cookie_mode_auth_path_exempt",

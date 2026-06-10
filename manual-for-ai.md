@@ -690,9 +690,11 @@ Standard Hurl — [`docs/scenario.md`](docs/scenario.md). yongol adds no DSL.
 Copy a starter template from [`docs/scenario.md`](docs/scenario.md) —
 there are ready-to-edit snippets for both auth modes:
 
-- **Cookie mode** (`backend.auth.mode: cookie`, the 2026 default): login
-  captures the CSRF token from a response header; every mutation carries
-  `X-CSRF-Token: {{csrf}}`.
+- **Cookie mode** (`backend.auth.mode: cookie`, the 2026 default): a safe
+  request (e.g. GET) makes the middleware issue the JS-readable CSRF
+  cookie; capture it with `csrf: cookie "XSRF-TOKEN"` and every mutation
+  carries `X-XSRF-TOKEN: {{csrf}}` (names follow `backend.auth.csrf`
+  overrides when set).
 - **Bearer mode** (`backend.auth.mode: bearer`): login captures
   `access_token` from the response body; every protected call carries
   `Authorization: Bearer {{token}}`.
@@ -702,7 +704,8 @@ Common mistakes caught at validate time:
 - Capturing `$.access_token` on a Register response that only returns
   `user` — XOH-08 reports the drift.
 - Calling a protected endpoint without a preceding auth step — XOH-06.
-- Omitting `X-CSRF-Token` on a POST/PUT/DELETE in cookie mode — XOH-07.
+- Omitting the manifest-resolved CSRF header (default `X-XSRF-TOKEN`) on
+  a POST/PUT/DELETE in cookie mode — XOH-07.
 - Invoking a state transition before its prerequisite transitions —
   XOH-05 (e.g. `ExecuteWorkflow` before `ActivateWorkflow`).
 

@@ -5,6 +5,7 @@ package react
 
 import (
 	"github.com/park-jun-woo/yongol/pkg/generate/prepared"
+	"github.com/park-jun-woo/yongol/pkg/parser/manifest"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
@@ -36,15 +37,11 @@ func resolveAPIClientPlan(fs *yongol.Fullstack) (apiClientPlan, error) {
 	// "cookie" and "hybrid": the browser session rides httpOnly cookies.
 	plan.cookie = true
 	plan.csrf = auth.CsrfRequired && (auth.Raw == nil || auth.Raw.Csrf == nil || auth.Raw.Csrf.Enabled)
-	plan.csrfCookieName = "XSRF-TOKEN"
-	plan.csrfHeaderName = "X-XSRF-TOKEN"
-	if auth.Raw != nil && auth.Raw.Csrf != nil {
-		if auth.Raw.Csrf.CookieName != "" {
-			plan.csrfCookieName = auth.Raw.Csrf.CookieName
-		}
-		if auth.Raw.Csrf.HeaderName != "" {
-			plan.csrfHeaderName = auth.Raw.Csrf.HeaderName
-		}
+	var csrfCfg *manifest.CsrfConfig
+	if auth.Raw != nil {
+		csrfCfg = auth.Raw.Csrf
 	}
+	plan.csrfCookieName = csrfCfg.ResolvedCookieName()
+	plan.csrfHeaderName = csrfCfg.ResolvedHeaderName()
 	return plan, nil
 }

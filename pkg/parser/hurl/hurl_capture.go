@@ -5,7 +5,8 @@ package hurl
 
 // HurlCapture is a parsed [Captures] line such as
 // `token: jsonpath "$.access_token"` or
-// `csrf: header "X-CSRF-Token"`.
+// `reqId: header "X-Request-Id"`. Other sources (e.g.
+// `csrf: cookie "XSRF-TOKEN"`) are preserved as raw expressions.
 type HurlCapture struct {
 	Var      string // variable name (e.g. "token")
 	Source   string // "jsonpath" | "header" | raw expression prefix

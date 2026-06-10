@@ -23,5 +23,8 @@ func runXoh07CSRFOnMutation(t *testing.T, c TestXoh07CSRFOnMutationCase) {
 		if !strings.Contains(d.Message, "[XOH-07]") {
 			t.Errorf("message should contain [XOH-07], got %q", d.Message)
 		}
+		if c.wantMsgContains != "" && !strings.Contains(d.Message, c.wantMsgContains) {
+			t.Errorf("message should contain %q, got %q", c.wantMsgContains, d.Message)
+		}
 	}
 }

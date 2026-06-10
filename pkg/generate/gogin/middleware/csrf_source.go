@@ -16,6 +16,14 @@ package middleware
 // (Authorization: Bearer header present) also skips — allows API clients
 // to coexist with browser sessions on the same surface.
 //
+// The in-template fallbacks ("XSRF-TOKEN" / "X-XSRF-TOKEN" / 86400 in
+// Csrf()) keep the emitted file self-contained; boot always injects the
+// manifest-resolved values, so they are defense-in-depth only. They must
+// stay byte-identical to the defaults in
+// pkg/parser/manifest/csrf_config.go (ResolvedCookieName /
+// ResolvedHeaderName / ResolvedMaxAge) — the single source consumed by
+// the generator and validate (XOH-07).
+//
 // Error envelope keeps the Phase004 shape (error / message / request_id)
 // so downstream JSON clients parse it uniformly.
 const csrfSourceTemplate = `//` + `ff:func feature=runtime-middleware type=util control=sequence topic=csrf

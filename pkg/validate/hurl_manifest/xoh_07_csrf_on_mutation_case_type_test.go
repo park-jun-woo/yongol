@@ -9,4 +9,7 @@ type TestXoh07CSRFOnMutationCase struct {
 	name      string
 	fs        *yongol.Fullstack
 	wantCount int
+	// wantMsgContains, when non-empty, must be a substring of every
+	// diagnostic Message (e.g. the manifest-resolved CSRF header name).
+	wantMsgContains string
 }

@@ -1,5 +1,5 @@
 //ff:func feature=validate type=test control=sequence topic=hurl-manifest
-//ff:what TestXoh07_Positive_CSRFPresent — X-CSRF-Token 존재 시 진단 없음
+//ff:what TestXoh07_Positive_CSRFPresent — X-XSRF-TOKEN 존재 시 진단 없음
 
 package hurl_manifest
 
@@ -18,7 +18,7 @@ func TestXoh07_Positive_CSRFPresent(t *testing.T) {
 		},
 		HurlEntries: []hurl.HurlEntry{
 			{Method: "POST", Path: "/workflows", File: "t.hurl", Line: 1,
-				Headers: []hurl.HurlHeader{{Name: "X-CSRF-Token", Value: "{{csrf}}"}}},
+				Headers: []hurl.HurlHeader{{Name: "X-XSRF-TOKEN", Value: "{{csrf}}"}}},
 		},
 	}
 	if diags := xoh07CSRFOnMutation(fs); len(diags) != 0 {

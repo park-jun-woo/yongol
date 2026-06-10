@@ -489,7 +489,7 @@ All Hurl files under `specs/tests/` are user-authored. yongol does not emit any 
 | Rule ID | Level | Description | Source |
 |---|---|---|---|
 | XOH-06 | WARNING | Protected Hurl call preceded by an auth step | `pkg/validate/hurl_manifest/xoh_06_auth_precondition.go` |
-| XOH-07 | WARNING | Cookie-mode mutation includes `X-CSRF-Token` header | `pkg/validate/hurl_manifest/xoh_07_csrf_on_mutation.go` |
+| XOH-07 | WARNING | Cookie-mode mutation includes the manifest-resolved CSRF header (default `X-XSRF-TOKEN`) | `pkg/validate/hurl_manifest/xoh_07_csrf_on_mutation.go` |
 
 ## R5. State Machine / Rego / Func
 

@@ -44,9 +44,24 @@ credentials to match your project.
 
 ### Cookie + CSRF (`backend.auth.mode: cookie`, the 2026 default)
 
+The generated middleware sets the JS-readable CSRF cookie (`XSRF-TOKEN`)
+on safe requests (GET/HEAD/OPTIONS) — it never sends the token as a
+response header. Capture the cookie after a safe request, then duplicate
+it into the `X-XSRF-TOKEN` header (double-submit) on every state-changing
+request — including the auth POSTs, since the generated CSRF middleware
+is registered globally with no default exemptions. Cookie and header
+names follow `backend.auth.csrf.cookie_name` / `header_name` overrides
+when set.
+
 ```hurl
+GET {{host}}/api/workflows
+HTTP 200
+[Captures]
+csrf: cookie "XSRF-TOKEN"
+
 POST {{host}}/auth/register
 Content-Type: application/json
+X-XSRF-TOKEN: {{csrf}}
 { "email": "smoke+{{newUuid}}@example.com", "password": "p@ssw0rd!" }
 HTTP 201
 [Asserts]
@@ -54,17 +69,13 @@ jsonpath "$.user.id" isInteger
 
 POST {{host}}/auth/login
 Content-Type: application/json
+X-XSRF-TOKEN: {{csrf}}
 { "email": "smoke+{{newUuid}}@example.com", "password": "p@ssw0rd!" }
-HTTP 200
-[Captures]
-csrf: header "X-CSRF-Token"
-
-GET {{host}}/api/workflows
 HTTP 200
 
 POST {{host}}/api/workflows
 Content-Type: application/json
-X-CSRF-Token: {{csrf}}
+X-XSRF-TOKEN: {{csrf}}
 { "name": "Demo" }
 HTTP 201
 ```
@@ -94,7 +105,7 @@ HTTP 200
 | XOH-04 | ERROR | Assert jsonpath reachable in response schema |
 | XOH-05 | WARNING | Call order satisfies state transitions |
 | XOH-06 | WARNING | Protected endpoint preceded by an auth step |
-| XOH-07 | WARNING | Cookie-mode mutation carries `X-CSRF-Token` |
+| XOH-07 | WARNING | Cookie-mode mutation carries the manifest-resolved CSRF header (default `X-XSRF-TOKEN`) |
 | XOH-08 | ERROR | Capture jsonpath reachable in response schema |
 | XOH-09 | WARNING | Captured variable is used later |
 
