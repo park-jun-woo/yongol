@@ -535,7 +535,7 @@ attribute vocabulary splits in two: **page attributes** (this table) and
 | `data-component` | Custom component delegation | `<div data-component="DatePicker" data-field="StartAt" />` |
 | `data-enabled-when` | Action enablement decision (guard) | `<button data-action="ActivateWorkflow" data-enabled-when="workflow.status=draft">` |
 | `data-invalidates` | Effect declaration: queries to refetch on action success (space-separated operationIds) | `<div data-action="CreateWorkflow" data-invalidates="ListWorkflows">` |
-| `data-capture` | Auth flow: store response fields into auth sinks on action success | `<section data-action="Login" data-capture="access_token -> auth.token, refresh_token -> auth.refresh">` |
+| `data-capture` | Auth flow: store response fields into auth sinks on action success. Sinks: `auth.token`, `auth.refresh`, `auth.claims.<name>` (a claim from the login response body — e.g. the user's role for the sitemap `data-roles` menu filter; works in cookie mode too) | `<section data-action="Login" data-capture="access_token -> auth.token, role -> auth.claims.role">` |
 | `data-redirect` | Flow: target navigated to on action success — a `/`-prefixed **static path**, or an STML **page-name reference** (filename without `.html`) whose resolved route gets `data-redirect-params` substituted | `<section data-action="Login" data-redirect="/">`, `<div data-action="CreateContract" data-redirect="contract-edit" data-redirect-params="id -> ContractID">` |
 | `data-redirect-params` | Flow: binds the redirect target route's segments — `<source> -> <SegmentName>` pairs (comma-separated, `data-capture`-style value grammar). Sources: unprefixed 2xx **response fields** of the action operation (the only data in scope after success) or `route.<Name>` (forwarding a current-page param). `-> <SegmentName>` may be elided when the target has exactly one required segment | `data-redirect-params="id -> ContractID"` |
 | `data-on-error` | Auth flow: marker for the element shown when the action fails (4xx/5xx rejects with the server ErrorResponse body; its `message` is displayed, falling back to a stringified error when `message` is absent). When absent, a default error element (`role="alert"`) is emitted right next to the submit button — declaring `data-on-error` decides the display element and position instead | `<p data-on-error></p>` |
@@ -553,8 +553,15 @@ wiring as a disposable projection.
 The three flow attributes declare the auth session flow (plans/stml/auth-flow):
 `data-capture` and `data-redirect` belong on the `data-action` element itself,
 `data-on-error` on an element *inside* a `data-action` block (TM-25 enforces
-placement). The capture sink namespace is restricted to `auth.token` and
-`auth.refresh` (`session.*` collides with the SSaC built-in session package).
+placement). The capture sink namespace is restricted to `auth.token`,
+`auth.refresh` and `auth.claims.<name>` (`session.*` collides with the SSaC
+built-in session package). `auth.claims.<name>` (plans/stml/sitemap
+Phase005) stores a login-response field as a named claim in the session
+store — the supply line of the sitemap `data-roles` menu filter via
+`manifest frontend.auth.role_field`. Because the claim comes from the
+response *body* (not an httpOnly cookie), claims captures are first-class
+in cookie mode too: TM-24 exempts them, and a cookie-mode project with
+claims captures gets a claims-only store (no token fields).
 `data-redirect` takes a `/`-prefixed static path (which must resolve to an
 STML page route, `/` being the index route) or a page-name reference; either
 way the target must exist (TM-26).
@@ -726,11 +733,11 @@ references, TM-13 warns on unused layouts).
 
 | Attribute | Purpose | Example |
 |---|---|---|
-| `data-nav` (on `<a>`) | Global menu entry. The value is an STML **page-name reference** (recommended — resolved to the page's route, the `data-redirect` dual rule) or a `/`-prefixed static path. The target must resolve, and a page-name target's route must carry no **required** parameter segment — a static menu link has no value to fill it (TM-36) | `<a data-nav="building-list">건물</a>` |
+| `data-nav` (on `<a>`) | Global menu entry — **only when `frontend/sitemap.html` is absent**. With a sitemap the layout menu derives from the sitemap tree and a surviving `data-nav` is an ERROR (TM-44 — the menu moved to sitemap.html; single source of truth). Without one, the value is an STML **page-name reference** (recommended — resolved to the page's route, the `data-redirect` dual rule) or a `/`-prefixed static path. The target must resolve, and a page-name target's route must carry no **required** parameter segment — a static menu link has no value to fill it (TM-36) | `<a data-nav="building-list">건물</a>` |
 | `data-outlet` (on `<slot>`) | Where the active page renders inside the layout (`<Outlet />`) | `<slot data-outlet></slot>` |
 | `data-logout` | Marks the element that ends the session. The optional value names the server logout operation (must exist and be non-GET — TM-37). bearer mode: op call (best-effort) → session store clear → `/login`; cookie mode: the server op *is* the logout (a valueless `data-logout` cannot end an httpOnly cookie session — TM-38) → `/login`. Without backend.auth the declaration is dead — TM-38 warns and nothing is emitted | `<button data-logout="Logout">로그아웃</button>` |
 
-Admin layout example (Gozhip-style):
+Admin layout example (Gozhip-style, **sitemap absent**):
 
 ```html
 <!-- frontend/layouts/app.html -->
@@ -754,6 +761,237 @@ rejected statically (TM-36) — that navigation belongs to `data-link` with
 `data-link-params`. The emitted layout component is the only component
 class that imports the api client (`@/lib/api`) and, in bearer mode, the
 session store (`@/stores/auth`) — the same import convention as pages.
+
+### Sitemap (`frontend/sitemap.html`)
+
+The optional central site-structure declaration (plans/stml/sitemap
+Phase001): an HTML nested-list page tree, one fixed-name file directly in
+the frontend directory (it is never parsed as a page). Absent file = the
+current behavior, unchanged — but TM-49 warns that the structure is
+undeclared. Each `<nav data-sitemap>` block groups pages, document order =
+menu order. The tree is free-depth; one page appears at most once across
+the whole file (canonical position — TM-40); cross-references between
+screens stay `data-link`'s job.
+
+| Attribute | Where | Purpose |
+|---|---|---|
+| `data-sitemap` | `<nav>` | Declares a sitemap block. At least one per file; any other top-level element is a parse error |
+| `data-layout` | `<nav>` | Default layout for the block's pages (must exist in `layouts/` — TM-41). Priority: page `data-layout` > sitemap > `manifest.frontend.defaultLayout` |
+| `data-entry` | `<nav>` | Marks every page in the block as a reachability root (public entry pages) |
+| `data-page` | `<li>` | STML page name (filename without `.html`; must exist — TM-39). An `<li>` without it is a group label (not clickable) |
+| `data-index` | `<li data-page>` | The `/` redirect target. At most one per sitemap; the page's route must have no required segment; must agree with `manifest.frontend.index` when both are declared (TM-42) |
+| `data-menu="false"` | `<li data-page>` | Hide from the menu (the node keeps its structural/breadcrumb position) |
+| `data-icon` | `<li>` | Menu icon: a kebab-case [lucide](https://lucide.dev) icon name, emitted as the lucide-react component (`layout-dashboard` → `<LayoutDashboard />`). The dependency is added to package.json only when at least one `data-icon` exists; an unknown name fails tsc as an import error (no silent runtime fallback) |
+| `data-roles` | `<li>` | Role allowlist (comma-separated) for the menu entry — the entry renders only when the signed-in user's role claim is in the list; the whole subtree inherits by nesting (ancestor conditions AND). Each value must be in `backend.auth.roles` (TM-46) and the wiring needs `frontend.auth.role_field` + an `auth.claims.<role_field>` capture (TM-47). **Menu hiding ≠ access blocking** — this filter is UX only; access control stays in Rego |
+| `data-crumb-field` | `<li data-page>` | Dynamic breadcrumb label (Phase006): the named field of the page's **first** `data-fetch` 2xx response replaces the static crumb label (and `document.title`) once the fetch arrives — "건물 상세" → "역삼타워". Page items only (TM-39); the field must exist in that response schema as a string/integer/number scalar (TM-50). Before arrival, on failure or without the field the static label stays — no blank/flicker |
+| `<a href="...">` | `<li>` child | External-link menu entry — mutually exclusive with `data-page` (TM-39) |
+| label | `<li>` direct text | Menu/breadcrumb label |
+| `data-fetch` / `data-each` / `data-link` / `data-link-params` / `data-label-field` | nested `<ul>` of a group `<li>` | **Dynamic menu group** (Phase007): the group's items are the rows of an OpenAPI list response — see §Sitemap dynamic menu groups below |
+
+```html
+<!-- frontend/sitemap.html -->
+<nav data-sitemap data-layout="app">
+  <ul>
+    <li data-page="dashboard" data-index>대시보드</li>
+    <li>건물 관리                       <!-- group label (no data-page) -->
+      <ul>
+        <li data-page="building-list">건물 목록
+          <ul>
+            <li data-page="building-detail">건물 상세</li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li data-page="member-list" data-icon="users" data-menu="false">멤버</li>
+    <li><a href="https://docs.example.com">사용자 매뉴얼</a></li>
+  </ul>
+</nav>
+
+<nav data-sitemap data-layout="bare" data-entry>
+  <ul>
+    <li data-page="login">로그인</li>
+  </ul>
+</nav>
+```
+
+**Reachability — listing is a node, not an edge.** With a sitemap present,
+TM-43 checks that every page is actually reachable: BFS from the roots
+(`data-index` pages, every page of a `data-entry` block,
+`manifest.frontend.index`, `data-route="/"` mounts) over the real movement
+edges — menu-rendered sitemap entries (menu depth ≤ 2, no required route
+param, no `data-menu="false"`), `data-link` targets, resolvable
+`data-redirect` targets and breadcrumb up-links (Phase004 — a reachable
+page's breadcrumb links each `MenuRenderable` sitemap ancestor, so the
+ancestor counts as reachable through it). **Listing a page in the sitemap does not make it
+reachable**: an entry that does not render in the menu (e.g. a detail page
+whose route needs `:BuildingID`) still needs an incoming `data-link`/
+`data-redirect` from a reachable page — typically `data-link` on the list's
+`data-each` row. Without a sitemap TM-43 stays inactive (there is nowhere
+to declare roots/entry points) and TM-49 warns instead.
+
+**Menu derivation (Phase003).** With a sitemap present the layout menus
+are emitted from the sitemap tree — `data-nav` in any layout HTML is then
+an ERROR (TM-44: the menu moved to sitemap.html; the layout keeps only the
+menu *position* — its `<nav>`/`data-outlet` shell). The rules:
+
+- **Block → layout**: each `<nav data-sitemap>` block feeds the layout its
+  `data-layout` names; a block without `data-layout` feeds
+  `manifest.frontend.defaultLayout`. Several blocks for the same layout
+  chain in document order. Layout assignment of the *pages* follows the
+  three-step chain page `data-layout` > sitemap block `data-layout` >
+  `defaultLayout` (the specific beats the general), and a layout assigned
+  only by a sitemap block counts as used (TM-13).
+- **2-level render**: level 1 = group labels (`<li>` without `data-page`,
+  non-clickable `<span>` headers, always expanded) or direct page items;
+  level 2 = items inside a group. Deeper nodes, required-parameter routes
+  and `data-menu="false"` subtrees do not render (the exact
+  `MenuRenderable` judgment TM-43 uses — validation and emission never
+  disagree).
+- **Active state**: internal items emit `<NavLink ... end>` (exact route
+  match). A menu-hidden descendant (detail page etc.) highlights its
+  nearest menu-rendered ancestor automatically: the ancestor's `className`
+  callback also matches `pathname.startsWith(...)` over the descendants'
+  static route prefixes — no manual `activeMenu` pointer needed.
+- **External links** emit `<a href target="_blank" rel="noopener noreferrer">`;
+  **icons** emit lucide-react components (see `data-icon` above).
+
+**Breadcrumb & document.title derivation (Phase004).** With a sitemap
+present, static breadcrumbs and page titles derive from the tree (labels
+are the `<li>` texts — DESIGN §4.6; `data-crumb-field` upgrades the
+self label to a dynamic entity name, below). Without a sitemap nothing
+below is emitted and the output stays byte-identical.
+
+- **Trails are generate-time constants**: `src/lib/breadcrumbs.ts` holds a
+  page-name-keyed `BREADCRUMBS` table (the root → self label chain — every
+  ancestor `<li>` contributes a crumb, groups and external links included)
+  plus a `BREADCRUMB_ROUTES` pattern → page matching table (static
+  patterns sorted before parameterized ones). No runtime tree walk.
+- **Crumb links**: an ancestor crumb gets an `href` only when its node is
+  a page the `MenuRenderable` judgment admits (same raw judgment as the
+  menu — a required-parameter ancestor, group label or external link stays
+  label-only, the Refine "parent without a list = crumb without href"
+  rule). The trail's own page is always label-only. These ancestor links
+  are TM-43's reachability edge (d) — validation and emission never
+  disagree on what the user can click.
+- **Rendering**: the shared `<Breadcrumb>` component
+  (`src/components/ui/Breadcrumb.tsx`) is placed above every layout's
+  `<Outlet />`; it matches the current pathname against
+  `BREADCRUMB_ROUTES` and renders the selected trail. Depth-1 pages (a
+  single-crumb trail is noise) and sitemap-unlisted pages render no
+  breadcrumb at all — the table simply has no entry.
+- **document.title**: every sitemap-listed page's component gets a mount
+  `useEffect` setting `document.title = '<label> · <app name>'` (the app
+  name is `manifest.metadata.name`; a labelless `<li data-page>` falls
+  back to the page name). Unlisted pages get **no** title effect — the
+  sitemap label is the only title source (PageSpec has no title concept).
+
+**Dynamic crumb label (`data-crumb-field`, Phase006).** A page item may
+name a field of its **first** `data-fetch` 2xx response; the value
+replaces the trail's *own* crumb label and `document.title` once the
+fetch arrives ("건물 상세" → "역삼타워"). Ancestor crumbs stay static —
+they would need their own fetches (out of scope). The label travels
+page → layout through the react-router **`<Outlet context>`** (the
+official mechanism, no dependency added):
+
+- the layout keeps `crumbLabel` state, resets it on `pathname` change
+  (no stale entity name after navigation), renders
+  `<Breadcrumb label={crumbLabel} />` and hands the setter down via
+  `<Outlet context={{ setCrumbLabel }} />`;
+- the declaring page receives it null-guarded —
+  `const { setCrumbLabel } = useOutletContext<…>() ?? {}` plus optional
+  call (a layout-less page has no provider) — and a `useEffect` over the
+  fetch data calls `setCrumbLabel?.(String(v))` and updates
+  `document.title` when the field value is non-null;
+- the trail marks the self crumb `dynamic: true`; `<Breadcrumb>` renders
+  the label state for it when set and the static label otherwise — the
+  single fallback point, so the crumb never blanks or flickers.
+
+Validation: page items only (TM-39); the field must exist in the first
+fetch's 2xx response schema as a string/integer/number scalar (TM-50).
+Without any `data-crumb-field` every artifact stays byte-identical to
+the Phase004/005 output.
+
+**Role-based menu (`data-roles`, Phase005).** Three declarations wire the
+role filter, each its own SSOT decision:
+
+```html
+<!-- frontend/sitemap.html — who sees the menu entry -->
+<li data-page="member-list" data-roles="admin,manager">멤버</li>
+```
+```yaml
+# manifest.yaml — which claim the filter reads + the valid role names
+backend:
+  auth:
+    roles: [member, manager, admin]
+frontend:
+  auth:
+    role_field: role        # reads claims['role']
+```
+```html
+<!-- login.html — where the claim comes from (a 2xx response field) -->
+<form data-action="Login" data-capture="role -> auth.claims.role">
+```
+
+The generated layout renders the entry as
+`{ROLES_admin_manager.includes(userRole) && (<li>…</li>)}` with
+`const userRole = useAuthStore((s) => s.claims['role'])` — a signed-out
+user has no claim, so role-gated entries are hidden. A `data-roles` on a
+group `<li>` gates the whole subtree (children render inside the
+conditional block, so ancestor conditions AND by nesting). Validation:
+TM-46 rejects values outside `backend.auth.roles`; TM-47 rejects use
+without the full wiring (role_field + capture + non-empty roles). In
+cookie mode the claims capture is exempt from TM-24 (the claim is read
+from the response body, not the httpOnly cookie), a role_field-only
+`frontend.auth` block is exempt from TM-24/XON-60, and the emitted store
+is claims-only (no token fields). **Menu hiding is not security** — direct
+URL access still works; access blocking is and stays the Rego policy's
+concern (the same separation Filament-class admin frameworks document).
+
+**Sitemap dynamic menu groups (Phase007).** A sidebar group whose items
+are the user's own entities — "내 건물" listing one menu entry per
+building (the workspace/project-switcher pattern). The page vocabulary is
+reused on the group `<li>`'s nested `<ul>`:
+
+```html
+<li>내 건물
+  <ul data-fetch="ListMyBuildings" data-each="items"
+      data-link="building-detail" data-link-params="item.building_id -> BuildingID"
+      data-label-field="building_name">
+  </ul>
+</li>
+```
+
+`data-fetch`/`data-each`/`data-link` and `data-label-field` are all
+required (TM-48 / TM-30); `data-link-params` is required by the target
+route's segments exactly like a page `data-link` (TM-32 — `item.*`
+sources only; `route.*` has no meaning in a menu that renders on every
+route). The layout component gets one TanStack Query `useQuery` per
+distinct operation with the **page fetch query key** (`['ListMyBuildings']`)
+— a page action's `data-invalidates` on the same operation refreshes the
+sidebar with no new vocabulary. In bearer mode the query is gated with
+`enabled: !!token` so signed-out visitors never fire the protected call;
+cookie mode fires ungated (the client cannot know the session state).
+While the list has zero items — loading, empty response or error alike —
+the **whole group, header included, is silently omitted**: a menu is not
+a content area, so the error's visibility belongs to the page consuming
+the same operation. Each item renders as
+`<li key={item.building_id}><NavLink to={…}>{item.building_name}</NavLink></li>`
+with the route segments substituted from `data-link-params` (the page
+`data-link` emission) and per-item active state by route matching.
+A dynamic group may not sit in a `data-entry` block (TM-48 — the public
+entry layout renders for signed-out visitors, where the fetch can never
+be satisfied), and its `data-link` target counts as a reachability edge
+(TM-43) exactly like a page `data-link`.
+
+**Non-scope (DESIGN §4.11 (b)): runtime delegation of the menu structure
+itself** — a CMS-style menu table the admin edits at runtime — **is not
+supported**. The moment the menu tree becomes runtime data, spec-time
+orphan/existence validation is impossible in principle, which contradicts
+the sitemap's reason to exist. Express such requirements as item
+expansion: a menu operation returning the list, declared as a dynamic
+group. All previously reserved sitemap attributes have graduated:
+`data-roles` (Phase005), `data-crumb-field` (Phase006), the dynamic-group
+vocabulary (Phase007) — TM-45 retired with nothing left to reserve.
 
 ### Example: List + Create
 
@@ -797,50 +1035,62 @@ session store (`@/stores/auth`) — the same import convention as pages.
 
 | Rule | Level | Cross target | Contract |
 |---|---|---|---|
-| `TM-01` | ERROR | OpenAPI | `data-fetch` operationId exists in OpenAPI |
+| `TM-01` | ERROR | OpenAPI | `data-fetch` operationId exists in OpenAPI (page fetches and sitemap dynamic menu groups alike) |
 | `TM-02` | ERROR | OpenAPI | `data-action` operationId exists in OpenAPI |
 | `TM-03` | ERROR | OpenAPI | `data-action` must not reference a GET endpoint |
 | `TM-04` | ERROR | OpenAPI | `data-param-*` name matches OpenAPI parameter |
 | `TM-05` | ERROR | OpenAPI | `data-field` name matches OpenAPI request body field |
 | `TM-06` | ERROR | OpenAPI | `data-bind` field matches OpenAPI response schema |
-| `TM-07` | ERROR | OpenAPI | `data-each` field exists in OpenAPI response schema |
+| `TM-07` | ERROR | OpenAPI | `data-each` field exists in OpenAPI response schema (page fetches and sitemap dynamic menu groups alike) |
 | `TM-08` | ERROR | OpenAPI | `data-each` field is an array type |
 | `TM-09` | ERROR | filesystem | `data-component` references an existing `.tsx` component file |
 | `TM-10` | ERROR | STML internal | element must not use a `class` attribute (use `<!-- @override class="..." -->`) |
 | `TM-11` | ERROR | layouts | page `data-layout` matches a layout in `layouts/` |
 | `TM-12` | ERROR | layouts | `manifest.frontend.defaultLayout` matches a layout in `layouts/` |
-| `TM-13` | WARNING | layouts | layout in `layouts/` is referenced by some page or defaultLayout |
+| `TM-13` | WARNING | layouts | layout in `layouts/` is referenced by some page, defaultLayout, or a sitemap `<nav data-layout>` block |
 | `TM-14` | ERROR | OpenAPI | `data-enabled-when` guard ref model is a top-level property of some page fetch response |
 | `TM-15` | ERROR | stateDiagram | guard comparison state value exists in the matching stateDiagram |
 | `TM-16` | ERROR | OpenAPI | `data-invalidates` operationId exists in OpenAPI and is a GET |
 | `TM-17` | ERROR | STML internal | `data-state` guard with a combinator parses under the §guard-syntax EBNF |
 | `TM-18` | WARNING | stateDiagram | the `data-action` transition is legal from the state its `data-enabled-when` requires |
 | `TM-19` | WARNING | OpenAPI | `data-field` must not bind an `object`(map) request body field to a plain text input |
-| `TM-20` | ERROR | OpenAPI | `data-capture` is well-formed (sink `auth.token`/`auth.refresh`) and every respField exists in the operation's 2xx response schema |
+| `TM-20` | ERROR | OpenAPI | `data-capture` is well-formed (sink `auth.token`/`auth.refresh`/`auth.claims.<name>`) and every respField (claims included) exists in the operation's 2xx response schema |
 | `TM-21` | WARNING | manifest/OpenAPI | bearer mode needs an `auth.token` capture, and declared captures need a page that calls a protected operation |
 | `TM-22` | ERROR | manifest/OpenAPI | bearer mode + a page calls a `security`-protected operation requires some page to capture `auth.token` |
 | `TM-23` | WARNING | stateDiagram | the `data-redirect` target page's `=` state guard must accept an arrival state of the action's transition |
-| `TM-24` | WARNING | manifest | cookie mode must not declare `auth.*` captures or a `frontend.auth` block (httpOnly cookies cannot be captured) |
+| `TM-24` | WARNING | manifest | cookie mode must not declare token captures or token keys in `frontend.auth` (httpOnly cookies cannot be captured). Exempt: `auth.claims.*` captures (read from the response body) and a role_field-only `frontend.auth` block — the Phase005 menu role wiring |
 | `TM-25` | ERROR | STML internal | `data-on-error` only inside a `data-action` block; `data-capture`/`data-redirect` only on a `data-action` element |
 | `TM-26` | ERROR | STML internal | `data-redirect` resolves to an STML page: a `/`-prefixed static path against the resolved routes (`/` allowed as index), any other value as a page-name reference (filename without `.html`) |
 | `TM-27` | ERROR | STML internal | every consumed `route.<Name>` appears as a same-named `:Name`/`:Name?` segment in the page's resolved route (case-exact) |
 | `TM-28` | WARNING | STML internal | every `:Name`/`:Name?` segment of the page's resolved route is consumed by some `data-param-*` binding |
 | `TM-29` | WARNING | OpenAPI | an action whose operation declares a 4xx/5xx response should declare a `data-on-error` element — without it the server error falls back to the default inline slot (`role="alert"`) |
-| `TM-30` | ERROR | OpenAPI | `item.<Field>` param source only inside a `data-each` block, and the field must exist in the enclosing each's item schema (OpenAPI response) |
-| `TM-31` | ERROR | STML internal | `data-link` target names an existing STML page (filename without `.html`) |
-| `TM-32` | ERROR | STML/OpenAPI | `data-link-params` is well-formed and satisfies the target route: every required segment mapped, SegmentNames exist in the target route, `item.*` sources inside `data-each` against the item schema, `route.*` sources in this page's resolved route, elided form only against a single required segment |
+| `TM-30` | ERROR | OpenAPI | `item.<Field>` param source only inside a `data-each` block, and the field must exist in the enclosing each's item schema (OpenAPI response); a sitemap dynamic group **requires** `data-label-field`, existing in the group's each item schema as a string/integer/number scalar |
+| `TM-31` | ERROR | STML internal | `data-link` target names an existing STML page (filename without `.html`) — sitemap dynamic groups included |
+| `TM-32` | ERROR | STML/OpenAPI | `data-link-params` is well-formed and satisfies the target route: every required segment mapped, SegmentNames exist in the target route, `item.*` sources inside `data-each` against the item schema, `route.*` sources in this page's resolved route, elided form only against a single required segment; sitemap dynamic groups get the same judgment with `item.*` sources only (`route.*` rejected — a menu has no route context) |
 | `TM-33` | ERROR | STML/OpenAPI | `data-redirect-params` is well-formed and satisfies the redirect target route: not declared on a static path (contradiction), respField sources exist in the action operation's 2xx response schema (`route.*` exempt), SegmentNames exist in the target route, every required segment mapped, elided form only against a single required segment |
 | `TM-34` | ERROR | manifest | `manifest.frontend.index` names an existing STML page whose resolved route has no required parameter segment, and no page simultaneously mounts `/` via `data-route` |
-| `TM-35` | WARNING | manifest | frontend ON with pages but no index declared (no `/` mount, no `frontend.index`) — the file-name-sort fallback decides the first screen; declare one of the two vehicles |
-| `TM-36` | ERROR | STML internal | layout `data-nav` resolves: a `/`-prefixed static path matches some page route (`/` allowed as index), a page-name reference names an existing page whose route has no required parameter segment |
+| `TM-35` | WARNING | manifest | frontend ON with pages but no index declared (no `/` mount, no `frontend.index`, no sitemap `data-index`) — the file-name-sort fallback decides the first screen; declare one of the three vehicles |
+| `TM-36` | ERROR | STML internal | layout `data-nav` resolves (sitemap-absent path): a `/`-prefixed static path matches some page route (`/` allowed as index), a page-name reference names an existing page whose route has no required parameter segment |
 | `TM-37` | ERROR | OpenAPI | layout `data-logout` operationId exists in OpenAPI and is not a GET (session-ending ops are mutations) |
 | `TM-38` | WARNING | manifest | `data-logout` mode fitness: no backend.auth → dead declaration (emission skipped); non-bearer mode + valueless `data-logout` → an httpOnly cookie session needs a server op to end |
+| `TM-39` | ERROR | sitemap | sitemap `data-page` names an existing STML page, never together with an `<a href>` external link (mutually exclusive), and `data-crumb-field` only on page items (a group `<li>` has no fetch to read the label from) |
+| `TM-40` | ERROR | sitemap | a page appears at most once across the whole sitemap (canonical position; both positions named) |
+| `TM-41` | ERROR | layouts | sitemap `<nav data-layout>` matches a layout in `layouts/` (the TM-11 judgment) |
+| `TM-42` | ERROR | sitemap/manifest | `data-index` consistency: at most one, on a `data-page` entry, route without required segments (TM-34 judgment), and agreement with `manifest.frontend.index` when both are declared |
+| `TM-43` | WARNING | sitemap/pages | every page is reachable from the roots (index ∪ `data-entry` pages) via real edges: menu-rendered sitemap entries, `data-link`, resolvable `data-redirect`, breadcrumb up-links (a reachable page's `MenuRenderable` sitemap ancestors), dynamic menu group `data-link` targets (Phase007). Listing ≠ reaching — a non-menu-rendered entry (required param / depth > 2 / `data-menu="false"`) still needs an incoming link. Sitemap present only |
+| `TM-44` | ERROR | layouts/sitemap | no layout HTML declares `data-nav` while `frontend/sitemap.html` exists — the menu's single source of truth is the sitemap (메뉴는 sitemap.html 로 이동); the layout keeps only the menu position |
+| `TM-46` | ERROR | sitemap/manifest | every `data-roles` value is in `backend.auth.roles` — a typo'd role hides the entry from everyone; menu hiding is not security (access blocking is Rego's concern) |
+| `TM-47` | ERROR | sitemap/manifest | `data-roles` use requires the full role-claim wiring: `frontend.auth.role_field` declared, an `auth.claims.<role_field>` capture on some action, and non-empty `backend.auth.roles` |
+| `TM-48` | ERROR | sitemap | dynamic menu group structure: never inside a `data-entry` block (a signed-out entry layout cannot satisfy the list fetch), and `data-fetch`/`data-each`/`data-link` declared together (`data-label-field` is TM-30's finding) |
+| `TM-49` | WARNING | filesystem | frontend ON with pages but no `frontend/sitemap.html` — site structure undeclared, menu/breadcrumb/reachability validation inactive |
+| `TM-50` | ERROR | sitemap/OpenAPI | `data-crumb-field` is satisfiable: the page has a `data-fetch`, the field is a top-level property of the first fetch's 2xx response schema, and its type is a string/integer/number scalar (label-renderable) |
 | `XMO-10` | ERROR | OpenAPI | Frontend ON & operationId is consumed by some STML page/component **or** tagged `no-front` |
 | `XMO-11` | ERROR | manifest | Frontend ON requires at least one STML page (else set `frontend.enabled: false`) |
 | `XMO-12` | WARNING | OpenAPI | operationId tagged `no-front` must not actually be consumed (stale tag) |
 
 An operation counts as **consumed** when an STML `data-fetch`/`data-action`
-references it, or when a referenced `data-component` (including a form's inner
+references it, when a sitemap dynamic menu group fetches it (the layout
+`useQuery`), or when a referenced `data-component` (including a form's inner
 widget) calls `api.<operationId>(` inside its `.tsx`. Coverage rules run only
 while the frontend is ON; backend-only projects (`frontend.enabled: false`)
 skip them.
