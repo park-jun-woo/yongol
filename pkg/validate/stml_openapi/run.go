@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=stml-openapi
-//ff:what Run — STML<->OpenAPI 교차 검증 실행 (TM-01 ~ TM-14, TM-16, TM-17, TM-19 ~ TM-22, TM-24 ~ TM-44, TM-46 ~ TM-50, XMO-10/11/12)
+//ff:what Run — STML<->OpenAPI 교차 검증 실행 (TM-01 ~ TM-14, TM-16, TM-17, TM-19 ~ TM-22, TM-24 ~ TM-44, TM-46 ~ TM-56, XMO-10/11/12)
 
 package stml_openapi
 
@@ -25,11 +25,14 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	// item schema of each response array field — TM-30 resolves item.<Field>
 	// sources against it (same extraction the react emitter keys rows with).
 	raif := oapiparser.ExtractResponseArrayItemFields(fs.OpenAPIDoc)
+	// item field types of each response array — TM-53 checks data-each binds
+	// (img/non-scalar) against the array item schema.
+	itemTypes := oapiparser.ExtractResponseArrayItemTypes(fs.OpenAPIDoc)
 
 	var diags []diagnostic.Diagnostic
 	for _, page := range fs.STMLPages {
 		for _, f := range page.Fetches {
-			diags = append(diags, validateFetchBlock(f, page.FileName, opMap, fs)...)
+			diags = append(diags, validateFetchBlock(f, page.FileName, opMap, fs, itemTypes)...)
 		}
 		modelFetchMap := buildModelFetchMap(page.Fetches, opMap)
 		for _, a := range page.Actions {
@@ -50,6 +53,8 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		diags = append(diags, tm30ItemSource(page, raif)...)
 		diags = append(diags, tm31LinkTargetNotFound(page, fs.STMLPages)...)
 		diags = append(diags, tm32LinkParamsUnsatisfied(page, fs.STMLPages, raif)...)
+		diags = append(diags, tm52DuplicateFieldAcrossForms(page)...)
+		diags = append(diags, prefillRuleDiags(page, opMap)...)
 	}
 
 	diags = append(diags, tm10ClassProhibited(fs.STMLPages)...)
@@ -70,11 +75,12 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	// surviving layout data-nav once the sitemap owns the menu truth,
 	// TM-46/47 validate the data-roles values and their role-claim wiring,
 	// TM-50 the data-crumb-field declarations against each page's first
-	// fetch response; TM-49 fires on its absence. Dynamic menu groups
-	// (Phase007) get TM-48 (data-entry block / structural completeness)
-	// plus the sitemap extensions of TM-01/07/30/31/32 (fetch op, each
-	// array field, label field, link target, link params). TM-45 retired
-	// in Phase007 — the whole reserved vocabulary graduated.
+	// fetch response, TM-51 the inverse of TM-49 (a sitemap derives a menu
+	// but no layout hosts it); TM-49 fires on its absence. Dynamic menu
+	// groups (Phase007) get TM-48 (data-entry block / structural
+	// completeness) plus the sitemap extensions of TM-01/07/30/31/32 (fetch
+	// op, each array field, label field, link target, link params). TM-45
+	// retired in Phase007 — the whole reserved vocabulary graduated.
 	if fs.Sitemap != nil {
 		diags = append(diags, sitemapDiags(fs, opMap, raif)...)
 	}

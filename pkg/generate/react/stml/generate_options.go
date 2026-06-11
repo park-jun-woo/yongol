@@ -26,6 +26,13 @@ type GenerateOptions struct {
 	// wrapped with Number(...) only when the item field is not already
 	// numeric in the response schema.
 	ResponseArrayItemTypes map[string]map[string]map[string]string
+	// ResponseBindTypes maps operationId → bind field path → FieldTypeInfo
+	// (type + format). Type-aware data-bind rendering consults it: boolean →
+	// Yes/No, date(-time) → locale format, number → toLocaleString, <img> →
+	// src binding. A field absent from the map (or the option unwired) falls
+	// back to the plain {value} emission, keeping output byte-identical
+	// (plans/gen/frontend Phase037, BUG-126).
+	ResponseBindTypes map[string]map[string]oapiparser.FieldTypeInfo
 	// NoBodyOps is the set of operationIds whose OpenAPI definition has no
 	// requestBody. Void mutations use mutate() instead of mutate({}).
 	NoBodyOps map[string]bool
@@ -57,4 +64,10 @@ type GenerateOptions struct {
 	// same join collectDocumentTitles uses for the static mount title (""
 	// when the manifest carries no app name).
 	CrumbTitleSuffix string
+	// ErrorDisplayField is the ErrorResponse property a mutation onError
+	// handler reads first when surfacing a thrown server error
+	// (ExtractErrorDisplayField: "error" → "message" → default "error",
+	// BUG-125/Phase036). renderOnErrorHandler normalizes "" to "error", so a
+	// partially constructed GenerateOptions stays safe.
+	ErrorDisplayField string
 }

@@ -33,12 +33,14 @@ func runSTMLCodegen(fs *yongol.Fullstack, artifactsDir string) error {
 		RequestConstraints:      constraints,
 		ResponseArrayItemFields: oapiparser.ExtractResponseArrayItemFields(fs.OpenAPIDoc),
 		ResponseArrayItemTypes:  oapiparser.ExtractResponseArrayItemTypes(fs.OpenAPIDoc),
+		ResponseBindTypes:       oapiparser.ExtractResponseFieldTypes(fs.OpenAPIDoc),
 		NoBodyOps:               noBodyOps,
 		PathParamTypes:          oapiparser.ExtractPathParamTypes(fs.OpenAPIDoc),
 		RoutePatterns:           collectRoutePatterns(fs.STMLPages),
 		DocumentTitles:          collectDocumentTitles(fs),
 		CrumbFields:             stml.SitemapCrumbFields(fs.Sitemap),
 		CrumbTitleSuffix:        crumbTitleSuffix(fs),
+		ErrorDisplayField:       oapiparser.ExtractErrorDisplayField(fs.OpenAPIDoc),
 	}
 	_, err := stmlgen.Generate(fs.STMLPages, fs.SpecsDir, pagesDir, opt)
 	return err

@@ -521,14 +521,14 @@ Location: `frontend/*.html` (flat, no subdirectories — except
 attribute vocabulary splits in two: **page attributes** (this table) and
 **layout attributes** (`data-nav` / `data-outlet` / `data-logout`, §Layouts).
 
-### Page data-* Attributes (18)
+### Page data-* Attributes (19)
 
 | Attribute | Purpose | Example |
 |---|---|---|
 | `data-fetch` | GET data loading (operationId) | `<section data-fetch="ListWorkflows">` |
 | `data-action` | POST/PUT/DELETE submission (operationId) | `<div data-action="CreateWorkflow">` |
 | `data-field` | Request body field binding | `<input data-field="title" />` |
-| `data-bind` | Response field display | `<span data-bind="status"></span>` |
+| `data-bind` | Response field display — **type-aware** (Phase037): the OpenAPI response type drives the JSX. `boolean` → `Yes`/`No`; `format: date`/`date-time` → `toLocaleDateString()`/`toLocaleString()`; `integer`/`number` → `toLocaleString()`; `string`/unknown → raw value. On an `<img>` the value binds to **`src`** (media bind, children-less `<img src={v} alt=… />`), not text children | `<span data-bind="status"></span>`, `<img data-bind="thumbnail_url" />` |
 | `data-param-*` | Path/query parameter (`route.<Name>`, or `item.<Field>` inside `data-each`) | `data-param-id="route.id"`, `data-param-photo-id="item.id"` |
 | `data-each` | Array iteration | `<ul data-each="workflows">` |
 | `data-state` | Conditional display (guard, see below) | `data-state="workflow.status=draft"` |
@@ -538,6 +538,7 @@ attribute vocabulary splits in two: **page attributes** (this table) and
 | `data-capture` | Auth flow: store response fields into auth sinks on action success. Sinks: `auth.token`, `auth.refresh`, `auth.claims.<name>` (a claim from the login response body — e.g. the user's role for the sitemap `data-roles` menu filter; works in cookie mode too) | `<section data-action="Login" data-capture="access_token -> auth.token, role -> auth.claims.role">` |
 | `data-redirect` | Flow: target navigated to on action success — a `/`-prefixed **static path**, or an STML **page-name reference** (filename without `.html`) whose resolved route gets `data-redirect-params` substituted | `<section data-action="Login" data-redirect="/">`, `<div data-action="CreateContract" data-redirect="contract-edit" data-redirect-params="id -> ContractID">` |
 | `data-redirect-params` | Flow: binds the redirect target route's segments — `<source> -> <SegmentName>` pairs (comma-separated, `data-capture`-style value grammar). Sources: unprefixed 2xx **response fields** of the action operation (the only data in scope after success) or `route.<Name>` (forwarding a current-page param). `-> <SegmentName>` may be elided when the target has exactly one required segment | `data-redirect-params="id -> ContractID"` |
+| `data-prefill` | Edit form: seed this form's initial values from a same-page `data-fetch` result. Value is that GET operationId; its 2xx response fields fill the matching `data-field` inputs by name (see §Edit form prefill). Valid only on the `data-action` element | `<form data-action="UpdateRule" data-prefill="GetRule">` |
 | `data-on-error` | Auth flow: marker for the element shown when the action fails (4xx/5xx rejects with the server ErrorResponse body; its `message` is displayed, falling back to a stringified error when `message` is absent). When absent, a default error element (`role="alert"`) is emitted right next to the submit button — declaring `data-on-error` decides the display element and position instead | `<p data-on-error></p>` |
 | `data-route` | Explicit route path override on the page's top-level element (`:Name` pattern params merge into `useParams()`) | `<main data-route="/buildings/:BuildingID/units/:UnitID">` |
 | `data-layout` | Layout opt-in on the page's top-level element — the page renders inside `layouts/<name>.html` (overrides `manifest.frontend.defaultLayout`) | `<main data-layout="app">` |
@@ -589,6 +590,42 @@ aborts the navigate and surfaces through the action's error state instead of
 baking `undefined` into the URL. Unmapped **optional** segments are omitted;
 every **required** segment must be mapped, and params on a static path are a
 contradiction (TM-33). The static-path form is unchanged.
+
+### Edit form prefill (`data-prefill`)
+
+An edit page reads the current values with a GET-by-id `data-fetch` and writes
+them back with a PUT/PATCH `data-action`. `data-prefill` (plans/gen/frontend
+Phase035, BUG-124) connects the two so the form opens **pre-filled** instead of
+empty. The value is the same-page fetch operationId; placement is the
+`data-action` element itself (TM-25 enforces it, like `data-capture`/`data-redirect`):
+
+```html
+<article data-fetch="GetRule" data-param-rule-id="route.RuleID">
+  <form data-action="UpdateRule"
+        data-prefill="GetRule"
+        data-param-rule-id="route.RuleID">
+    <input data-field="sheet_name" />
+    <input data-field="start_row" type="number" />
+    <button type="submit">저장</button>
+  </form>
+</article>
+```
+
+- **Field matching is by name**: a `data-field` is prefilled from the fetch 2xx
+  response's same-named top-level field. Codegen wires react-hook-form's `values`
+  option from the fetch data variable (`<fetchOpLower>Data`, here `getRuleData`)
+  plus `resetOptions: { keepDirtyValues: true }`, so a `data-invalidates` refetch
+  re-syncs server values without overwriting fields the user is editing.
+- A form field **absent** from the response opens blank (TM-54 WARNING — codegen
+  fills it with a type-appropriate empty literal so the build still passes). The
+  prefill value must name an existing same-page fetch or it is a TM-54 ERROR.
+- **PUT vs PATCH**: codegen never relaxes zod `required` on its own — that is the
+  OpenAPI decision. With prefill, a PUT whole-body submit still works as
+  "change one field and save" because the unchanged fields are resent from their
+  current values. A PATCH whose requestBody is all-required contradicts partial
+  update — TM-56 WARNING points you to mark the optional fields not required in
+  OpenAPI, after which the zod schema relaxes them automatically. The edit page
+  that has a GET-by-id fetch but forgets `data-prefill` raises TM-55 WARNING.
 
 ### Page links (`data-link` / `data-link-params`)
 
@@ -855,6 +892,17 @@ menu *position* — its `<nav>`/`data-outlet` shell). The rules:
 - **External links** emit `<a href target="_blank" rel="noopener noreferrer">`;
   **icons** emit lucide-react components (see `data-icon` above).
 
+The menu and the breadcrumb both render **inside a layout** (`<slot
+data-outlet>` host). If the sitemap derives a menu but *no* layout exists to
+host it — `layouts/` empty **and** `manifest.frontend.defaultLayout` unset
+**and** no nav declares `data-layout` — the derived menu/breadcrumb never
+render and the emitted `<Breadcrumb>` would be dead code; **TM-51** WARNS
+(the inverse of TM-49, BUG-129). The breadcrumb emitter also skips its
+artifacts when no layout hosts it (no dead code). Declare one
+`layouts/<name>.html` with a `<slot data-outlet>` and assign it via
+`defaultLayout` or a nav `data-layout`. (When the layout is *declared but
+missing* from `layouts/`, TM-12/TM-41 ERROR instead — TM-51 stays silent.)
+
 **Breadcrumb & document.title derivation (Phase004).** With a sitemap
 present, static breadcrumbs and page titles derive from the tree (labels
 are the `<li>` texts — DESIGN §4.6; `data-crumb-field` upgrades the
@@ -1084,6 +1132,10 @@ vocabulary (Phase007) — TM-45 retired with nothing left to reserve.
 | `TM-48` | ERROR | sitemap | dynamic menu group structure: never inside a `data-entry` block (a signed-out entry layout cannot satisfy the list fetch), and `data-fetch`/`data-each`/`data-link` declared together (`data-label-field` is TM-30's finding) |
 | `TM-49` | WARNING | filesystem | frontend ON with pages but no `frontend/sitemap.html` — site structure undeclared, menu/breadcrumb/reachability validation inactive |
 | `TM-50` | ERROR | sitemap/OpenAPI | `data-crumb-field` is satisfiable: the page has a `data-fetch`, the field is a top-level property of the first fetch's 2xx response schema, and its type is a string/integer/number scalar (label-renderable) |
+| `TM-53` | WARNING | OpenAPI | `data-bind` is renderable: not an object/array bound as text (use a dotted path / `data-each`), not on a void/media tag except `<img>`, and an `<img data-bind>` binds a string URL. `boolean` is fine (codegen emits Yes/No). Display-quality advisory — does not block codegen |
+| `TM-54` | ERROR / WARNING | OpenAPI | `data-prefill` resolves: the value names a same-page `data-fetch` op (ERROR otherwise — data variable out of scope); each form `data-field` is a top-level field of that fetch's 2xx response (WARNING otherwise — the input opens blank) |
+| `TM-55` | WARNING | OpenAPI | edit page hygiene: a page with a GET-by-id fetch and a PUT/PATCH form carrying `data-field` but no `data-prefill` — the form is generated empty; add `data-prefill` |
+| `TM-56` | WARNING | OpenAPI | a PATCH op consumed by a form has an all-required requestBody — contradicts partial update; mark optional fields not required in OpenAPI so zod relaxes them |
 | `XMO-10` | ERROR | OpenAPI | Frontend ON & operationId is consumed by some STML page/component **or** tagged `no-front` |
 | `XMO-11` | ERROR | manifest | Frontend ON requires at least one STML page (else set `frontend.enabled: false`) |
 | `XMO-12` | WARNING | OpenAPI | operationId tagged `no-front` must not actually be consumed (stale tag) |

@@ -100,8 +100,8 @@ func (r *ReactTarget) GeneratePage(page stmlparser.PageSpec, specsDir string, op
 	if crumbField != "" {
 		sb.WriteString(renderCrumbLabelEffect(crumbField, toLowerFirst(page.Fetches[0].OperationID)+"Data", opt.CrumbTitleSuffix))
 	}
-	renderPageMutations(allActions, fetchOps, actionFetchMap, opt.RequestConstraints, opt.BearerAuth, opt.NoBodyOps, opt.PathParamTypes, &sb)
-	renderPageJSX(page, &sb, opt.NoBodyOps)
+	renderPageMutations(allActions, fetchOps, actionFetchMap, opt.RequestConstraints, opt.BearerAuth, opt.NoBodyOps, opt.PathParamTypes, opt.ErrorDisplayField, opt.ResponseBindTypes, &sb)
+	renderPageJSX(page, &sb, opt.NoBodyOps, bindCtx{all: opt.ResponseBindTypes})
 
 	sb.WriteString("}\n")
 	return sb.String()
