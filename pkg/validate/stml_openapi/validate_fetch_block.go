@@ -11,8 +11,11 @@ import (
 
 // validateFetchBlock checks a data-fetch block against the OpenAPI spec.
 // TM-01 (operationId), TM-03 (GET method), TM-04 (params), TM-06 (binds),
-// TM-07/TM-08 (each), TM-09 (component).
-func validateFetchBlock(f stml.FetchBlock, file string, opMap map[string]operationEntry, fs *yongol.Fullstack) []diagnostic.Diagnostic {
+// TM-53 (unrenderable binds), TM-07/TM-08 (each), TM-09 (component). itemTypes
+// (operationId → array field → item field → type) feeds TM-53's data-each bind
+// checks. The recursion into f.NestedFetches re-looks-up each child's op, so
+// nested fetch binds are validated against their own response schema.
+func validateFetchBlock(f stml.FetchBlock, file string, opMap map[string]operationEntry, fs *yongol.Fullstack, itemTypes map[string]map[string]map[string]string) []diagnostic.Diagnostic {
 	var diags []diagnostic.Diagnostic
 
 	entry, ok := opMap[f.OperationID]
@@ -33,6 +36,11 @@ func validateFetchBlock(f stml.FetchBlock, file string, opMap map[string]operati
 	// TM-06: binds
 	diags = append(diags, tm06Binds(f.Binds, f.OperationID, file, entry)...)
 
+	// TM-53: unrenderable binds (non-scalar / unsupported tag / img mismatch).
+	// Placed alongside TM-06 so nested fetch and data-each binds are covered
+	// by the same recursion (plans/gen/frontend Phase037, BUG-126).
+	diags = append(diags, tm53UnrenderableBind(f, f.OperationID, file, entry, itemTypes)...)
+
 	// TM-07 / TM-08: each
 	diags = append(diags, tm0708Each(f.Eaches, f.OperationID, file, entry)...)
 
@@ -41,7 +49,7 @@ func validateFetchBlock(f stml.FetchBlock, file string, opMap map[string]operati
 
 	// Recurse into nested fetches
 	for _, child := range f.NestedFetches {
-		diags = append(diags, validateFetchBlock(child, file, opMap, fs)...)
+		diags = append(diags, validateFetchBlock(child, file, opMap, fs, itemTypes)...)
 	}
 
 	return diags

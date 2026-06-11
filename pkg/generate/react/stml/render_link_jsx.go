@@ -13,7 +13,7 @@ import (
 // `to` value is the target page's resolved route pattern with the link's
 // param sources substituted (LinkToAttr); children reuse the existing
 // bind/static renderers (page-flow Phase007).
-func renderLinkJSX(lr stmlparser.LinkRef, dataVar, itemVar string, indent int, noBodyOps map[string]bool) string {
+func renderLinkJSX(lr stmlparser.LinkRef, dataVar, itemVar string, indent int, noBodyOps map[string]bool, ctx bindCtx) string {
 	ind := indentStr(indent)
 	cls := clsAttr(lr.ClassName)
 	to := LinkToAttr(lr)
@@ -27,7 +27,7 @@ func renderLinkJSX(lr stmlparser.LinkRef, dataVar, itemVar string, indent int, n
 	if lr.Text != "" {
 		lines = append(lines, fmt.Sprintf("%s  %s", ind, lr.Text))
 	}
-	lines = append(lines, renderChildNodes(lr.Children, dataVar, itemVar, indent+2, noBodyOps)...)
+	lines = append(lines, renderChildNodes(lr.Children, dataVar, itemVar, indent+2, noBodyOps, ctx)...)
 	lines = append(lines, fmt.Sprintf("%s</Link>", ind))
 	return strings.Join(lines, "\n")
 }

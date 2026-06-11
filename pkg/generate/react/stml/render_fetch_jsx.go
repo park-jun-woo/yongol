@@ -9,8 +9,12 @@ import (
 	stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
 )
 
-// renderFetchJSX generates JSX for a FetchBlock using ChildNode tree.
-func renderFetchJSX(f stmlparser.FetchBlock, indent int, noBodyOps map[string]bool) string {
+// renderFetchJSX generates JSX for a FetchBlock using ChildNode tree. The
+// bindCtx scope is re-set to this fetch's operationId so descendant binds —
+// including nested data-fetch blocks dispatched via renderChildNodes — resolve
+// their field types against the correct op (plans/gen/frontend Phase037).
+func renderFetchJSX(f stmlparser.FetchBlock, indent int, noBodyOps map[string]bool, ctx bindCtx) string {
+	ctx.opID = f.OperationID
 	alias := toLowerFirst(f.OperationID) + "Data"
 	ind := indentStr(indent)
 	tag := orDefault(f.Tag, "div")
@@ -22,7 +26,7 @@ func renderFetchJSX(f stmlparser.FetchBlock, indent int, noBodyOps map[string]bo
 	lines = append(lines, fmt.Sprintf("%s{%s && (", ind, alias))
 	lines = append(lines, fmt.Sprintf("%s  <%s%s>", ind, tag, cls))
 
-	lines = append(lines, renderFetchJSXBody(f, alias, indent+4, noBodyOps)...)
+	lines = append(lines, renderFetchJSXBody(f, alias, indent+4, noBodyOps, ctx)...)
 
 	lines = append(lines, fmt.Sprintf("%s  </%s>", ind, tag))
 	lines = append(lines, fmt.Sprintf("%s)}", ind))

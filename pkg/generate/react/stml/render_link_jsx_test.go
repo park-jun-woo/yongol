@@ -14,7 +14,7 @@ func TestRenderLinkJSX(t *testing.T) {
 		TargetPage:    "settings-parsing-rules",
 		TargetPattern: "/settings-parsing-rules",
 		Text:          "파싱 규칙",
-	}, "", "item", 0, nil)
+	}, "", "item", 0, nil, bindCtx{})
 	want := `<Link to="/settings-parsing-rules">파싱 규칙</Link>`
 	if got != want {
 		t.Errorf("text link:\n got %q\nwant %q", got, want)
@@ -29,7 +29,7 @@ func TestRenderLinkJSX(t *testing.T) {
 		Params:        []stmlparser.LinkParamBind{{Source: "item.id", Segment: "BuildingID"}},
 		Text:          "보기",
 		Children:      []stmlparser.ChildNode{{Kind: "bind", Bind: &bind}},
-	}, "data", "item", 0, nil)
+	}, "data", "item", 0, nil, bindCtx{})
 	assertContains(t, got, "<Link to={`/buildings/${item.id}`}>")
 	assertContains(t, got, "보기")
 	assertContains(t, got, "</Link>")

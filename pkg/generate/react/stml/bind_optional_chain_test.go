@@ -38,7 +38,7 @@ func TestBindOptionalChain(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := renderBindJSX(
 				stmlparser.FieldBind{Name: tt.bind, Tag: "span"},
-				"data", 0,
+				"data", 0, bindCtx{},
 			)
 			assertContains(t, got, tt.want)
 			if tt.notWant != "" {

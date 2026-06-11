@@ -9,15 +9,15 @@ import (
 	stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
 )
 
-func renderPageJSX(page stmlparser.PageSpec, sb *strings.Builder, noBodyOps map[string]bool) {
+func renderPageJSX(page stmlparser.PageSpec, sb *strings.Builder, noBodyOps map[string]bool, ctx bindCtx) {
 	sb.WriteString("  return (\n")
 	sb.WriteString(`    <main className="mx-auto max-w-4xl px-4 py-8 space-y-6">` + "\n")
 	sb.WriteString(fmt.Sprintf(`      <h1 className="text-2xl font-bold">%s</h1>`+"\n", kebabToTitle(page.Name)))
 
 	if len(page.Children) > 0 {
-		renderPageJSXWithChildren(page.Children, sb, noBodyOps)
+		renderPageJSXWithChildren(page.Children, sb, noBodyOps, ctx)
 	} else {
-		renderPageJSXFallback(page, sb, noBodyOps)
+		renderPageJSXFallback(page, sb, noBodyOps, ctx)
 	}
 
 	sb.WriteString("    </main>\n")

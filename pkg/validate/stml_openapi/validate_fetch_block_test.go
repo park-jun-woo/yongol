@@ -22,7 +22,7 @@ func TestValidateFetchBlock(t *testing.T) {
 	opMap := buildOperationMethodMap(doc)
 
 	// TM-01: unknown operationId → single diag, early return.
-	d := validateFetchBlock(stml.FetchBlock{OperationID: "Nope"}, "p.html", opMap, fs)
+	d := validateFetchBlock(stml.FetchBlock{OperationID: "Nope"}, "p.html", opMap, fs, nil)
 	if len(d) != 1 || !strings.Contains(d[0].Message, "[TM-01]") {
 		t.Fatalf("TM-01: got %+v", d)
 	}
@@ -33,7 +33,7 @@ func TestValidateFetchBlock(t *testing.T) {
 		Binds:         []stml.FieldBind{{Name: "Name"}}, // exists → no diag
 		NestedFetches: []stml.FetchBlock{{OperationID: "Nested"}},
 	}
-	d = validateFetchBlock(f, "p.html", opMap, fs)
+	d = validateFetchBlock(f, "p.html", opMap, fs, nil)
 	if !hasDiag(d, "[TM-01]") {
 		t.Fatalf("expected nested TM-01 from recursion, got %+v", d)
 	}

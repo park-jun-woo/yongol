@@ -15,7 +15,7 @@ func TestRenderPageJSXFallback_ZeroCov(t *testing.T) {
 		Actions: []stmlparser.ActionBlock{{OperationID: "CreateItem", Tag: "form"}},
 	}
 	var sb strings.Builder
-	renderPageJSXFallback(page, &sb, map[string]bool{})
+	renderPageJSXFallback(page, &sb, map[string]bool{}, bindCtx{})
 	out := sb.String()
 	if out == "" {
 		t.Fatal("expected non-empty output")
@@ -23,7 +23,7 @@ func TestRenderPageJSXFallback_ZeroCov(t *testing.T) {
 
 	// Empty page → empty output.
 	var sb2 strings.Builder
-	renderPageJSXFallback(stmlparser.PageSpec{}, &sb2, nil)
+	renderPageJSXFallback(stmlparser.PageSpec{}, &sb2, nil, bindCtx{})
 	if sb2.String() != "" {
 		t.Errorf("empty page should yield empty output, got %q", sb2.String())
 	}

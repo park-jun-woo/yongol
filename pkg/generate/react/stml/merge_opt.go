@@ -17,6 +17,9 @@ func mergeOpt(base, override GenerateOptions) GenerateOptions {
 	if override.ResponseArrayItemTypes != nil {
 		base.ResponseArrayItemTypes = override.ResponseArrayItemTypes
 	}
+	if override.ResponseBindTypes != nil {
+		base.ResponseBindTypes = override.ResponseBindTypes
+	}
 	if override.NoBodyOps != nil {
 		base.NoBodyOps = override.NoBodyOps
 	}

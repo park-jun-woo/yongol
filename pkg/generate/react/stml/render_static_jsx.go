@@ -10,7 +10,7 @@ import (
 )
 
 // renderStaticJSX renders a StaticElement preserving structure.
-func renderStaticJSX(se stmlparser.StaticElement, dataVar, itemVar string, indent int, noBodyOps map[string]bool) string {
+func renderStaticJSX(se stmlparser.StaticElement, dataVar, itemVar string, indent int, noBodyOps map[string]bool, ctx bindCtx) string {
 	ind := indentStr(indent)
 	tag := se.Tag
 	cls := clsAttr(se.ClassName)
@@ -27,7 +27,7 @@ func renderStaticJSX(se stmlparser.StaticElement, dataVar, itemVar string, inden
 	if se.Text != "" {
 		lines = append(lines, fmt.Sprintf("%s  %s", ind, se.Text))
 	}
-	lines = append(lines, renderChildNodes(se.Children, dataVar, itemVar, indent+2, noBodyOps)...)
+	lines = append(lines, renderChildNodes(se.Children, dataVar, itemVar, indent+2, noBodyOps, ctx)...)
 	lines = append(lines, fmt.Sprintf("%s</%s>", ind, tag))
 	return strings.Join(lines, "\n")
 }
