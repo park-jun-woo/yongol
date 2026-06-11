@@ -16,6 +16,14 @@ func TestTM20CaptureFieldInResponse(t *testing.T) {
 			"access_token":  stringProp(),
 			"refresh_token": stringProp(),
 		}),
+		// Success status 201 (Created) with a body — its fields are consumable
+		// (BUG-128 / Phase039: responseFields scans 200 → 201).
+		"/login201": postOpStatusResp("Login201", 201, map[string]*openapi3.SchemaRef{
+			"access_token": stringProp(),
+		}),
+		// Success status 204 (No Content) — no body, so any field capture is
+		// unsatisfiable and must ERROR.
+		"/ping204": postOpStatusResp("Ping204", 204, nil),
 	})
 	opMap := buildOperationMethodMap(doc)
 
@@ -85,5 +93,19 @@ func TestTM20CaptureFieldInResponse(t *testing.T) {
 		CaptureRaw:  "access_token -> auth.token",
 	}, "login.html", opMap); len(d) != 0 {
 		t.Errorf("unknown op: expected 0 diagnostics, got %+v", d)
+	}
+
+	// 201 success body field → no diagnostics; 204 no-body op → 1 ERROR (Phase039).
+	if d := tm20CaptureFieldInResponse(stml.ActionBlock{
+		OperationID: "Login201",
+		CaptureRaw:  "access_token -> auth.token",
+	}, "login.html", opMap); len(d) != 0 {
+		t.Errorf("201 body capture: expected 0 diagnostics, got %+v", d)
+	}
+	if d := tm20CaptureFieldInResponse(stml.ActionBlock{
+		OperationID: "Ping204",
+		CaptureRaw:  "access_token -> auth.token",
+	}, "login.html", opMap); countDiag(d, "[TM-20]") != 1 {
+		t.Errorf("204 capture: expected 1 TM-20, got %+v", d)
 	}
 }

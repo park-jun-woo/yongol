@@ -38,9 +38,10 @@ import (
 // `r.data`/`r.error` are read into `d`/`e` *before* the error check, for
 // two tsc reasons. (a) The check would narrow the openapi-fetch result
 // union to its success branch, dropping the `| undefined` arm from
-// `r.data` — and Res<K> is void for ops whose success status is not 200
-// (201/204), a type only `T | undefined` (not bare `T`) can be cast to;
-// `d` freezes the pre-narrowing type. (b) For ops declaring no error
+// `r.data`; `d` freezes the pre-narrowing type so the `d as Res<K>` cast
+// (a `T | undefined → T` widening) stays legal. Res<K> maps the 200 or
+// 201 success body (Phase039); only 204/no-body ops keep `void`. (b) The
+// load-bearing reason `d`/`e` are pre-captured: for ops declaring no error
 // responses the error branch's `error` is `never`, so the check narrows
 // `r` itself to `never` and `throw r.error` would not compile; throwing
 // the captured `e` stays legal for every op shape.

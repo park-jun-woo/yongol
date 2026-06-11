@@ -35,4 +35,12 @@ func TestWriteAPIClient_TypedSig_ReqResHelpers(t *testing.T) {
 	assertContains(t, content, "type Req<K extends keyof operations>")
 	assertContains(t, content, "PathOf<K> & QueryOf<K> & BodyOf<K> extends infer R")
 	assertContains(t, content, "type Res<K extends keyof operations>")
+
+	// Res<K> must map the success body in 200 → 201 priority, falling back to
+	// void for 204/no-body ops (BUG-128 / Phase039). Go can only assert the
+	// emitted text here; whether per-op the 201 body is actually adopted vs.
+	// void is a TS type computation, verified by tsc (helper_tsc_res_test.go).
+	assertContains(t, content, "200: { content: { 'application/json': infer R } } } } ? R")
+	assertContains(t, content, "201: { content: { 'application/json': infer R } } } } ? R")
+	assertContains(t, content, "  : void")
 }

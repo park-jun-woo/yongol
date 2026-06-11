@@ -15,6 +15,13 @@ func TestTM33CheckParamSource(t *testing.T) {
 		"/contracts": postOpWithResp("CreateContract", map[string]*openapi3.SchemaRef{
 			"id": {Value: &openapi3.Schema{Type: &openapi3.Types{"integer"}}},
 		}),
+		// 201 (Created) create op exposing the new resource id — the canonical
+		// "redirect to detail by id" flow (BUG-128 / Phase039).
+		"/contracts201": postOpStatusResp("CreateContract201", 201, map[string]*openapi3.SchemaRef{
+			"id": {Value: &openapi3.Schema{Type: &openapi3.Types{"integer"}}},
+		}),
+		// 204 (No Content) op — no body to source a redirect param from.
+		"/ping204": postOpStatusResp("Ping204", 204, nil),
 	})
 	opMap := buildOperationMethodMap(doc)
 	a := stml.ActionBlock{OperationID: "CreateContract", Redirect: "contract-edit"}
@@ -38,5 +45,17 @@ func TestTM33CheckParamSource(t *testing.T) {
 	unknown := stml.ActionBlock{OperationID: "Nope", Redirect: "contract-edit"}
 	if d := tm33CheckParamSource(stml.LinkParamBind{Source: "id", Segment: "ContractID"}, unknown, "f.html", opMap); len(d) != 0 {
 		t.Errorf("unknown op: expected 0 diagnostics, got %+v", d)
+	}
+
+	// 201 success body field → silent (Phase039).
+	a201 := stml.ActionBlock{OperationID: "CreateContract201", Redirect: "contract-edit"}
+	if d := tm33CheckParamSource(stml.LinkParamBind{Source: "id", Segment: "ContractID"}, a201, "f.html", opMap); len(d) != 0 {
+		t.Errorf("201 field source: expected 0 diagnostics, got %+v", d)
+	}
+
+	// 204 no-body op → param source unsatisfiable → 1 ERROR.
+	a204 := stml.ActionBlock{OperationID: "Ping204", Redirect: "contract-edit"}
+	if d := tm33CheckParamSource(stml.LinkParamBind{Source: "id", Segment: "ContractID"}, a204, "f.html", opMap); countDiag(d, "[TM-33]") != 1 {
+		t.Errorf("204 field source: expected 1 TM-33, got %+v", d)
 	}
 }

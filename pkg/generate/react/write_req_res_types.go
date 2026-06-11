@@ -27,6 +27,11 @@ func writeReqResTypes(b *strings.Builder) {
 	b.WriteString("    ? keyof R extends never ? void : R\n")
 	b.WriteString("    : void\n\n")
 
+	// Res<K> adopts the success body schema in 200 → 201 priority — matching
+	// validate's responseFields (response_fields.go, first 2xx with props).
+	// A 204/no-body op has neither branch and stays void. (BUG-128 / Phase039)
 	b.WriteString("type Res<K extends keyof operations> =\n")
-	b.WriteString("  operations[K] extends { responses: { 200: { content: { 'application/json': infer R } } } } ? R : void\n\n")
+	b.WriteString("  operations[K] extends { responses: { 200: { content: { 'application/json': infer R } } } } ? R\n")
+	b.WriteString("  : operations[K] extends { responses: { 201: { content: { 'application/json': infer R } } } } ? R\n")
+	b.WriteString("  : void\n\n")
 }
