@@ -11,8 +11,9 @@ import (
 
 // renderStaticActionJSX renders a StaticElement inside an action form.
 // A data-on-error marker element becomes a conditional error render bound
-// to errVar instead of a plain static element.
-func renderStaticActionJSX(se stmlparser.StaticElement, formName, errVar string, indent int) string {
+// to errVar instead of a plain static element. idPrefix is threaded through
+// nested children so form-scoped field ids survive the recursion (BUG-127).
+func renderStaticActionJSX(se stmlparser.StaticElement, formName, idPrefix, errVar string, indent int) string {
 	if se.OnError && errVar != "" {
 		return renderOnErrorElement(se, errVar, indent)
 	}
@@ -30,7 +31,7 @@ func renderStaticActionJSX(se stmlparser.StaticElement, formName, errVar string,
 
 	var lines []string
 	lines = append(lines, fmt.Sprintf("%s<%s%s>", ind, tag, cls))
-	lines = append(lines, renderActionChildNodes(se.Children, formName, errVar, indent+2)...)
+	lines = append(lines, renderActionChildNodes(se.Children, formName, idPrefix, errVar, indent+2)...)
 	lines = append(lines, fmt.Sprintf("%s</%s>", ind, tag))
 	return strings.Join(lines, "\n")
 }

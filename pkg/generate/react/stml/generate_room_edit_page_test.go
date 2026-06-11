@@ -39,9 +39,9 @@ func TestGenerateRoomEditPage(t *testing.T) {
 	assertContains(t, code, "deleteRoomMutation.mutate")
 	assertNotContains(t, code, "deleteRoomForm")
 	// label + id on form fields
-	assertContains(t, code, `<label htmlFor="Name">Name</label>`)
-	assertContains(t, code, `<label htmlFor="Capacity">Capacity</label>`)
-	assertContains(t, code, `<label htmlFor="Location">Location</label>`)
+	assertContains(t, code, `<label htmlFor="updateRoom-Name">Name</label>`)
+	assertContains(t, code, `<label htmlFor="updateRoom-Capacity">Capacity</label>`)
+	assertContains(t, code, `<label htmlFor="updateRoom-Location">Location</label>`)
 	// isPending on submit and action buttons
 	assertContains(t, code, `disabled={updateRoomMutation.isPending}`)
 	assertContains(t, code, `disabled={deleteRoomMutation.isPending}`)

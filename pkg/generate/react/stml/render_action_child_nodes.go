@@ -6,15 +6,16 @@ import stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
 
 // renderActionChildNodes renders ChildNode slice in DOM order for action
 // context. errVar names the action's error-message state (data-on-error);
-// empty when the action declares no error slot.
-func renderActionChildNodes(nodes []stmlparser.ChildNode, formName, errVar string, indent int) []string {
+// empty when the action declares no error slot. idPrefix is threaded to
+// renderFieldJSX to form-scope each field's DOM id (BUG-127).
+func renderActionChildNodes(nodes []stmlparser.ChildNode, formName, idPrefix, errVar string, indent int) []string {
 	var lines []string
 	for _, ch := range nodes {
 		switch ch.Kind {
 		case "bind":
-			lines = append(lines, renderFieldJSX(*ch.Bind, formName, indent))
+			lines = append(lines, renderFieldJSX(*ch.Bind, formName, idPrefix, indent))
 		case "static":
-			lines = append(lines, renderStaticActionJSX(*ch.Static, formName, errVar, indent))
+			lines = append(lines, renderStaticActionJSX(*ch.Static, formName, idPrefix, errVar, indent))
 		}
 	}
 	return lines

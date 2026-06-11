@@ -11,13 +11,13 @@ import (
 
 func TestRenderStaticActionJSX(t *testing.T) {
 	// self-closing (no children, no text)
-	got := renderStaticActionJSX(stmlparser.StaticElement{Tag: "hr"}, "form", "", 2)
+	got := renderStaticActionJSX(stmlparser.StaticElement{Tag: "hr"}, "form", "createReservation", "", 2)
 	if got != "  <hr />" {
 		t.Errorf("self-closing = %q, want '  <hr />'", got)
 	}
 
 	// text content with class
-	got = renderStaticActionJSX(stmlparser.StaticElement{Tag: "label", ClassName: "lbl", Text: "Email"}, "form", "", 0)
+	got = renderStaticActionJSX(stmlparser.StaticElement{Tag: "label", ClassName: "lbl", Text: "Email"}, "form", "createReservation", "", 0)
 	if got != `<label className="lbl">Email</label>` {
 		t.Errorf("text+class = %q", got)
 	}
@@ -27,7 +27,7 @@ func TestRenderStaticActionJSX(t *testing.T) {
 		Tag:      "div",
 		Children: []stmlparser.ChildNode{{Kind: "static", Static: &stmlparser.StaticElement{Tag: "span", Text: "hi"}}},
 	}
-	got = renderStaticActionJSX(parent, "form", "", 2)
+	got = renderStaticActionJSX(parent, "form", "createReservation", "", 2)
 	lines := strings.Split(got, "\n")
 	if len(lines) != 3 {
 		t.Fatalf("expected 3 lines, got %d: %q", len(lines), got)

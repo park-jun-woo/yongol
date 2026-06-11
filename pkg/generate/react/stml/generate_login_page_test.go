@@ -29,10 +29,10 @@ func TestGenerateLoginPage(t *testing.T) {
 	assertContains(t, code, `type="email"`)
 	assertContains(t, code, `type="password"`)
 	// label + id attributes
-	assertContains(t, code, `<label htmlFor="Email">Email</label>`)
-	assertContains(t, code, `<label htmlFor="Password">Password</label>`)
-	assertContains(t, code, `id="Email"`)
-	assertContains(t, code, `id="Password"`)
+	assertContains(t, code, `<label htmlFor="login-Email">Email</label>`)
+	assertContains(t, code, `<label htmlFor="login-Password">Password</label>`)
+	assertContains(t, code, `id="login-Email"`)
+	assertContains(t, code, `id="login-Password"`)
 	// isPending on submit button
 	assertContains(t, code, `disabled={loginMutation.isPending}`)
 	assertContains(t, code, "'로그인'")

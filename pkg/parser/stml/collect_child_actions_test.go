@@ -1,5 +1,5 @@
 //ff:func feature=stml-parse type=test control=iteration dimension=1
-//ff:what collectChildActions — fetch/state/static/each 중첩 트리에서 ActionBlock DOM 순서 수집 검증
+//ff:what CollectChildActions — fetch/state/static/each 중첩 트리에서 ActionBlock DOM 순서 수집 검증
 
 package stml
 
@@ -21,7 +21,7 @@ func TestCollectChildActions(t *testing.T) {
 		}}},
 		{Kind: "bind", Bind: &FieldBind{}},
 	}
-	got := collectChildActions(nodes)
+	got := CollectChildActions(nodes)
 	want := []string{"TopAction", "StateAction", "EachAction", "StaticAction"}
 	if len(got) != len(want) {
 		t.Fatalf("got %d actions, want %d", len(got), len(want))

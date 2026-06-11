@@ -17,7 +17,7 @@ func collectRouteParams(p PageSpec) []routeParam {
 	for _, a := range p.Actions {
 		params = appendRouteParams(params, seen, a.Params, false)
 	}
-	for _, a := range collectChildActions(p.Children) {
+	for _, a := range CollectChildActions(p.Children) {
 		params = appendRouteParams(params, seen, a.Params, false)
 	}
 	return params

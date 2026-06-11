@@ -17,6 +17,6 @@ func TestFieldLabelSnakeCase(t *testing.T) {
   </div>
 </main>`))
 	code := GeneratePage(page, "")
-	assertContains(t, code, `<label htmlFor="trigger_event">Trigger Event</label>`)
-	assertContains(t, code, `id="trigger_event"`)
+	assertContains(t, code, `<label htmlFor="createWorkflow-trigger_event">Trigger Event</label>`)
+	assertContains(t, code, `id="createWorkflow-trigger_event"`)
 }

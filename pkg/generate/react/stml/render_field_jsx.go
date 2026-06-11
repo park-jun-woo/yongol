@@ -9,8 +9,13 @@ import (
 	stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
 )
 
-// renderFieldJSX generates JSX for a form field.
-func renderFieldJSX(f stmlparser.FieldBind, formName string, indent int) string {
+// renderFieldJSX generates JSX for a form field. idPrefix scopes the DOM
+// id/htmlFor to the owning form (operationId-derived) so two forms on one
+// page that declare a same-named field do not collide on a single id
+// (BUG-127). The register/zod/formState.errors keys stay f.Name — those are
+// the OpenAPI request-body contract; only the DOM id is form-scoped. An
+// empty idPrefix leaves the bare field name (direct unit calls).
+func renderFieldJSX(f stmlparser.FieldBind, formName, idPrefix string, indent int) string {
 	ind := indentStr(indent)
 
 	// data-component field — no label wrapper
@@ -19,8 +24,13 @@ func renderFieldJSX(f stmlparser.FieldBind, formName string, indent int) string 
 		return fmt.Sprintf("%s<%s {...%s.register('%s')} />", ind, comp, formName, f.Name)
 	}
 
+	domID := f.Name
+	if idPrefix != "" {
+		domID = idPrefix + "-" + f.Name
+	}
+
 	var attrs []string
-	attrs = append(attrs, fmt.Sprintf(`id="%s"`, f.Name))
+	attrs = append(attrs, fmt.Sprintf(`id="%s"`, domID))
 	if f.Type != "" {
 		attrs = append(attrs, fmt.Sprintf(`type="%s"`, f.Type))
 	}
@@ -45,7 +55,7 @@ func renderFieldJSX(f stmlparser.FieldBind, formName string, indent int) string 
 
 	var lines []string
 	lines = append(lines, fmt.Sprintf("%s<div>", ind))
-	lines = append(lines, fmt.Sprintf(`%s  <label htmlFor="%s">%s</label>`, ind, f.Name, label))
+	lines = append(lines, fmt.Sprintf(`%s  <label htmlFor="%s">%s</label>`, ind, domID, label))
 	lines = append(lines, fmt.Sprintf("%s  <Input%s %s />", ind, attrStr, reg))
 	lines = append(lines, fmt.Sprintf(`%s  {%s.formState.errors.%s && (`, ind, formName, f.Name))
 	lines = append(lines, fmt.Sprintf(`%s    <p className="text-sm text-destructive">{%s.formState.errors.%s?.message}</p>`, ind, formName, f.Name))
