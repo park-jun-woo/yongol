@@ -31,13 +31,14 @@ func populateDDL(g *rule.Ground, fs *yongol.Fullstack) {
 	// Register DDL column Go types for var.Field resolution (Phase009).
 	for _, t := range fs.DDLTables {
 		modelName := sqlcModelName(t.Name)
-		// apiModelName / apiFieldName use the same casing functions as
-		// populateSSaCSymbols (strcase.ToGoPascal over inflection.Singular)
-		// so that DDL.apifield.<M>.<f> keys align exactly with the
-		// Struct.<M>.<f> keys inferResponseValueType looks up. Using
-		// sqlcModelName/SnakeToPascalSqlc here would diverge on cases like
-		// "user_ids" (UserIDS vs UserIds) or irregular plurals, silently
-		// missing the apifield override (BUG-099 regression).
+		// Field keys in both DDL.field.* and DDL.apifield.* use
+		// caseconv.SnakeToPascalSqlc so they match the sqlc-generated struct
+		// field names — the identifiers codegen emits and the compiler requires
+		// (BUG-123). This also keeps DDL.apifield.<M>.<f> keys aligned with the
+		// Struct.<M>.<f> keys (populateSSaCSymbols now uses the same function),
+		// preserving the apifield-override key parity (BUG-099). The apiModelName
+		// keeps strcase.ToGoPascal(Singular) — model-name casing is out of scope
+		// for this Phase; only the field-key token is unified.
 		apiModelName := strcase.ToGoPascal(inflection.Singular(t.Name))
 		for _, colName := range t.ColumnOrder {
 			col := t.Columns[colName]
@@ -49,8 +50,7 @@ func populateDDL(g *rule.Ground, fs *yongol.Fullstack) {
 			// can compare @response bindings of DDL columns against the
 			// generated response struct field type. For UUID columns this
 			// corrects GoTypeOf=string → ApiField=openapi_types.UUID.
-			apiFieldName := strcase.ToGoPascal(colName)
-			g.Types["DDL.apifield."+apiModelName+"."+apiFieldName] = binding.ApiField
+			g.Types["DDL.apifield."+apiModelName+"."+fieldName] = binding.ApiField
 		}
 	}
 }

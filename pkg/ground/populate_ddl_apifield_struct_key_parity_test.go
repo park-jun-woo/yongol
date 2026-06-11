@@ -36,6 +36,19 @@ func TestPopulateDDL_ApifieldStructKeyParity(t *testing.T) {
 			},
 			ColumnOrder: []string{"id", "workflow_id"},
 		},
+		{
+			// Initialism columns whose ToGoPascal and SnakeToPascalSqlc
+			// spellings diverge (BUG-123). Both key spaces must now agree on
+			// the sqlc spelling, so the parity check below still holds.
+			Name: "sites",
+			Columns: map[string]ddl.Column{
+				"id":                    {Name: "id", RawType: "BIGINT", NotNull: true},
+				"queue_export_repo_url": {Name: "queue_export_repo_url", RawType: "TEXT", NotNull: true},
+				"gsc_sa_json_path":      {Name: "gsc_sa_json_path", RawType: "TEXT", NotNull: true},
+				"user_ids":              {Name: "user_ids", RawType: "TEXT", NotNull: true},
+			},
+			ColumnOrder: []string{"id", "queue_export_repo_url", "gsc_sa_json_path", "user_ids"},
+		},
 	}
 	fs := newMinimalFullstack(withDDLTables(tables...))
 
@@ -55,6 +68,30 @@ func TestPopulateDDL_ApifieldStructKeyParity(t *testing.T) {
 	for tok := range apiTokens {
 		if !structTokens[tok] {
 			t.Errorf("DDL.apifield token %q has no matching Struct.%s key — casing divergence breaks apifield override", tok, tok)
+		}
+	}
+
+	// Both key spaces must use the sqlc spelling (SnakeToPascalSqlc), not
+	// ToGoPascal, for initialism columns (BUG-123). Spot-check the canonical
+	// (sqlc) tokens are present and the ToGoPascal tokens are absent.
+	for _, sqlcTok := range []string{
+		"Site.QueueExportRepoUrl", "Site.GscSaJsonPath", "Site.UserIDS",
+	} {
+		if !apiTokens[sqlcTok] {
+			t.Errorf("DDL.apifield missing sqlc-spelled token %q", sqlcTok)
+		}
+		if !structTokens[sqlcTok] {
+			t.Errorf("Struct missing sqlc-spelled token %q", sqlcTok)
+		}
+	}
+	for _, goTok := range []string{
+		"Site.QueueExportRepoURL", "Site.GscSaJSONPath", "Site.UserIds",
+	} {
+		if apiTokens[goTok] {
+			t.Errorf("DDL.apifield has ToGoPascal-spelled token %q — should be sqlc spelling", goTok)
+		}
+		if structTokens[goTok] {
+			t.Errorf("Struct has ToGoPascal-spelled token %q — should be sqlc spelling", goTok)
 		}
 	}
 }

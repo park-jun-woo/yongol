@@ -1,11 +1,9 @@
 //ff:func feature=validate type=rule control=iteration dimension=3 topic=ssac-structural
-//ff:what S-59 — validates that the field in a variable.field access is an actual field of the variable's type
+//ff:what s59DottedField — S-59 검증: variable.field 참조 시 필드가 변수 타입에 실재해야 함
 
 package ssac
 
 import (
-	"fmt"
-
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
@@ -39,14 +37,7 @@ func s59DottedField(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					continue
 				}
 				if !containsField(schema, arg.Field) {
-					diags = append(diags, diagnostic.Diagnostic{
-						File:    fn.FileName,
-						Line:    seq.Line,
-						Phase:   diagnostic.PhaseValidate,
-						Level:   diagnostic.LevelError,
-						Message: fmt.Sprintf("[S-59] %s.%s: field %q does not exist on variable type", arg.Source, arg.Field, arg.Field),
-						Advice:  fmt.Sprintf("Correct the field name to match an actual field of variable %s", arg.Source),
-					})
+					diags = append(diags, s59FieldDiag(fn.FileName, seq.Line, arg.Source, arg.Field, schema))
 				}
 			}
 			// seq.Inputs values: "source.field" — same check
@@ -60,14 +51,7 @@ func s59DottedField(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 					continue
 				}
 				if !containsField(schema, fld) {
-					diags = append(diags, diagnostic.Diagnostic{
-						File:    fn.FileName,
-						Line:    seq.Line,
-						Phase:   diagnostic.PhaseValidate,
-						Level:   diagnostic.LevelError,
-						Message: fmt.Sprintf("[S-59] %s.%s: field %q does not exist on variable type", src, fld, fld),
-						Advice:  fmt.Sprintf("Correct the field name to match an actual field of variable %s", src),
-					})
+					diags = append(diags, s59FieldDiag(fn.FileName, seq.Line, src, fld, schema))
 				}
 			}
 		}

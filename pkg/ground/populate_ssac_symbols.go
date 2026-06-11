@@ -10,6 +10,7 @@ import (
 
 	"github.com/park-jun-woo/yongol/pkg/generate/gogin/types"
 	"github.com/park-jun-woo/yongol/pkg/rule"
+	"github.com/park-jun-woo/yongol/pkg/util/caseconv"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
@@ -26,12 +27,17 @@ import (
 // the Schemas side can be dropped.
 func populateSSaCSymbols(g *rule.Ground, fs *yongol.Fullstack) {
 	// Layer 2: register DDL row struct field → Go type.
-	// Field names are converted to Go PascalCase (matching the struct field names emitted by codegen).
+	// Field names use caseconv.SnakeToPascalSqlc so they match the field names
+	// of the sqlc-generated row struct (the actual identifiers codegen emits and
+	// the compiler requires). Initialism tokens (url/json/ids) diverge from
+	// strcase.ToGoPascal; the sqlc spelling is the canonical one S-59 validates
+	// against (BUG-123). The model name keeps strcase.ToGoPascal(Singular) —
+	// out of scope for this Phase.
 	ddlFields := make(map[string][]string)
 	for _, t := range fs.DDLTables {
 		modelName := strcase.ToGoPascal(inflection.Singular(t.Name))
 		for col, c := range t.Columns {
-			fieldName := strcase.ToGoPascal(col)
+			fieldName := caseconv.SnakeToPascalSqlc(col)
 			g.Types["Struct."+modelName+"."+fieldName] = types.GoTypeOf(c)
 			ddlFields[t.Name] = append(ddlFields[t.Name], fieldName)
 		}
