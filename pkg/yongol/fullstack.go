@@ -51,11 +51,15 @@ type Fullstack struct {
 	ResponseConstraints map[string]map[string]oapiparser.FieldConstraint
 	STMLPages           []stml.PageSpec
 	Layouts             []stml.LayoutSpec
-	Features            []features.Feature
-	FeatureTables       map[string]features.TableDef
-	DesignSpec          *design.DesignSpec
-	ParseDiagnostics    []diagnostic.Diagnostic   // All errors collected during the parser phase. Gated at the CLI level.
-	Presences           map[SSOTKind]SSOTPresence // Presence state (Absent/Declared/Populated) per SSOT kind.
+	// Sitemap is the parsed frontend/sitemap.html — the central site-structure
+	// declaration (plans/stml/sitemap Phase001). nil = file absent: every
+	// sitemap-derived behavior stays off (optional-file backward compatibility).
+	Sitemap          *stml.SitemapSpec
+	Features         []features.Feature
+	FeatureTables    map[string]features.TableDef
+	DesignSpec       *design.DesignSpec
+	ParseDiagnostics []diagnostic.Diagnostic   // All errors collected during the parser phase. Gated at the CLI level.
+	Presences        map[SSOTKind]SSOTPresence // Presence state (Absent/Declared/Populated) per SSOT kind.
 	// SsacInterfaces holds parsed ssac/pkg/*/interface.yaml documents keyed
 	// by package name. Populated by parseSsacInterfaces during ParseAll and
 	// consumed by Phase002 codegen (pkg/generate/gogin/infra/) plus Phase004/005
