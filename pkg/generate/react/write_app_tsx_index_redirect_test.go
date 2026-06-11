@@ -20,7 +20,7 @@ func TestWriteAppTSX_IndexRedirect_FirstPublicPage(t *testing.T) {
 	}
 	// about is protected → dashboard is the first public page by file name
 	protected := map[string]bool{"about.html": true}
-	if err := writeAppTSX(dir, pages, nil, "", protected, ""); err != nil {
+	if err := writeAppTSX(dir, pages, nil, "", protected, "", nil); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))

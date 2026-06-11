@@ -44,7 +44,7 @@ func renderEachJSX(e stmlparser.EachBlock, dataVar string, indent int, noBodyOps
 	// Whole-row link: wrap every field cell's content in a <Link>
 	linkOpen, linkClose := "", ""
 	if e.RowLink != nil {
-		linkOpen = fmt.Sprintf("<Link %s>", linkToAttr(*e.RowLink))
+		linkOpen = fmt.Sprintf("<Link %s>", LinkToAttr(*e.RowLink))
 		linkClose = "</Link>"
 	}
 

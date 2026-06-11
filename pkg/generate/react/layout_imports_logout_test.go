@@ -15,7 +15,7 @@ func TestLayoutImports_Logout(t *testing.T) {
 		HasOutlet: true,
 		Logout:    &stml.LogoutSpec{OperationID: "Logout"},
 	}
-	imports := layoutImports(layout, true)
+	imports := layoutImports(layout, true, nil)
 	want := []string{"Link", "Outlet", "useNavigate"}
 	if len(imports) != len(want) {
 		t.Fatalf("imports = %v, want %v", imports, want)
@@ -27,7 +27,7 @@ func TestLayoutImports_Logout(t *testing.T) {
 	}
 
 	// emission gated off (no auth): no useNavigate even with a declared logout.
-	imports = layoutImports(layout, false)
+	imports = layoutImports(layout, false, nil)
 	if len(imports) != 2 || imports[0] != "Link" || imports[1] != "Outlet" {
 		t.Errorf("expected [Link, Outlet] without logout emission, got %v", imports)
 	}

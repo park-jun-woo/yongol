@@ -18,7 +18,7 @@ func TestWriteAppTSX_Authz_FlatRoutes(t *testing.T) {
 		{Name: "settings", FileName: "settings.html"},
 	}
 	protected := map[string]bool{"about.html": true, "settings.html": true}
-	if err := writeAppTSX(dir, pages, nil, "", protected, ""); err != nil {
+	if err := writeAppTSX(dir, pages, nil, "", protected, "", nil); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))

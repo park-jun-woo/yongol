@@ -18,7 +18,7 @@ func TestWriteLayoutTSX_AuthLayout_NoNav(t *testing.T) {
 		File:      "layouts/auth.html",
 		HasOutlet: true,
 	}
-	if err := writeLayoutTSX(dir, layout, nil, ""); err != nil {
+	if err := writeLayoutTSX(dir, layout, nil, "", nil); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "layouts", "AuthLayout.tsx"))

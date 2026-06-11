@@ -26,7 +26,7 @@ func TestWriteLayoutsTSX_Multiple(t *testing.T) {
 			HasOutlet: true,
 		},
 	}
-	if err := writeLayoutsTSX(dir, layouts, nil, ""); err != nil {
+	if err := writeLayoutsTSX(dir, layouts, nil, "", nil, "", "", nil); err != nil {
 		t.Fatal(err)
 	}
 

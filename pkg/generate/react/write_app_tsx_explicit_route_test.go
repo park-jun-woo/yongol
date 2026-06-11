@@ -28,7 +28,7 @@ func TestWriteAppTSX_ExplicitRoute(t *testing.T) {
 			}},
 		},
 	}
-	if err := writeAppTSX(dir, pages, nil, "", nil, ""); err != nil {
+	if err := writeAppTSX(dir, pages, nil, "", nil, "", nil); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))

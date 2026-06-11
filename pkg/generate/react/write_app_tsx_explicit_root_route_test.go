@@ -18,7 +18,7 @@ func TestWriteAppTSX_ExplicitRootRoute_NoIndexRedirect(t *testing.T) {
 		{Name: "home", FileName: "home.html", Route: "/"},
 		{Name: "about", FileName: "about.html"},
 	}
-	if err := writeAppTSX(dir, pages, nil, "", nil, ""); err != nil {
+	if err := writeAppTSX(dir, pages, nil, "", nil, "", nil); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))

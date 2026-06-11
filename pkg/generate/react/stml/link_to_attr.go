@@ -9,14 +9,14 @@ import (
 	stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
 )
 
-// linkToAttr builds the `to` attribute of the emitted <Link> by
+// LinkToAttr builds the `to` attribute of the emitted <Link> by
 // substituting the link's param sources into the target page's resolved
 // route pattern. Optional segments (":Name?") are filled only when mapped
 // and omitted otherwise; unmapped required segments cannot survive
 // validation (TM-32) and are omitted defensively. Without any
 // interpolation the attribute is a plain string, otherwise a template
 // literal. An empty TargetPattern falls back to "/<page-name>".
-func linkToAttr(lr stmlparser.LinkRef) string {
+func LinkToAttr(lr stmlparser.LinkRef) string {
 	pattern := lr.TargetPattern
 	if pattern == "" {
 		pattern = "/" + lr.TargetPage

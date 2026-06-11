@@ -22,7 +22,7 @@ func TestWriteAppTSX_DefaultLayout(t *testing.T) {
 		{Name: "app", HasOutlet: true},
 		{Name: "auth", HasOutlet: true},
 	}
-	if err := writeAppTSX(dir, pages, layouts, "app", nil, ""); err != nil {
+	if err := writeAppTSX(dir, pages, layouts, "app", nil, "", nil); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))

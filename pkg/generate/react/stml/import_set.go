@@ -11,9 +11,11 @@ type importSet struct {
 	useParams      bool
 	useNavigate    bool
 	useLink        bool // react-router-dom <Link> (data-link emission)
+	useOutletCtx   bool // react-router-dom useOutletContext (data-crumb-field pages — Phase006)
 	useForm        bool
 	useZod         bool // zod + @hookform/resolvers/zod
 	useState       bool
+	useEffect      bool     // document.title mount effect (sitemap-listed pages — Phase004)
 	useAuthStore   bool     // @/stores/auth (bearer session store)
 	useButton      bool     // @/components/ui/Button
 	useInput       bool     // @/components/ui/Input

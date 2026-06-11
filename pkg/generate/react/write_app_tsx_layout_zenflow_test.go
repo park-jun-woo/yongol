@@ -42,7 +42,7 @@ func TestWriteAppTSX_LayoutGrouping_ZenflowFull(t *testing.T) {
 		},
 		{Name: "auth", HasOutlet: true},
 	}
-	if err := writeAppTSX(dir, pages, layouts, "app", nil, ""); err != nil {
+	if err := writeAppTSX(dir, pages, layouts, "app", nil, "", nil); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))

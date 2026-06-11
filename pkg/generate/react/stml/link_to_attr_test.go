@@ -10,14 +10,14 @@ import (
 
 func TestLinkToAttr(t *testing.T) {
 	// No params → plain string attribute.
-	got := linkToAttr(stmlparser.LinkRef{TargetPage: "settings", TargetPattern: "/settings"})
+	got := LinkToAttr(stmlparser.LinkRef{TargetPage: "settings", TargetPattern: "/settings"})
 	if got != `to="/settings"` {
 		t.Errorf("static: got %q", got)
 	}
 
 	// item.* source substituted into a template literal; the unmapped
 	// optional segment is omitted.
-	got = linkToAttr(stmlparser.LinkRef{
+	got = LinkToAttr(stmlparser.LinkRef{
 		TargetPage:    "building-detail",
 		TargetPattern: "/buildings/:BuildingID/:PhotoID?",
 		Params:        []stmlparser.LinkParamBind{{Source: "item.id", Segment: "BuildingID"}},
@@ -27,7 +27,7 @@ func TestLinkToAttr(t *testing.T) {
 	}
 
 	// route.* source uses the useParams() variable.
-	got = linkToAttr(stmlparser.LinkRef{
+	got = LinkToAttr(stmlparser.LinkRef{
 		TargetPage:    "unit-list",
 		TargetPattern: "/unit-list/:BuildingID",
 		Params:        []stmlparser.LinkParamBind{{Source: "route.BuildingID", Segment: "BuildingID"}},
@@ -37,7 +37,7 @@ func TestLinkToAttr(t *testing.T) {
 	}
 
 	// Elided segment binds to the single required segment.
-	got = linkToAttr(stmlparser.LinkRef{
+	got = LinkToAttr(stmlparser.LinkRef{
 		TargetPage:    "building-detail",
 		TargetPattern: "/buildings/:BuildingID/:PhotoID?",
 		Params:        []stmlparser.LinkParamBind{{Source: "item.id"}},
@@ -47,7 +47,7 @@ func TestLinkToAttr(t *testing.T) {
 	}
 
 	// Mapped optional segment is filled.
-	got = linkToAttr(stmlparser.LinkRef{
+	got = LinkToAttr(stmlparser.LinkRef{
 		TargetPage:    "building-detail",
 		TargetPattern: "/buildings/:BuildingID/:PhotoID?",
 		Params: []stmlparser.LinkParamBind{
@@ -60,13 +60,13 @@ func TestLinkToAttr(t *testing.T) {
 	}
 
 	// Empty pattern falls back to "/<page-name>".
-	got = linkToAttr(stmlparser.LinkRef{TargetPage: "login"})
+	got = LinkToAttr(stmlparser.LinkRef{TargetPage: "login"})
 	if got != `to="/login"` {
 		t.Errorf("fallback: got %q", got)
 	}
 
 	// The index route ("/") keeps the bare root path.
-	got = linkToAttr(stmlparser.LinkRef{TargetPage: "dashboard", TargetPattern: "/"})
+	got = LinkToAttr(stmlparser.LinkRef{TargetPage: "dashboard", TargetPattern: "/"})
 	if got != `to="/"` {
 		t.Errorf("index: got %q", got)
 	}

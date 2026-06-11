@@ -9,6 +9,7 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/generate/prepared"
 	stmlgen "github.com/park-jun-woo/yongol/pkg/generate/react/stml"
 	oapiparser "github.com/park-jun-woo/yongol/pkg/parser/openapi"
+	"github.com/park-jun-woo/yongol/pkg/parser/stml"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
@@ -35,6 +36,9 @@ func runSTMLCodegen(fs *yongol.Fullstack, artifactsDir string) error {
 		NoBodyOps:               noBodyOps,
 		PathParamTypes:          oapiparser.ExtractPathParamTypes(fs.OpenAPIDoc),
 		RoutePatterns:           collectRoutePatterns(fs.STMLPages),
+		DocumentTitles:          collectDocumentTitles(fs),
+		CrumbFields:             stml.SitemapCrumbFields(fs.Sitemap),
+		CrumbTitleSuffix:        crumbTitleSuffix(fs),
 	}
 	_, err := stmlgen.Generate(fs.STMLPages, fs.SpecsDir, pagesDir, opt)
 	return err

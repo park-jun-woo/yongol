@@ -21,7 +21,7 @@ func TestWriteLayoutTSX_LogoutNoAuth(t *testing.T) {
 		Logout:    &stml.LogoutSpec{OperationID: "Logout", Label: "로그아웃"},
 	}
 	patterns := map[string]string{"dashboard": "/dashboard"}
-	if err := writeLayoutTSX(dir, layout, patterns, ""); err != nil {
+	if err := writeLayoutTSX(dir, layout, patterns, "", nil); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "layouts", "AppLayout.tsx"))

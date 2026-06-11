@@ -38,4 +38,23 @@ type GenerateOptions struct {
 	// data-link emission substitutes the link's param sources into the
 	// target page's pattern (page-flow Phase007).
 	RoutePatterns map[string]string
+	// DocumentTitles maps STML page name → the full document.title string
+	// ("<sitemap label> · <app name>") emitted as a mount useEffect
+	// (plans/stml/sitemap Phase004). Populated only when
+	// frontend/sitemap.html exists and only for pages listed in it — a
+	// page without an entry emits no title effect, so the sitemap-absent
+	// output stays byte-identical.
+	DocumentTitles map[string]string
+	// CrumbFields maps STML page name → the sitemap data-crumb-field
+	// declaration (plans/stml/sitemap Phase006). A listed page gets the
+	// dynamic crumb-label wiring: useOutletContext + a useEffect that
+	// feeds the first fetch's response field to the layout's setCrumbLabel
+	// and updates document.title with the same value. Pages without an
+	// entry stay byte-identical to the Phase004/005 emission.
+	CrumbFields map[string]string
+	// CrumbTitleSuffix is the " · <app name>" tail appended to the dynamic
+	// crumb label when the Phase006 effect updates document.title — the
+	// same join collectDocumentTitles uses for the static mount title (""
+	// when the manifest carries no app name).
+	CrumbTitleSuffix string
 }

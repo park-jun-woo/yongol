@@ -26,5 +26,14 @@ func mergeOpt(base, override GenerateOptions) GenerateOptions {
 	if override.RoutePatterns != nil {
 		base.RoutePatterns = override.RoutePatterns
 	}
+	if override.DocumentTitles != nil {
+		base.DocumentTitles = override.DocumentTitles
+	}
+	if override.CrumbFields != nil {
+		base.CrumbFields = override.CrumbFields
+	}
+	if override.CrumbTitleSuffix != "" {
+		base.CrumbTitleSuffix = override.CrumbTitleSuffix
+	}
 	return base
 }

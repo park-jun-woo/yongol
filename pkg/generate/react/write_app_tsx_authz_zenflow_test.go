@@ -51,7 +51,7 @@ func TestWriteAppTSX_Authz_ZenflowFull(t *testing.T) {
 		"webhooks.html":        true,
 		"audit-logs.html":      true,
 	}
-	if err := writeAppTSX(dir, pages, layouts, "app", protected, ""); err != nil {
+	if err := writeAppTSX(dir, pages, layouts, "app", protected, "", nil); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))

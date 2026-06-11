@@ -17,6 +17,8 @@ import (
 //	src/types/api.d.ts — openapi-typescript output (spawn)
 //	src/lib/utils.ts — shadcn cn() helper
 //	src/components/ui/*.tsx — 10 shadcn-like primitives
+//	src/lib/breadcrumbs.ts + src/components/ui/Breadcrumb.tsx — static
+//	breadcrumb trails from frontend/sitemap.html (sitemap present only)
 //
 // Page files (src/pages/*.tsx) are **not** emitted — TSX is the SSOT, so
 // yongol reads them, not writes them.

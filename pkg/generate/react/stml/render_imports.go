@@ -14,8 +14,18 @@ func renderImports(is importSet, opt GenerateOptions) string {
 	if opt.UseClient {
 		lines = append(lines, "'use client'\n")
 	}
+	// react core hooks (useEffect = the Phase004 document.title mount
+	// effect; without it the line stays byte-identical to the
+	// useState-only output)
+	var reactImports []string
+	if is.useEffect {
+		reactImports = append(reactImports, "useEffect")
+	}
 	if is.useState {
-		lines = append(lines, "import { useState } from 'react'")
+		reactImports = append(reactImports, "useState")
+	}
+	if len(reactImports) > 0 {
+		lines = append(lines, fmt.Sprintf("import { %s } from 'react'", strings.Join(reactImports, ", ")))
 	}
 
 	// tanstack query
@@ -43,6 +53,9 @@ func renderImports(is importSet, opt GenerateOptions) string {
 	}
 	if is.useNavigate {
 		routerImports = append(routerImports, "useNavigate")
+	}
+	if is.useOutletCtx {
+		routerImports = append(routerImports, "useOutletContext")
 	}
 	if len(routerImports) > 0 {
 		lines = append(lines, fmt.Sprintf("import { %s } from 'react-router-dom'", strings.Join(routerImports, ", ")))

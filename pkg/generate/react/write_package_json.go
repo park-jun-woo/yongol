@@ -21,7 +21,10 @@ import (
 //     the cn() utility.
 //   - zustand 5 (withAuthStore only) — the bearer session store emitted as
 //     src/stores/auth.ts depends on it.
-func writePackageJSON(dir string, withAuthStore bool) error {
+//   - lucide-react (withIcons only) — sitemap data-icon menu icons
+//     (plans/stml/sitemap Phase003); the same conditional pattern as
+//     zustand, gated on at least one data-icon in the sitemap.
+func writePackageJSON(dir string, withAuthStore bool, withIcons bool) error {
 	deps := map[string]string{
 		"react":                 "^19",
 		"react-dom":             "^19",
@@ -36,6 +39,9 @@ func writePackageJSON(dir string, withAuthStore bool) error {
 	}
 	if withAuthStore {
 		deps["zustand"] = "^5"
+	}
+	if withIcons {
+		deps["lucide-react"] = "^0.525.0"
 	}
 	pkg := map[string]interface{}{
 		"private": true,

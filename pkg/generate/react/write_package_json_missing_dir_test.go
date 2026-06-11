@@ -9,7 +9,7 @@ import (
 
 func TestWritePackageJSONMissingDir(t *testing.T) {
 	missing := filepath.Join(t.TempDir(), "absent", "dir")
-	if err := writePackageJSON(missing, false); err == nil {
+	if err := writePackageJSON(missing, false, false); err == nil {
 		t.Fatal("expected error writing into non-existent directory, got nil")
 	}
 }

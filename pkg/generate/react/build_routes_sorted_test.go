@@ -15,7 +15,7 @@ func TestBuildRoutes_Sorted(t *testing.T) {
 		{Name: "alpha", FileName: "alpha.html"},
 		{Name: "mid", FileName: "mid.html"},
 	}
-	routes := buildRoutes(pages, "", nil)
+	routes := buildRoutes(pages, "", nil, nil)
 	if len(routes) != 3 {
 		t.Fatalf("got %d routes, want 3", len(routes))
 	}

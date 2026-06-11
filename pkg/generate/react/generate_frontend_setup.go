@@ -53,7 +53,7 @@ func generateFrontendSetup(fs *yongol.Fullstack, artifactsDir string) error {
 		}
 	}
 
-	if err := writePackageJSON(frontendDir, bearerAuth); err != nil {
+	if err := writePackageJSON(frontendDir, bearerAuth, sitemapHasIcon(fsSitemap(fs))); err != nil {
 		return err
 	}
 	if err := writeViteConfig(frontendDir); err != nil {
@@ -71,7 +71,7 @@ func generateFrontendSetup(fs *yongol.Fullstack, artifactsDir string) error {
 	if err := writeMainTSX(srcDir); err != nil {
 		return err
 	}
-	if err := writeLayoutsTSX(srcDir, stmlLayouts, navRoutePatterns(stmlPages), resolveLayoutAuthMode(hasAuth, bearerAuth)); err != nil {
+	if err := writeLayoutsTSX(srcDir, stmlLayouts, navRoutePatterns(stmlPages), resolveLayoutAuthMode(hasAuth, bearerAuth), fsSitemap(fs), defaultLayout, resolveRoleField(fs), crumbFieldLayouts(stmlPages, fsSitemap(fs), defaultLayout)); err != nil {
 		return err
 	}
 	if hasAuth {
@@ -79,15 +79,13 @@ func generateFrontendSetup(fs *yongol.Fullstack, artifactsDir string) error {
 			return err
 		}
 	}
-	if bearerAuth {
-		if err := writeSessionStore(srcDir, authStore); err != nil {
-			return err
-		}
-	}
-	if err := writeAppTSX(srcDir, stmlPages, stmlLayouts, defaultLayout, resolveProtectedPages(fs), indexPage); err != nil {
+	if err := writeAuthStores(srcDir, authStore, bearerAuth, stmlPages); err != nil {
 		return err
 	}
-	if err := writeLibUtils(srcDir); err != nil {
+	if err := writeAppTSX(srcDir, stmlPages, stmlLayouts, defaultLayout, resolveProtectedPages(fs), indexPage, sitemapPageLayouts(fsSitemap(fs))); err != nil {
+		return err
+	}
+	if err := writeLibArtifacts(srcDir, fs, stmlPages); err != nil {
 		return err
 	}
 	if err := writeComponentsUI(srcDir, dspec); err != nil {

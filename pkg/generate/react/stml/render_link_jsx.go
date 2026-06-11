@@ -11,12 +11,12 @@ import (
 
 // renderLinkJSX renders a LinkRef as a react-router <Link> element. The
 // `to` value is the target page's resolved route pattern with the link's
-// param sources substituted (linkToAttr); children reuse the existing
+// param sources substituted (LinkToAttr); children reuse the existing
 // bind/static renderers (page-flow Phase007).
 func renderLinkJSX(lr stmlparser.LinkRef, dataVar, itemVar string, indent int, noBodyOps map[string]bool) string {
 	ind := indentStr(indent)
 	cls := clsAttr(lr.ClassName)
-	to := linkToAttr(lr)
+	to := LinkToAttr(lr)
 
 	if len(lr.Children) == 0 {
 		return fmt.Sprintf("%s<Link %s%s>%s</Link>", ind, to, cls, lr.Text)

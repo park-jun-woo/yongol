@@ -22,7 +22,7 @@ func TestWriteAppTSX_IndexRedirect_DeclaredIndex(t *testing.T) {
 	// redirect (page-flow Phase009). Without the declaration the fallback
 	// would pick /forgot-password (BUG-114 (3)).
 	protected := map[string]bool{"dashboard.html": true}
-	if err := writeAppTSX(dir, pages, nil, "", protected, "dashboard"); err != nil {
+	if err := writeAppTSX(dir, pages, nil, "", protected, "dashboard", nil); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "App.tsx"))

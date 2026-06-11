@@ -19,7 +19,7 @@ func TestWriteLayoutTSX_LogoutCookie(t *testing.T) {
 		HasOutlet: true,
 		Logout:    &stml.LogoutSpec{OperationID: "Logout", Label: "로그아웃"},
 	}
-	if err := writeLayoutTSX(dir, layout, nil, "cookie"); err != nil {
+	if err := writeLayoutTSX(dir, layout, nil, "cookie", nil); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "layouts", "AppLayout.tsx"))

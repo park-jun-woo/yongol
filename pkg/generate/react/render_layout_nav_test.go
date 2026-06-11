@@ -19,7 +19,7 @@ func TestRenderLayoutNav(t *testing.T) {
 			NavItems: []stml.NavItem{{Path: "dashboard", Label: "대시보드"}},
 			Logout:   &stml.LogoutSpec{OperationID: "Logout", Label: "로그아웃"},
 		}
-		renderLayoutNav(&sb, layout, patterns, true)
+		renderLayoutNav(&sb, layout, patterns, true, nil)
 		out := sb.String()
 		assertContains(t, out, "<nav>")
 		assertContains(t, out, `<Link to="/dashboard">대시보드</Link>`)
@@ -30,7 +30,7 @@ func TestRenderLayoutNav(t *testing.T) {
 	t.Run("empty label falls back to Logout", func(t *testing.T) {
 		var sb strings.Builder
 		layout := stml.LayoutSpec{Logout: &stml.LogoutSpec{}}
-		renderLayoutNav(&sb, layout, nil, true)
+		renderLayoutNav(&sb, layout, nil, true, nil)
 		assertContains(t, sb.String(), "<button onClick={handleLogout}>Logout</button>")
 	})
 
@@ -40,7 +40,7 @@ func TestRenderLayoutNav(t *testing.T) {
 			NavItems: []stml.NavItem{{Path: "/home", Label: "Home"}},
 			Logout:   &stml.LogoutSpec{OperationID: "Logout"},
 		}
-		renderLayoutNav(&sb, layout, nil, false)
+		renderLayoutNav(&sb, layout, nil, false, nil)
 		out := sb.String()
 		assertContains(t, out, `<Link to="/home">Home</Link>`)
 		assertNotContains(t, out, "handleLogout")
@@ -48,7 +48,7 @@ func TestRenderLayoutNav(t *testing.T) {
 
 	t.Run("nothing without nav items or logout", func(t *testing.T) {
 		var sb strings.Builder
-		renderLayoutNav(&sb, stml.LayoutSpec{}, nil, false)
+		renderLayoutNav(&sb, stml.LayoutSpec{}, nil, false, nil)
 		if sb.Len() != 0 {
 			t.Errorf("expected empty output, got %q", sb.String())
 		}

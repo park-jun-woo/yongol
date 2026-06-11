@@ -14,7 +14,7 @@ func TestLayoutImports_LinkAndOutlet(t *testing.T) {
 		NavItems:  []stml.NavItem{{Path: "/foo", Label: "Foo"}},
 		HasOutlet: true,
 	}
-	imports := layoutImports(layout, false)
+	imports := layoutImports(layout, false, nil)
 	if len(imports) != 2 || imports[0] != "Link" || imports[1] != "Outlet" {
 		t.Errorf("expected [Link, Outlet], got %v", imports)
 	}

@@ -74,6 +74,18 @@ func (r *ReactTarget) GeneratePage(page stmlparser.PageSpec, specsDir string, op
 	}
 	is.useQueryClient = len(allActions) > 0 && needsInvalidate
 
+	// document.title mount effect — only for sitemap-listed pages
+	// (plans/stml/sitemap Phase004; an absent entry emits nothing, keeping
+	// the sitemap-absent output byte-identical) — and the dynamic crumb
+	// label wiring (Phase006) — only for data-crumb-field pages
+	// (pageCrumbField's judgment).
+	docTitle := opt.DocumentTitles[page.Name]
+	crumbField := pageCrumbField(page, opt.CrumbFields)
+	if docTitle != "" || crumbField != "" {
+		is.useEffect = true
+	}
+	is.useOutletCtx = crumbField != ""
+
 	var sb strings.Builder
 	sb.WriteString(renderImports(is, opt))
 	sb.WriteString("\n\n")
@@ -81,7 +93,13 @@ func (r *ReactTarget) GeneratePage(page stmlparser.PageSpec, specsDir string, op
 	componentName := toComponentName(page.Name)
 	sb.WriteString(fmt.Sprintf("export default function %s() {\n", componentName))
 
+	if docTitle != "" {
+		sb.WriteString(renderTitleEffect(docTitle))
+	}
 	renderPageHooks(page, is, opt.PathParamTypes, &sb)
+	if crumbField != "" {
+		sb.WriteString(renderCrumbLabelEffect(crumbField, toLowerFirst(page.Fetches[0].OperationID)+"Data", opt.CrumbTitleSuffix))
+	}
 	renderPageMutations(allActions, fetchOps, actionFetchMap, opt.RequestConstraints, opt.BearerAuth, opt.NoBodyOps, opt.PathParamTypes, &sb)
 	renderPageJSX(page, &sb, opt.NoBodyOps)
 

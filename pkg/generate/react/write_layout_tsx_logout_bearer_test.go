@@ -24,7 +24,7 @@ func TestWriteLayoutTSX_LogoutBearer(t *testing.T) {
 		Logout:    &stml.LogoutSpec{OperationID: "Logout", Label: "로그아웃"},
 	}
 	patterns := map[string]string{"dashboard": "/dashboard"}
-	if err := writeLayoutTSX(dir, layout, patterns, "bearer"); err != nil {
+	if err := writeLayoutTSX(dir, layout, patterns, "bearer", nil); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "layouts", "AppLayout.tsx"))

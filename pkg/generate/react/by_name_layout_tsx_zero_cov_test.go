@@ -15,7 +15,7 @@ func TestByNameLayoutTSX_ZeroCov(t *testing.T) {
 		NavItems:  []stml.NavItem{{Path: "/home", Label: "Home"}},
 		HasOutlet: true,
 	}
-	out := renderLayoutTSX("AppLayout", layout, nil, "")
+	out := renderLayoutTSX("AppLayout", layout, nil, "", nil)
 	if !strings.Contains(out, "AppLayout") {
 		t.Errorf("renderLayoutTSX missing name")
 	}
