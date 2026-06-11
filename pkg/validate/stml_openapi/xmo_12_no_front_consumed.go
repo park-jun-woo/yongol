@@ -22,7 +22,7 @@ func xmo12NoFrontConsumed(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	}
 
 	ops := collectOpIDs(doc)
-	consumed := collectConsumedOps(fs.STMLPages, fs.Layouts, fs.SpecsDir, ops)
+	consumed := collectConsumedOps(fs.STMLPages, fs.Layouts, fs.Sitemap, fs.SpecsDir, ops)
 
 	var diags []diagnostic.Diagnostic
 	for _, item := range doc.Paths.Map() {

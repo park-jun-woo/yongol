@@ -67,6 +67,19 @@ func TestTM35IndexFallback(t *testing.T) {
 		}
 	})
 
+	t.Run("sitemap data-index is silent", func(t *testing.T) {
+		fs := makeFS(pages, nil)
+		fs.Sitemap = &stml.SitemapSpec{
+			FileName: "sitemap.html",
+			Navs: []stml.SitemapNav{{Items: []stml.SitemapNode{
+				{Page: "login", Label: "로그인", Index: true, Menu: true},
+			}}},
+		}
+		if diags := tm35IndexFallback(fs, nil); len(diags) != 0 {
+			t.Errorf("expected silence with sitemap data-index declared, got %+v", diags)
+		}
+	})
+
 	t.Run("slash mount is silent", func(t *testing.T) {
 		fs := makeFS([]stml.PageSpec{
 			{Name: "home", FileName: "home.html", Route: "/"},

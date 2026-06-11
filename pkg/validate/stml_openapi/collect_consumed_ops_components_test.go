@@ -23,7 +23,7 @@ func TestCollectConsumedOpsWithComponents(t *testing.T) {
 	}}
 	ops := map[string]struct{}{"CompOp": {}}
 
-	out := collectConsumedOps(pages, nil, specsDir, ops)
+	out := collectConsumedOps(pages, nil, nil, specsDir, ops)
 	for _, want := range []string{"ListItems", "CompOp"} {
 		if _, ok := out[want]; !ok {
 			t.Errorf("missing consumed op %q", want)

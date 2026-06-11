@@ -20,7 +20,7 @@ func TestCollectConsumedOpsLayouts(t *testing.T) {
 		{Name: "bare", Logout: &stml.LogoutSpec{}}, // valueless — no op to consume
 	}
 
-	out := collectConsumedOps(pages, layouts, "", nil)
+	out := collectConsumedOps(pages, layouts, nil, "", nil)
 	for _, want := range []string{"ListItems", "Logout"} {
 		if _, ok := out[want]; !ok {
 			t.Errorf("missing consumed op %q", want)

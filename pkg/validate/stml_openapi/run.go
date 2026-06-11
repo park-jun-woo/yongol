@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=stml-openapi
-//ff:what Run — STML<->OpenAPI 교차 검증 실행 (TM-01 ~ TM-14, TM-16, TM-17, TM-19 ~ TM-22, TM-24 ~ TM-38, XMO-10/11/12)
+//ff:what Run — STML<->OpenAPI 교차 검증 실행 (TM-01 ~ TM-14, TM-16, TM-17, TM-19 ~ TM-22, TM-24 ~ TM-44, TM-46 ~ TM-50, XMO-10/11/12)
 
 package stml_openapi
 
@@ -64,12 +64,28 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		diags = append(diags, tm35IndexFallback(fs, opMap)...)
 	}
 
+	// Sitemap rules (plans/stml/sitemap Phase001/002/003/005/006/007):
+	// TM-39~42 validate an existing frontend/sitemap.html, TM-43 runs
+	// the reachability BFS over it (listing ≠ reaching), TM-44 rejects a
+	// surviving layout data-nav once the sitemap owns the menu truth,
+	// TM-46/47 validate the data-roles values and their role-claim wiring,
+	// TM-50 the data-crumb-field declarations against each page's first
+	// fetch response; TM-49 fires on its absence. Dynamic menu groups
+	// (Phase007) get TM-48 (data-entry block / structural completeness)
+	// plus the sitemap extensions of TM-01/07/30/31/32 (fetch op, each
+	// array field, label field, link target, link params). TM-45 retired
+	// in Phase007 — the whole reserved vocabulary graduated.
+	if fs.Sitemap != nil {
+		diags = append(diags, sitemapDiags(fs, opMap, raif)...)
+	}
+	diags = append(diags, tm49SitemapAbsent(fs)...)
+
 	if len(fs.Layouts) > 0 || (fs.Manifest != nil && fs.Manifest.Frontend.DefaultLayout != "") {
 		diags = append(diags, tm11LayoutNotFound(fs.STMLPages, fs.Layouts)...)
 		if fs.Manifest != nil {
 			diags = append(diags, tm12DefaultLayoutNotFound(fs.Manifest.Frontend.DefaultLayout, fs.Layouts)...)
 		}
-		diags = append(diags, tm13UnusedLayout(fs.STMLPages, fs.Layouts, defaultLayoutFromManifest(fs))...)
+		diags = append(diags, tm13UnusedLayout(fs.STMLPages, fs.Layouts, defaultLayoutFromManifest(fs), fs.Sitemap)...)
 		diags = append(diags, tm36NavTarget(fs.Layouts, fs.STMLPages)...)
 		diags = append(diags, tm37LogoutOp(fs.Layouts, opMap)...)
 		diags = append(diags, tm38LogoutMode(fs)...)

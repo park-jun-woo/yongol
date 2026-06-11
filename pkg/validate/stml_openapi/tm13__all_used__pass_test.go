@@ -18,7 +18,7 @@ func TestTM13_AllUsed_Pass(t *testing.T) {
 		{Name: "app", File: "layouts/app.html"},
 		{Name: "auth", File: "layouts/auth.html"},
 	}
-	diags := tm13UnusedLayout(pages, layouts, "")
+	diags := tm13UnusedLayout(pages, layouts, "", nil)
 	if hasDiag(diags, "[TM-13]") {
 		t.Errorf("unexpected TM-13 when all layouts are used, got %v", diags)
 	}

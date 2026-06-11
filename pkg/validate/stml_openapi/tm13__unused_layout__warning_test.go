@@ -19,7 +19,7 @@ func TestTM13_UnusedLayout_Warning(t *testing.T) {
 		{Name: "app", File: "layouts/app.html"},
 		{Name: "auth", File: "layouts/auth.html"},
 	}
-	diags := tm13UnusedLayout(pages, layouts, "app")
+	diags := tm13UnusedLayout(pages, layouts, "app", nil)
 	if !hasDiag(diags, "[TM-13]") {
 		t.Errorf("expected TM-13 for unused layout 'auth', got %v", diags)
 	}

@@ -20,7 +20,7 @@ func TestTM13_DefaultLayoutCountsAsUsed(t *testing.T) {
 		{Name: "auth", File: "layouts/auth.html"},
 	}
 	// "app" is only used as defaultLayout, not by any page directly
-	diags := tm13UnusedLayout(pages, layouts, "app")
+	diags := tm13UnusedLayout(pages, layouts, "app", nil)
 	if hasDiag(diags, "[TM-13]") {
 		t.Errorf("unexpected TM-13 when layout is defaultLayout, got %v", diags)
 	}
