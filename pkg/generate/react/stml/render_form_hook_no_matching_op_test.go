@@ -17,7 +17,7 @@ func TestRenderFormHookNoMatchingOp(t *testing.T) {
 		OperationID: "CreateWorkflow",
 		Fields:      []stmlparser.FieldBind{{Name: "title"}},
 	}
-	code := renderFormHook(a, constraints)
+	code := renderFormHook(a, constraints, nil)
 	assertContains(t, code, "const createWorkflowForm = useForm()")
 	assertNotContains(t, code, "zodResolver")
 }

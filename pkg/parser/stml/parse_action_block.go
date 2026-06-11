@@ -19,6 +19,7 @@ func parseActionBlock(n *html.Node, operationID string) ActionBlock {
 		Invalidates:       strings.Fields(getAttr(n, "data-invalidates")),
 		CaptureRaw:        getAttr(n, "data-capture"),
 		Redirect:          getAttr(n, "data-redirect"),
+		Prefill:           getAttr(n, "data-prefill"),
 		RedirectParamsRaw: getAttr(n, "data-redirect-params"),
 		OnErrorNode:       hasDescendantOnError(n),
 	}

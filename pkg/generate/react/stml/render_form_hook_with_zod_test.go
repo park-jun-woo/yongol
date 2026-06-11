@@ -21,7 +21,7 @@ func TestRenderFormHookWithZod(t *testing.T) {
 		OperationID: "CreateWorkflow",
 		Fields:      []stmlparser.FieldBind{{Name: "title"}, {Name: "trigger_event"}},
 	}
-	code := renderFormHook(a, constraints)
+	code := renderFormHook(a, constraints, nil)
 	assertContains(t, code, "const createWorkflowSchema = z.object(")
 	assertContains(t, code, "resolver: zodResolver(createWorkflowSchema)")
 	assertContains(t, code, "const createWorkflowForm = useForm<z.infer<typeof createWorkflowSchema>>(")

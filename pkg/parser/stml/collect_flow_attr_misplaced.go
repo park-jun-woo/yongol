@@ -5,8 +5,8 @@ package stml
 import "golang.org/x/net/html"
 
 // collectFlowAttrMisplaced walks the whole DOM recording flow attributes on
-// illegal positions into page.FlowAttrMisplaced: data-capture and
-// data-redirect are valid only on a data-action element itself, and
+// illegal positions into page.FlowAttrMisplaced: data-capture, data-redirect
+// and data-prefill are valid only on a data-action element itself, and
 // data-on-error is valid only on an element inside a data-action block
 // (the action root does not count as inside).
 func collectFlowAttrMisplaced(n *html.Node, inAction bool, page *PageSpec) {
@@ -17,6 +17,9 @@ func collectFlowAttrMisplaced(n *html.Node, inAction bool, page *PageSpec) {
 		}
 		if !isAction && hasAttr(n, "data-redirect") {
 			page.FlowAttrMisplaced = append(page.FlowAttrMisplaced, FlowAttrMisplaced{Attr: "data-redirect", Tag: n.Data})
+		}
+		if !isAction && hasAttr(n, "data-prefill") {
+			page.FlowAttrMisplaced = append(page.FlowAttrMisplaced, FlowAttrMisplaced{Attr: "data-prefill", Tag: n.Data})
 		}
 		if !inAction && hasAttr(n, "data-on-error") {
 			page.FlowAttrMisplaced = append(page.FlowAttrMisplaced, FlowAttrMisplaced{Attr: "data-on-error", Tag: n.Data})

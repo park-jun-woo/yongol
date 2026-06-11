@@ -13,7 +13,7 @@ func TestRenderFormHookWithoutConstraints(t *testing.T) {
 		OperationID: "DeleteRoom",
 		Fields:      []stmlparser.FieldBind{{Name: "reason"}},
 	}
-	code := renderFormHook(a, nil)
+	code := renderFormHook(a, nil, nil)
 	assertContains(t, code, "const deleteRoomForm = useForm()")
 	assertNotContains(t, code, "zodResolver")
 	assertNotContains(t, code, "z.object")

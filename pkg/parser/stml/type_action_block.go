@@ -16,6 +16,7 @@ type ActionBlock struct {
 	CaptureRaw  string        // raw data-capture attribute value (TM-20 re-parses it for syntax diagnostics)
 	Captures    []CaptureBind // parsed data-capture bindings (empty when absent or syntactically invalid)
 	Redirect    string        // data-redirect target navigated to on action success: "/"-prefixed static path, or an STML page-name reference (empty if unset)
+	Prefill     string        // data-prefill value: the same-page data-fetch operationId whose 2xx response seeds this form's initial values (empty if unset)
 	OnErrorNode bool          // true when a descendant element carries data-on-error
 
 	RedirectParamsRaw string          // raw data-redirect-params value (TM-33 re-parses it for syntax diagnostics)
