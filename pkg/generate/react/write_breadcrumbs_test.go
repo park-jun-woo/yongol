@@ -24,7 +24,7 @@ func TestWriteBreadcrumbs(t *testing.T) {
 
 	t.Run("sitemap present writes both artifacts", func(t *testing.T) {
 		srcDir := t.TempDir()
-		if err := writeBreadcrumbs(srcDir, sitemap, routePatterns); err != nil {
+		if err := writeBreadcrumbs(srcDir, sitemap, 1, routePatterns); err != nil {
 			t.Fatalf("writeBreadcrumbs: %v", err)
 		}
 		lib, err := os.ReadFile(filepath.Join(srcDir, "lib", "breadcrumbs.ts"))
@@ -47,7 +47,7 @@ func TestWriteBreadcrumbs(t *testing.T) {
 				{Page: "building-detail", Label: "건물 상세", Menu: true, CrumbField: "building_name"},
 			}},
 		}}}}
-		if err := writeBreadcrumbs(srcDir, dyn, routePatterns); err != nil {
+		if err := writeBreadcrumbs(srcDir, dyn, 1, routePatterns); err != nil {
 			t.Fatalf("writeBreadcrumbs: %v", err)
 		}
 		lib, err := os.ReadFile(filepath.Join(srcDir, "lib", "breadcrumbs.ts"))
@@ -65,7 +65,7 @@ func TestWriteBreadcrumbs(t *testing.T) {
 
 	t.Run("nil sitemap writes nothing — byte-identical backward compat", func(t *testing.T) {
 		srcDir := t.TempDir()
-		if err := writeBreadcrumbs(srcDir, nil, routePatterns); err != nil {
+		if err := writeBreadcrumbs(srcDir, nil, 1, routePatterns); err != nil {
 			t.Fatalf("writeBreadcrumbs: %v", err)
 		}
 		if _, err := os.Stat(filepath.Join(srcDir, "lib", "breadcrumbs.ts")); !os.IsNotExist(err) {
@@ -73,6 +73,19 @@ func TestWriteBreadcrumbs(t *testing.T) {
 		}
 		if _, err := os.Stat(filepath.Join(srcDir, "components", "ui", "Breadcrumb.tsx")); !os.IsNotExist(err) {
 			t.Error("Breadcrumb.tsx must not exist without a sitemap")
+		}
+	})
+
+	t.Run("zero layouts writes nothing — no host for the breadcrumb (Phase008)", func(t *testing.T) {
+		srcDir := t.TempDir()
+		if err := writeBreadcrumbs(srcDir, sitemap, 0, routePatterns); err != nil {
+			t.Fatalf("writeBreadcrumbs: %v", err)
+		}
+		if _, err := os.Stat(filepath.Join(srcDir, "lib", "breadcrumbs.ts")); !os.IsNotExist(err) {
+			t.Error("breadcrumbs.ts must not exist without a layout host")
+		}
+		if _, err := os.Stat(filepath.Join(srcDir, "components", "ui", "Breadcrumb.tsx")); !os.IsNotExist(err) {
+			t.Error("Breadcrumb.tsx must not exist without a layout host")
 		}
 	})
 }

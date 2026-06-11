@@ -26,9 +26,12 @@ func TestWriteLibArtifacts(t *testing.T) {
 		}
 	})
 
-	t.Run("with a sitemap the breadcrumb pair appears too", func(t *testing.T) {
+	t.Run("with a sitemap and a layout host the breadcrumb pair appears too", func(t *testing.T) {
 		srcDir := t.TempDir()
-		fs := &yongol.Fullstack{Sitemap: &stml.SitemapSpec{}}
+		fs := &yongol.Fullstack{
+			Sitemap: &stml.SitemapSpec{},
+			Layouts: []stml.LayoutSpec{{Name: "app", HasOutlet: true}},
+		}
 		if err := writeLibArtifacts(srcDir, fs, nil); err != nil {
 			t.Fatalf("writeLibArtifacts: %v", err)
 		}
@@ -37,6 +40,20 @@ func TestWriteLibArtifacts(t *testing.T) {
 		}
 		if _, err := os.Stat(filepath.Join(srcDir, "components", "ui", "Breadcrumb.tsx")); err != nil {
 			t.Errorf("Breadcrumb.tsx missing: %v", err)
+		}
+	})
+
+	t.Run("with a sitemap but no layout host nothing breadcrumb appears (Phase008)", func(t *testing.T) {
+		srcDir := t.TempDir()
+		fs := &yongol.Fullstack{Sitemap: &stml.SitemapSpec{}}
+		if err := writeLibArtifacts(srcDir, fs, nil); err != nil {
+			t.Fatalf("writeLibArtifacts: %v", err)
+		}
+		if _, err := os.Stat(filepath.Join(srcDir, "lib", "breadcrumbs.ts")); !os.IsNotExist(err) {
+			t.Error("breadcrumbs.ts must not exist without a layout host")
+		}
+		if _, err := os.Stat(filepath.Join(srcDir, "components", "ui", "Breadcrumb.tsx")); !os.IsNotExist(err) {
+			t.Error("Breadcrumb.tsx must not exist without a layout host")
 		}
 	})
 }

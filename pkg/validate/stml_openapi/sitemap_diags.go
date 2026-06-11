@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=stml-openapi
-//ff:what sitemapDiags — frontend/sitemap.html 존재 시의 사이트맵 규칙 일괄 실행 (TM-39~44, TM-46~48, TM-50 + 동적 그룹 TM-01/07/30/31/32 확장)
+//ff:what sitemapDiags — frontend/sitemap.html 존재 시의 사이트맵 규칙 일괄 실행 (TM-39~44, TM-46~48, TM-50, TM-51 + 동적 그룹 TM-01/07/30/31/32 확장)
 
 package stml_openapi
 
@@ -15,7 +15,9 @@ import (
 // data-crumb-field declarations; dynamic menu groups (Phase007) get TM-48
 // (data-entry block / structural completeness) plus the sitemap
 // extensions of TM-01/07/30/31/32 (fetch op, each array field, label
-// field, link target, link params).
+// field, link target, link params). TM-51 is the inverse of TM-49: a
+// sitemap that derives a menu but has no layout to host it (layouts/
+// empty + no defaultLayout + no nav data-layout).
 func sitemapDiags(fs *yongol.Fullstack, opMap map[string]operationEntry, raif map[string]map[string]map[string]bool) []diagnostic.Diagnostic {
 	var diags []diagnostic.Diagnostic
 	diags = append(diags, tm39SitemapPageNotFound(fs)...)
@@ -33,5 +35,6 @@ func sitemapDiags(fs *yongol.Fullstack, opMap map[string]operationEntry, raif ma
 	diags = append(diags, tm31SitemapGroupLink(fs)...)
 	diags = append(diags, tm32SitemapGroupLinkParams(fs, raif)...)
 	diags = append(diags, tm50CrumbField(fs, opMap)...)
+	diags = append(diags, tm51SitemapNoLayoutHost(fs)...)
 	return diags
 }

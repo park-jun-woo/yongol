@@ -10,13 +10,14 @@ import (
 
 // writeLibArtifacts emits the src/lib artifacts in one step of the
 // frontend setup sequence: the unconditional shadcn cn() helper
-// (writeLibUtils) and, with a sitemap present, the Phase004 breadcrumb
-// pair (writeBreadcrumbs — src/lib/breadcrumbs.ts plus the shared
-// components/ui/Breadcrumb.tsx; a nil sitemap writes nothing and the
-// output stays byte-identical).
+// (writeLibUtils) and, with a sitemap present and a layout to host it,
+// the Phase004 breadcrumb pair (writeBreadcrumbs — src/lib/breadcrumbs.ts
+// plus the shared components/ui/Breadcrumb.tsx; a nil sitemap or zero
+// layouts (Phase008, BUG-129) writes nothing and the output stays
+// byte-identical).
 func writeLibArtifacts(srcDir string, fs *yongol.Fullstack, stmlPages []stml.PageSpec) error {
 	if err := writeLibUtils(srcDir); err != nil {
 		return err
 	}
-	return writeBreadcrumbs(srcDir, fsSitemap(fs), navRoutePatterns(stmlPages))
+	return writeBreadcrumbs(srcDir, fsSitemap(fs), len(fs.Layouts), navRoutePatterns(stmlPages))
 }
