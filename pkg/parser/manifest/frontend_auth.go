@@ -1,5 +1,5 @@
 //ff:type feature=projectconfig type=model
-//ff:what FrontendAuth — frontend.auth 섹션 모델 (token_field / refresh_field / refresh_op / store)
+//ff:what FrontendAuth — frontend.auth 섹션 모델 (token_field / refresh_field / refresh_op / store / role_field)
 
 package manifest
 
@@ -12,8 +12,12 @@ package manifest
 // `data-capture` attribute (plans/stml/auth-flow Phase001).
 type FrontendAuth struct {
 	// TokenField names the response property captured as the access
-	// token (bearer mode). Required when the auth block is declared;
-	// XON-60 verifies it exists in at least one OpenAPI 2xx response.
+	// token (bearer mode). Required when the auth block is declared,
+	// except for a role_field-only block (RoleFieldOnly) — cookie-mode
+	// menu role wiring carries no token contract. XON-60 is the single
+	// enforcer: it verifies the field exists in at least one OpenAPI 2xx
+	// response and grants exactly the RoleFieldOnly exemption
+	// (plans/stml/sitemap Phase005).
 	TokenField string `yaml:"token_field"`
 	// RefreshField names the response property captured as the refresh
 	// token. Optional; when absent no refresh flow is generated.
@@ -29,6 +33,12 @@ type FrontendAuth struct {
 	// Prefer ResolvedStore() over reading Store directly — it applies
 	// the default and keeps the per-call resolution in one place.
 	Store string `yaml:"store,omitempty"`
+	// RoleField names the auth.claims.<name> entry the sitemap
+	// data-roles menu filter reads (plans/stml/sitemap Phase005).
+	// Optional; required only when the sitemap uses data-roles — TM-47
+	// verifies the wiring (declaration + a matching auth.claims.<name>
+	// capture + non-empty backend.auth.roles).
+	RoleField string `yaml:"role_field,omitempty"`
 }
 
 // ResolvedStore returns the effective frontend.auth.store after applying

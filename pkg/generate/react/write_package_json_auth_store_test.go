@@ -11,7 +11,7 @@ import (
 
 func TestWritePackageJSON_WithAuthStore(t *testing.T) {
 	dir := t.TempDir()
-	if err := writePackageJSON(dir, true); err != nil {
+	if err := writePackageJSON(dir, true, false); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "package.json"))

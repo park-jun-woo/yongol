@@ -1,5 +1,5 @@
 //ff:func feature=stml-gen type=generator control=iteration dimension=1
-//ff:what data-capture 바인딩을 토큰 부재 방어 가드 + 세션 store setAuth 호출 라인들로 렌더링한다
+//ff:what data-capture 바인딩을 토큰 부재 방어 가드 + setAuth/setClaim 커밋 라인들로 렌더링한다
 package stml
 
 import (
@@ -9,8 +9,11 @@ import (
 )
 
 // renderCaptureCommit renders the session-store commit lines for the action's
-// data-capture bindings: each respField is read from the mutation response
-// and written to its auth sink via useAuthStore.setAuth(token, refresh).
+// data-capture bindings: token/refresh respFields are read from the mutation
+// response and written via useAuthStore.setAuth(token, refresh); each
+// auth.claims.<name> binding (plans/stml/sitemap Phase005) commits via
+// setClaim('<name>', String(...)) after the token commit — claims-only
+// captures (cookie mode) emit no setAuth call at all.
 //
 // Defensive commit (BUG-113 (3)): when an auth.token capture is declared, a
 // guard precedes the commit — a 2xx response missing the token field (schema
@@ -18,18 +21,10 @@ import (
 // commit and any redirect instead of storing undefined. The violation is
 // surfaced through the action's data-on-error state when declared (errVar
 // non-empty), else via console.error. auth.refresh stays optional — only the
-// token gates the commit.
+// token gates the commit. A claim missing from the response is skipped (the
+// menu simply stays role-hidden) instead of storing "undefined".
 func renderCaptureCommit(captures []stmlparser.CaptureBind, errVar string) []string {
-	tokenField := ""
-	refreshExpr := ""
-	for _, c := range captures {
-		switch c.Sink {
-		case "auth.token":
-			tokenField = c.RespField
-		case "auth.refresh":
-			refreshExpr = "data." + c.RespField
-		}
-	}
+	tokenField, refreshField, claims := splitCaptureBinds(captures)
 	tokenExpr := "undefined"
 	var lines []string
 	if tokenField != "" {
@@ -45,8 +40,20 @@ func renderCaptureCommit(captures []stmlparser.CaptureBind, errVar string) []str
 			"}",
 		)
 	}
-	if refreshExpr == "" {
-		return append(lines, fmt.Sprintf("useAuthStore.getState().setAuth(%s)", tokenExpr))
+	if tokenField != "" || refreshField != "" {
+		if refreshField == "" {
+			lines = append(lines, fmt.Sprintf("useAuthStore.getState().setAuth(%s)", tokenExpr))
+		} else {
+			lines = append(lines, fmt.Sprintf("useAuthStore.getState().setAuth(%s, data.%s)", tokenExpr, refreshField))
+		}
 	}
-	return append(lines, fmt.Sprintf("useAuthStore.getState().setAuth(%s, %s)", tokenExpr, refreshExpr))
+	for _, c := range claims {
+		name, _ := stmlparser.ClaimsSinkName(c.Sink)
+		lines = append(lines,
+			fmt.Sprintf("if (data?.%s != null) {", c.RespField),
+			fmt.Sprintf("  useAuthStore.getState().setClaim('%s', String(data.%s))", name, c.RespField),
+			"}",
+		)
+	}
+	return lines
 }

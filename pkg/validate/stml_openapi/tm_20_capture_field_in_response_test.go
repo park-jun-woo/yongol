@@ -55,6 +55,25 @@ func TestTM20CaptureFieldInResponse(t *testing.T) {
 		t.Errorf("sink: expected 1 TM-20, got %+v", sink)
 	}
 
+	// Claims capture with a missing response field → 1 ERROR (the claims
+	// sink joins the same existence check — plans/stml/sitemap Phase005).
+	claims := tm20CaptureFieldInResponse(stml.ActionBlock{
+		OperationID: "Login",
+		CaptureRaw:  "role -> auth.claims.role",
+	}, "login.html", opMap)
+	if countDiag(claims, "[TM-20]") != 1 {
+		t.Errorf("claims field: expected 1 TM-20, got %+v", claims)
+	}
+
+	// Claims capture of an existing field → no diagnostics.
+	okClaims := tm20CaptureFieldInResponse(stml.ActionBlock{
+		OperationID: "Login",
+		CaptureRaw:  "access_token -> auth.token, refresh_token -> auth.claims.kind",
+	}, "login.html", opMap)
+	if len(okClaims) != 0 {
+		t.Errorf("valid claims: expected 0 diagnostics, got %+v", okClaims)
+	}
+
 	// No data-capture → no diagnostics.
 	if d := tm20CaptureFieldInResponse(stml.ActionBlock{OperationID: "Login"}, "login.html", opMap); len(d) != 0 {
 		t.Errorf("no capture: expected 0 diagnostics, got %+v", d)

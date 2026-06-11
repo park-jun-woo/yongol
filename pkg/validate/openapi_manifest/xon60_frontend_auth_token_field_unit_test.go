@@ -81,4 +81,5 @@ func TestXon60FrontendAuthTokenField_Unit(t *testing.T) {
 			t.Fatalf("expected 0, got %d: %+v", len(diags), diags)
 		}
 	})
+
 }

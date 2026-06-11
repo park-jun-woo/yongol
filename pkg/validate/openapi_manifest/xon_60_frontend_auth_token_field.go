@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=sequence topic=config-check
-//ff:what XON-60 — frontend.auth 의 token_field/refresh_field/refresh_op 가 OpenAPI 2xx 응답에 실재
+//ff:what XON-60 — frontend.auth 의 token_field/refresh_field/refresh_op 가 OpenAPI 2xx 응답에 실재 (role_field 전용 블록만 면제)
 
 package openapi_manifest
 
@@ -17,11 +17,24 @@ import (
 // would generate a capture that silently never matches at runtime —
 // the same "manifest claim ↔ source-of-truth" failure mode XDN-* guards
 // against (plans/stml/auth-flow Phase001).
+//
+// Exactly one exemption (plans/stml/sitemap Phase005): a role_field-only
+// block (manifest.FrontendAuth.RoleFieldOnly — the same predicate TM-24
+// consumes, so the two rules' judgments cannot drift) skips the
+// token_field requirement. A cookie-mode login puts no token in the
+// response body, so the data-roles menu wiring would otherwise be blocked.
+// Any token-related key in the block restores the full check — XON-60 is
+// the *single* enforcer of token_field presence (the refresh downgrade
+// paths pass silently), so an unconditional relaxation would weaken the
+// bearer protection for real.
 func xon60FrontendAuthTokenField(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	if fs == nil || fs.Manifest == nil || fs.Manifest.Frontend.Auth == nil || fs.OpenAPIDoc == nil {
 		return nil
 	}
 	auth := fs.Manifest.Frontend.Auth
+	if auth.RoleFieldOnly() {
+		return nil // no token contract to verify; the claim capture is TM-20's job
+	}
 	allProps, refreshOpProps, refreshOpFound := collectFrontendAuthProps(fs.OpenAPIDoc, auth.RefreshOp)
 
 	var diags []diagnostic.Diagnostic

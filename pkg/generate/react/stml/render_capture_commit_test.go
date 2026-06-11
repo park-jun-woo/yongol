@@ -1,5 +1,5 @@
 //ff:func feature=stml-gen type=test control=sequence
-//ff:what renderCaptureCommit — 토큰 부재 가드(on-error state/console 분기) + setAuth 커밋 라인 렌더 검증
+//ff:what renderCaptureCommit — 토큰 부재 가드(on-error state/console 분기) + setAuth/setClaim 커밋 라인 렌더 검증
 package stml
 
 import (
@@ -39,11 +39,33 @@ func TestRenderCaptureCommit(t *testing.T) {
 		t.Errorf("both = %q, want %q", got, wantBoth)
 	}
 
-	// unknown sink only -> no token capture, no guard, token stays undefined
+	// unknown sink only -> nothing to commit (ParseCapture never yields
+	// such a bind; the defensive result is no store write at all)
 	unknown := []stmlparser.CaptureBind{
 		{RespField: "whatever", Sink: "auth.other"},
 	}
-	if got, want := strings.Join(renderCaptureCommit(unknown, ""), "\n"), "useAuthStore.getState().setAuth(undefined)"; got != want {
-		t.Errorf("unknown sink = %q, want %q", got, want)
+	if got := renderCaptureCommit(unknown, ""); len(got) != 0 {
+		t.Errorf("unknown sink = %q, want no lines", got)
+	}
+
+	// claims-only capture (cookie mode) -> guarded setClaim, no setAuth
+	claimsOnly := []stmlparser.CaptureBind{
+		{RespField: "role", Sink: "auth.claims.role"},
+	}
+	wantClaimsOnly := "if (data?.role != null) {\n" +
+		"  useAuthStore.getState().setClaim('role', String(data.role))\n" +
+		"}"
+	if got := strings.Join(renderCaptureCommit(claimsOnly, ""), "\n"); got != wantClaimsOnly {
+		t.Errorf("claims only = %q, want %q", got, wantClaimsOnly)
+	}
+
+	// token + claims -> token guard + setAuth, then the claim commit
+	tokenAndClaims := []stmlparser.CaptureBind{
+		{RespField: "access_token", Sink: "auth.token"},
+		{RespField: "role", Sink: "auth.claims.role"},
+	}
+	wantTokenAndClaims := wantTokenOnly + "\n" + wantClaimsOnly
+	if got := strings.Join(renderCaptureCommit(tokenAndClaims, ""), "\n"); got != wantTokenAndClaims {
+		t.Errorf("token+claims = %q, want %q", got, wantTokenAndClaims)
 	}
 }

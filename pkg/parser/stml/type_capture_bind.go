@@ -7,5 +7,5 @@ package stml
 // (e.g. "access_token -> auth.token").
 type CaptureBind struct {
 	RespField string // OpenAPI 2xx response property name (e.g. "access_token")
-	Sink      string // "auth.token" | "auth.refresh" (the only allowed sinks)
+	Sink      string // "auth.token" | "auth.refresh" | "auth.claims.<name>" (the only allowed sinks)
 }

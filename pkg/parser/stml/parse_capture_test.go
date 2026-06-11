@@ -24,6 +24,32 @@ func TestParseCapture(t *testing.T) {
 		t.Errorf("multi: got %+v", binds)
 	}
 
+	// Claims sink (plans/stml/sitemap Phase005).
+	binds, err = ParseCapture("role -> auth.claims.role")
+	if err != nil {
+		t.Fatalf("claims: unexpected error: %v", err)
+	}
+	if len(binds) != 1 || binds[0].RespField != "role" || binds[0].Sink != "auth.claims.role" {
+		t.Errorf("claims: got %+v", binds)
+	}
+
+	// Mixed token + claims bindings.
+	binds, err = ParseCapture("access_token -> auth.token, role -> auth.claims.role")
+	if err != nil {
+		t.Fatalf("token+claims: unexpected error: %v", err)
+	}
+	if len(binds) != 2 || binds[1].Sink != "auth.claims.role" {
+		t.Errorf("token+claims: got %+v", binds)
+	}
+
+	// Claims sink with an empty or invalid identifier name.
+	if _, err := ParseCapture("role -> auth.claims."); err == nil {
+		t.Errorf("empty claim name: expected error, got nil")
+	}
+	if _, err := ParseCapture("role -> auth.claims.ro-le"); err == nil {
+		t.Errorf("invalid claim name: expected error, got nil")
+	}
+
 	// Disallowed sink (session.* collides with the SSaC built-in).
 	if _, err := ParseCapture("access_token -> session.token"); err == nil {
 		t.Errorf("session sink: expected error, got nil")

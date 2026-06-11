@@ -14,9 +14,11 @@ import (
 // OpenAPI spec — the runtime twin of XOH-08 ([Captures] jsonpath must exist
 // in the response). The raw attribute is re-parsed here (mirroring the
 // ParseGuard / TM-17 split), so a syntax violation — including a sink
-// outside auth.token / auth.refresh — is an ERROR. Each parsed respField
-// must then be a top-level property of the operation's 2xx response
-// schema; an unknown operationId is silently skipped (TM-02 reports it).
+// outside auth.token / auth.refresh / auth.claims.<name> — is an ERROR.
+// Each parsed respField (claims captures included — plans/stml/sitemap
+// Phase005 folds them into the same existence check) must then be a
+// top-level property of the operation's 2xx response schema; an unknown
+// operationId is silently skipped (TM-02 reports it).
 func tm20CaptureFieldInResponse(a stml.ActionBlock, file string, opMap map[string]operationEntry) []diagnostic.Diagnostic {
 	if a.CaptureRaw == "" {
 		return nil
@@ -28,7 +30,7 @@ func tm20CaptureFieldInResponse(a stml.ActionBlock, file string, opMap map[strin
 			Phase:       diagnostic.PhaseValidate,
 			Level:       diagnostic.LevelError,
 			Message:     fmt.Sprintf("[TM-20] data-capture %q on action %q is invalid: %s", a.CaptureRaw, a.OperationID, err.Error()),
-			Advice:      "Use data-capture=\"<respField> -> <sink>[, <respField> -> <sink>...]\" where sink is auth.token or auth.refresh",
+			Advice:      "Use data-capture=\"<respField> -> <sink>[, <respField> -> <sink>...]\" where sink is auth.token, auth.refresh or auth.claims.<name>",
 			OperationID: a.OperationID,
 		}}
 	}
