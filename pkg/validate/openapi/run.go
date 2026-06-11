@@ -19,5 +19,6 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	diags = append(diags, xoo71PasswordNoMinLength(fs)...)
 	diags = append(diags, xoo72EmailNoFormat(fs)...)
 	diags = append(diags, xoe01ErrorResponseRequired(fs)...)
+	diags = append(diags, xoe02ErrorDisplayField(fs)...)
 	return diags
 }

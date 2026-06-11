@@ -27,10 +27,12 @@ func TestGeneratePage_OnError_StateHandlerConditionalRender(t *testing.T) {
 	assertContains(t, code, "import { useState } from 'react'")
 
 	// onError handler feeds the state; onMutate clears it on (re)submission.
-	// The thrown ErrorResponse is a plain object — message is extracted
-	// defensively (no schema guarantee; XOE-01 checks only error/code).
+	// The thrown ErrorResponse is a plain object — the schema-derived display
+	// field (default "error") is read first, message second, String(err) only
+	// as the final fallback (BUG-125/Phase036).
 	assertContains(t, code, "onError: (err) => {")
-	assertContains(t, code, "const msg = (err as any)?.message")
+	assertContains(t, code, "const e = err as any")
+	assertContains(t, code, "const msg = e?.error ?? e?.message")
 	assertContains(t, code, "setLoginError(typeof msg === 'string' && msg !== '' ? msg : String(err))")
 	assertContains(t, code, "onMutate: () => setLoginError(null)")
 

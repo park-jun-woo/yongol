@@ -14,15 +14,23 @@ import (
 // so a rejected mutation never fails silently (BUG-113 (2)).
 //
 // Since BUG-113 the api wrapper throws the server ErrorResponse as a plain
-// object, so `err` is usually not an Error instance. `message` is read
-// defensively: XOE-01 only checks error/code required (WARNING) and never
-// `message`, so the schema gives no type/presence guarantee — extract a
-// non-empty string `message` first, fall back to String(err).
-func renderOnErrorHandler(a stmlparser.ActionBlock) string {
+// object, so `err` is usually not an Error instance. displayField is the
+// schema-derived display field (ExtractErrorDisplayField: "error" for the
+// current ErrorResponse contract) and is read first; `message` is read second
+// to keep covering real Error instances from network-level rejects
+// (BUG-125). String(err) is the final fallback only when both are absent or
+// non-string. An empty displayField is normalized to "error" so partially
+// constructed GenerateOptions (no ErrorDisplayField) never emit a broken
+// `e?. ?? e?.message` expression.
+func renderOnErrorHandler(a stmlparser.ActionBlock, displayField string) string {
+	if displayField == "" {
+		displayField = "error"
+	}
 	errVar := errorStateVar(a)
 	return fmt.Sprintf(`    onError: (err) => {
-      const msg = (err as any)?.message
+      const e = err as any
+      const msg = e?.%s ?? e?.message
       set%s(typeof msg === 'string' && msg !== '' ? msg : String(err))
     },
-`, toUpperFirst(errVar))
+`, displayField, toUpperFirst(errVar))
 }

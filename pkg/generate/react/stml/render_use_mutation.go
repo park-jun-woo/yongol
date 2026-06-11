@@ -15,7 +15,7 @@ import (
 // invalidateQueries). onMutate resets the action's error state on every
 // (re)submission and onError feeds it — always emitted since page-flow
 // Phase004 so a rejected mutation is never silent (BUG-113 (2)).
-func renderUseMutation(a stmlparser.ActionBlock, fetchOps []string, bearerAuth bool, noBodyOps map[string]bool, pathParamTypes map[string]map[string]string, constraints map[string]map[string]oapiparser.FieldConstraint) string {
+func renderUseMutation(a stmlparser.ActionBlock, fetchOps []string, bearerAuth bool, noBodyOps map[string]bool, pathParamTypes map[string]map[string]string, constraints map[string]map[string]oapiparser.FieldConstraint, errorDisplayField string) string {
 	mutName := toLowerFirst(a.OperationID) + "Mutation"
 	paramArgs := renderParamArgs(a.Params, a.OperationID, pathParamTypes)
 	isVoid := noBodyOps[a.OperationID]
@@ -37,7 +37,7 @@ func renderUseMutation(a stmlparser.ActionBlock, fetchOps []string, bearerAuth b
 	captures := actionFlowCaptures(a, bearerAuth)
 	onMutate := fmt.Sprintf("    onMutate: () => set%s(null),\n", toUpperFirst(errorStateVar(a)))
 	onSuccess := renderOnSuccessHandler(a, captures, fetchOps)
-	onError := renderOnErrorHandler(a)
+	onError := renderOnErrorHandler(a, errorDisplayField)
 
 	return fmt.Sprintf(`const %s = useMutation({
     mutationFn: %s,

@@ -18,7 +18,7 @@ func TestByNameRenderHooks_ZeroCov(t *testing.T) {
 	if s := renderUseQuery(f, ppt); s == "" {
 		t.Errorf("renderUseQuery empty")
 	}
-	if s := renderUseMutation(a, []string{"ListItems"}, false, noBody, ppt, cons); s == "" {
+	if s := renderUseMutation(a, []string{"ListItems"}, false, noBody, ppt, cons, "error"); s == "" {
 		t.Errorf("renderUseMutation empty")
 	}
 
@@ -26,7 +26,7 @@ func TestByNameRenderHooks_ZeroCov(t *testing.T) {
 	renderFetchHooks(f, ppt, &sb)
 	is := collectImports(page, "")
 	renderPageHooks(page, is, ppt, &sb)
-	renderPageMutations(page.Actions, []string{"ListItems"}, buildActionFetchMap(page), cons, false, noBody, ppt, &sb)
+	renderPageMutations(page.Actions, []string{"ListItems"}, buildActionFetchMap(page), cons, false, noBody, ppt, "error", nil, &sb)
 	if sb.Len() == 0 {
 		t.Errorf("hook renderers produced nothing")
 	}
@@ -37,8 +37,8 @@ func TestByNameRenderHooks_ZeroCov(t *testing.T) {
 	}
 
 	var jb strings.Builder
-	renderPageJSX(page, &jb, noBody)
-	renderPageJSXWithChildren(page.Children, &jb, noBody)
+	renderPageJSX(page, &jb, noBody, bindCtx{})
+	renderPageJSXWithChildren(page.Children, &jb, noBody, bindCtx{})
 	if jb.Len() == 0 {
 		t.Errorf("renderPageJSX produced nothing")
 	}
