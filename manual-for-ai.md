@@ -585,7 +585,14 @@ in cookie mode too: TM-24 exempts them, and a cookie-mode project with
 claims captures gets a claims-only store (no token fields).
 `data-redirect` takes a `/`-prefixed static path (which must resolve to an
 STML page route, `/` being the index route) or a page-name reference; either
-way the target must exist (TM-26).
+way the target must exist (TM-26). A **state-changing mutation**
+`data-action` (POST/PUT/PATCH/DELETE) **must** declare `data-redirect` —
+where to go on success is an author decision, not a heuristic, so a mutation
+without it is a **TM-57 ERROR** (BUG-132). The bearer login capture action
+(`data-capture`) is exempt: it drives its own navigation. With the redirect
+declared, the generated onSuccess refreshes the affected queries (a delete
+`removeQueries`-es its own resource GET so a navigate away never refetches a
+404) **and** navigates — invalidate and navigate combine, not exclude.
 
 ### Dynamic redirect (`data-redirect` page-name reference + `data-redirect-params`)
 
@@ -1156,6 +1163,7 @@ vocabulary (Phase007) — TM-45 retired with nothing left to reserve.
 | `TM-54` | ERROR / WARNING | OpenAPI | `data-prefill` resolves: the value names a same-page `data-fetch` op (ERROR otherwise — data variable out of scope); each form `data-field` is a top-level field of that fetch's 2xx response (WARNING otherwise — the input opens blank) |
 | `TM-55` | WARNING | OpenAPI | edit page hygiene: a page with a GET-by-id fetch and a PUT/PATCH form carrying `data-field` but no `data-prefill` — the form is generated empty; add `data-prefill` |
 | `TM-56` | WARNING | OpenAPI | a PATCH op consumed by a form has an all-required requestBody — contradicts partial update; mark optional fields not required in OpenAPI so zod relaxes them |
+| `TM-57` | ERROR | OpenAPI | a state-changing mutation `data-action` (POST/PUT/PATCH/DELETE) declares no `data-redirect` — where to navigate on success (BUG-132). "Where to go after create/update/delete" is an author decision, so the codegen requires it (a declared redirect makes onSuccess always navigate and combine invalidate/removeQueries; without one the CRUD screen stays put and delete refetches the deleted item). A bearer login capture action (`data-capture`) is exempt; a GET `data-action` and an unknown operationId stay silent |
 | `XMO-10` | ERROR | OpenAPI | Frontend ON & operationId is consumed by some STML page/component **or** tagged `no-front` |
 | `XMO-11` | ERROR | manifest | Frontend ON requires at least one STML page (else set `frontend.enabled: false`) |
 | `XMO-12` | WARNING | OpenAPI | operationId tagged `no-front` must not actually be consumed (stale tag) |
@@ -1260,7 +1268,7 @@ invalid → 401. Permission checks are handled by `@auth`.
 
 ## Validation
 
-`yongol validate` runs 337 active rules from a catalog of 363 rule IDs across
+`yongol validate` runs 338 active rules from a catalog of 364 rule IDs across
 60 prefix categories (C-*, D-*, O-*, S-*, TM-*, XOS-*, XPS-*, XDM-*, XDP-*,
 XNS-*, PRV-*, MIG-*, CORS-*, SEC-*, OBS-*, H-*, …; the remaining 26 IDs are
 retired — see the rulebook's Deprecated section). AI authors do not memorise IDs — the validator prints rule ID, level,

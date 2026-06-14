@@ -24,6 +24,7 @@ func TestGenerateZodSchemaString(t *testing.T) {
 
 	code := generateZodSchema("CreateWorkflow", fields)
 	assertContains(t, code, "const createWorkflowSchema = z.object(")
-	assertContains(t, code, "title: z.string().min(1).max(200)")
-	assertContains(t, code, "trigger_event: z.string().min(1)")
+	// required-without-minLength no longer attaches .min(1) (BUG-134).
+	assertContains(t, code, "title: z.string().max(200)")
+	assertContains(t, code, "trigger_event: z.string(),")
 }

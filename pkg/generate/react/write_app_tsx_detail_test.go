@@ -35,8 +35,9 @@ func TestWriteAppTSX_DetailPage(t *testing.T) {
 	}
 	content := string(data)
 
+	// workflows is the index target → eager; the detail page is lazy (BUG-133)
 	assertContains(t, content, "import Workflows from './pages/workflows'")
-	assertContains(t, content, "import WorkflowDetail from './pages/workflow-detail'")
+	assertContains(t, content, "const WorkflowDetail = lazy(() => import('./pages/workflow-detail'))")
 	assertContains(t, content, `<Route path="/workflows" element={<Workflows />} />`)
 	// route segment name is derived from the consumed route.* declaration,
 	// matching the useParams() destructuring the page emitter produces

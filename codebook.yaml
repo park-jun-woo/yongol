@@ -136,7 +136,7 @@ optional:
     statemachine-structural: "Mermaid stateDiagram 파싱 검증 (ST-*)"
     rego-structural: "Rego 파싱 + @ownership 어노테이션 (P-*, XPP-*)"
     funcspec-structural: "Func 스펙 구조 + 본체/import 제약 (F-*, XFF-*)"
-    stml-openapi: "STML data-* ↔ OpenAPI operationId/param/field/bind/each/component 교차 검증 (TM-01~TM-09; TM-53 = 렌더 불가 data-bind 경고 — 비스칼라/미지원 태그/img 타입 불일치; TM-54/55/56 = data-prefill 소스·필드 커버리지·edit 폼 prefill 누락·PATCH 전필드 required)"
+    stml-openapi: "STML data-* ↔ OpenAPI operationId/param/field/bind/each/component 교차 검증 (TM-01~TM-09; TM-53 = 렌더 불가 data-bind 경고 — 비스칼라/미지원 태그/img 타입 불일치; TM-54/55/56 = data-prefill 소스·필드 커버리지·edit 폼 prefill 누락·PATCH 전필드 required; TM-57 = 상태 변경 mutation(POST/PUT/PATCH/DELETE) data-redirect 미선언 ERROR — 성공 후 navigate 강제, bearer capture 제외, BUG-132)"
     hurl-structural: "Hurl deprecated 확장자 감지 (H-*)"
     design-structural: "DESIGN.md 내부 정합성 검증 (V-01~V-07) — pkg/validate/design"
     design-manifest: "DESIGN.md ↔ manifest 교차 검증 (XNV-01~XNV-02) — pkg/validate/design_manifest"

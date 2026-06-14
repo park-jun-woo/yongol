@@ -22,7 +22,7 @@ func TestByNameRouteWriters_ZeroCov(t *testing.T) {
 
 	var sb strings.Builder
 	writeLayoutImports(&sb, []string{"app", "auth"})
-	writePageImports(&sb, routes)
+	writePageImports(&sb, routes, "/items")
 	writeFlatRoutes(&sb, []stmlRoute{routes[0]})
 	writeLayoutGroupRoutes(&sb, "app", []stmlRoute{routes[1]})
 	writeAuthzMiddleware(&sb, false)

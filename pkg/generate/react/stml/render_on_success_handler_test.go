@@ -22,16 +22,40 @@ func TestRenderOnSuccessHandler(t *testing.T) {
 		"      useAuthStore.getState().setAuth(data.access_token)\n" +
 		"      navigate('/home')\n" +
 		"    },\n"
-	if got := renderOnSuccessHandler(a, captures, nil); got != want {
+	if got := renderOnSuccessHandler(a, captures, nil, nil); got != want {
 		t.Errorf("capture+redirect = %q, want %q", got, want)
 	}
 
-	// no captures, no redirect, no on-error: () param, invalidate fallback
+	// no captures, no remove, no redirect: () param, plain invalidate
 	plain := stmlparser.ActionBlock{OperationID: "CreateThing"}
 	wantPlain := "    onSuccess: () => {\n" +
 		"      queryClient.invalidateQueries({ queryKey: ['ListThings'] })\n" +
 		"    },\n"
-	if got := renderOnSuccessHandler(plain, nil, []string{"ListThings"}); got != wantPlain {
-		t.Errorf("invalidate fallback = %q, want %q", got, wantPlain)
+	if got := renderOnSuccessHandler(plain, nil, []string{"ListThings"}, nil); got != wantPlain {
+		t.Errorf("plain invalidate = %q, want %q", got, wantPlain)
+	}
+
+	// combined invalidate + navigate: a non-capture mutation refreshes the
+	// affected list and then navigates to its data-redirect target (BUG-132
+	// 132-1) — they are no longer exclusive branches.
+	combined := stmlparser.ActionBlock{OperationID: "CreateThing", Redirect: "/things"}
+	wantCombined := "    onSuccess: () => {\n" +
+		"      queryClient.invalidateQueries({ queryKey: ['ListThings'] })\n" +
+		"      navigate('/things')\n" +
+		"    },\n"
+	if got := renderOnSuccessHandler(combined, nil, []string{"ListThings"}, nil); got != wantCombined {
+		t.Errorf("combined invalidate+navigate = %q, want %q", got, wantCombined)
+	}
+
+	// delete: the self GET is removed (not invalidated), sibling list is
+	// invalidated, then navigate (BUG-132 132-2).
+	del := stmlparser.ActionBlock{OperationID: "DeleteThing", Redirect: "/things"}
+	wantDel := "    onSuccess: () => {\n" +
+		"      queryClient.removeQueries({ queryKey: ['GetThing'] })\n" +
+		"      queryClient.invalidateQueries({ queryKey: ['ListThings'] })\n" +
+		"      navigate('/things')\n" +
+		"    },\n"
+	if got := renderOnSuccessHandler(del, nil, []string{"ListThings"}, []string{"GetThing"}); got != wantDel {
+		t.Errorf("delete remove+invalidate+navigate = %q, want %q", got, wantDel)
 	}
 }

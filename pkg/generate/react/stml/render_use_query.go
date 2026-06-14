@@ -23,8 +23,14 @@ func renderUseQuery(f stmlparser.FetchBlock, pathParamTypes map[string]map[strin
 	// API call args
 	apiCall := fmt.Sprintf("api.%s(%s)", f.OperationID, paramArgs)
 
+	// Optional route params can be absent — gate the query so it does not fire
+	// with NaN / undefined before the segment is present (BUG-136). Required
+	// params always exist in the matched route, so they emit no guard
+	// (no regression to existing snapshots).
+	enabled := renderEnabledGuard(f, pathParamTypes)
+
 	return fmt.Sprintf(`const { data: %s, isLoading: %sLoading, error: %sError } = useQuery({
     queryKey: [%s],
-    queryFn: () => %s,
-  })`, alias, alias, alias, queryKey, apiCall)
+    queryFn: () => %s,%s
+  })`, alias, alias, alias, queryKey, apiCall, enabled)
 }

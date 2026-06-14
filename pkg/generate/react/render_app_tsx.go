@@ -30,14 +30,27 @@ func renderAppTSX(routes []stmlRoute, layoutSet map[string]bool, indexTarget str
 		}
 	}
 
+	// Route-level code splitting (BUG-133): every page except the index page
+	// is lazy-loaded. anyLazy gates the react lazy/Suspense import and the
+	// <Suspense> wrapper so a project where every page is eager stays clean.
+	eager := indexEagerComponent(routes, indexTarget)
+	anyLazy := false
+	for _, r := range routes {
+		if r.ComponentName != eager {
+			anyLazy = true
+			break
+		}
+	}
+
 	var sb strings.Builder
 	if indexTarget != "" || catchAll {
 		sb.WriteString("import { Routes, Route, Navigate } from 'react-router-dom'\n")
 	} else {
 		sb.WriteString("import { Routes, Route } from 'react-router-dom'\n")
 	}
-
-	writePageImports(&sb, routes)
+	if anyLazy {
+		sb.WriteString("import { lazy, Suspense } from 'react'\n")
+	}
 
 	layoutNames := sortedLayoutNames(grouped)
 	writeLayoutImports(&sb, layoutNames)
@@ -46,7 +59,15 @@ func renderAppTSX(routes []stmlRoute, layoutSet map[string]bool, indexTarget str
 		sb.WriteString("import ProtectedRoute from './components/ProtectedRoute'\n")
 	}
 
-	sb.WriteString("\nexport default function App() {\n  return (\n    <Routes>\n")
+	// Page imports last: eager static imports then lazy const declarations,
+	// keeping every `import` statement ahead of any value binding.
+	writePageImports(&sb, routes, indexTarget)
+
+	sb.WriteString("\nexport default function App() {\n  return (\n")
+	if anyLazy {
+		sb.WriteString("    <Suspense fallback={<div>로딩 중...</div>}>\n")
+	}
+	sb.WriteString("    <Routes>\n")
 
 	if indexTarget != "" {
 		fmt.Fprintf(&sb, "      <Route path=\"/\" element={<Navigate to=\"%s\" replace />} />\n", indexTarget)
@@ -65,7 +86,11 @@ func renderAppTSX(routes []stmlRoute, layoutSet map[string]bool, indexTarget str
 		sb.WriteString("      <Route path=\"*\" element={<Navigate to=\"/\" replace />} />\n")
 	}
 
-	sb.WriteString("    </Routes>\n  )\n}\n")
+	sb.WriteString("    </Routes>\n")
+	if anyLazy {
+		sb.WriteString("    </Suspense>\n")
+	}
+	sb.WriteString("  )\n}\n")
 
 	return sb.String()
 }

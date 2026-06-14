@@ -4,6 +4,8 @@ package stml
 
 import (
 	"testing"
+
+	stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
 )
 
 func TestByNameActionFetchMap_ZeroCov(t *testing.T) {
@@ -19,7 +21,7 @@ func TestByNameActionFetchMap_ZeroCov(t *testing.T) {
 	recordActionFetchMapping("CreateItem", []string{"ListItems"}, rm) // already present
 	recordActionFetchMapping("NoFetch", nil, rm)
 
-	ops := resolveInvalidateOps("CreateItem", []string{"ListItems"}, m, nil)
+	ops, _ := resolveInvalidateOps(stmlparser.ActionBlock{OperationID: "CreateItem"}, []string{"ListItems"}, m, nil)
 	_ = ops
-	_ = resolveInvalidateOps("Unknown", []string{"ListItems"}, m, nil)
+	_, _ = resolveInvalidateOps(stmlparser.ActionBlock{OperationID: "Unknown"}, []string{"ListItems"}, m, nil)
 }

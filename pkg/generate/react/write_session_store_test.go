@@ -10,7 +10,7 @@ import (
 
 func TestWriteSessionStore_LocalStoragePersist(t *testing.T) {
 	dir := t.TempDir()
-	if err := writeSessionStore(dir, "localStorage"); err != nil {
+	if err := writeSessionStore(dir, "localStorage", true); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "stores", "auth.ts"))

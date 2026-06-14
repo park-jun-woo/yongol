@@ -27,9 +27,13 @@ func TestWriteAppTSX_BasicPages(t *testing.T) {
 	}
 	content := string(data)
 
-	assertContains(t, content, "import Login from './pages/login'")
-	assertContains(t, content, "import Register from './pages/register'")
+	// Dashboard is the index target (first public page) → eager static import;
+	// the rest are route-level lazy-loaded (BUG-133).
 	assertContains(t, content, "import Dashboard from './pages/dashboard'")
+	assertContains(t, content, "const Login = lazy(() => import('./pages/login'))")
+	assertContains(t, content, "const Register = lazy(() => import('./pages/register'))")
+	assertContains(t, content, "import { lazy, Suspense } from 'react'")
+	assertContains(t, content, "<Suspense fallback={<div>로딩 중...</div>}>")
 	assertContains(t, content, `<Route path="/login" element={<Login />} />`)
 	assertContains(t, content, `<Route path="/register" element={<Register />} />`)
 	assertContains(t, content, `<Route path="/dashboard" element={<Dashboard />} />`)

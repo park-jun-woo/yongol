@@ -59,12 +59,14 @@ func TestWriteAppTSX_NonDetailPageWithRouteParam(t *testing.T) {
 	assertContains(t, content, `<Route path="/webhooks/:id?" element={<Webhooks />} />`)
 	assertNotContains(t, content, `<Route path="/webhooks" element=`)
 
-	importCount := strings.Count(content, "import Templates from")
+	// no route matches the /login index target → every page is lazy (BUG-133),
+	// each lazy declaration emitted exactly once (dedup by component name)
+	importCount := strings.Count(content, "const Templates = lazy(() => import('./pages/templates'))")
 	if importCount != 1 {
-		t.Errorf("expected 1 Templates import, got %d", importCount)
+		t.Errorf("expected 1 Templates lazy import, got %d", importCount)
 	}
-	importCount = strings.Count(content, "import Webhooks from")
+	importCount = strings.Count(content, "const Webhooks = lazy(() => import('./pages/webhooks'))")
 	if importCount != 1 {
-		t.Errorf("expected 1 Webhooks import, got %d", importCount)
+		t.Errorf("expected 1 Webhooks lazy import, got %d", importCount)
 	}
 }

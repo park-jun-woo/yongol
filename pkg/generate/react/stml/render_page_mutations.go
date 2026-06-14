@@ -19,7 +19,7 @@ func renderPageMutations(allActions []stmlparser.ActionBlock, fetchOps []string,
 		// (data-on-error only decides the display element/position).
 		errVar := errorStateVar(a)
 		sb.WriteString(fmt.Sprintf("  const [%s, set%s] = useState<string | null>(null)\n", errVar, toUpperFirst(errVar)))
-		targetOps := resolveInvalidateOps(a.OperationID, fetchOps, actionFetchMap, a.Invalidates)
-		sb.WriteString(fmt.Sprintf("  %s\n\n", renderUseMutation(a, targetOps, bearerAuth, noBodyOps, pathParamTypes, constraints, errorDisplayField)))
+		invalidateOps, removeOps := resolveInvalidateOps(a, fetchOps, actionFetchMap, pathParamTypes)
+		sb.WriteString(fmt.Sprintf("  %s\n\n", renderUseMutation(a, invalidateOps, removeOps, bearerAuth, noBodyOps, pathParamTypes, constraints, errorDisplayField)))
 	}
 }

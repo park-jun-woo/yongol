@@ -6,4 +6,10 @@ package stml
 type ParamBind struct {
 	Name   string // parameter name (e.g. "ReservationID")
 	Source string // value source (e.g. "route.ReservationID")
+	// Optional marks a route.<Name> source whose URL segment is optional
+	// (":Name?") — consumed only by data-action blocks, never by a data-fetch
+	// (collectRouteParams's Required=false). Optional integer params need a
+	// null guard before Number() so an absent segment does not send NaN
+	// (BUG-136). Populated by the react emitter (markOptionalRouteParams).
+	Optional bool
 }

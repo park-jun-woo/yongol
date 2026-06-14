@@ -19,7 +19,7 @@ func TestZodChainFor_Supported(t *testing.T) {
 		{
 			name: "required string",
 			fc:   oapiparser.FieldConstraint{Type: "string", Required: true},
-			want: "z.string().min(1)",
+			want: "z.string()",
 		},
 		{
 			name: "optional integer",

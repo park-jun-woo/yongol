@@ -15,7 +15,7 @@ func TestWriteSessionStoreClaims_MkdirError(t *testing.T) {
 	if err := os.WriteFile(file, []byte("x"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if err := writeSessionStoreClaims(file, "localStorage", true); err == nil {
+	if err := writeSessionStoreClaims(file, "localStorage", true, true); err == nil {
 		t.Fatal("expected error creating stores dir under a file, got nil")
 	}
 }

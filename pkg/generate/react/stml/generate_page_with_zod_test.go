@@ -35,7 +35,7 @@ func TestGeneratePageWithZodSchema(t *testing.T) {
 	assertContains(t, code, "import { zodResolver } from '@hookform/resolvers/zod'")
 	assertContains(t, code, "import { useForm } from 'react-hook-form'")
 	assertContains(t, code, "const createWorkflowSchema = z.object(")
-	assertContains(t, code, "title: z.string().min(1).max(200)")
-	assertContains(t, code, "trigger_event: z.string().min(1)")
+	assertContains(t, code, "title: z.string().max(200)")
+	assertContains(t, code, "trigger_event: z.string(),")
 	assertContains(t, code, "resolver: zodResolver(createWorkflowSchema)")
 }

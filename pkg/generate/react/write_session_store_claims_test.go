@@ -22,7 +22,7 @@ func TestWriteSessionStoreClaims(t *testing.T) {
 
 	t.Run("bearer localStorage keeps tokens and adds claims", func(t *testing.T) {
 		dir := t.TempDir()
-		if err := writeSessionStoreClaims(dir, "localStorage", true); err != nil {
+		if err := writeSessionStoreClaims(dir, "localStorage", true, true); err != nil {
 			t.Fatal(err)
 		}
 		out := read(t, dir)
@@ -46,7 +46,7 @@ func TestWriteSessionStoreClaims(t *testing.T) {
 
 	t.Run("bearer memory skips persist", func(t *testing.T) {
 		dir := t.TempDir()
-		if err := writeSessionStoreClaims(dir, "memory", true); err != nil {
+		if err := writeSessionStoreClaims(dir, "memory", true, true); err != nil {
 			t.Fatal(err)
 		}
 		out := read(t, dir)
@@ -55,9 +55,24 @@ func TestWriteSessionStoreClaims(t *testing.T) {
 		assertContains(t, out, "clear: () => set({ token: null, refresh: null, claims: {} }),")
 	})
 
+	t.Run("bearer without refresh signal drops the dead refresh surface", func(t *testing.T) {
+		dir := t.TempDir()
+		if err := writeSessionStoreClaims(dir, "localStorage", true, false); err != nil {
+			t.Fatal(err)
+		}
+		out := read(t, dir)
+		// token + claims survive; refresh is gone (BUG-135).
+		assertContains(t, out, "token: string | null")
+		assertContains(t, out, "claims: Record<string, string>")
+		assertContains(t, out, "setAuth: (token?: string | null) => void")
+		assertContains(t, out, "setAuth: (token) => set({ token: token ?? null }),")
+		assertContains(t, out, "clear: () => set({ token: null, claims: {} }),")
+		assertNotContains(t, out, "refresh")
+	})
+
 	t.Run("cookie localStorage emits the claims-only reduced store", func(t *testing.T) {
 		dir := t.TempDir()
-		if err := writeSessionStoreClaims(dir, "localStorage", false); err != nil {
+		if err := writeSessionStoreClaims(dir, "localStorage", false, false); err != nil {
 			t.Fatal(err)
 		}
 		out := read(t, dir)
@@ -71,7 +86,7 @@ func TestWriteSessionStoreClaims(t *testing.T) {
 
 	t.Run("cookie memory emits the claims-only store without persist", func(t *testing.T) {
 		dir := t.TempDir()
-		if err := writeSessionStoreClaims(dir, "memory", false); err != nil {
+		if err := writeSessionStoreClaims(dir, "memory", false, false); err != nil {
 			t.Fatal(err)
 		}
 		out := read(t, dir)

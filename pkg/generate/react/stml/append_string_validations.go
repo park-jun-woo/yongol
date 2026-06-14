@@ -13,14 +13,18 @@ func appendStringValidations(parts []string, fc oapiparser.FieldConstraint) []st
 	if fc.Type != "string" && fc.Type != "" {
 		return parts
 	}
+	// formatRejectsEmpty: formats that already reject empty strings (e.g. email),
+	// so a redundant .min(1) must not be attached.
+	formatRejectsEmpty := false
 	if fc.Format == "email" {
 		parts = append(parts, ".email()")
+		formatRejectsEmpty = true
 	}
-	if fc.Required {
-		parts = append(parts, ".min(1)")
-	}
+	// nonempty (.min(1)) and length floors come solely from an explicit OpenAPI
+	// minLength. Required (key presence) is projected by .optional() in zodChain,
+	// not by .min(1).
 	if fc.MinLength != nil && *fc.MinLength > 0 {
-		if !fc.Required || *fc.MinLength > 1 {
+		if !(formatRejectsEmpty && *fc.MinLength == 1) {
 			parts = append(parts, fmt.Sprintf(".min(%d)", *fc.MinLength))
 		}
 	}

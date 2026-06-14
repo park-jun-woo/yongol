@@ -3,15 +3,16 @@
 package stml
 
 import (
-	"fmt"
-	"strings"
-
 	stmlparser "github.com/park-jun-woo/yongol/pkg/parser/stml"
 )
 
 func (r *ReactTarget) GeneratePage(page stmlparser.PageSpec, specsDir string, opt GenerateOptions) string {
 	// Pre-populate EachBlock.KeyField from response schema
 	populateEachKeyFields(&page, opt.ResponseArrayItemFields)
+	// Flag action-only route.* params as optional (":Name?") so integer args
+	// get a null guard instead of Number(undefined)===NaN (BUG-136). Must run
+	// before populateRowActionArgs so row-action mutate args capture the flag.
+	markOptionalRouteParams(&page)
 	// Pre-populate row-action mutate arguments (item.* sources, Phase006)
 	populateRowActionArgs(&page, opt.ResponseArrayItemTypes, opt.PathParamTypes)
 	// Pre-resolve data-link target route patterns (Phase007)
@@ -53,8 +54,10 @@ func (r *ReactTarget) GeneratePage(page stmlparser.PageSpec, specsDir string, op
 	}
 
 	// STML flow declarations drive imports: data-redirect → useNavigate,
-	// data-capture (bearer) → session store. queryClient is needed only
-	// when at least one action keeps the default invalidateQueries() path.
+	// data-capture (bearer) → session store. queryClient is needed when any
+	// non-capture mutation emits invalidate/removeQueries — and since a
+	// redirect now combines with invalidation (BUG-132 132-1), that includes
+	// redirect-carrying mutations, not only the keyless default path.
 	needsInvalidate := false
 	for _, a := range allActions {
 		if a.Redirect != "" {
@@ -67,12 +70,14 @@ func (r *ReactTarget) GeneratePage(page stmlparser.PageSpec, specsDir string, op
 		}
 		if len(actionFlowCaptures(a, opt.BearerAuth)) > 0 {
 			is.useAuthStore = true
+			continue // capture-mode onSuccess commits to the store, not the cache
 		}
-		if !actionHasFlowSuccess(a, opt.BearerAuth) {
+		inv, rem := resolveInvalidateOps(a, fetchOps, actionFetchMap, opt.PathParamTypes)
+		if len(inv) > 0 || len(rem) > 0 {
 			needsInvalidate = true
 		}
 	}
-	is.useQueryClient = len(allActions) > 0 && needsInvalidate
+	is.useQueryClient = needsInvalidate
 
 	// document.title mount effect — only for sitemap-listed pages
 	// (plans/stml/sitemap Phase004; an absent entry emits nothing, keeping
@@ -86,23 +91,5 @@ func (r *ReactTarget) GeneratePage(page stmlparser.PageSpec, specsDir string, op
 	}
 	is.useOutletCtx = crumbField != ""
 
-	var sb strings.Builder
-	sb.WriteString(renderImports(is, opt))
-	sb.WriteString("\n\n")
-
-	componentName := toComponentName(page.Name)
-	sb.WriteString(fmt.Sprintf("export default function %s() {\n", componentName))
-
-	if docTitle != "" {
-		sb.WriteString(renderTitleEffect(docTitle))
-	}
-	renderPageHooks(page, is, opt.PathParamTypes, &sb)
-	if crumbField != "" {
-		sb.WriteString(renderCrumbLabelEffect(crumbField, toLowerFirst(page.Fetches[0].OperationID)+"Data", opt.CrumbTitleSuffix))
-	}
-	renderPageMutations(allActions, fetchOps, actionFetchMap, opt.RequestConstraints, opt.BearerAuth, opt.NoBodyOps, opt.PathParamTypes, opt.ErrorDisplayField, opt.ResponseBindTypes, &sb)
-	renderPageJSX(page, &sb, opt.NoBodyOps, bindCtx{all: opt.ResponseBindTypes})
-
-	sb.WriteString("}\n")
-	return sb.String()
+	return renderPageSource(page, is, allActions, fetchOps, actionFetchMap, docTitle, crumbField, opt)
 }

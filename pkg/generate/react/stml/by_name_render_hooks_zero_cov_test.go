@@ -18,7 +18,7 @@ func TestByNameRenderHooks_ZeroCov(t *testing.T) {
 	if s := renderUseQuery(f, ppt); s == "" {
 		t.Errorf("renderUseQuery empty")
 	}
-	if s := renderUseMutation(a, []string{"ListItems"}, false, noBody, ppt, cons, "error"); s == "" {
+	if s := renderUseMutation(a, []string{"ListItems"}, nil, false, noBody, ppt, cons, "error"); s == "" {
 		t.Errorf("renderUseMutation empty")
 	}
 

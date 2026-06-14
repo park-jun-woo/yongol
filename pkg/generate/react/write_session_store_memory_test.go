@@ -10,7 +10,7 @@ import (
 
 func TestWriteSessionStore_MemoryNonPersistent(t *testing.T) {
 	dir := t.TempDir()
-	if err := writeSessionStore(dir, "memory"); err != nil {
+	if err := writeSessionStore(dir, "memory", true); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "stores", "auth.ts"))

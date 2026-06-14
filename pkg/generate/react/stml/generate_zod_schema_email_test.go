@@ -13,5 +13,6 @@ func TestGenerateZodSchemaEmail(t *testing.T) {
 		"email": {Type: "string", Format: "email", Required: true},
 	}
 	code := generateZodSchema("Register", fields)
-	assertContains(t, code, "email: z.string().email().min(1)")
+	// email format already rejects empty strings, so no redundant .min(1).
+	assertContains(t, code, "email: z.string().email()")
 }

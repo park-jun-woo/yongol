@@ -17,7 +17,7 @@ func renderParamArgs(params []stmlparser.ParamBind, opID string, pathParamTypes 
 	for _, p := range params {
 		expr := paramSourceExpr(p)
 		if isIntegerParam(opID, p.Name, pathParamTypes) {
-			expr = "Number(" + expr + ")"
+			expr = wrapNumberArg(expr, p.Optional)
 		}
 		parts = append(parts, fmt.Sprintf("%s: %s", p.Name, expr))
 	}

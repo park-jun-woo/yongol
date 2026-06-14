@@ -79,7 +79,7 @@ func generateFrontendSetup(fs *yongol.Fullstack, artifactsDir string) error {
 			return err
 		}
 	}
-	if err := writeAuthStores(srcDir, authStore, bearerAuth, stmlPages); err != nil {
+	if err := writeAuthStores(srcDir, authStore, bearerAuth, resolveHasRefresh(fs), stmlPages); err != nil {
 		return err
 	}
 	if err := writeAppTSX(srcDir, stmlPages, stmlLayouts, defaultLayout, resolveProtectedPages(fs), indexPage, sitemapPageLayouts(fsSitemap(fs))); err != nil {

@@ -1,5 +1,5 @@
 //ff:func feature=stml-gen type=test control=sequence
-//ff:what 흐름 속성 없는 액션은 bearer여도 기존 invalidateQueries 경로 불변 검증
+//ff:what 흐름 속성·fetch 없는 액션은 keyless invalidateQueries()를 방출하지 않음 (BUG-132 132-3)
 package stml
 
 import (
@@ -22,10 +22,12 @@ func TestGeneratePage_NoFlowAttrs_DefaultInvalidate(t *testing.T) {
 		BearerAuth:    true,
 	})
 
-	// No data-capture/data-redirect → the default invalidation path stays.
-	// "Login" gets no special treatment (hardcode removed in Phase003).
-	assertContains(t, code, "queryClient.invalidateQueries()")
-	assertContains(t, code, "useQueryClient")
+	// No data-capture/data-redirect and no page-level fetch → there is no
+	// query key to invalidate, so the keyless invalidateQueries() that would
+	// wipe the whole cache is gone (BUG-132 132-3) and queryClient is not
+	// imported. "Login" gets no special treatment (hardcode removed Phase003).
+	assertNotContains(t, code, "invalidateQueries")
+	assertNotContains(t, code, "useQueryClient")
 
 	assertNotContains(t, code, "useAuthStore")
 	assertNotContains(t, code, "localStorage.setItem")

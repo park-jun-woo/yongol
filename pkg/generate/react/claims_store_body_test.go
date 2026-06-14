@@ -9,7 +9,7 @@ import (
 )
 
 func TestClaimsStoreBody(t *testing.T) {
-	full := strings.Join(claimsStoreBody(true), "\n")
+	full := strings.Join(claimsStoreBody(true, true), "\n")
 	// bearer shape keeps the token fields and the writeSessionStore
 	// setAuth contract — its body never touches claims, so the 401
 	// refresh flow preserves them.
@@ -23,11 +23,19 @@ func TestClaimsStoreBody(t *testing.T) {
 	assertContains(t, full, "set((state) => ({ claims: { ...state.claims, [name]: value } })),")
 	assertContains(t, full, "clear: () => set({ token: null, refresh: null, claims: {} }),")
 
-	reduced := strings.Join(claimsStoreBody(false), "\n")
+	reduced := strings.Join(claimsStoreBody(false, false), "\n")
 	// cookie shape: claims/setClaim/clear only — no token surface at all.
 	assertContains(t, reduced, "claims: {},")
 	assertContains(t, reduced, "setClaim: (name, value) =>")
 	assertContains(t, reduced, "clear: () => set({ claims: {} }),")
 	assertNotContains(t, reduced, "token")
 	assertNotContains(t, reduced, "setAuth")
+
+	// bearer without refresh (BUG-135): token + claims kept, refresh dropped.
+	noRefresh := strings.Join(claimsStoreBody(true, false), "\n")
+	assertContains(t, noRefresh, "token: null,")
+	assertContains(t, noRefresh, "claims: {},")
+	assertContains(t, noRefresh, "setAuth: (token) => set({ token: token ?? null }),")
+	assertContains(t, noRefresh, "clear: () => set({ token: null, claims: {} }),")
+	assertNotContains(t, noRefresh, "refresh")
 }

@@ -14,5 +14,5 @@ func TestGenerateZodSchemaMinLengthGreaterThan1(t *testing.T) {
 		"password": {Type: "string", Required: true, MinLength: &minLen},
 	}
 	code := generateZodSchema("Login", fields)
-	assertContains(t, code, "password: z.string().min(1).min(8)")
+	assertContains(t, code, "password: z.string().min(8)")
 }

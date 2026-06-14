@@ -27,7 +27,7 @@ func TestWriteAuthStores(t *testing.T) {
 	t.Run("claims captures emit the claims store, empty store falls back to localStorage", func(t *testing.T) {
 		dir := t.TempDir()
 		// authStore "" — claims captures without backend.auth resolved none
-		if err := writeAuthStores(dir, "", false, claimsPages); err != nil {
+		if err := writeAuthStores(dir, "", false, false, claimsPages); err != nil {
 			t.Fatal(err)
 		}
 		out := read(t, dir)
@@ -40,7 +40,7 @@ func TestWriteAuthStores(t *testing.T) {
 
 	t.Run("claims captures in bearer mode keep the full token shape", func(t *testing.T) {
 		dir := t.TempDir()
-		if err := writeAuthStores(dir, "memory", true, claimsPages); err != nil {
+		if err := writeAuthStores(dir, "memory", true, true, claimsPages); err != nil {
 			t.Fatal(err)
 		}
 		out := read(t, dir)
@@ -51,7 +51,7 @@ func TestWriteAuthStores(t *testing.T) {
 
 	t.Run("bearer without claims captures keeps the pre-Phase005 store", func(t *testing.T) {
 		dir := t.TempDir()
-		if err := writeAuthStores(dir, "localStorage", true, nil); err != nil {
+		if err := writeAuthStores(dir, "localStorage", true, true, nil); err != nil {
 			t.Fatal(err)
 		}
 		out := read(t, dir)
@@ -59,9 +59,20 @@ func TestWriteAuthStores(t *testing.T) {
 		assertNotContains(t, out, "setClaim")
 	})
 
+	t.Run("bearer without refresh signal drops the dead refresh surface", func(t *testing.T) {
+		dir := t.TempDir()
+		if err := writeAuthStores(dir, "localStorage", true, false, nil); err != nil {
+			t.Fatal(err)
+		}
+		out := read(t, dir)
+		assertContains(t, out, "setAuth: (token) => set({ token: token ?? null }),")
+		assertNotContains(t, out, "setClaim")
+		assertNotContains(t, out, "refresh")
+	})
+
 	t.Run("cookie or no-auth without claims emits no store", func(t *testing.T) {
 		dir := t.TempDir()
-		if err := writeAuthStores(dir, "localStorage", false, nil); err != nil {
+		if err := writeAuthStores(dir, "localStorage", false, false, nil); err != nil {
 			t.Fatal(err)
 		}
 		if _, err := os.Stat(filepath.Join(dir, "stores", "auth.ts")); !os.IsNotExist(err) {

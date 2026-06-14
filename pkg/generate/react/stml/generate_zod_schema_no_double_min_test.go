@@ -1,5 +1,5 @@
 //ff:func feature=stml-gen type=test control=sequence
-//ff:what generateZodSchema required + minLength=1 시 .min(1) 중복 방지 검증
+//ff:what generateZodSchema minLength=1 시 .min(1) 단일 방출 검증 (중복 없음)
 package stml
 
 import (

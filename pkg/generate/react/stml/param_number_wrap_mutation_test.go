@@ -1,5 +1,5 @@
 //ff:func feature=stml-gen type=test control=sequence
-//ff:what integer path param이 useMutation에서 Number()로 래핑되는지 검증
+//ff:what action-only(optional ":id?") integer path param이 useMutation에서 null 가드된 Number()로 방출되는지 검증 (BUG-136)
 package stml
 
 import (
@@ -19,6 +19,8 @@ func TestParamNumberWrapMutation(t *testing.T) {
 			"DeleteBuilding": {"id": "integer"},
 		},
 	})
-	assertContains(t, code, `id: Number(id)`)
-	assertNotContains(t, code, `id: id`)
+	// route.id is action-only → optional segment ":id?", so an absent segment
+	// must not send Number(undefined)===NaN (BUG-136).
+	assertContains(t, code, `id: id != null ? Number(id) : undefined`)
+	assertNotContains(t, code, `id: Number(id) }`)
 }

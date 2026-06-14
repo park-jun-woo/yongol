@@ -34,7 +34,7 @@ func TestRefreshFlowClaimsRegression(t *testing.T) {
 	// (2) the bearer claims store: setAuth's implementation is claims-free
 	// (preservation) and clear()'s resets claims (eviction).
 	dir := t.TempDir()
-	if err := writeSessionStoreClaims(dir, "localStorage", true); err != nil {
+	if err := writeSessionStoreClaims(dir, "localStorage", true, true); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, "stores", "auth.ts"))

@@ -1,5 +1,5 @@
 //ff:func feature=gen-react type=generator control=selection
-//ff:what writeAuthStores — store 방출 게이트: claims 캡처 → claims store, bearer → 현행 store, 그 외 미방출
+//ff:what writeAuthStores — store 방출 게이트: claims 캡처 → claims store, bearer → 현행 store, 그 외 미방출 (hasRefresh로 refresh 필드 게이트)
 
 package react
 
@@ -15,15 +15,15 @@ import "github.com/park-jun-woo/yongol/pkg/parser/stml"
 //   - bearer without claims captures → writeSessionStore, byte-identical
 //     to the pre-Phase005 output;
 //   - otherwise (cookie/no-auth, no claims) → no store at all, as before.
-func writeAuthStores(srcDir, authStore string, bearerAuth bool, pages []stml.PageSpec) error {
+func writeAuthStores(srcDir, authStore string, bearerAuth, hasRefresh bool, pages []stml.PageSpec) error {
 	switch {
 	case hasClaimsCaptures(pages):
 		if authStore == "" {
 			authStore = "localStorage"
 		}
-		return writeSessionStoreClaims(srcDir, authStore, bearerAuth)
+		return writeSessionStoreClaims(srcDir, authStore, bearerAuth, hasRefresh)
 	case bearerAuth:
-		return writeSessionStore(srcDir, authStore)
+		return writeSessionStore(srcDir, authStore, hasRefresh)
 	default:
 		return nil
 	}

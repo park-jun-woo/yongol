@@ -13,5 +13,5 @@ func TestGenerateZodSchemaPattern(t *testing.T) {
 		"phone": {Type: "string", Required: true, Pattern: `^\d{3}-\d{4}-\d{4}$`},
 	}
 	code := generateZodSchema("UpdatePhone", fields)
-	assertContains(t, code, `phone: z.string().min(1).regex(new RegExp("^\d{3}-\d{4}-\d{4}$"))`)
+	assertContains(t, code, `phone: z.string().regex(new RegExp("^\d{3}-\d{4}-\d{4}$"))`)
 }
