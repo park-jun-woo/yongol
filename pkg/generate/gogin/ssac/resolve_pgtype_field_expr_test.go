@@ -19,11 +19,12 @@ func TestResolvePgtypeFieldExpr(t *testing.T) {
 			{
 				Name: "gadgets",
 				Columns: map[string]ddl.Column{
-					"id":      {Name: "id", RawType: "UUID", NotNull: true},
-					"org_id":  {Name: "org_id", RawType: "UUID", NotNull: true},
-					"url":     {Name: "url", RawType: "UUID", NotNull: true},
-					"api_key": {Name: "api_key", RawType: "UUID", NotNull: true},
-					"name":    {Name: "name", RawType: "TEXT", NotNull: true},
+					"id":         {Name: "id", RawType: "UUID", NotNull: true},
+					"org_id":     {Name: "org_id", RawType: "UUID", NotNull: true},
+					"url":        {Name: "url", RawType: "UUID", NotNull: true},
+					"api_key":    {Name: "api_key", RawType: "UUID", NotNull: true},
+					"name":       {Name: "name", RawType: "TEXT", NotNull: true},
+					"created_at": {Name: "created_at", RawType: "TIMESTAMPTZ", NotNull: true},
 				},
 			},
 		},
@@ -47,6 +48,10 @@ func TestResolvePgtypeFieldExpr(t *testing.T) {
 		{"acronym APIKey", "g.APIKey", "pgtypex.FromPgUUID(g.APIKey)", []string{pgtypexImport}},
 		// slice-typed var must be stripped of "[]" prefix and still resolve.
 		{"slice var ID", "list.ID", "pgtypex.FromPgUUID(list.ID)", []string{pgtypexImport}},
+		// BUG-131: timestamptz binding.Imports carries "time", but the dotted
+		// conversion only references pgtypex — "time" must be excluded so the
+		// generated handler does not get an unused "time" import.
+		{"timestamptz CreatedAt", "g.CreatedAt", "pgtypex.FromPgTimestamptz(g.CreatedAt)", []string{pgtypexImport}},
 		// non-pgtype column (TEXT) → no conversion.
 		{"non-pgtype Name", "g.Name", "", nil},
 		// missing column → no conversion.

@@ -54,21 +54,14 @@ func (g *methodGen) resolvePgtypeFieldExpr(varExpr string) (string, []string) {
 	// as sqlc emits it).
 	expr := types.Expand(binding.ConvertExpr, varName, fieldName, "")
 
-	// Collect only the imports that the handler file actually references.
-	// The pgtypex bridge functions are called directly; the pgtype import
-	// is needed only by the sqlc-generated db package, not by the handler.
-	// Other imports (e.g. "time" for FromPgTimestamptz) are included.
+	// The dotted-access conversion handler only references the pgtypex bridge
+	// (pgtypex.FromPgXxx). It never names pgtype, runtime/types, or time, so
+	// include only the pgtypex import (matches wrapInsertExpr / resolvePKSqlcArg).
 	var quoted []string
 	for _, imp := range binding.Imports {
-		// pgtype import is used by db package, not by the handler code.
-		// runtime/types is used by the convert-func file (openapi_types
-		// alias) but never by the dotted-access conversion handler, which
-		// assigns the conversion expression directly without naming the type.
-		if imp == "github.com/jackc/pgx/v5/pgtype" ||
-			imp == "github.com/oapi-codegen/runtime/types" {
-			continue
+		if strings.Contains(imp, "pgtypex") {
+			quoted = append(quoted, `"`+imp+`"`)
 		}
-		quoted = append(quoted, `"`+imp+`"`)
 	}
 	return expr, quoted
 }
