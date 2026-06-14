@@ -41,6 +41,14 @@ identifier.
 `specs/`. yongol parses everything internally; all compilation and code
 generation land in `arts/` via `yongol generate`.
 
+**Frontend compile smoke (Phase041).** After emitting the React tree,
+`yongol generate` runs a `tsc --noEmit` smoke over `arts/frontend/` — the
+front-end counterpart of the backend `go build` step — so a generated tree that
+type-checks is part of the "generate succeeded" contract. A type error fails
+generate with the `tsc` output. When the toolchain is unavailable (no
+`node_modules`/`tsc`/`npx`), the gate **skips with a warning** instead of
+failing; install front-end deps to enforce it (CI/dev).
+
 ## manifest.yaml
 
 Full schema: [`docs/manifest.md`](docs/manifest.md).
@@ -771,6 +779,18 @@ parameter is a query parameter. When the derivation is unsuitable (e.g.
 nested resource paths like `/buildings/:BuildingID/units/:UnitID`), declare
 `data-route` — its `:Name` pattern params are merged into `useParams()`
 automatically.
+
+**Route param → API argument (Phase041).** An integer path parameter sourced
+from `route.<Name>` is converted with a plain `Number(<Name>)` — `Number()`
+returns type `number` regardless of input, so it always satisfies a required
+path parameter (never `number | undefined`). The route-segment optionality
+above (required `:Name` vs optional `:Name?`) is a **separate** concern and is
+not changed by the argument conversion. To keep an *optional* route param from
+reaching the API as `NaN` when the segment is absent, the operation that
+consumes it is **call-guarded** rather than its argument mangled: a dependent
+`useQuery` carries `enabled`, and a dependent mutation's trigger (button or form
+submit) is `disabled` while the optional param is `== null`. So the call simply
+does not fire until the param is present — the argument stays plain `Number`.
 
 ### Index route
 

@@ -42,7 +42,10 @@ func TestGenerateRoomEditPage(t *testing.T) {
 	assertContains(t, code, `<label htmlFor="updateRoom-Name">Name</label>`)
 	assertContains(t, code, `<label htmlFor="updateRoom-Capacity">Capacity</label>`)
 	assertContains(t, code, `<label htmlFor="updateRoom-Location">Location</label>`)
-	// isPending on submit and action buttons
-	assertContains(t, code, `disabled={updateRoomMutation.isPending}`)
-	assertContains(t, code, `disabled={deleteRoomMutation.isPending}`)
+	// isPending on submit and action buttons; RoomID is action-only (no fetch
+	// consumes it) → optional segment, so the trigger is also guarded against an
+	// absent route param (BUG-136 mutation trigger guard) while the arg stays
+	// plain Number(RoomID) (BUG-137).
+	assertContains(t, code, `disabled={updateRoomMutation.isPending || RoomID == null}`)
+	assertContains(t, code, `disabled={deleteRoomMutation.isPending || RoomID == null}`)
 }

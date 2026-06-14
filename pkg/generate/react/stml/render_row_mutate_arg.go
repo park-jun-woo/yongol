@@ -23,7 +23,7 @@ func renderRowMutateArg(a stmlparser.ActionBlock, pathParamTypes map[string]map[
 	for _, p := range a.Params {
 		expr := paramSourceExpr(p)
 		if isIntegerParam(a.OperationID, p.Name, pathParamTypes) && !itemParamIsNumber(p, itemFieldTypes) {
-			expr = wrapNumberArg(expr, p.Optional)
+			expr = wrapNumberArg(expr)
 		}
 		parts = append(parts, fmt.Sprintf("%s: %s", p.Name, expr))
 	}

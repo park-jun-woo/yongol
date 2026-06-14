@@ -1,5 +1,5 @@
 //ff:func feature=generate type=util control=selection
-//ff:what runFrontend — FrontendType에 따라 React 스캐폴드 생성 + STML 페이지 생성 + 사용자 컴포넌트 복사
+//ff:what runFrontend — FrontendType에 따라 React 스캐폴드 생성 + STML 페이지 생성 + 사용자 컴포넌트 복사 + tsc 게이트
 package generate
 
 import (
@@ -24,6 +24,12 @@ func runFrontend(fs *yongol.Fullstack, artifactsDir string, frontend FrontendTyp
 		}
 		if err := copyFrontendComponents(fs.SpecsDir, artifactsDir); err != nil {
 			return fmt.Errorf("components: %w", err)
+		}
+		// Final gate: type-check the generated frontend so "generate success =
+		// buildable" holds for the frontend, symmetric to backend `go build`
+		// (BUG-137 Phase041). Skips gracefully when the toolchain is unresolved.
+		if err := react.RunTscCheck(artifactsDir); err != nil {
+			return fmt.Errorf("tsc gate: %w", err)
 		}
 		return nil
 	default:

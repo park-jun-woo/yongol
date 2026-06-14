@@ -29,6 +29,13 @@ func renderActionForm(a stmlparser.ActionBlock, indent int) string {
 	}
 
 	disabledExpr := mergeDisabledExpr(mutName+".isPending", a.EnabledWhen, "data")
+	// page-flow / BUG-136: an optional route param consumed only by this action
+	// can be absent on entry — disable submit so Number(undefined)===NaN never
+	// reaches the API (the arg itself stays plain Number(...) per BUG-137). The
+	// headline edit-form path (building-photo-edit) relies on this guard.
+	if g := renderOptionalMutationGuard(a); g != "" {
+		disabledExpr = disabledExpr + " || " + g
+	}
 	lines = append(lines, fmt.Sprintf(`%s  <Button type="submit" disabled={%s}>{%s.isPending ? '처리 중...' : '%s'}</Button>`, ind, disabledExpr, mutName, submitText))
 	// page-flow Phase004: no data-on-error declared — emit the default error
 	// slot right after the submit button so a rejected mutation stays visible.

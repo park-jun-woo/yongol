@@ -30,6 +30,12 @@ func renderActionButton(a stmlparser.ActionBlock, indent int, noBodyOps map[stri
 		mutateArg = a.RowMutateArg
 	}
 	disabledExpr := mergeDisabledExpr(mutName+".isPending", a.EnabledWhen, "data")
+	// page-flow / BUG-136: an optional route param consumed only by this action
+	// can be absent on entry — disable the trigger so Number(undefined)===NaN
+	// never reaches the API (the arg itself stays plain Number(...) per BUG-137).
+	if g := renderOptionalMutationGuard(a); g != "" {
+		disabledExpr = disabledExpr + " || " + g
+	}
 	// The button path drops static children, so the error slot is rendered
 	// right after the button (conditional on the state). data-on-error keeps
 	// the declared element; otherwise the Phase004 default slot is emitted so

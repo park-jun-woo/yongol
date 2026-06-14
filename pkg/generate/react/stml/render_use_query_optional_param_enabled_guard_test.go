@@ -19,8 +19,13 @@ func TestRenderUseQuery_OptionalParamEnabledGuard(t *testing.T) {
 	ppt := map[string]map[string]string{"GetBuilding": {"id": "integer"}}
 
 	code := renderUseQuery(f, ppt)
-	if !strings.Contains(code, "id: id != null ? Number(id) : undefined") {
-		t.Errorf("optional param not null-guarded:\n%s", code)
+	// BUG-137: the arg stays plain Number(id) (type number); the empty-value
+	// call is blocked by the enabled guard below, not by mutilating the arg.
+	if !strings.Contains(code, "id: Number(id) }") {
+		t.Errorf("optional param arg should be plain Number(id):\n%s", code)
+	}
+	if strings.Contains(code, "id != null ? Number(id) : undefined") {
+		t.Errorf("optional param arg should no longer be null-guarded:\n%s", code)
 	}
 	if !strings.Contains(code, "enabled: Number.isFinite(Number(id)),") {
 		t.Errorf("optional integer query missing enabled guard:\n%s", code)

@@ -28,3 +28,7 @@ arts/frontend/
 ```
 
 `openapi-typescript` 바이너리는 env → PATH → npx 순으로 해결, 부재 시 fallback stub `api.d.ts` 기록.
+
+## frontend tsc 게이트 (Phase041)
+
+`runFrontend` 의 마지막 단계로 `RunTscCheck` 가 `arts/frontend/` 에서 `tsc --noEmit` 스모크를 돌린다 — backend 의 `go build` 에 대응하는 frontend 컴파일 게이트. 타입 에러가 있으면 그 출력과 함께 generate 가 실패한다("generate 성공 = 빌드 가능" 불변식). `tsc` 해석은 프로젝트 `node_modules/.bin` → `resolveTscArgv`(env → `npx -p typescript tsc`) 순이며, 해석 불가(`node_modules`/tsc/npx 부재) 시 **경고 후 skip**(generate 실패 아님) — 강제하려면 frontend deps 를 설치한다(CI/dev). `run_tsc_check.go` / `resolve_tsc_argv.go`.
