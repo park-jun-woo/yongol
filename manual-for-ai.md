@@ -366,6 +366,26 @@ Append `!` to suppress WARNINGs (`@delete!`, `@response!`).
 // Validated by XNS-80.
 ```
 
+**리소스 1개 = 표현 1개 (canonical response representation, XDO-11/12).** 같은
+엔티티(같은 DDL 테이블에 귀결되는 리소스)를 반환하는 모든 2xx 응답 — GET-by-id ·
+Create · Update — 은 **동일한 표현**을 써야 한다. GET-by-id 만 평면 inline 으로,
+Create/Update 는 `$ref` 풀스키마로 내보내는 식의 표현 분기는 계약 모순이며 백엔드
+codegen 의 평면/모델 이중 경로를 비대칭으로 갈라 `go build` 를 깬다(BUG-131).
+
+```yaml
+# 권장: 모든 엔티티 응답이 같은 component 를 $ref
+responses:
+  '200':
+    content: { application/json: { schema: { $ref: '#/components/schemas/Rule' } } }
+```
+
+- **XDO-11 (ERROR)** — 한 엔티티의 2xx 응답들이 서로 다른 표현(필드 집합·중첩·평면
+  vs 래퍼)을 노출하면 즉시 거부. 같은 component 를 `$ref` 하도록 통일하라.
+- **XDO-12 (WARNING)** — 엔티티 응답을 `$ref` 공유 없이 inline 으로 정의하면(현재는
+  일치해도 drift 위험) 경고. `components.schemas.<Model>` 를 `$ref` 하라.
+- 엔티티가 아닌 응답(스칼라 · COUNT · 페이지네이션 봉투 `{items, total}` · 함수결과
+  struct · 토큰)은 canonical 비대상 — 자유롭게 표현한다.
+
 Function-level annotations (placed above `func`): `// @no-pagination` exempts
 list endpoints from S-63; `// @state-neutral` declares that the operation is
 intentionally independent of the target resource's state machine and exempts

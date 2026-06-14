@@ -20,5 +20,6 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	diags = append(diags, xdo76RequiredNullable(fs)...)
 	diags = append(diags, xdo77ColumnTypeMismatch(fs)...)
 	diags = append(diags, xod10DDLToResponse(fs)...)
+	diags = append(diags, canonicalResponseRepr(fs)...)
 	return diags
 }

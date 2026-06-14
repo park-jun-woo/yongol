@@ -25,6 +25,8 @@ OpenAPI ↔ DDL 교차 검증. property/column 매칭, 길이·enum·CHECK 제�
 | XDO-76 | `xdo76RequiredNullable` | OpenAPI required + DDL nullable (WARNING, `-- @nullable` 면제) | IF-ELSE | ✓ |
 | XDO-77 | `xdo77ColumnTypeMismatch` | DDL column 타입 ↔ OpenAPI field 타입 불일치 (ERROR) | IF-ELSE | ✓ |
 | XDO-78 | `xdo78EnumNoCheck` | OpenAPI enum 요청 필드에 대응 DDL CHECK IN 제약 없음 (ERROR) | IF-ELSE | ✓ |
+| XDO-11 | `canonicalResponseRepr` | 같은 엔티티 2xx 응답이 서로 다른 표현 노출 (ERROR, 리소스 1개 = 표현 1개) | IF-ELSE | ✓ |
+| XDO-12 | `canonicalResponseRepr` | 엔티티 응답을 `$ref` 공유 없이 inline 정의 (WARNING, drift 위험) | IF-ELSE | ✓ |
 
 ## XDO-77 타입 대조
 

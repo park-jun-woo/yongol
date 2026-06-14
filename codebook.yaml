@@ -113,6 +113,7 @@ optional:
     sqlc: "queries/*.sql에서 sqlc 쿼리 파싱, $N 매핑"
     # --- crosscheck topics (183 funcs, rule 단위 클러스터) ---
     openapi-ddl: "OpenAPI x-확장 ↔ DDL 테이블 검증, 유령/누락 property"
+    canonical-representation: "리소스 1개 = 표현 1개 — 같은 엔티티(DDL 테이블)를 반환하는 2xx 응답들이 동일 component $ref 로 수렴하는지 검증 (XDO-11 ERROR/XDO-12 WARNING). 엔티티 식별: 전략 A(SSaC @response var) / B-1(@response 필드 base-var 수렴) / B-2(DDL 테이블·component 가드). pkg/validate/openapi_ddl/canonical_response_repr.go"
     ssac-ddl: "SSaC @result/@param 타입 ↔ DDL 일치"
     ssac-openapi: "SSaC 함수명 ↔ operationId, @response 필드 매칭"
     states: "상태 다이어그램 ↔ SSaC/DDL/OpenAPI 교차"

@@ -63,9 +63,9 @@ The `Source` column of each rule row is a Go file path relative to the repo root
 ## Rule count
 
 **This catalog is the single source of truth for the rule set.** The official
-total is the count of distinct rule IDs in the tables below — **388 rules across
+total is the count of distinct rule IDs in the tables below — **390 rules across
 60 prefixes**. This includes 27 retired rules (Deprecated section); the
-**active** subset (rows in the non-deprecated tables) is **361**.
+**active** subset (rows in the non-deprecated tables) is **363**.
 
 Counting note: a rule's ID is emitted either as a `[ID]` literal in the
 diagnostic message **or** via a `RuleID:` field / builder. A naive
@@ -261,6 +261,8 @@ Cross-consistency between DDL tables/columns and OpenAPI schemas / extension fie
 | Rule ID | Level | Description | Source |
 |---|---|---|---|
 | XDO-9 | ERROR | OpenAPI property does not correspond to any DDL table column (ghost) | `pkg/validate/openapi_ddl/xdo_09_ghost_property.go` |
+| XDO-11 | ERROR | Two or more 2xx responses returning the same entity (same DDL table) expose different representations (field set / nesting / flat-vs-wrapper) — "one resource = one representation" violated (BUG-131). Entity identity: strategy A (SSaC `@response` var), B-1 (SSaC `@response` field base-var convergence), B-2 (DDL table/component guard) | `pkg/validate/openapi_ddl/canonical_response_repr.go` |
+| XDO-12 | WARNING | An entity 2xx response is defined inline instead of sharing a `components.schemas.<Model>` `$ref` — consistent today but drift-prone | `pkg/validate/openapi_ddl/canonical_response_repr.go` |
 | XDO-67 | ERROR | DDL `VARCHAR(n)` ↔ OpenAPI `maxLength` missing/inconsistent | `pkg/validate/openapi_ddl/xdo_67_max_length_varchar.go` |
 | XDO-68 | ERROR | DDL `CHECK IN` ↔ OpenAPI `enum` missing/inconsistent | `pkg/validate/openapi_ddl/xdo_68_check_in_enum.go` |
 | XDO-69 | ERROR | DDL `CHECK` allowed values ↔ OpenAPI `enum` values mismatch | `pkg/validate/openapi_ddl/xdo_69_check_values_enum.go` |
