@@ -42,18 +42,14 @@ identifier.
 generation land in `arts/` via `yongol generate`.
 
 **Frontend scaffold mode (Phase048).** Frontend generation is
-**scaffold-only**: when the output directory (`arts/frontend/`) already exists,
-`yongol generate` skips frontend emission entirely. Use
-`--regenerate-frontend` (`-r`) to force a fresh re-emit, or `--frontend none`
-to skip frontend generation altogether.
+**scaffold-only**: when `arts/frontend/` already exists, `yongol generate`
+skips frontend emission. Use `--regenerate-frontend` (`-r`) to force re-emit,
+or `--frontend none` to skip entirely.
 
-**Frontend compile smoke (Phase041).** After emitting the React tree,
-`yongol generate` runs a `tsc --noEmit` smoke over `arts/frontend/` — the
-front-end counterpart of the backend `go build` step — so a generated tree that
-type-checks is part of the "generate succeeded" contract. A type error fails
-generate with the `tsc` output. When the toolchain is unavailable (no
-`node_modules`/`tsc`/`npx`), the gate **skips with a warning** instead of
-failing; install front-end deps to enforce it (CI/dev).
+**Frontend compile smoke (Phase041).** After emitting React, `yongol generate`
+runs `tsc --noEmit` over `arts/frontend/`. A type error fails generate. When
+the toolchain is unavailable (no `node_modules`/`tsc`/`npx`), the gate skips
+with a warning; install front-end deps to enforce it (CI/dev).
 
 ## Multi-domain project layout
 
@@ -68,45 +64,36 @@ Rego are shared** across all domains.
 <project-root>/
 ├── manifest.yaml                 # declares domains: public + admin (+ internal)
 ├── api/
-│   ├── public.yaml               # one OpenAPI spec PER DOMAIN (no top-level api/openapi.yaml)
+│   ├── public.yaml               # one OpenAPI spec PER DOMAIN
 │   └── admin.yaml
 ├── db/ … service/ … states/ … policy/   # SHARED across all domains
 └── frontend/
-    ├── public/                   # one STML app PER DOMAIN (sitemap.html + pages + layouts/)
+    ├── public/                   # one STML app PER DOMAIN
     │   └── sitemap.html
     └── admin/
         └── sitemap.html
 ```
 
-**Reserved domain key-names (semantic).** The domain map keys `public`,
-`admin`, `internal` are **reserved markers** consumed by the domain-security
-rules (Z4: XDS-80/81/82, XMO-20/21/22) — they classify a domain by its key
-name, not by a flag. `admin` endpoints may not expose `security: []` (XDS-80);
-`internal` endpoints are service-to-service (XDS-81); `public`/`admin`
-operationIds must each be consumed by their own frontend (XMO-20/21).
+**Reserved domain key-names:** `public`, `admin`, `internal` are semantic
+markers consumed by domain-security rules (Z4: XDS-80/81/82, XMO-20/21/22).
+`admin` may not expose `security: []`; `internal` is service-to-service;
+`public`/`admin` operationIds must each be consumed by their own frontend.
 
 **One operationId namespace.** operationIds are globally unique across domains
 (XDO-90), so a single shared `*service.Server` implements every domain's
-`StrictServerInterface`. There is **no `PublicServer`/`AdminServer` split**.
+`StrictServerInterface`.
 
 **Single binary, per-domain route groups.** `generate` emits one backend with a
-route group per domain at its `route_prefix` (e.g. `/api`, `/api/admin`), a
-per-domain `internal/api_<domain>` oapi-codegen package, and a per-domain React
-app under `arts/frontend/<domain>/`. Auth and CORS are applied per route group
-from each domain's `auth_mode` / `cors` (CORS stays global with a per-path
-origin decision). A `domains:` block must declare **at least two** domains
-(C-17) — a single domain is a plain single-site project.
-
-The manifest-structural domain rules **C-12~C-17** validate the block (openapi
-& frontend required, unique route_prefix, auth_mode enum, single-site frontend
-collision, ≥2 domains). See [`docs/manifest.md`](docs/manifest.md#multi-domain-block-domains)
-and `rulebook.md` §B / §Z4.
+route group per domain at its `route_prefix`, a per-domain
+`internal/api_<domain>` oapi-codegen package, and a per-domain React app under
+`arts/frontend/<domain>/`. A `domains:` block must declare **at least two**
+domains (C-17). Structural rules: C-12~C-17. See
+[`docs/manifest.md`](docs/manifest.md#multi-domain-block-domains) and
+`rulebook.md` §B / §Z4.
 
 ## manifest.yaml
 
-Full schema: [`docs/manifest.md`](docs/manifest.md).
-
-Minimum:
+Full schema: [`docs/manifest.md`](docs/manifest.md). Minimum:
 
 ```yaml
 apiVersion: yongol/v1
@@ -117,9 +104,9 @@ backend:
   framework: gin
   module: github.com/org/project
   auth:
-    type: jwt                     # only "jwt" is supported
+    type: jwt                     # only "jwt" supported
     secret_env: JWT_SECRET
-    user_table: users             # DDL table that holds user rows (XDN-01~03, XDN-05~06)
+    user_table: users             # DDL table backing JWT claims (XDN-01~06)
     claims:                       # JWT claim → CurrentUser field mapping
       ID: user_id:int64           # format: <col>:<type> (type required — XDN-05)
       Email: email:string
@@ -127,55 +114,28 @@ backend:
 frontend: { lang: typescript, framework: react, bundler: vite, name: <app> }
 ```
 
-Set `frontend.enabled: false` to declare a **backend-only** project (no React
-frontend). When OFF, STML pages are not required, frontend codegen is skipped,
-and the STML↔OpenAPI coverage rules (XMO-10/11/12) are not run. An omitted or
-empty `frontend:` block is also treated as OFF — ON requires `enabled != false`
-**and** content (`lang` or `framework` set).
+- `backend.auth` is **mandatory** (C-6) — yongol targets SaaS/business backends.
+- `backend.auth.user_table` names the DDL table; validate enforces column/type
+  matches (XDN-01~06).
+- Claim types: `string`, `int64`, `int32`, `bool`, `uuid`. Both `ID` and
+  `Role` must exist.
+- `frontend.enabled: false` → backend-only (no STML required, XMO-10/11/12
+  skipped). An omitted or empty `frontend:` block is also treated as OFF.
+- `frontend.index: <page-name>` → `/` redirects to that page's route. TM-34
+  rejects unknown names, routes with required params, or simultaneous
+  `data-route="/"`. TM-35 warns on fallback.
 
-`frontend.index: <page-name>` declares what the `/` index route **redirects**
-to — an STML page name (filename without `.html`, the same page-name
-reference as `data-link`), not a path. The page keeps its own route
-(`frontend.index: dashboard` → `<Navigate to="/dashboard" replace />`); a
-protected index page is legal — `<ProtectedRoute>` bounces unauthenticated
-visits to `/login` (the dashboard-as-index admin pattern). TM-34 rejects an
-unknown page name, a target route with a required parameter segment, and a
-simultaneous `data-route="/"` mount (mount vs redirect are different
-decisions — declare one). When neither is declared, the emitter falls back to
-the first public page in file-name sort order and TM-35 flags the accident
-(see the STML "Index route" rules).
-
-Claim type declaration is **required** (XDN-05). Allowed types: `string`,
-`int64`, `int32`, `bool`, `uuid`. The generated `@auth` middleware uses
-`currentUser.ID` and `currentUser.Role`; both field names must exist.
-
-`backend.auth` is **mandatory** in every yongol project (**C-6**) — yongol
-targets SaaS / business backends and does not support auth-free dynamic
-backends. Use a static site generator + CDN (Hugo / Jekyll / Next.js SSG)
-for public dynamic content instead.
-
-`backend.auth.user_table` names the DDL table (e.g. `users`,
-`accounts`, `members`) backing the JWT claims. `yongol validate`
-enforces (`XDN-01~03, XDN-05~06`) that the field is present whenever
-auth is active, the named table exists in `db/*.sql`, every
-`claims.<Field>: <col>:<type>` mapping points at a real column, the
-type declaration is present and allowed (XDN-05), and the declared type
-matches the DDL column type per the compatibility matrix (XDN-06).
-
-Optional top-level blocks (see [`docs/manifest.md`](docs/manifest.md) for full
-schema + env-var overrides): `backend.cors`, `backend.http` (body limits),
-`backend.observability.metrics` / `tracing`, `backend.error` (envelope +
-request_id), `backend.security_headers`, `backend.auth.mode` (cookie default /
-bearer / hybrid), `session.backend`, `cache.backend`, `file.backend`,
-`queue.backend`, `authz.package`. Rate limiting is delegated to the gateway
-(CDN / WAF / API gateway); only hardcoded business-logic guards stay in-app
-(e.g. `/auth/refresh` 10 rpm/IP).
-
-Validation rule families: `CORS-*`, `SEC-*`, `OBS-*`.
+Optional blocks (see [`docs/manifest.md`](docs/manifest.md)): `backend.cors`,
+`backend.http` (body limits), `backend.observability.metrics` / `tracing`,
+`backend.error` (envelope + request_id), `backend.security_headers`,
+`backend.auth.mode` (cookie default / bearer / hybrid), `session.backend`,
+`cache.backend`, `file.backend`, `queue.backend`, `authz.package`. Rule
+families: `CORS-*`, `SEC-*`, `OBS-*`.
 
 ## features.yaml
 
-Optional SSOT. A list of project features keyed by `operationId`, with an optional `tables` section describing data model topology.
+Optional SSOT. Features keyed by `operationId`, with an optional `tables`
+topology section.
 
 ```yaml
 features:
@@ -184,317 +144,170 @@ features:
     desc: Create a new workflow in draft state
     table: workflows
     public: false
-
 tables:
   workflows:
-    has_many:
-      - actions
-    states:
-      - draft
-      - active
-      - completed
+    has_many: [actions]
+    states: [draft, active, completed]
   actions:
-    belongs_to:
-      - workflows
+    belongs_to: [workflows]
 ```
 
-Feature fields:
-- `op` (required) — operationId (PascalCase). Must match an OpenAPI `operationId`.
-- `path` (required) — HTTP method + URI pattern.
-- `desc` (required) — one-line human description.
-- `table` (optional) — primary table this feature operates on. Must be defined in `tables`.
-- `public` (optional) — `true` if no authentication required. Defaults to `false`.
-
-Tables section fields (per table key):
-- `has_many` — child tables (one-to-many). Each must also be a key in `tables`.
-- `belongs_to` — parent tables (many-to-one). Child DDL must contain `<parent>_id` FK column.
-- `states` — valid state values. Each must exist in the corresponding stateDiagram.
-
-Validation rule families: `FT-*` (internal), `XFO-*` / `XOF-*` (cross with OpenAPI), `XFD-*` (cross with DDL), `XFS-*` (cross with stateDiagram).
+Feature fields: `op` (required, PascalCase operationId), `path` (required,
+method + URI), `desc` (required), `table` (optional, must be in `tables`),
+`public` (optional, default false). Table fields: `has_many`, `belongs_to`
+(referenced tables must exist), `states` (must match stateDiagram). Rule
+families: `FT-*`, `XFO-*`/`XOF-*`, `XFD-*`, `XFS-*`.
 
 ## OpenAPI
 
-Standard OpenAPI 3.x. yongol-specific conventions: see
+Standard OpenAPI 3.x. yongol-specific conventions:
 [`docs/openapi.md`](docs/openapi.md).
 
-- `operationId` is mandatory and PascalCase; it is the global key across all SSOTs.
-- Pagination / sort / filter are expressed as standard `parameters` — yongol
-  supports offset (`page`, `per_page`, `sort_by`, `sort_dir` + per-column filter
-  params) and cursor (`cursor`, `per_page`). No `x-*` extensions.
-- Offset response must include `items` + `total`; cursor response needs `items`
-  only. Additional fields (e.g. `next_cursor`) are authored directly in the
-  response schema.
-- `securitySchemes` keys (e.g. `bearerAuth`) must appear in
-  `backend.middleware`.
+- `operationId` is mandatory and PascalCase — the global key across all SSOTs.
+- Pagination: offset (`page`, `per_page`, `sort_by`, `sort_dir` + per-column
+  filters) or cursor (`cursor`, `per_page`). No `x-*` extensions.
 - Every 4xx/5xx response requires `content: application/json` + schema (O-5).
-  204 / 304 are exempt. RFC 7807 recommended but not enforced.
-- **ErrorResponse 스키마의 `error`, `code` 필드는 `required` 필수** (XOE-01).
-  required에 빠지면 oapi-codegen이 `*string`으로 생성하여 codegen 빌드 실패.
-- **`tags: ["no-front"]`** marks an operation as backend-only — never consumed by
-  any STML page or component. With the frontend ON, every operationId must be
-  consumed by an STML `data-fetch`/`data-action` or component `api.<Op>(` call,
-  **or** carry the `no-front` tag; otherwise **XMO-10** errors. `no-front` is a
-  standard OpenAPI tag, not an `x-*` extension. Auth endpoints are no longer
-  auto-excluded: a `/auth/refresh` or `/auth/logout` op with no consuming page
-  needs `tags: ["no-front"]`.
+  204/304 exempt.
+- ErrorResponse `error`, `code` fields must be `required` (XOE-01) — omission
+  causes oapi-codegen `*string` generation and build failure.
+- `tags: ["no-front"]` marks backend-only ops (exempt from XMO-10 frontend
+  coverage). Auth endpoints are no longer auto-excluded.
+- **Canonical response (XDO-11/12):** Same entity's 2xx responses (GET/Create/
+  Update) must share the same representation. Use `$ref` to a component schema.
+  XDO-11 rejects divergent representations; XDO-12 warns on inline definitions.
 
 ## DDL + sqlc
 
-Standard SQL DDL and sqlc. Details: [`docs/ddl.md`](docs/ddl.md).
+Standard SQL DDL and sqlc. yongol-specific details:
+[`docs/ddl.md`](docs/ddl.md).
 
-- One table per `db/<table>.sql`. Model name = filename desingularised and
-  PascalCased (`users.sql` → `User`; `ies→y`, `sses→ss`, `xes→x`, else drop
-  trailing `s`). Plural table naming is recommended, but singular naming
-  (`app_config.sql` → `AppConfig`) is also accepted — model↔table matching
-  normalises both sides to a canonical singular form.
-- `db/sqlc.yaml` is required (D-4). `sql[].schema` covers `db/*.sql`,
-  `sql[].queries` covers `db/queries/`.
-- **`sql_package: pgx/v5` is required** (Q-11). yongol's backend codegen
-  is unified on pgx/v5; `database/sql` / `pgx/v4` / `lib/pq` / absent are
-  rejected at `yongol validate`.
-- **Non-native PG types require explicit `pgtype` overrides** (Q-12 ~
-  Q-18). sqlc's `pgx/v5` mode has no default mapping for the seven
-  pgtype-only families: `UUID` (Q-12), `NUMERIC` / `DECIMAL` (Q-13),
-  `TIMESTAMPTZ` (Q-14), `TIMESTAMP` (Q-15), `DATE` (Q-16), `INET` /
-  `CIDR` (Q-17), `INTERVAL` (Q-18). For each declared column the
-  matching `db/sqlc.yaml` block must register two entries — one for
-  `nullable: false`, one for `nullable: true`. Each Q-NN rule fires
-  only when the corresponding column appears in DDL; the diagnostic
-  prints the exact YAML stanza (UUID example below — see
-  [`docs/ddl.md`](docs/ddl.md) for the full table).
-  ```yaml
-  overrides:
-    - db_type: "uuid"
-      nullable: false
-      go_type: { import: "github.com/jackc/pgx/v5/pgtype", package: "pgtype", type: "UUID" }
-    - db_type: "uuid"
-      nullable: true
-      go_type: { import: "github.com/jackc/pgx/v5/pgtype", package: "pgtype", type: "UUID" }
-  ```
-  At codegen time, nullable columns mapped to `pgtype.*` use
-  `ssac/pkg/pgtypex` bridge functions (e.g. `pgtypex.ToPgUUID`,
-  `pgtypex.FromPgUUID`, `pgtypex.IsNilPgUUID`). The SSaC emit imports
-  `pgtypex` automatically; nil-check guards, sqlc arg wrapping, and
-  Owners-map UUID serialisation all route through `GoTypeBinding`
-  templates (`NilCheckExpr`, `InsertExpr`, `ConvertExpr`,
-  `ResponseExpr`) resolved from the types matrix.
-
-  Multi-word PG type names are accepted as equivalents of their
-  single-token alias — `DOUBLE PRECISION` ≡ `FLOAT8`,
-  `TIMESTAMP WITH TIME ZONE` ≡ `TIMESTAMPTZ`,
-  `TIMESTAMP WITHOUT TIME ZONE` ≡ `TIMESTAMP`,
-  `CHARACTER VARYING(N)` ≡ `VARCHAR(N)`, `CHARACTER(N)` ≡ `CHAR(N)`.
-  The DDL parser preserves the verbatim spelling and
-  `ddl.NormalizePGTypeHead` folds it to the canonical alias for
-  downstream matrix lookup. `TIME WITH/WITHOUT TIME ZONE` (TIMETZ /
-  TIME) and `BIT VARYING` (VARBIT) are still rejected by D-11 — no Go
-  binding yet. `CREATE TYPE` user-defined ENUMs remain rejected; use
-  inline `VARCHAR(N) + CHECK IN (...)` instead.
-- Recommended `gen.go.out`: `../../artifacts/<project>/backend/internal/db`.
-- **Query filename → model name mapping**: sqlc queries for a model must
-  live in `db/queries/<table_plural>.sql`. yongol derives the model name
-  from the query filename: singular + PascalCase
-  (`refresh_tokens.sql` → `RefreshToken`, `users.sql` → `User`,
-  `user_profiles.sql` → `UserProfile`). Placing a query in the wrong file
-  (e.g. `RefreshToken.FindByHash` in `auth.sql` instead of
-  `refresh_tokens.sql`) causes S-49 "method not found" because yongol maps
-  `auth.sql` → model `Auth`, not `RefreshToken`.
-- Queries use a **global sqlc namespace** — prefix each `-- name:` with the
-  Model (`UserCreate`, `GigFindByID`). In SSaC the prefix is auto-stripped:
-  `UserCreate` → `User.Create`. The character after the prefix must be
-  uppercase for stripping.
-- Cardinality maps: `:one` → `*T`, `:many` → `[]T`, `:exec` → no return.
-- Positional `$N` is forbidden (D-7). Use `@name` for WHERE/SET/VALUES,
-  `sqlc.arg(name)` inside LIMIT/OFFSET or arithmetic.
-- `page`/`per_page` query param `format` must match the sqlc LIMIT/OFFSET
-  type (XQS-72). sqlc defaults to `int32`. If using `format: int64`, add
-  `::bigint` cast in the sqlc query, or use `format: int32` consistently.
-- Partial SELECT queries (not `SELECT *`) must include all columns that
-  SSaC references (XQS-73). `@empty`/`@exists` always access the PK
-  column (`id`). `@response { field: var.Field }` accesses specific
-  fields. `@response var` accesses all model fields via convert.
-- Avoid Go-reserved column names (`type`, `range`, `select`, `map`, …) — rename
-  to `tx_type`, `date_range`, etc.
-- **FK 컬럼은 NOT NULL 필수** (D-15). nullable FK는 codegen 타입 에러를
-  유발한다. 선택적 관계는 `NOT NULL DEFAULT 0` sentinel 패턴을 사용하고,
-  참조 테이블에 `id=0` sentinel row를 둔다. 의도적 nullable이면
-  `-- @nullable` 어노테이션으로 D-15를 면제할 수 있다.
-- Auto-increment primary keys must use `GENERATED ALWAYS AS IDENTITY`.
-  `SERIAL` / `BIGSERIAL` / `SMALLSERIAL` are banned (D-8). Write
-  `id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY`.
-- **All integer columns must be `BIGINT`** — yongol enforces a single
-  `int64` width across DDL → sqlc → OpenAPI (`format: int64`) → Go. `INTEGER`
-  / `SMALLINT` / `INT4` fails XDO-77 against the matching OpenAPI schema.
-  Rationale: SaaS counters (credits, prices in cents, sequence numbers, IDs)
-  overflow `int32` once tenants scale; one width = zero cast surface in
-  handlers and tests.
+- One table per `db/<table>.sql`. Model name = filename desingularised +
+  PascalCased. Plural naming recommended; singular also accepted (both
+  normalised to a canonical singular form).
+- `db/sqlc.yaml` required (D-4). **`sql_package: pgx/v5` required** (Q-11).
+- **Non-native PG types need `pgtype` overrides** (Q-12~Q-18): UUID,
+  NUMERIC/DECIMAL, TIMESTAMPTZ, TIMESTAMP, DATE, INET/CIDR, INTERVAL. Each
+  needs two sqlc override entries (nullable: false + true). At codegen time,
+  nullable `pgtype.*` columns use `ssac/pkg/pgtypex` bridge functions. See
+  [`docs/ddl.md`](docs/ddl.md) for the full table.
+- **All integer columns must be `BIGINT`** — enforced via XDO-77.
+  `INTEGER`/`SMALLINT`/`INT4` rejected.
+- Auto-increment: `GENERATED ALWAYS AS IDENTITY` only.
+  `SERIAL`/`BIGSERIAL`/`SMALLSERIAL` banned (D-8).
+- **FK columns must be NOT NULL** (D-15). Optional relations: `NOT NULL DEFAULT
+  0` sentinel pattern + `id=0` sentinel row. `-- @nullable` exempts.
+- Query filename → model mapping: `db/queries/<table_plural>.sql`. Model =
+  singular PascalCase of filename. Wrong file → S-49 "method not found".
+- Global sqlc namespace — prefix `-- name:` with Model (`UserCreate`). SSaC
+  auto-strips prefix. Character after prefix must be uppercase.
+- Cardinality: `:one` → `*T`, `:many` → `[]T`, `:exec` → no return.
+- Positional `$N` forbidden (D-7). Use `@name` or `sqlc.arg(name)`.
+- `page`/`per_page` `format` must match sqlc LIMIT/OFFSET type (XQS-72).
+- Partial SELECT must include all SSaC-referenced columns (XQS-73).
+- Avoid Go-reserved column names (`type`, `range`, `select`, `map`, …).
+- Multi-word PG type aliases accepted (`DOUBLE PRECISION` ≡ `FLOAT8`,
+  `TIMESTAMP WITH TIME ZONE` ≡ `TIMESTAMPTZ`, etc.). `TIME WITH/WITHOUT TIME
+  ZONE` and `BIT VARYING` rejected (D-11). `CREATE TYPE` ENUMs rejected — use
+  `VARCHAR(N) + CHECK IN (...)`.
 
 ### DDL annotations
 
 | Annotation | Scope | Effect |
 |---|---|---|
-| `-- @sensitive` | column | Generates `json:"-"`; excluded from responses. |
-| `-- @nosensitive` | column | Keeps JSON tag; suppresses sensitive-pattern WARNING (for `file_hash`, `commit_hash`, etc.). |
-| `-- @archived` | table | Marks table as soft-deprecated (미사용/폐기). XSD-55 면제. |
-| `-- @func-managed` | table | Marks table as actively managed by a `@call`'d function/RPC (살아있는 테이블, 미사용 아님). SSaC `@model`/`@result`에 직접 안 나타나도 XSD-55만 면제. 다른 규칙(응답/민감도 등)은 정상 적용. `@archived`와 의미가 다르므로 실사용 RPC 테이블엔 `@func-managed`를 쓴다. |
-| `-- @rename from=<old> [to=<new>]` | CREATE TABLE or column line | Migration emits `ALTER ... RENAME` instead of drop+add. |
-| `-- @cast using=<expr>` | column line | USING clause for `ALTER COLUMN TYPE`. Resolves MIG-005. |
-| `-- @backfill default=<value>` | column line | Populates existing rows before adding NOT NULL. Resolves MIG-002. |
-| `-- @data_migration file=<path>` | CREATE TABLE | Inlines a sidecar SQL file into the migration. |
-| `-- @allow_destructive` | CREATE TABLE | Suppresses DROP warnings for this table. Resolves MIG-004. |
-| `-- @sentinel` | INSERT statement | Copies the annotated `INSERT` verbatim into the migration between CREATE TABLE and CREATE INDEX/ADD FK. Required on every top-level INSERT in `specs/db/*.sql` (D-9); must include `ON CONFLICT DO NOTHING` (D-10). Enables the `DEFAULT 0` sentinel FK pattern. |
+| `-- @sensitive` | column | `json:"-"`; excluded from responses |
+| `-- @nosensitive` | column | Suppresses sensitive-pattern WARNING (`file_hash`, etc.) |
+| `-- @archived` | table | Soft-deprecated. XSD-55 exempt |
+| `-- @func-managed` | table | Managed by `@call` func. XSD-55 exempt only (other rules apply). Use for live RPC tables, not retired ones |
+| `-- @rename from=<old> [to=<new>]` | CREATE TABLE / column | Migration emits `ALTER RENAME` instead of drop+add |
+| `-- @cast using=<expr>` | column | USING clause for `ALTER COLUMN TYPE` (MIG-005) |
+| `-- @backfill default=<value>` | column | Populates existing rows before NOT NULL (MIG-002) |
+| `-- @data_migration file=<path>` | CREATE TABLE | Inlines sidecar SQL into migration |
+| `-- @allow_destructive` | CREATE TABLE | Suppresses DROP warnings (MIG-004) |
+| `-- @sentinel` | INSERT | Copies INSERT into migration. Required on every top-level INSERT (D-9); must include `ON CONFLICT DO NOTHING` (D-10) |
+| `-- @nullable` | column | Exempts FK from D-15 NOT NULL requirement |
 
-Patterns such as `password`, `secret`, `hash`, `token` without `@sensitive`
-emit a WARNING.
-
-**Annotation placement**: **column-scope** annotations (`@sensitive`,
-`@nullable`, …) go at the **end** of the column line, in a **single** `--`
-comment. Multiple annotations are space-separated inside that comment. Never
-place them on a separate line, and never write multiple `--` on the same line.
-**Table-scope** annotations (`@archived`, `@func-managed`) go on their own
-`--` comment line **directly above** the `CREATE TABLE`. They may be stacked
-on consecutive lines (each on its own `--` line); both take effect
-independently.
+**Placement**: column-scope annotations go at the **end** of the column line
+in a **single** `--` comment (space-separated if multiple). Table-scope go on
+their own `--` line **directly above** `CREATE TABLE`.
 
 ```sql
 -- Correct:
 email     VARCHAR(255) NOT NULL -- @sensitive
 token_hash VARCHAR(255) NOT NULL -- @sensitive @archived
-revoked_at TIMESTAMPTZ           -- @nullable
-
--- Wrong (separate line):
-email     VARCHAR(255) NOT NULL
--- @sensitive
-
--- Wrong (double comment):
-token_hash VARCHAR(255) NOT NULL -- @sensitive -- @archived
+-- Wrong (separate line for column annotation; double comment):
 ```
 
 ### DDL → OpenAPI type mapping (common pitfall)
 
 | DDL type | OpenAPI | Note |
 |---|---|---|
-| `TIMESTAMPTZ` | `type: string, format: date-time` | SSaC `@response` binds it as a string field. |
+| `TIMESTAMPTZ` | `type: string, format: date-time` | SSaC `@response` binds it as a string field |
 
 ## SSaC
 
-Custom DSL embedded in Go-comment form (`.ssac` extension, excluded from Go
-build). Full reference: [`docs/ssac.md`](docs/ssac.md).
+Custom DSL in Go-comment form (`.ssac`, excluded from Go build). Full
+reference: [`docs/ssac.md`](docs/ssac.md).
 
-- One `func` per file. Files live under `service/<domain>/`, never directly
-  under `service/`.
+- One `func` per file under `service/<domain>/` (never directly under `service/`).
 - Function name = OpenAPI `operationId`.
-- Full Go import paths at the top of the file are required for every package referenced by `@call` or `@eval` (S-72, S-73).
-- External API calls use flat names: `@call stripe.CreateCharge(...)`, never
-  `stripe.Charge.Create` (S-47). Package-prefix model calls
-  (`@get session.Session.Get`) are deprecated — use the built-in `@call`.
+- Full Go import paths required for every `@call`/`@eval` package (S-72, S-73).
+- External API calls: flat names only (`stripe.CreateCharge`, not
+  `stripe.Charge.Create` — S-47).
 
 ### Sequence types
 
 | Type | Purpose | Format | Args |
 |---|---|---|---|
-| `@get` | Query | `Type var = Model.Method(args...)` | 0 args allowed |
+| `@get` | Query | `Type var = Model.Method(args...)` | 0 args OK |
 | `@post` | Create | `Type var = Model.Method(args...)` | Required |
 | `@put` | Update (no return) | `Model.Method(args...)` | Required |
 | `@delete` | Delete | `Model.Method(args...)` | 0 args → WARNING |
-| `@empty` | Guard: nil/zero → 404 | `target "message" [STATUS]` | default 404. Target must be a Model var (S-64); scalars rejected. S-37 applies only to single-Model queries — `@empty` is not needed for scalar results. |
-| `@exists` | Guard: not nil → 409 | `target "message" [STATUS]` | default 409. Target must be a Model var (S-64); scalars rejected. |
+| `@empty` | Guard: nil→404 | `target "message" [STATUS]` | Must be Model var (S-64) |
+| `@exists` | Guard: not nil→409 | `target "message" [STATUS]` | Must be Model var (S-64) |
 | `@state` | State transition | `diagramID {inputs} "transition" "message" [STATUS]` | default 409 |
 | `@auth` | Permission check | `"action" "resource" {inputs} "message" [STATUS]` | default 403 |
 | `@call` | Function call | `[Type var =] package.Func(args...)` | — |
-| `@eval` | Predicate guard (true → STATUS) | `package.Func({k: v, ...}) "message" STATUS` | STATUS required (S-68); Func must return `bool` (S-67). |
+| `@eval` | Predicate guard (true→STATUS) | `package.Func({k:v}) "message" STATUS` | STATUS required (S-68); must return `bool` (S-67) |
 | `@publish` | Queue publish | `"topic" {payload} [{options}]` | — |
 | `@response` | JSON response | `varName` or `{ field: var, ... }` | — |
-| `@verify-password` | Timing-safe login check | `<Model>.<emailCol>=<emailExpr> <Model>.<hashCol> vs <pwExpr> -> <var> <status> "<message>"` | — |
+| `@verify-password` | Timing-safe login | `<Model>.<emailCol>=<emailExpr> <Model>.<hashCol> vs <pwExpr> -> <var> <status> "<message>"` | — |
 
 Append `!` to suppress WARNINGs (`@delete!`, `@response!`).
 
-**`@response` syntax** — always use braces for field binding:
+**`@response` syntax:**
 ```
-// Correct: explicit field binding
-@response { id: todo.ID, title: todo.Title, created_at: todo.CreatedAt }
-
-// Correct: direct variable (slice or scalar, no field mapping)
-@response todos
-
-// Wrong: @response <varName> when OpenAPI 200 schema has properties
-// → XOS-69 "binds 0 fields". Use braces instead.
-
-// manifest.* reference — reads a manifest.yaml value at codegen time.
-// Duration values are converted to seconds (int64).
-@response { access_token: token.AccessToken, expires_in: manifest.auth.accessTokenTTL }
-// Supported paths: manifest.auth.accessTokenTTL, manifest.auth.refreshTokenTTL
-// Validated by XNS-80.
+@response { id: todo.ID, title: todo.Title }               // field binding (braces required)
+@response todos                                             // direct variable (slice/scalar)
+@response { expires_in: manifest.auth.accessTokenTTL }      // manifest.* reference (XNS-80)
+// Wrong: @response <varName> when 200 schema has properties → XOS-69 "binds 0 fields"
 ```
 
-**리소스 1개 = 표현 1개 (canonical response representation, XDO-11/12).** 같은
-엔티티(같은 DDL 테이블에 귀결되는 리소스)를 반환하는 모든 2xx 응답 — GET-by-id ·
-Create · Update — 은 **동일한 표현**을 써야 한다. GET-by-id 만 평면 inline 으로,
-Create/Update 는 `$ref` 풀스키마로 내보내는 식의 표현 분기는 계약 모순이며 백엔드
-codegen 의 평면/모델 이중 경로를 비대칭으로 갈라 `go build` 를 깬다(BUG-131).
+Function annotations: `// @no-pagination` (exempts from S-63),
+`// @state-neutral` (exempts from XSM-27).
 
-```yaml
-# 권장: 모든 엔티티 응답이 같은 component 를 $ref
-responses:
-  '200':
-    content: { application/json: { schema: { $ref: '#/components/schemas/Rule' } } }
-```
+`@put` returns nothing; re-query with `@get` for updated row.
 
-- **XDO-11 (ERROR)** — 한 엔티티의 2xx 응답들이 서로 다른 표현(필드 집합·중첩·평면
-  vs 래퍼)을 노출하면 즉시 거부. 같은 component 를 `$ref` 하도록 통일하라.
-- **XDO-12 (WARNING)** — 엔티티 응답을 `$ref` 공유 없이 inline 으로 정의하면(현재는
-  일치해도 drift 위험) 경고. `components.schemas.<Model>` 를 `$ref` 하라.
-- 엔티티가 아닌 응답(스칼라 · COUNT · 페이지네이션 봉투 `{items, total}` · 함수결과
-  struct · 토큰)은 canonical 비대상 — 자유롭게 표현한다.
-
-Function-level annotations (placed above `func`): `// @no-pagination` exempts
-list endpoints from S-63; `// @state-neutral` declares that the operation is
-intentionally independent of the target resource's state machine and exempts
-the function from XSM-27 (use it as an intent declaration, not an escape
-hatch — state-dependent operations should add a `@state` guard and the
-corresponding transition, self-loop if there is no state change).
-
-`@put` returns nothing; re-query with `@get` if the response needs the updated
-row.
-
-**Return type ↔ RETURNING shape (XQS-20).** For `@get` / `@post` / `@put`,
-declare `<Model>` when the sqlc query uses `RETURNING *` (or lists every
-column), and `<QueryName>Row` when the query uses a partial RETURNING
-(e.g. `RETURNING id, email`). sqlc emits the model directly in the first
-case and an auto-generated row struct in the second; mismatches break
-`go build` of the generated handler. `yongol validate` enforces this with
-XQS-20 and suggests both directions of fix in the advice.
+**Return type ↔ RETURNING shape (XQS-20):** `<Model>` for `RETURNING *`,
+`<QueryName>Row` for partial RETURNING. Mismatch breaks `go build`.
 
 ### Args format
 
 Sources: `request.*`, `currentUser.*`, `query.*`, `message.*` (subscribe only),
-plus any variable introduced earlier in the sequence. String literals in
-quotes; numeric / boolean / `nil` as Go literals.
+plus earlier sequence variables. String literals in quotes; numeric/boolean/`nil`
+as Go literals.
 
-- `request.*` field names must exactly match the OpenAPI request schema
-  property names (snake_case or camelCase, whichever OpenAPI uses).
-- Every other source uses Go PascalCase (`user.Email`, `course.InstructorID`).
+- `request.*` must match OpenAPI property names exactly (snake_case or camelCase).
+- Other sources use Go PascalCase (`user.Email`, `course.InstructorID`).
 - `config.*` is forbidden; custom funcs read env vars directly.
-- `@auth` Inputs `ResourceID` value must be a `string`-compatible type
-  (XFS-70). Use `request.id` (OpenAPI path param = string).
-  DB row UUID fields (`wf.ID` etc.) are `pgtype.UUID` and cannot be passed directly.
-- When passing `request.*` to `@call`, the OpenAPI param type must match
-  the Func Request field type (XFS-73). Path param `format: uuid` maps to
-  `openapi_types.UUID` — declare the Func field as `openapi_types.UUID` too.
-- `@state` Inputs values must also be `string`-compatible (XSM-71).
-  `{status: wf.Status}` (TEXT column = string) is OK.
-  `{ID: wf.ID}` (UUID column = pgtype.UUID) is unnecessary and causes a type error.
-- Reserved sources (`currentUser`, `request`, `query`, `message`) must
-  always appear in **dotted** form inside `@post` / `@put` Inputs —
-  e.g. `currentUser.Email`, never `currentUser` alone (S-70). Standalone
-  reserved sources in DDL writes pack the whole object into one column
-  (blob anti-pattern). `@call` is exempt — user-authored Funcs may
-  legitimately receive a raw reserved object.
+- `@auth` Inputs `ResourceID` must be `string`-compatible (XFS-70). Use
+  `request.id` (path param = string), not DB row UUID fields (`pgtype.UUID`).
+- When passing `request.*` to `@call`, OpenAPI param type must match Func
+  Request field type (XFS-73).
+- `@state` Inputs must also be `string`-compatible (XSM-71).
+- Reserved sources (`currentUser`, `request`, `query`, `message`) must appear
+  in **dotted** form inside `@post`/`@put` (S-70). `@call` is exempt.
 
 ### @verify-password
-
-Collapses `@get FindByEmail` + `@empty` + `@call auth.VerifyPassword` into one
-line with dummy-hash timing defense. Example:
 
 ```ssac
 // @verify-password User.email=request.email User.password_hash vs request.password -> user 401 "Invalid credentials"
@@ -510,18 +323,16 @@ func Login() {}
 func OnEvent(message MessageType) {}
 ```
 
-Parameter name must be `message`. Message struct is declared in the same
-`.ssac` file. No `@response`, no `request.*`.
+Parameter name must be `message`. No `@response`, no `request.*`.
 
 ### Built-in funcs callable from SSaC
 
-Runtime implementations live in the sibling repo
-`github.com/park-jun-woo/ssac` under `ssac/pkg/<pkg>/`. Custom funcs in
-`func/<pkg>/` override built-ins of the same name.
+Runtime: `github.com/park-jun-woo/ssac` under `ssac/pkg/<pkg>/`. Custom
+`func/<pkg>/` overrides built-ins.
 
-| Package | SSaC @call functions | manifest backend |
+| Package | Functions | manifest backend |
 |---|---|---|
-| `auth` | `HashPassword`, `VerifyPassword`, `GenerateResetToken`, `RefreshRotate`, `Logout` + `IssueToken`\*, `VerifyToken`\*, `RefreshToken`\* | — |
+| `auth` | `HashPassword`, `VerifyPassword`, `GenerateResetToken`, `RefreshRotate`, `Logout`, `IssueToken`\*, `VerifyToken`\*, `RefreshToken`\* | — |
 | `session` | `Set`, `Get`, `Delete` | `session.backend` |
 | `cache` | `Set`, `Get`, `Delete` | `cache.backend` |
 | `file` | `Upload`, `Download`, `Delete` | `file.backend` |
@@ -531,76 +342,56 @@ Runtime implementations live in the sibling repo
 | `text` | `GenerateSlug`, `SanitizeHTML`, `TruncateText` | — |
 | `image` | `OgImage`, `Thumbnail` | — |
 
-\* `auth.IssueToken` / `VerifyToken` / `RefreshToken` are conditionally
-available when `backend.auth.claims` is declared in manifest.yaml — their
-request/response field names mirror claim names.
-
-SSaC imports `auth` via full path: `import "github.com/park-jun-woo/ssac/pkg/auth"`.
-
-`yongol validate` checks every `@call` against this list (XFS-39). Calling a
-non-existent builtin function (e.g. `auth.IssueTokenFromClaims`) emits an
-ERROR with the available function names for that package.
+\* Available when `backend.auth.claims` is declared. Import:
+`"github.com/park-jun-woo/ssac/pkg/auth"`. XFS-39 validates every `@call`.
 
 ### Built-in models
 
-Package-level singletons initialised via `Init()`.
-
 | Model | Purpose | Config |
 |---|---|---|
-| `authz` | OPA Rego authorization. Enforces `@auth` via `authz.Check`. Loads `OPA_POLICY_PATH` at startup (server exits if unset). | `authz.package` (optional); `@ownership` annotations in Rego |
-| `queue` | `@publish` / `@subscribe`. Options: `WithDelay(seconds)`, `WithPriority(n)`. Inside a DB tx (any `@post/@put/@delete`), `@publish` is emitted as `queue.PublishTx` for atomic outbox semantics. Memory backend has no tx-bound publish (use `postgres` — XNS-57). | `queue.backend` |
+| `authz` | OPA Rego authorization via `authz.Check`. `OPA_POLICY_PATH` required at startup | `authz.package` |
+| `queue` | `@publish`/`@subscribe`. Options: `WithDelay(seconds)`, `WithPriority(n)`. Inside DB tx → `queue.PublishTx`. Memory backend has no tx publish (use `postgres` — XNS-57) | `queue.backend` |
 
 authz input: `input.action`, `input.resource`, `input.resource_id`,
-`input.claims.<field>` (mirrors claim keys). `@auth` always injects
-`UserID: currentUser.ID` and `Role: currentUser.Role`. `data.owners.<resource>`
-is loaded per request from the `@ownership` mappings.
+`input.claims.<field>`. `@auth` injects `UserID: currentUser.ID`, `Role:
+currentUser.Role`. `data.owners.<resource>` loaded from `@ownership`.
 
 ## Mermaid stateDiagram
 
 Standard `stateDiagram-v2`. Details: [`docs/states.md`](docs/states.md).
 
-- Location: `states/*.md`, one diagram per file, wrapped in a ```` ```mermaid ````
-  fence.
-- Filename = diagram ID (`course.md` → referenced by `@state course {...}`).
+- Location: `states/*.md`, one diagram per file in a ` ```mermaid ` fence.
+- Filename = diagram ID (`course.md` → `@state course {...}`).
 - Transition label = SSaC function name = OpenAPI `operationId`.
-- `[*] --> X` initial state must equal the corresponding DDL column `DEFAULT`
-  value (XDM-28).
+- `[*] --> X` initial state must equal DDL column `DEFAULT` (XDM-28).
 
 ## OPA Rego
 
-OPA v1 only (every rule uses the `if` keyword). Details:
+OPA v1 only (every rule uses `if`). Details:
 [`docs/policy.md`](docs/policy.md).
 
 - Location: `policy/*.rego`.
 - Every `allow` rule must specify **both** `input.action` and `input.resource`
   (XPS-28).
-- Input schema fixed: `input.action`, `input.resource`, `input.resource_id`,
-  `input.claims.<field>`. `data.owners.<resource>` is loaded from DB per
-  request.
-- `@ownership` comment annotations declare the DB-backed ownership lookup:
+- Input schema: `input.action`, `input.resource`, `input.resource_id`,
+  `input.claims.<field>`. `data.owners.<resource>` loaded from DB.
+- `@ownership` annotations declare DB-backed ownership:
 
   ```rego
   # @ownership course: courses.instructor_id
   # @ownership lesson: courses.instructor_id via lessons.course_id
-  # @ownership review: reviews.user_id
   ```
 
   Forms: `resource: table.column` (direct) or
   `resource: table.column via join_table.fk` (joined).
-- Allowed patterns: unconditional, role-based, owner-based, role+owner,
-  multi-action set.
 
 ## STML (Semantic Template Markup Language)
 
 STML is yongol's declarative frontend SSOT. Plain HTML files with `data-*`
 attributes describe what data each page fetches, displays, and submits.
-`yongol generate` compiles STML into React TSX pages; the `.html` files are
-the source of truth, the generated `.tsx` files are disposable artifacts.
+`yongol generate` compiles STML into React TSX; the `.html` is source of truth.
 
-Location: `frontend/*.html` (flat, no subdirectories — except
-`frontend/layouts/*.html`, the layout vocabulary, see §Layouts below). The
-attribute vocabulary splits in two: **page attributes** (this table) and
-**layout attributes** (`data-nav` / `data-outlet` / `data-logout`, §Layouts).
+Location: `frontend/*.html` (flat; layouts in `frontend/layouts/*.html`).
 
 ### Page data-* Attributes (19)
 
@@ -609,496 +400,181 @@ attribute vocabulary splits in two: **page attributes** (this table) and
 | `data-fetch` | GET data loading (operationId) | `<section data-fetch="ListWorkflows">` |
 | `data-action` | POST/PUT/DELETE submission (operationId) | `<div data-action="CreateWorkflow">` |
 | `data-field` | Request body field binding | `<input data-field="title" />` |
-| `data-bind` | Response field display — **type-aware** (Phase037): the OpenAPI response type drives the JSX. `boolean` → `Yes`/`No`; `format: date`/`date-time` → `toLocaleDateString()`/`toLocaleString()`; `integer`/`number` → `toLocaleString()`; `string`/unknown → raw value. On an `<img>` the value binds to **`src`** (media bind, children-less `<img src={v} alt=… />`), not text children | `<span data-bind="status"></span>`, `<img data-bind="thumbnail_url" />` |
-| `data-param-*` | Path/query parameter (`route.<Name>`, or `item.<Field>` inside `data-each`) | `data-param-id="route.id"`, `data-param-photo-id="item.id"` |
+| `data-bind` | Response field display — **type-aware**: boolean→Yes/No, date/date-time→locale, number→locale, `<img>`→`src` bind | `<span data-bind="status">` |
+| `data-param-*` | Path/query param (`route.<Name>` or `item.<Field>` in `data-each`) | `data-param-id="route.id"` |
 | `data-each` | Array iteration | `<ul data-each="workflows">` |
-| `data-state` | Conditional display (guard, see below) | `data-state="workflow.status=draft"` |
+| `data-state` | Conditional display (guard) | `data-state="workflow.status=draft"` |
 | `data-component` | Custom component delegation | `<div data-component="DatePicker" data-field="StartAt" />` |
-| `data-enabled-when` | Action enablement decision (guard) | `<button data-action="ActivateWorkflow" data-enabled-when="workflow.status=draft">` |
-| `data-invalidates` | Effect declaration: queries to refetch on action success (space-separated operationIds) | `<div data-action="CreateWorkflow" data-invalidates="ListWorkflows">` |
-| `data-capture` | Auth flow: store response fields into auth sinks on action success. Sinks: `auth.token`, `auth.refresh`, `auth.claims.<name>` (a claim from the login response body — e.g. the user's role for the sitemap `data-roles` menu filter; works in cookie mode too) | `<section data-action="Login" data-capture="access_token -> auth.token, role -> auth.claims.role">` |
-| `data-redirect` | Flow: target navigated to on action success — a `/`-prefixed **static path**, or an STML **page-name reference** (filename without `.html`) whose resolved route gets `data-redirect-params` substituted | `<section data-action="Login" data-redirect="/">`, `<div data-action="CreateContract" data-redirect="contract-edit" data-redirect-params="id -> ContractID">` |
-| `data-redirect-params` | Flow: binds the redirect target route's segments — `<source> -> <SegmentName>` pairs (comma-separated, `data-capture`-style value grammar). Sources: unprefixed 2xx **response fields** of the action operation (the only data in scope after success) or `route.<Name>` (forwarding a current-page param). `-> <SegmentName>` may be elided when the target has exactly one required segment | `data-redirect-params="id -> ContractID"` |
-| `data-prefill` | Edit form: seed this form's initial values from a same-page `data-fetch` result. Value is that GET operationId; its 2xx response fields fill the matching `data-field` inputs by name (see §Edit form prefill). Valid only on the `data-action` element | `<form data-action="UpdateRule" data-prefill="GetRule">` |
-| `data-on-error` | Auth flow: marker for the element shown when the action fails (4xx/5xx rejects with the server ErrorResponse body; its `message` is displayed, falling back to a stringified error when `message` is absent). When absent, a default error element (`role="alert"`) is emitted right next to the submit button — declaring `data-on-error` decides the display element and position instead | `<p data-on-error></p>` |
-| `data-route` | Explicit route path override on the page's top-level element (`:Name` pattern params merge into `useParams()`) | `<main data-route="/buildings/:BuildingID/units/:UnitID">` |
-| `data-layout` | Layout opt-in on the page's top-level element — the page renders inside `layouts/<name>.html` (overrides `manifest.frontend.defaultLayout`) | `<main data-layout="app">` |
-| `data-link` | Navigation: clicking this element goes to another page. The value is a **page name** (STML filename without `.html`), not a path — route paths are a derived projection | `<li data-link="building-detail" data-link-params="item.id -> BuildingID">` |
-| `data-link-params` | Navigation: binds the target route's segments — `<source> -> <SegmentName>` pairs (comma-separated, `data-capture`-style value grammar). Sources: `item.<Field>` (inside `data-each`) or `route.<Name>` (own page route). `-> <SegmentName>` may be elided when the target has exactly one required segment | `data-link-params="item.id -> BuildingID"` |
+| `data-enabled-when` | Action enablement guard (button disabled unless true) | `data-enabled-when="workflow.status=draft"` |
+| `data-invalidates` | Queries to refetch on success (space-separated operationIds) | `data-invalidates="ListWorkflows"` |
+| `data-capture` | Auth flow: store response→auth sinks (`auth.token`, `auth.refresh`, `auth.claims.<name>`) | `data-capture="access_token -> auth.token"` |
+| `data-redirect` | Navigate on success: `/`-prefixed static path or page-name reference | `data-redirect="contract-edit"` |
+| `data-redirect-params` | Bind redirect target segments: `<source> -> <SegmentName>` | `data-redirect-params="id -> ContractID"` |
+| `data-prefill` | Edit form: seed from a same-page `data-fetch` result | `data-prefill="GetRule"` |
+| `data-on-error` | Error display element (defaults to inline `role="alert"` if absent) | `<p data-on-error></p>` |
+| `data-route` | Explicit route path override (`:Name` pattern params) | `data-route="/buildings/:BuildingID/units/:UnitID"` |
+| `data-layout` | Layout opt-in (renders inside `layouts/<name>.html`) | `data-layout="app"` |
+| `data-link` | Navigation to another page (page-name reference, not path) | `data-link="building-detail"` |
+| `data-link-params` | Bind link target segments: `<source> -> <SegmentName>` | `data-link-params="item.id -> BuildingID"` |
 
-`data-enabled-when` declares *when an action is available*: the button renders
-`disabled` unless the guard holds. `data-invalidates` declares *what goes stale*
-on success — each listed GET operationId is refetched (TanStack Query
-invalidation). Both are decisions, not implementation; codegen renders the
-wiring as a disposable projection.
+### Key attribute semantics
 
-The three flow attributes declare the auth session flow (plans/stml/auth-flow):
-`data-capture` and `data-redirect` belong on the `data-action` element itself,
-`data-on-error` on an element *inside* a `data-action` block (TM-25 enforces
-placement). The capture sink namespace is restricted to `auth.token`,
-`auth.refresh` and `auth.claims.<name>` (`session.*` collides with the SSaC
-built-in session package). `auth.claims.<name>` (plans/stml/sitemap
-Phase005) stores a login-response field as a named claim in the session
-store — the supply line of the sitemap `data-roles` menu filter via
-`manifest frontend.auth.role_field`. Because the claim comes from the
-response *body* (not an httpOnly cookie), claims captures are first-class
-in cookie mode too: TM-24 exempts them, and a cookie-mode project with
-claims captures gets a claims-only store (no token fields).
-`data-redirect` takes a `/`-prefixed static path (which must resolve to an
-STML page route, `/` being the index route) or a page-name reference; either
-way the target must exist (TM-26). A **state-changing mutation**
-`data-action` (POST/PUT/PATCH/DELETE) **must** declare `data-redirect` —
-where to go on success is an author decision, not a heuristic, so a mutation
-without it is a **TM-57 ERROR** (BUG-132). The bearer login capture action
-(`data-capture`) is exempt: it drives its own navigation. With the redirect
-declared, the generated onSuccess refreshes the affected queries (a delete
-`removeQueries`-es its own resource GET so a navigate away never refetches a
-404) **and** navigates — invalidate and navigate combine, not exclude.
+**`data-capture` / `data-redirect` / `data-on-error` (flow attributes):**
+`data-capture` and `data-redirect` go on the `data-action` element;
+`data-on-error` goes inside a `data-action` block (TM-25). Capture sinks:
+`auth.token`, `auth.refresh`, `auth.claims.<name>`. In cookie mode, token
+captures are rejected (TM-24) but `auth.claims.*` is exempt (read from response
+body, not httpOnly cookie).
 
-### Dynamic redirect (`data-redirect` page-name reference + `data-redirect-params`)
+**`data-redirect` is required on mutations** (TM-57): POST/PUT/PATCH/DELETE
+`data-action` must declare where to go on success. Bearer login capture
+(`data-capture`) is exempt. Dynamic redirect: non-`/`-prefixed value =
+page-name reference; `data-redirect-params` substitutes response fields into
+segments. Sources: unprefixed 2xx response fields or `route.<Name>`.
+Unmapped optional segments omitted; every required segment must be mapped
+(TM-33). The declared redirect combines invalidate/removeQueries and navigate.
 
-A non-`/`-prefixed `data-redirect` value is a **page-name reference**
-(plans/stml/page-flow Phase008) — the same target vocabulary as `data-link`.
-Codegen resolves it to the target page's route (the `RoutePaths` table) and
-substitutes `data-redirect-params` sources into the segments, so a create
-flow can land on the resource it just made:
+**`data-prefill` (edit form):** On `data-action` element; value = same-page
+fetch operationId. Fields matched by name. Codegen wires react-hook-form
+`values` + `keepDirtyValues`. Missing field → blank with WARNING (TM-54).
+A PUT with prefill resends unchanged fields; a PATCH with all-required
+requestBody → TM-56 WARNING. Edit page with GET-by-id fetch but no prefill →
+TM-55 WARNING.
 
-```html
-<div data-action="CreateContract"
-     data-redirect="contract-edit"
-     data-redirect-params="id -> ContractID">
-```
-
-emits `navigate(`/contract-edit/${data.id}`)` in the mutation's `onSuccess`.
-Sources are unprefixed 2xx response fields (`data-capture` left-hand-side
-tier; validated against the operation's response schema) or `route.<Name>`
-(forwarding a current-page param to the target). Each substituted response
-field is guarded like the capture commit: a 2xx response missing the field
-aborts the navigate and surfaces through the action's error state instead of
-baking `undefined` into the URL. Unmapped **optional** segments are omitted;
-every **required** segment must be mapped, and params on a static path are a
-contradiction (TM-33). The static-path form is unchanged.
-
-### Edit form prefill (`data-prefill`)
-
-An edit page reads the current values with a GET-by-id `data-fetch` and writes
-them back with a PUT/PATCH `data-action`. `data-prefill` (plans/gen/frontend
-Phase035, BUG-124) connects the two so the form opens **pre-filled** instead of
-empty. The value is the same-page fetch operationId; placement is the
-`data-action` element itself (TM-25 enforces it, like `data-capture`/`data-redirect`):
-
-```html
-<article data-fetch="GetRule" data-param-rule-id="route.RuleID">
-  <form data-action="UpdateRule"
-        data-prefill="GetRule"
-        data-param-rule-id="route.RuleID">
-    <input data-field="sheet_name" />
-    <input data-field="start_row" type="number" />
-    <button type="submit">저장</button>
-  </form>
-</article>
-```
-
-- **Field matching is by name**: a `data-field` is prefilled from the fetch 2xx
-  response's same-named top-level field. Codegen wires react-hook-form's `values`
-  option from the fetch data variable (`<fetchOpLower>Data`, here `getRuleData`)
-  plus `resetOptions: { keepDirtyValues: true }`, so a `data-invalidates` refetch
-  re-syncs server values without overwriting fields the user is editing.
-- A form field **absent** from the response opens blank (TM-54 WARNING — codegen
-  fills it with a type-appropriate empty literal so the build still passes). The
-  prefill value must name an existing same-page fetch or it is a TM-54 ERROR.
-- **PUT vs PATCH**: codegen never relaxes zod `required` on its own — that is the
-  OpenAPI decision. With prefill, a PUT whole-body submit still works as
-  "change one field and save" because the unchanged fields are resent from their
-  current values. A PATCH whose requestBody is all-required contradicts partial
-  update — TM-56 WARNING points you to mark the optional fields not required in
-  OpenAPI, after which the zod schema relaxes them automatically. The edit page
-  that has a GET-by-id fetch but forgets `data-prefill` raises TM-55 WARNING.
-
-### Page links (`data-link` / `data-link-params`)
-
-`data-link` declares "clicking here goes to that page" (plans/stml/page-flow
-Phase007). The target is a page-name reference; codegen resolves it to the
-target page's route (the same `RoutePaths` table the router uses) and emits a
-react-router `<Link to={...}>`. Placement: on a `data-each` item template
-(whole-row link — every field cell's content is wrapped), as a row child or
-`data-fetch` child, or in static context (plain navigation link). The same
-element must not also declare `data-action` — click semantics conflict,
-rejected at parse time. List → detail row link:
-
-```html
-<ul data-each="buildings">
-  <li data-link="building-detail" data-link-params="item.id -> BuildingID">
-    <span data-bind="name"></span>
-  </li>
-</ul>
-
-<a data-link="settings-parsing-rules">파싱 규칙</a>
-```
-
-`building-detail` is a `-detail` page, so its derived route is
-`/buildings/:BuildingID/...` — the emitted path differs from the page name by
-design (the SSOT records only *which page*). Unmapped **optional** segments
-(`:Name?`) are omitted from the emitted path; every **required** segment must
-be mapped (TM-32). A target page that does not exist is a broken link,
-blocked statically (TM-31) — an advantage hand-written code does not have.
+**`data-link` / `data-link-params`:** Page-name reference navigation. Emits
+react-router `<Link>`. Placement: `data-each` item, row child, or static
+context. Must not co-occur with `data-action`. Target must exist (TM-31);
+required segments must be mapped, `item.*` sources validated against item
+schema (TM-32).
 
 ### Guard syntax (`data-state` / `data-enabled-when`)
 
-Guards are a deliberately restricted, Turing-incomplete expression language —
-comparisons, logical combinators, negation, and parentheses only (no function
-calls, arithmetic, or ternaries), so they stay statically verifiable. EBNF:
+Restricted expression language — comparisons, logical combinators, negation,
+parentheses only (no function calls/arithmetic/ternaries).
 
 ```
-guard     := term (("&&" | "||") term)*
-term      := "!"? atom
-atom      := ref op value | ref "." lifecycle | "(" guard ")"
-ref       := <model> "." <Field>            // workflow.status, currentUser.Role
-op        := "=" | "!=" | ">" | "<" | ">=" | "<="
-value     := <state-id> | <number> | <quoted-string> | <enum-literal>
+guard := term (("&&" | "||") term)*
+term  := "!"? atom
+atom  := ref op value | ref "." lifecycle | "(" guard ")"
+ref   := <model> "." <Field>
+op    := "=" | "!=" | ">" | "<" | ">=" | "<="
 lifecycle := "loading" | "error" | "empty"
 ```
 
-Examples: `workflow.status = active`,
-`workflow.status=active && currentUser.Role=owner`,
-`!(workflow.status = archived)`, `workflows.empty`, `.loading`.
+Examples: `workflow.status=active`,
+`workflow.status=active && currentUser.Role=owner`, `workflows.empty`.
 
-**Backward compatibility**: a single comparison (`field=value`), a lifecycle
-suffix (`.loading` / `.error` / `.empty` / `items.empty`), and a bare field keep
-their existing behavior unchanged. Only conditions containing a combinator
-(`&&`, `||`), a leading `!`, or parentheses are routed through the guard parser
-and validated by TM-17.
+### Page structure and nesting
 
-### Page Structure
-
-A page is a single `.html` file containing `data-fetch` and/or `data-action`
-blocks at the top level. Nesting rules:
-
-- `data-fetch` can contain `data-bind`, `data-each`, `data-state`, and nested
-  `data-action` (e.g. action buttons inside a detail view).
-- `data-each` iterates an array field from the parent `data-fetch` response.
-  Children inside `data-each` use `data-bind` to display item fields, and may
-  declare row-level `data-action` buttons (e.g. delete-this-row) whose
-  `data-param-*` sources reference the current row via `item.<Field>`.
-- `data-action` can contain `data-field` inputs and a submit button.
-- `data-state` conditionally shows its children based on a field value
-  (e.g. `data-state="status=draft"` or `data-state="items.empty"`).
-- `data-param-*` passes path/query parameters. The `*` suffix is kebab-case
-  and maps to camelCase (`data-param-reservation-id` → `reservationId`).
-  Source is `route.<Name>` for URL params, or `item.<Field>` for the current
-  row's field inside a `data-each` block (TM-30: `item.*` is only legal
-  inside `data-each`, against the innermost each's item schema; it
-  contributes no route segment). Example:
-
-  ```html
-  <ul data-each="photos">
-    <li>
-      <span data-bind="caption"></span>
-      <button data-action="DeletePhoto"
-              data-param-building-id="route.BuildingID"
-              data-param-photo-id="item.id">삭제</button>
-    </li>
-  </ul>
-  ```
+- `data-fetch` contains `data-bind`, `data-each`, `data-state`, nested
+  `data-action`.
+- `data-each` iterates array fields; children use `data-bind`, may have
+  row-level `data-action` with `data-param-*` via `item.<Field>`.
+- `data-action` contains `data-field` inputs and submit button.
+- `data-param-*` suffix is kebab-case → camelCase. Source: `route.<Name>` or
+  `item.<Field>` (TM-30: `item.*` only inside `data-each`).
 
 ### Route paths
 
-Each page resolves to exactly one route path. An explicit `data-route` on the
-page's top-level element always wins; without it the path is **derived from
-the page's `route.<Name>` consumption** so the route pattern and the page's
-`useParams()` destructuring agree in name and arity:
+Each page resolves to one route path. `data-route` always wins; without it:
 
-1. Base path: filename without `.html` → `/<kebab>` (`workflows.html` →
-   `/workflows`); a `-detail` suffix maps to the pluralized parent resource
-   (`workflow-detail.html` → `/workflows`).
-2. Every `route.<Name>` the page consumes becomes a path segment after the
-   base, in first-appearance order (fetch blocks → page-level actions →
-   child actions): params consumed by some `data-fetch` are **required**
-   segments (`:Name` — the page cannot render without them), params consumed
-   only by `data-action` blocks are trailing **optional** segments (`:Name?`,
-   react-router v6.5+ — the page must stay reachable without them). Required
-   segments come first.
-   Example: `unit-info.html` fetching with `route.BuildingID`/`route.UnitID`
-   and deleting with `route.PhotoID` → `/unit-info/:BuildingID/:UnitID/:PhotoID?`.
-   (Row-context IDs are better expressed as `item.<Field>` inside `data-each`
-   — `item.*` contributes no route segment, so the delete above declared with
-   `data-param-photo-id="item.id"` drops the `:PhotoID?` segment.)
-3. A page that consumes no `route.*` keeps the bare base path. A page whose
-   fetch requires params has **no** bare-path route — a list+detail hybrid
-   needs two pages or an explicit `data-route`.
+1. Base: filename → `/<kebab>` (`workflows.html` → `/workflows`); `-detail`
+   suffix → pluralized parent (`workflow-detail.html` → `/workflows`).
+2. Each `route.<Name>` consumed becomes a segment. Fetch params = **required**
+   (`:Name`); action-only params = **optional** (`:Name?`). Required first.
+3. No `route.*` consumed → bare base path.
 
-All `route.<Name>` sources are path segments, even when the bound OpenAPI
-parameter is a query parameter. When the derivation is unsuitable (e.g.
-nested resource paths like `/buildings/:BuildingID/units/:UnitID`), declare
-`data-route` — its `:Name` pattern params are merged into `useParams()`
-automatically.
+All `route.*` sources are path segments. When derivation is unsuitable, use
+`data-route`.
 
-**Route param → API argument (Phase041).** An integer path parameter sourced
-from `route.<Name>` is converted with a plain `Number(<Name>)` — `Number()`
-returns type `number` regardless of input, so it always satisfies a required
-path parameter (never `number | undefined`). The route-segment optionality
-above (required `:Name` vs optional `:Name?`) is a **separate** concern and is
-not changed by the argument conversion. To keep an *optional* route param from
-reaching the API as `NaN` when the segment is absent, the operation that
-consumes it is **call-guarded** rather than its argument mangled: a dependent
-`useQuery` carries `enabled`, and a dependent mutation's trigger (button or form
-submit) is `disabled` while the optional param is `== null`. So the call simply
-does not fire until the param is present — the argument stays plain `Number`.
+**Route param → API argument (Phase041):** Integer route params converted with
+`Number()`. Optional params call-guarded (`enabled`/`disabled`) rather than
+argument-mangled — the call does not fire until the param is present.
 
 ### Index route
 
-What `/` shows is decided in three tiers (plans/stml/page-flow Phase009):
-
-1. A page with `data-route="/"` **mounts** at `/` — no redirect is emitted.
-2. `manifest.frontend.index: <page-name>` — `/` **redirects** to that page's
-   resolved route (the page keeps its own path). Optional segments
-   (`:Name?`) are stripped from the emitted `<Navigate to>` (a redirect has
-   no value to fill them); a route with a **required** segment cannot be the
-   index (TM-34). Declaring both tiers at once is a contradiction (TM-34).
-3. Neither declared — fallback: the first **public** page in file-name sort
-   order (`/login` when every candidate is protected or parameterized).
-   TM-35 warns that an accident, not a declaration, decides the first
-   screen, and names the picked page.
+Three tiers: (1) `data-route="/"` mounts at `/`. (2) `manifest.frontend.index`
+redirects. (3) Fallback: first public page by name sort (TM-35 warns).
+Declaring both (1) and (2) → TM-34 error.
 
 ### Layouts (`frontend/layouts/*.html`)
 
-A layout is the shared shell pages render inside — global menu, logout, and
-an outlet slot. Filename = layout name (`app.html` → `app`). A page opts in
-with `data-layout="<name>"` on its top-level element, or every page at once
-via `manifest.frontend.defaultLayout: <name>` (TM-11/12 validate the
-references, TM-13 warns on unused layouts).
+Shared shell. Filename = layout name. Page opts in via `data-layout` or
+`manifest.frontend.defaultLayout`.
 
-| Attribute | Purpose | Example |
-|---|---|---|
-| `data-nav` (on `<a>`) | Global menu entry — **only when `frontend/sitemap.html` is absent**. With a sitemap the layout menu derives from the sitemap tree and a surviving `data-nav` is an ERROR (TM-44 — the menu moved to sitemap.html; single source of truth). Without one, the value is an STML **page-name reference** (recommended — resolved to the page's route, the `data-redirect` dual rule) or a `/`-prefixed static path. The target must resolve, and a page-name target's route must carry no **required** parameter segment — a static menu link has no value to fill it (TM-36) | `<a data-nav="building-list">건물</a>` |
-| `data-outlet` (on `<slot>`) | Where the active page renders inside the layout (`<Outlet />`) | `<slot data-outlet></slot>` |
-| `data-logout` | Marks the element that ends the session. The optional value names the server logout operation (must exist and be non-GET — TM-37). bearer mode: op call (best-effort) → session store clear → `/login`; cookie mode: the server op *is* the logout (a valueless `data-logout` cannot end an httpOnly cookie session — TM-38) → `/login`. Without backend.auth the declaration is dead — TM-38 warns and nothing is emitted | `<button data-logout="Logout">로그아웃</button>` |
-
-Admin layout example (Gozhip-style, **sitemap absent**):
-
-```html
-<!-- frontend/layouts/app.html -->
-<div>
-  <nav>
-    <a data-nav="dashboard">대시보드</a>
-    <a data-nav="building-list">건물</a>
-    <a data-nav="member-list">멤버</a>
-    <button data-logout="Logout">로그아웃</button>
-  </nav>
-  <slot data-outlet></slot>
-</div>
-```
-
-With `manifest.frontend.defaultLayout: app` every page without its own
-`data-layout` renders inside this shell: menu navigation across the
-parameter-less list pages plus a working logout. A menu entry into a page
-whose resolved route carries a required segment (e.g. a `contract-list`
-whose fetch consumes `route.BuildingID` → `/contract-list/:BuildingID`) is
-rejected statically (TM-36) — that navigation belongs to `data-link` with
-`data-link-params`. The emitted layout component is the only component
-class that imports the api client (`@/lib/api`) and, in bearer mode, the
-session store (`@/stores/auth`) — the same import convention as pages.
+| Attribute | Purpose |
+|---|---|
+| `data-nav` (on `<a>`) | Menu entry — **only when sitemap absent** (TM-44). Value: page-name or `/`-path. Target route must have no required params (TM-36) |
+| `data-outlet` (on `<slot>`) | Where the page renders (`<Outlet />`) |
+| `data-logout` | Session end. Optional value = server logout operationId (must exist, non-GET — TM-37). Bearer: op call → clear → `/login`. Cookie: valueless rejected — httpOnly cookie needs server op (TM-38). TM-58 warns bearer-mode valueless `data-logout` when a logout-like op exists. Without `backend.auth` → dead declaration |
 
 ### Sitemap (`frontend/sitemap.html`)
 
-The optional central site-structure declaration (plans/stml/sitemap
-Phase001): an HTML nested-list page tree, one fixed-name file directly in
-the frontend directory (it is never parsed as a page). Absent file = the
-current behavior, unchanged — but TM-49 warns that the structure is
-undeclared. Each `<nav data-sitemap>` block groups pages, document order =
-menu order. The tree is free-depth; one page appears at most once across
-the whole file (canonical position — TM-40); cross-references between
-screens stay `data-link`'s job.
+Optional central site-structure declaration. An HTML nested-list page tree;
+absent = current behavior (TM-49 warns). Each `<nav data-sitemap>` groups pages;
+document order = menu order. One page appears at most once (TM-40).
 
 | Attribute | Where | Purpose |
 |---|---|---|
-| `data-sitemap` | `<nav>` | Declares a sitemap block. At least one per file; any other top-level element is a parse error |
-| `data-layout` | `<nav>` | Default layout for the block's pages (must exist in `layouts/` — TM-41). Priority: page `data-layout` > sitemap > `manifest.frontend.defaultLayout` |
-| `data-entry` | `<nav>` | Marks every page in the block as a reachability root (public entry pages) |
-| `data-page` | `<li>` | STML page name (filename without `.html`; must exist — TM-39). An `<li>` without it is a group label (not clickable) |
-| `data-index` | `<li data-page>` | The `/` redirect target. At most one per sitemap; the page's route must have no required segment; must agree with `manifest.frontend.index` when both are declared (TM-42) |
-| `data-menu="false"` | `<li data-page>` | Hide from the menu (the node keeps its structural/breadcrumb position) |
-| `data-icon` | `<li>` | Menu icon: a kebab-case [lucide](https://lucide.dev) icon name, emitted as the lucide-react component (`layout-dashboard` → `<LayoutDashboard />`). The dependency is added to package.json only when at least one `data-icon` exists; an unknown name fails tsc as an import error (no silent runtime fallback) |
-| `data-roles` | `<li>` | Role allowlist (comma-separated) for the menu entry — the entry renders only when the signed-in user's role claim is in the list; the whole subtree inherits by nesting (ancestor conditions AND). Each value must be in `backend.auth.roles` (TM-46) and the wiring needs `frontend.auth.role_field` + an `auth.claims.<role_field>` capture (TM-47). **Menu hiding ≠ access blocking** — this filter is UX only; access control stays in Rego |
-| `data-crumb-field` | `<li data-page>` | Dynamic breadcrumb label (Phase006): the named field of the page's **first** `data-fetch` 2xx response replaces the static crumb label (and `document.title`) once the fetch arrives — "건물 상세" → "역삼타워". Page items only (TM-39); the field must exist in that response schema as a string/integer/number scalar (TM-50). Before arrival, on failure or without the field the static label stays — no blank/flicker |
-| `<a href="...">` | `<li>` child | External-link menu entry — mutually exclusive with `data-page` (TM-39) |
-| label | `<li>` direct text | Menu/breadcrumb label |
-| `data-fetch` / `data-each` / `data-link` / `data-link-params` / `data-label-field` | nested `<ul>` of a group `<li>` | **Dynamic menu group** (Phase007): the group's items are the rows of an OpenAPI list response — see §Sitemap dynamic menu groups below |
+| `data-sitemap` | `<nav>` | Declares a sitemap block (at least one per file) |
+| `data-layout` | `<nav>` | Default layout for block's pages (TM-41). Priority: page `data-layout` > sitemap > `defaultLayout` |
+| `data-entry` | `<nav>` | Marks pages as reachability roots (public entry) |
+| `data-page` | `<li>` | STML page name (must exist — TM-39). Without it = group label |
+| `data-index` | `<li data-page>` | The `/` redirect target (at most one; TM-42) |
+| `data-menu="false"` | `<li data-page>` | Hide from menu (keeps structural/breadcrumb position) |
+| `data-icon` | `<li>` | Kebab-case [lucide](https://lucide.dev) icon name |
+| `data-roles` | `<li>` | Role allowlist (comma-separated). Menu UX only, not security. Each value in `backend.auth.roles` (TM-46). Requires full wiring: `frontend.auth.role_field` + `auth.claims.<role>` capture (TM-47). Subtree inherits |
+| `data-crumb-field` | `<li data-page>` | Dynamic breadcrumb: named field of first `data-fetch` response replaces crumb label + `document.title` (TM-50). Page items only |
+| `<a href>` | `<li>` child | External link (mutually exclusive with `data-page` — TM-39) |
+| label | `<li>` text | Menu/breadcrumb label |
 
 ```html
-<!-- frontend/sitemap.html -->
 <nav data-sitemap data-layout="app">
   <ul>
     <li data-page="dashboard" data-index>대시보드</li>
-    <li>건물 관리                       <!-- group label (no data-page) -->
+    <li>건물 관리
       <ul>
         <li data-page="building-list">건물 목록
-          <ul>
-            <li data-page="building-detail">건물 상세</li>
-          </ul>
+          <ul><li data-page="building-detail">건물 상세</li></ul>
         </li>
       </ul>
     </li>
-    <li data-page="member-list" data-icon="users" data-menu="false">멤버</li>
-    <li><a href="https://docs.example.com">사용자 매뉴얼</a></li>
   </ul>
 </nav>
-
 <nav data-sitemap data-layout="bare" data-entry>
-  <ul>
-    <li data-page="login">로그인</li>
-  </ul>
+  <ul><li data-page="login">로그인</li></ul>
 </nav>
 ```
 
-**Reachability — listing is a node, not an edge.** With a sitemap present,
-TM-43 checks that every page is actually reachable: BFS from the roots
-(`data-index` pages, every page of a `data-entry` block,
-`manifest.frontend.index`, `data-route="/"` mounts) over the real movement
-edges — menu-rendered sitemap entries (menu depth ≤ 2, no required route
-param, no `data-menu="false"`), `data-link` targets, resolvable
-`data-redirect` targets and breadcrumb up-links (Phase004 — a reachable
-page's breadcrumb links each `MenuRenderable` sitemap ancestor, so the
-ancestor counts as reachable through it). **Listing a page in the sitemap does not make it
-reachable**: an entry that does not render in the menu (e.g. a detail page
-whose route needs `:BuildingID`) still needs an incoming `data-link`/
-`data-redirect` from a reachable page — typically `data-link` on the list's
-`data-each` row. Without a sitemap TM-43 stays inactive (there is nowhere
-to declare roots/entry points) and TM-49 warns instead.
+**Reachability (TM-43).** BFS from roots (index + `data-entry` pages) over
+edges: menu-rendered entries (depth ≤ 2, no required param, no
+`data-menu="false"`), `data-link`, `data-redirect`, breadcrumb up-links (a
+reachable page's `MenuRenderable` sitemap ancestors), dynamic group
+`data-link`. **Listing ≠ reaching** — a non-menu-rendered entry still needs an
+incoming link.
 
-**Menu derivation (Phase003).** With a sitemap present the layout menus
-are emitted from the sitemap tree — `data-nav` in any layout HTML is then
-an ERROR (TM-44: the menu moved to sitemap.html; the layout keeps only the
-menu *position* — its `<nav>`/`data-outlet` shell). The rules:
+**Menu derivation.** With sitemap present, layout menus derive from sitemap
+— `data-nav` in layouts is ERROR (TM-44). 2-level render: groups
+(non-clickable headers, always expanded) + items. Deeper nodes,
+required-parameter routes, `data-menu="false"` subtrees do not render. Active
+state: `<NavLink ... end>` with ancestor pathname prefix matching for
+menu-hidden descendants.
 
-- **Block → layout**: each `<nav data-sitemap>` block feeds the layout its
-  `data-layout` names; a block without `data-layout` feeds
-  `manifest.frontend.defaultLayout`. Several blocks for the same layout
-  chain in document order. Layout assignment of the *pages* follows the
-  three-step chain page `data-layout` > sitemap block `data-layout` >
-  `defaultLayout` (the specific beats the general), and a layout assigned
-  only by a sitemap block counts as used (TM-13).
-- **2-level render**: level 1 = group labels (`<li>` without `data-page`,
-  non-clickable `<span>` headers, always expanded) or direct page items;
-  level 2 = items inside a group. Deeper nodes, required-parameter routes
-  and `data-menu="false"` subtrees do not render (the exact
-  `MenuRenderable` judgment TM-43 uses — validation and emission never
-  disagree).
-- **Active state**: internal items emit `<NavLink ... end>` (exact route
-  match). A menu-hidden descendant (detail page etc.) highlights its
-  nearest menu-rendered ancestor automatically: the ancestor's `className`
-  callback also matches `pathname.startsWith(...)` over the descendants'
-  static route prefixes — no manual `activeMenu` pointer needed.
-- **External links** emit `<a href target="_blank" rel="noopener noreferrer">`;
-  **icons** emit lucide-react components (see `data-icon` above).
+**Breadcrumb & title (Phase004).** Static breadcrumbs and `document.title`
+derive from the sitemap tree (`src/lib/breadcrumbs.ts` — generate-time
+constants). `data-crumb-field` upgrades the self label to a dynamic entity name
+via react-router `<Outlet context>`. Without sitemap, nothing emitted.
 
-The menu and the breadcrumb both render **inside a layout** (`<slot
-data-outlet>` host). If the sitemap derives a menu but *no* layout exists to
-host it — `layouts/` empty **and** `manifest.frontend.defaultLayout` unset
-**and** no nav declares `data-layout` — the derived menu/breadcrumb never
-render and the emitted `<Breadcrumb>` would be dead code; **TM-51** WARNS
-(the inverse of TM-49, BUG-129). The breadcrumb emitter also skips its
-artifacts when no layout hosts it (no dead code). Declare one
-`layouts/<name>.html` with a `<slot data-outlet>` and assign it via
-`defaultLayout` or a nav `data-layout`. (When the layout is *declared but
-missing* from `layouts/`, TM-12/TM-41 ERROR instead — TM-51 stays silent.)
+**Role-based menu (Phase005).** Three declarations wire the filter:
+`data-roles` on `<li>`, `backend.auth.roles` in manifest,
+`frontend.auth.role_field` + `auth.claims.<role>` capture on login. In cookie
+mode, claims captures are exempt from TM-24 (read from response body).
 
-**Breadcrumb & document.title derivation (Phase004).** With a sitemap
-present, static breadcrumbs and page titles derive from the tree (labels
-are the `<li>` texts — DESIGN §4.6; `data-crumb-field` upgrades the
-self label to a dynamic entity name, below). Without a sitemap nothing
-below is emitted and the output stays byte-identical.
-
-- **Trails are generate-time constants**: `src/lib/breadcrumbs.ts` holds a
-  page-name-keyed `BREADCRUMBS` table (the root → self label chain — every
-  ancestor `<li>` contributes a crumb, groups and external links included)
-  plus a `BREADCRUMB_ROUTES` pattern → page matching table (static
-  patterns sorted before parameterized ones). No runtime tree walk.
-- **Crumb links**: an ancestor crumb gets an `href` only when its node is
-  a page the `MenuRenderable` judgment admits (same raw judgment as the
-  menu — a required-parameter ancestor, group label or external link stays
-  label-only, the Refine "parent without a list = crumb without href"
-  rule). The trail's own page is always label-only. These ancestor links
-  are TM-43's reachability edge (d) — validation and emission never
-  disagree on what the user can click.
-- **Rendering**: the shared `<Breadcrumb>` component
-  (`src/components/ui/Breadcrumb.tsx`) is placed above every layout's
-  `<Outlet />`; it matches the current pathname against
-  `BREADCRUMB_ROUTES` and renders the selected trail. Depth-1 pages (a
-  single-crumb trail is noise) and sitemap-unlisted pages render no
-  breadcrumb at all — the table simply has no entry.
-- **document.title**: every sitemap-listed page's component gets a mount
-  `useEffect` setting `document.title = '<label> · <app name>'` (the app
-  name is `manifest.metadata.name`; a labelless `<li data-page>` falls
-  back to the page name). Unlisted pages get **no** title effect — the
-  sitemap label is the only title source (PageSpec has no title concept).
-
-**Dynamic crumb label (`data-crumb-field`, Phase006).** A page item may
-name a field of its **first** `data-fetch` 2xx response; the value
-replaces the trail's *own* crumb label and `document.title` once the
-fetch arrives ("건물 상세" → "역삼타워"). Ancestor crumbs stay static —
-they would need their own fetches (out of scope). The label travels
-page → layout through the react-router **`<Outlet context>`** (the
-official mechanism, no dependency added):
-
-- the layout keeps `crumbLabel` state, resets it on `pathname` change
-  (no stale entity name after navigation), renders
-  `<Breadcrumb label={crumbLabel} />` and hands the setter down via
-  `<Outlet context={{ setCrumbLabel }} />`;
-- the declaring page receives it null-guarded —
-  `const { setCrumbLabel } = useOutletContext<…>() ?? {}` plus optional
-  call (a layout-less page has no provider) — and a `useEffect` over the
-  fetch data calls `setCrumbLabel?.(String(v))` and updates
-  `document.title` when the field value is non-null;
-- the trail marks the self crumb `dynamic: true`; `<Breadcrumb>` renders
-  the label state for it when set and the static label otherwise — the
-  single fallback point, so the crumb never blanks or flickers.
-
-Validation: page items only (TM-39); the field must exist in the first
-fetch's 2xx response schema as a string/integer/number scalar (TM-50).
-Without any `data-crumb-field` every artifact stays byte-identical to
-the Phase004/005 output.
-
-**Role-based menu (`data-roles`, Phase005).** Three declarations wire the
-role filter, each its own SSOT decision:
-
-```html
-<!-- frontend/sitemap.html — who sees the menu entry -->
-<li data-page="member-list" data-roles="admin,manager">멤버</li>
-```
-```yaml
-# manifest.yaml — which claim the filter reads + the valid role names
-backend:
-  auth:
-    roles: [member, manager, admin]
-frontend:
-  auth:
-    role_field: role        # reads claims['role']
-```
-```html
-<!-- login.html — where the claim comes from (a 2xx response field) -->
-<form data-action="Login" data-capture="role -> auth.claims.role">
-```
-
-The generated layout renders the entry as
-`{ROLES_admin_manager.includes(userRole) && (<li>…</li>)}` with
-`const userRole = useAuthStore((s) => s.claims['role'])` — a signed-out
-user has no claim, so role-gated entries are hidden. A `data-roles` on a
-group `<li>` gates the whole subtree (children render inside the
-conditional block, so ancestor conditions AND by nesting). Validation:
-TM-46 rejects values outside `backend.auth.roles`; TM-47 rejects use
-without the full wiring (role_field + capture + non-empty roles). In
-cookie mode the claims capture is exempt from TM-24 (the claim is read
-from the response body, not the httpOnly cookie), a role_field-only
-`frontend.auth` block is exempt from TM-24/XON-60, and the emitted store
-is claims-only (no token fields). **Menu hiding is not security** — direct
-URL access still works; access blocking is and stays the Rego policy's
-concern (the same separation Filament-class admin frameworks document).
-
-**Sitemap dynamic menu groups (Phase007).** A sidebar group whose items
-are the user's own entities — "내 건물" listing one menu entry per
-building (the workspace/project-switcher pattern). The page vocabulary is
-reused on the group `<li>`'s nested `<ul>`:
+**Dynamic menu groups (Phase007).** Workspace/project-switcher pattern.
+Required on a group `<li>`'s nested `<ul>`: `data-fetch`, `data-each`,
+`data-link`, `data-label-field` (TM-48/TM-30). `data-link-params` with
+`item.*` sources only (`route.*` rejected in menu context). Not in
+`data-entry` blocks. Items hidden when list empty.
 
 ```html
 <li>내 건물
@@ -1109,37 +585,9 @@ reused on the group `<li>`'s nested `<ul>`:
 </li>
 ```
 
-`data-fetch`/`data-each`/`data-link` and `data-label-field` are all
-required (TM-48 / TM-30); `data-link-params` is required by the target
-route's segments exactly like a page `data-link` (TM-32 — `item.*`
-sources only; `route.*` has no meaning in a menu that renders on every
-route). The layout component gets one TanStack Query `useQuery` per
-distinct operation with the **page fetch query key** (`['ListMyBuildings']`)
-— a page action's `data-invalidates` on the same operation refreshes the
-sidebar with no new vocabulary. In bearer mode the query is gated with
-`enabled: !!token` so signed-out visitors never fire the protected call;
-cookie mode fires ungated (the client cannot know the session state).
-While the list has zero items — loading, empty response or error alike —
-the **whole group, header included, is silently omitted**: a menu is not
-a content area, so the error's visibility belongs to the page consuming
-the same operation. Each item renders as
-`<li key={item.building_id}><NavLink to={…}>{item.building_name}</NavLink></li>`
-with the route segments substituted from `data-link-params` (the page
-`data-link` emission) and per-item active state by route matching.
-A dynamic group may not sit in a `data-entry` block (TM-48 — the public
-entry layout renders for signed-out visitors, where the fetch can never
-be satisfied), and its `data-link` target counts as a reachability edge
-(TM-43) exactly like a page `data-link`.
-
-**Non-scope (DESIGN §4.11 (b)): runtime delegation of the menu structure
-itself** — a CMS-style menu table the admin edits at runtime — **is not
-supported**. The moment the menu tree becomes runtime data, spec-time
-orphan/existence validation is impossible in principle, which contradicts
-the sitemap's reason to exist. Express such requirements as item
-expansion: a menu operation returning the list, declared as a dynamic
-group. All previously reserved sitemap attributes have graduated:
-`data-roles` (Phase005), `data-crumb-field` (Phase006), the dynamic-group
-vocabulary (Phase007) — TM-45 retired with nothing left to reserve.
+**TM-51:** Sitemap with no layout to host menu/breadcrumb → WARNING. Declare
+`layouts/<name>.html` with `<slot data-outlet>` and assign via `defaultLayout`
+or nav `data-layout`.
 
 ### Example: List + Create
 
@@ -1147,186 +595,72 @@ vocabulary (Phase007) — TM-45 retired with nothing left to reserve.
 <main>
   <section data-fetch="ListWorkflows">
     <ul data-each="workflows">
-      <li>
-        <span data-bind="title"></span>
-        <span data-bind="status"></span>
-      </li>
+      <li><span data-bind="title"></span><span data-bind="status"></span></li>
     </ul>
   </section>
-
-  <div data-action="CreateWorkflow">
+  <div data-action="CreateWorkflow" data-redirect="/">
     <input data-field="title" type="text" />
-    <input data-field="trigger_event" type="text" />
     <button type="submit">Create</button>
   </div>
 </main>
 ```
 
-### Example: Detail + Conditional Actions
+### Cross-validation rules (STML ↔ OpenAPI / stateDiagram / manifest)
 
-```html
-<main>
-  <article data-fetch="GetReservation" data-param-reservation-id="route.ReservationID">
-    <span data-bind="reservation.Status"></span>
-    <dd data-bind="reservation.RoomID"></dd>
+59 active TM-\* rules validate STML against OpenAPI, stateDiagram, manifest,
+layouts, sitemap, and internal consistency. Key rule families referenced
+throughout this section:
 
-    <footer data-state="canCancel">
-      <button data-action="CancelReservation" data-param-reservation-id="route.ReservationID">
-        Cancel
-      </button>
-    </footer>
-  </article>
-</main>
-```
+- **TM-01~09**: attribute ↔ OpenAPI schema (operationId, params, fields, bind, each)
+- **TM-11~13**: layout references
+- **TM-17**: guard syntax (combinator validation)
+- **TM-20~26**: auth flow (capture, redirect, on-error placement)
+- **TM-30~36**: links, redirects, routes, params
+- **TM-39~50**: sitemap (page existence, index, reachability, roles, crumb)
+- **TM-53~59**: prefill, mutation redirect, logout, refresh
 
-### Cross-validation (STML → OpenAPI / stateDiagram)
+Full catalog with level, cross target, and contract:
+[`rulebook.md`](rulebook.md) §TM.
 
-| Rule | Level | Cross target | Contract |
-|---|---|---|---|
-| `TM-01` | ERROR | OpenAPI | `data-fetch` operationId exists in OpenAPI (page fetches and sitemap dynamic menu groups alike) |
-| `TM-02` | ERROR | OpenAPI | `data-action` operationId exists in OpenAPI |
-| `TM-03` | ERROR | OpenAPI | `data-action` must not reference a GET endpoint |
-| `TM-04` | ERROR | OpenAPI | `data-param-*` name matches OpenAPI parameter |
-| `TM-05` | ERROR | OpenAPI | `data-field` name matches OpenAPI request body field |
-| `TM-06` | ERROR | OpenAPI | `data-bind` field matches OpenAPI response schema |
-| `TM-07` | ERROR | OpenAPI | `data-each` field exists in OpenAPI response schema (page fetches and sitemap dynamic menu groups alike) |
-| `TM-08` | ERROR | OpenAPI | `data-each` field is an array type |
-| `TM-09` | ERROR | filesystem | `data-component` references an existing `.tsx` component file |
-| `TM-10` | ERROR | STML internal | element must not use a `class` attribute (use `<!-- @override class="..." -->`) |
-| `TM-11` | ERROR | layouts | page `data-layout` matches a layout in `layouts/` |
-| `TM-12` | ERROR | layouts | `manifest.frontend.defaultLayout` matches a layout in `layouts/` |
-| `TM-13` | WARNING | layouts | layout in `layouts/` is referenced by some page, defaultLayout, or a sitemap `<nav data-layout>` block |
-| `TM-14` | ERROR | OpenAPI | `data-enabled-when` guard ref model is a top-level property of some page fetch response |
-| `TM-15` | ERROR | stateDiagram | guard comparison state value exists in the matching stateDiagram |
-| `TM-16` | ERROR | OpenAPI | `data-invalidates` operationId exists in OpenAPI and is a GET |
-| `TM-17` | ERROR | STML internal | `data-state` guard with a combinator parses under the §guard-syntax EBNF |
-| `TM-18` | WARNING | stateDiagram | the `data-action` transition is legal from the state its `data-enabled-when` requires |
-| `TM-19` | WARNING | OpenAPI | `data-field` must not bind an `object`(map) request body field to a plain text input |
-| `TM-20` | ERROR | OpenAPI | `data-capture` is well-formed (sink `auth.token`/`auth.refresh`/`auth.claims.<name>`) and every respField (claims included) exists in the operation's 2xx response schema |
-| `TM-21` | WARNING | manifest/OpenAPI | bearer mode needs an `auth.token` capture, and declared captures need a page that calls a protected operation |
-| `TM-22` | ERROR | manifest/OpenAPI | bearer mode + a page calls a `security`-protected operation requires some page to capture `auth.token` |
-| `TM-23` | WARNING | stateDiagram | the `data-redirect` target page's `=` state guard must accept an arrival state of the action's transition |
-| `TM-24` | WARNING | manifest | cookie mode must not declare token captures or token keys in `frontend.auth` (httpOnly cookies cannot be captured). Exempt: `auth.claims.*` captures (read from the response body) and a role_field-only `frontend.auth` block — the Phase005 menu role wiring |
-| `TM-25` | ERROR | STML internal | `data-on-error` only inside a `data-action` block; `data-capture`/`data-redirect` only on a `data-action` element |
-| `TM-26` | ERROR | STML internal | `data-redirect` resolves to an STML page: a `/`-prefixed static path against the resolved routes (`/` allowed as index), any other value as a page-name reference (filename without `.html`) |
-| `TM-27` | ERROR | STML internal | every consumed `route.<Name>` appears as a same-named `:Name`/`:Name?` segment in the page's resolved route (case-exact) |
-| `TM-28` | WARNING | STML internal | every `:Name`/`:Name?` segment of the page's resolved route is consumed by some `data-param-*` binding |
-| `TM-29` | WARNING | OpenAPI | an action whose operation declares a 4xx/5xx response should declare a `data-on-error` element — without it the server error falls back to the default inline slot (`role="alert"`) |
-| `TM-30` | ERROR | OpenAPI | `item.<Field>` param source only inside a `data-each` block, and the field must exist in the enclosing each's item schema (OpenAPI response); a sitemap dynamic group **requires** `data-label-field`, existing in the group's each item schema as a string/integer/number scalar |
-| `TM-31` | ERROR | STML internal | `data-link` target names an existing STML page (filename without `.html`) — sitemap dynamic groups included |
-| `TM-32` | ERROR | STML/OpenAPI | `data-link-params` is well-formed and satisfies the target route: every required segment mapped, SegmentNames exist in the target route, `item.*` sources inside `data-each` against the item schema, `route.*` sources in this page's resolved route, elided form only against a single required segment; sitemap dynamic groups get the same judgment with `item.*` sources only (`route.*` rejected — a menu has no route context) |
-| `TM-33` | ERROR | STML/OpenAPI | `data-redirect-params` is well-formed and satisfies the redirect target route: not declared on a static path (contradiction), respField sources exist in the action operation's 2xx response schema (`route.*` exempt), SegmentNames exist in the target route, every required segment mapped, elided form only against a single required segment |
-| `TM-34` | ERROR | manifest | `manifest.frontend.index` names an existing STML page whose resolved route has no required parameter segment, and no page simultaneously mounts `/` via `data-route` |
-| `TM-35` | WARNING | manifest | frontend ON with pages but no index declared (no `/` mount, no `frontend.index`, no sitemap `data-index`) — the file-name-sort fallback decides the first screen; declare one of the three vehicles |
-| `TM-36` | ERROR | STML internal | layout `data-nav` resolves (sitemap-absent path): a `/`-prefixed static path matches some page route (`/` allowed as index), a page-name reference names an existing page whose route has no required parameter segment |
-| `TM-37` | ERROR | OpenAPI | layout `data-logout` operationId exists in OpenAPI and is not a GET (session-ending ops are mutations) |
-| `TM-38` | WARNING | manifest | `data-logout` mode fitness: no backend.auth → dead declaration (emission skipped); non-bearer mode + valueless `data-logout` → an httpOnly cookie session needs a server op to end |
-| `TM-39` | ERROR | sitemap | sitemap `data-page` names an existing STML page, never together with an `<a href>` external link (mutually exclusive), and `data-crumb-field` only on page items (a group `<li>` has no fetch to read the label from) |
-| `TM-40` | ERROR | sitemap | a page appears at most once across the whole sitemap (canonical position; both positions named) |
-| `TM-41` | ERROR | layouts | sitemap `<nav data-layout>` matches a layout in `layouts/` (the TM-11 judgment) |
-| `TM-42` | ERROR | sitemap/manifest | `data-index` consistency: at most one, on a `data-page` entry, route without required segments (TM-34 judgment), and agreement with `manifest.frontend.index` when both are declared |
-| `TM-43` | WARNING | sitemap/pages | every page is reachable from the roots (index ∪ `data-entry` pages) via real edges: menu-rendered sitemap entries, `data-link`, resolvable `data-redirect`, breadcrumb up-links (a reachable page's `MenuRenderable` sitemap ancestors), dynamic menu group `data-link` targets (Phase007). Listing ≠ reaching — a non-menu-rendered entry (required param / depth > 2 / `data-menu="false"`) still needs an incoming link. Sitemap present only |
-| `TM-44` | ERROR | layouts/sitemap | no layout HTML declares `data-nav` while `frontend/sitemap.html` exists — the menu's single source of truth is the sitemap (메뉴는 sitemap.html 로 이동); the layout keeps only the menu position |
-| `TM-46` | ERROR | sitemap/manifest | every `data-roles` value is in `backend.auth.roles` — a typo'd role hides the entry from everyone; menu hiding is not security (access blocking is Rego's concern) |
-| `TM-47` | ERROR | sitemap/manifest | `data-roles` use requires the full role-claim wiring: `frontend.auth.role_field` declared, an `auth.claims.<role_field>` capture on some action, and non-empty `backend.auth.roles` |
-| `TM-48` | ERROR | sitemap | dynamic menu group structure: never inside a `data-entry` block (a signed-out entry layout cannot satisfy the list fetch), and `data-fetch`/`data-each`/`data-link` declared together (`data-label-field` is TM-30's finding) |
-| `TM-49` | WARNING | filesystem | frontend ON with pages but no `frontend/sitemap.html` — site structure undeclared, menu/breadcrumb/reachability validation inactive |
-| `TM-50` | ERROR | sitemap/OpenAPI | `data-crumb-field` is satisfiable: the page has a `data-fetch`, the field is a top-level property of the first fetch's 2xx response schema, and its type is a string/integer/number scalar (label-renderable) |
-| `TM-53` | WARNING | OpenAPI | `data-bind` is renderable: not an object/array bound as text (use a dotted path / `data-each`), not on a void/media tag except `<img>`, and an `<img data-bind>` binds a string URL. `boolean` is fine (codegen emits Yes/No). Display-quality advisory — does not block codegen |
-| `TM-54` | ERROR / WARNING | OpenAPI | `data-prefill` resolves: the value names a same-page `data-fetch` op (ERROR otherwise — data variable out of scope); each form `data-field` is a top-level field of that fetch's 2xx response (WARNING otherwise — the input opens blank) |
-| `TM-55` | WARNING | OpenAPI | edit page hygiene: a page with a GET-by-id fetch and a PUT/PATCH form carrying `data-field` but no `data-prefill` — the form is generated empty; add `data-prefill` |
-| `TM-56` | WARNING | OpenAPI | a PATCH op consumed by a form has an all-required requestBody — contradicts partial update; mark optional fields not required in OpenAPI so zod relaxes them |
-| `TM-57` | ERROR | OpenAPI | a state-changing mutation `data-action` (POST/PUT/PATCH/DELETE) declares no `data-redirect` — where to navigate on success (BUG-132). "Where to go after create/update/delete" is an author decision, so the codegen requires it (a declared redirect makes onSuccess always navigate and combine invalidate/removeQueries; without one the CRUD screen stays put and delete refetches the deleted item). A bearer login capture action (`data-capture`) is exempt; a GET `data-action` and an unknown operationId stay silent |
-| `TM-58` | WARNING | OpenAPI/manifest | bearer 모드 + valueless `data-logout` + OpenAPI에 logout-like op(operationId에 "logout" 포함, auth 필요) 존재 — 서버 logout 미호출로 refresh token 미revoke 가능; `data-logout="<operationId>"` 명시 유도 (TM-38의 bearer-mode 대칭, BUG-145) |
-| `TM-59` | WARNING | manifest/STML | `manifest.frontend.auth.refresh_field` 선언 시 어떤 STML 액션도 `auth.refresh`를 캡처하지 않음 — login에서 refresh token 미저장으로 무음 갱신 불가 (BUG-146) |
-| `XMO-10` | ERROR | OpenAPI | Frontend ON & operationId is consumed by some STML page/component **or** tagged `no-front` |
-| `XMO-11` | ERROR | manifest | Frontend ON requires at least one STML page (else set `frontend.enabled: false`) |
-| `XMO-12` | WARNING | OpenAPI | operationId tagged `no-front` must not actually be consumed (stale tag) |
-
-An operation counts as **consumed** when an STML `data-fetch`/`data-action`
-references it, when a sitemap dynamic menu group fetches it (the layout
-`useQuery`), or when a referenced `data-component` (including a form's inner
-widget) calls `api.<operationId>(` inside its `.tsx`. Coverage rules run only
-while the frontend is ON; backend-only projects (`frontend.enabled: false`)
-skip them.
-
-**Migration:** auth endpoints are no longer auto-excluded, so a page-less auth
-op (`refresh`/`logout`) now needs `tags: ["no-front"]` to clear XMO-10
-(login/register usually have a form page that consumes them). A backend-only
-project with zero STML pages should set `frontend.enabled: false` to clear
-XMO-11 and skip frontend codegen.
+Coverage rules: XMO-10 (every op consumed or `no-front`), XMO-11 (≥1 page when
+frontend ON), XMO-12 (stale `no-front` tag). Coverage runs only with frontend
+ON. An operation counts as consumed when referenced by STML `data-fetch`/
+`data-action`, a sitemap dynamic menu group fetch, or a `data-component`'s
+`api.<Op>(` call.
 
 ## Hurl tests
 
 Standard Hurl — [`docs/scenario.md`](docs/scenario.md). yongol adds no DSL.
 
-- Location: `specs/tests/*.hurl` — **every hurl file is user-authored**
-  (`smoke.hurl`, `scenario-*.hurl`, `invariant-*.hurl`). yongol does not
-  generate any hurl.
-- `yongol generate` only mirrors `specs/tests/` → `arts/tests/` verbatim;
-  orphaned `.hurl` files under `arts/tests/` that no longer exist in specs
-  are pruned so the two directories stay in sync.
-- `.feature` files are deprecated (H-1 ERROR).
-- Cross-validation covers Hurl ↔ OpenAPI / State Machine / Manifest
-  (rulebook sections R / R2 / R3 / R4): URL+method (XOH-01, ERROR), response
-  status (XOH-02, ERROR), request body field (XOH-03, ERROR), assert
-  jsonpath (XOH-04, ERROR), state order (XOH-05, WARNING), auth
-  precondition (XOH-06, WARNING), CSRF on mutation (XOH-07, WARNING),
-  capture jsonpath (XOH-08, ERROR), unused capture (XOH-09, WARNING),
-  smoke.hurl required (XOH-10, ERROR), smoke operationId coverage
-  (XOH-11, ERROR), status code coverage (XOH-12, WARNING), SSaC
-  guard+happy path coverage (XOH-13, WARNING).
-
-### Authoring quick-start
-
-Copy a starter template from [`docs/scenario.md`](docs/scenario.md) —
-there are ready-to-edit snippets for both auth modes:
-
-- **Cookie mode** (`backend.auth.mode: cookie`, the 2026 default): a safe
-  request (e.g. GET) makes the middleware issue the JS-readable CSRF
-  cookie; capture it with `csrf: cookie "XSRF-TOKEN"` and every mutation
-  carries `X-XSRF-TOKEN: {{csrf}}` (names follow `backend.auth.csrf`
-  overrides when set).
-- **Bearer mode** (`backend.auth.mode: bearer`): login captures
-  `access_token` from the response body; every protected call carries
-  `Authorization: Bearer {{token}}`.
-
-Common mistakes caught at validate time:
-
-- Capturing `$.access_token` on a Register response that only returns
-  `user` — XOH-08 reports the drift.
-- Calling a protected endpoint without a preceding auth step — XOH-06.
-- Omitting the manifest-resolved CSRF header (default `X-XSRF-TOKEN`) on
-  a POST/PUT/DELETE in cookie mode — XOH-07.
-- Invoking a state transition before its prerequisite transitions —
-  XOH-05 (e.g. `ExecuteWorkflow` before `ActivateWorkflow`).
+- Location: `specs/tests/*.hurl` — all user-authored. yongol does not generate
+  hurl; `yongol generate` mirrors `specs/tests/` → `arts/tests/` (orphans
+  pruned).
+- `.feature` files deprecated (H-1).
+- Cross-validation: XOH-01~13 cover URL+method, response status, request body,
+  jsonpath, state order, auth precondition, CSRF, captures. Full catalog:
+  [`rulebook.md`](rulebook.md) §R.
+- Authoring templates (cookie/bearer modes):
+  [`docs/scenario.md`](docs/scenario.md).
 
 ## Func Spec
 
 Custom `@call` implementations in `func/<pkg>/*.go`. Details:
 [`docs/func.md`](docs/func.md).
 
-- Fixed signature: `func FuncName(req FuncNameRequest) (FuncNameResponse, error)`.
-  `@call` targets must return exactly 2 values `(Response, error)` (XFS-63).
-  Single `error` return is rejected — use a Response struct even for side-effect-only funcs.
-- One `@func` per file. Annotations above the function:
-  - `// @func camelCaseName` — must match the SSaC `@call` reference.
-  - `// @error NNN` — default HTTP status on error. Priority: `.ssac`
-    explicit status > `@error` > 500.
-  - `// @description ...` — human note.
-- Purity: file I/O and session/cache are allowed; direct DB access
-  (`database/sql`, `pgx`, `lib/pq`) and network calls (`net/http`, `grpc`,
-  `net/rpc`) are forbidden.
-- Import path: `internal/<pkg>`. Specs under `func/<pkg>/` are copied to
-  `artifacts/<project>/backend/internal/<pkg>/` at generate time.
-- Resolution order: project `func/<pkg>/` → built-in `ssac/pkg/<pkg>/` → ERROR.
+- Signature: `func FuncName(req FuncNameRequest) (FuncNameResponse, error)` —
+  exactly 2 returns (XFS-63).
+- One `@func` per file. Annotations: `// @func camelCaseName`,
+  `// @error NNN`, `// @description ...`.
+- Purity: file I/O and session/cache OK; direct DB access and network calls
+  forbidden.
+- Import path: `internal/<pkg>`. Resolution: project `func/<pkg>/` → built-in
+  `ssac/pkg/<pkg>/` → ERROR.
 
 ## Middleware — bearerAuth
 
-Emitted when `backend.middleware` contains `bearerAuth` and OpenAPI
-`securitySchemes` declares `bearerAuth`. `Authorization: Bearer <token>` →
-`internal/auth.VerifyToken` → `*model.CurrentUser` in gin context. Missing /
-invalid → 401. Permission checks are handled by `@auth`.
+Emitted when `backend.middleware` contains `bearerAuth` and OpenAPI declares it.
+`Authorization: Bearer <token>` → `internal/auth.VerifyToken` →
+`*model.CurrentUser` in gin context. Missing/invalid → 401. Permission: `@auth`.
 
 ## Name matching
 
@@ -1337,134 +671,106 @@ invalid → 401. Permission checks are handled by `@auth`.
 | STML `data-param-*` ↔ OpenAPI parameters | Identical (TM-04) |
 | STML `data-field` ↔ OpenAPI request body field | Identical (TM-05) |
 | stateDiagram transition ↔ SSaC funcName | Identical |
-| SSaC Model ↔ DDL table | PascalCase ↔ snake_case (plural recommended; singular also matches — both sides normalised to a canonical singular lower-snake form) |
+| SSaC Model ↔ DDL table | PascalCase ↔ snake_case (normalised to singular) |
 | SSaC `Model.Method` ↔ sqlc `-- name:` | Identical after ModelPrefix strip |
 | SSaC `@call pkg.Func` ↔ Func spec | Identical |
 
 ## Validation
 
-`yongol validate` runs 371 active rules from a catalog of 398 rule IDs across
-60 prefix categories (C-*, D-*, O-*, S-*, TM-*, XOS-*, XPS-*, XDM-*, XDP-*,
-XNS-*, PRV-*, MIG-*, CORS-*, SEC-*, OBS-*, H-*, …; the remaining 27 IDs are
-retired — see the rulebook's Deprecated section). AI authors do not memorise IDs — the validator prints rule ID, level,
-file, line, message. Catalog: [`rulebook.md`](rulebook.md). `yongol generate`
-refuses to run while any ERROR or WARNING remains.
+`yongol validate` runs 371 active rules across 60 prefix categories. AI authors
+do not memorise IDs — the validator prints rule ID, level, file, line, message.
+Full catalog: [`rulebook.md`](rulebook.md). `yongol generate` refuses while any
+ERROR or WARNING remains.
 
-Output formats (`-f`): `md` (default, GitHub Flavored Markdown), `json` (flat
-snake_case — `{yongol_version, specs_dir, summary, diagnostics[]}`), `sarif`
-(SARIF 2.1.0 with embedded full rulebook catalog for GitHub Code Scanning /
-VS Code SARIF Viewer). Unknown values exit 2.
+Output formats (`-f`): `md` (default), `json`, `sarif` (SARIF 2.1.0 for GitHub
+Code Scanning / VS Code).
 
 ## Migrations
 
 `yongol generate` detects DDL diffs and emits
-`artifacts/db/migrations/NNNN_<desc>.up.sql` plus a companion
-`NNNN_<desc>.down.sql` **stub** (golang-migrate compatible). Not a separate
-command — runs after validate, before backend/frontend codegen.
+`artifacts/db/migrations/NNNN_<desc>.up.sql` + `.down.sql` stub
+(golang-migrate compatible). Not a separate command — runs after validate,
+before backend/frontend codegen.
 
-- SSOT is the DDL (`specs/db/*.sql`). Users edit `CREATE TABLE` directly; never
-  hand-author migration files.
-- Baseline snapshot: `arts/db/.latest_schema.sql` (yongol-maintained, normalised form). Phase010 (BUG-034) moved the baseline out of `specs/` so the SSOT directory holds only user-authored DDL; the baseline now sits next to `arts/db/migrations/` (same parent), so `rm -rf arts/` resets baseline + migrations atomically.
-- First run (no snapshot) → `0001_initial.up.sql` with all CREATE TABLE/INDEX/FK
-  and an empty `0001_initial.down.sql` stub.
-  Subsequent runs emit only the diff as ALTER statements (plus matching down
-  stub). No change → no file.
-- `.down.sql` files are no-op stubs. yongol does not auto-generate reverse
-  migrations; roll back by checking out the previous `specs/` revision and
-  re-running `yongol generate`.
-- Each migration is wrapped in `BEGIN; ... COMMIT;` with a header
-  `-- Generated by yongol <ver> at <ts>`.
-- DB application is the user's responsibility — use `golang-migrate`, `flyway`,
-  or similar.
+- SSOT is DDL (`specs/db/*.sql`). Users edit `CREATE TABLE`; never hand-author
+  migrations.
+- Baseline: `arts/db/.latest_schema.sql`. First run → `0001_initial.up.sql`;
+  subsequent → ALTER diff only. No change → no file.
+- `.down.sql` are no-op stubs. Roll back via previous `specs/` revision +
+  re-generate.
+- Each migration wrapped in `BEGIN; ... COMMIT;`.
+- DB application: user's responsibility (golang-migrate, flyway, etc.).
 - DDL hints (`@rename`, `@cast`, `@backfill`, `@data_migration`,
-  `@allow_destructive`) disambiguate renames, type conversions, backfills, and
-  destructive drops — see the DDL annotations table above. Without hints, diff
-  falls back to drop+add, which can lose data and trigger MIG-00N warnings.
-- Rule family: `MIG-*`. Full contract: [`docs/MIGRATION.md`](docs/MIGRATION.md).
+  `@allow_destructive`) disambiguate diffs. Without hints → drop+add fallback.
+- Rule family: `MIG-*`. Full contract:
+  [`docs/MIGRATION.md`](docs/MIGRATION.md).
 
 ## Preserve contract
 
-`yongol generate` preserves human/AI edits to generated Go files across
-regeneration. Every emitted file carries
-`//ff:checked llm=yongol-gen hash=<8hex>` (SHA-256 over the primary `func`
-after newline normalisation). When the hash no longer matches, yongol skips
-that file on the next generate. Preserve unit is the **file** (one func per
-file); there are no `// BEGIN PRESERVE:` block markers. Release with
-`rm <file> && yongol generate`.
+`yongol generate` preserves edits via
+`//ff:checked llm=yongol-gen hash=<8hex>`. When hash mismatches, yongol skips
+that file. Unit = file. Release with `rm <file> && yongol generate`.
 
-When editing a preserved file:
+When editing preserved files:
 
-- Do not touch `//ff:func`, `//ff:what`, or the `//ff:checked` hash.
-- Keep the function signature identical:
+- Do not touch `//ff:func`, `//ff:what`, or `//ff:checked` hash.
+- Keep function signature identical:
   `func (server *Server) <OpID>(ctx context.Context, request api.<OpID>RequestObject) (api.<OpID>ResponseObject, error)`.
-- Do not reference sqlc queries, `@call` funcs, or struct fields that are not
-  in the SSOTs. PRV-02 cross-checks every `qtx.<Query>`, `<pkg>.<Func>`, and
-  `<struct>.<Field>` against Ground metadata.
-- Record intent with `//ff:preserve reason="..."` above the `//ff:checked`
-  line.
+- Do not reference sqlc queries, `@call` funcs, or struct fields not in SSOTs.
+  PRV-02 cross-checks.
+- Record intent: `//ff:preserve reason="..."` above `//ff:checked`.
 
-`yongol validate <specs> <arts>` runs PRV-01~17 over preserved files.
-`yongol status <specs> <arts>` lists preserved files and drift. Per-line escape
-hatch: `// nolint:prv-NN` (or `// nolint:panic` for PRV-10). Full spec:
+`yongol validate <specs> <arts>` runs PRV-01~17. `yongol status` lists
+preserved files + drift. Per-line escape: `// nolint:prv-NN`. Full spec:
 [`docs/PRESERVE.md`](docs/PRESERVE.md).
 
 ## CLI
 
 | Command | Description |
 |---|---|
-| `yongol init <ProjectID> <features.yaml> ["description"] [--dir <path>] [--module <go-module>] [-f]` | Read features.yaml and scaffold SSOT stubs (manifest + OpenAPI paths + SSaC + Rego + Hurl + sqlc) plus a `specs/.yongol` SHA-256 hash lock. Description is optional (defaults to `<ProjectID> project`). `yongol validate` checks the hash lock via FT-03. |
-| `yongol features add <features.yaml>` | 신규 features.yaml 과 기존 specs/features.yaml 을 비교하여 신규 op 의 SSaC stub 생성 + features.yaml 교체 + `.yongol` 해시 갱신. |
-| `yongol features remove <operationId> [...] [--yes]` | 지정된 operationId 를 features.yaml 에서 삭제 + SSaC 파일 삭제 + `.yongol` 해시 갱신. `--yes` 없으면 확인 프롬프트. |
-| `yongol hash <specs-dir>` | Read `features.yaml` from `<specs-dir>`, compute SHA-256, and write `<specs-dir>/.yongol` hash lock. Use for existing projects where `yongol init` was not used. |
-| `yongol next <specs-dir>` | Show one error (or one operationId group) + fix instruction. Repeat until 0 errors. |
-| `yongol validate [-f md\|json\|sarif] <specs-dir>` | Per-SSOT + cross validation. Shows all errors at once. |
-| `yongol generate [--backend go-gin] [--frontend react\|none] [-r] <specs-dir> <artifacts-dir>` | Runs validate then emits code. Refuses on any ERROR or WARNING. Frontend is **scaffold-only**: skipped when output dir already exists unless `-r` (`--regenerate-frontend`) is given. `--frontend none` skips frontend entirely. |
-| `yongol status <specs-dir> [<arts-dir>]` | Read-only dashboard. With `<arts-dir>`, lists preserved files and PRV-01~17 drift. Never fails. |
-| `yongol chain <operationId> <specs-dir>` | Trace every SSOT node connected to one API operation. |
-| `yongol import <openapi-source> <output-dir>` | Generate a Go client package from an external OpenAPI; callable from SSaC via `@call <pkg>.<Func>(...)`. |
-| `yongol version` | Print yongol version. |
+| `yongol init <ProjectID> <features.yaml> ["description"] [--dir <path>] [--module <go-module>] [-f]` | Scaffold SSOT stubs from features.yaml + `.yongol` hash lock |
+| `yongol features add <features.yaml>` | Add new ops: SSaC stub + features.yaml merge + hash update |
+| `yongol features remove <operationId> [...] [--yes]` | Remove ops + SSaC files + hash update |
+| `yongol hash <specs-dir>` | Compute features.yaml SHA-256 → `.yongol` |
+| `yongol next <specs-dir>` | Show one error + fix instruction. Repeat until clean |
+| `yongol validate [-f md\|json\|sarif] <specs-dir>` | Full validation. Shows all errors |
+| `yongol generate [--backend go-gin] [--frontend react\|none] [-r] <specs-dir> <artifacts-dir>` | Validate then emit code. Refuses on ERROR/WARNING. `-r` forces frontend re-emit |
+| `yongol status <specs-dir> [<arts-dir>]` | Read-only dashboard. Lists preserved files + PRV drift |
+| `yongol chain <operationId> <specs-dir>` | Trace every SSOT node for one API operation |
+| `yongol import <openapi-source> <output-dir>` | Generate Go client from external OpenAPI |
+| `yongol version` | Print version |
 
 ## Workflow
 
 1. **Read this manual.** Do not copy from other projects' specs.
 2. **Author SSOTs** under `specs/<project>/` in this order: manifest →
    DDL + sqlc.yaml + sqlc queries → OpenAPI → states → policy → SSaC
-   → STML → Hurl (Func spec optional). Keep `operationId` consistent across
-   all layers.
-3. **Fix errors:** `yongol next specs/<project>`. Fix the error shown, then run `yongol next` again. Repeat until "All validations passed."
+   → STML → Hurl (Func spec optional). Keep `operationId` consistent.
+3. **Fix errors:** `yongol next specs/<project>`. Repeat until clean.
 4. **Generate:** `yongol generate specs/<project> artifacts/<project>`.
 5. **Build backend:** `cd artifacts/<project>/backend && go build -o server ./cmd/`.
-   On failure, the cause is in the SSOTs or in yongol itself — never patch
-   generated code.
-6. **Start server** with `JWT_SECRET` + `OPA_POLICY_PATH` + DSN. `OPA_POLICY_PATH`
-   is mandatory; the server exits at startup if unset.
+   On failure: SSOTs or yongol bug — never patch generated code.
+6. **Start server** with `JWT_SECRET` + `OPA_POLICY_PATH` + DSN.
+   `OPA_POLICY_PATH` mandatory; server exits if unset.
 7. **Run tests:** `hurl --test --variable host=http://localhost:8080 arts/<project>/tests/*.hurl`
-   (generate mirrors `specs/tests/` → `arts/tests/`). Initial smoke.hurl
-   draft: copy the template from `docs/scenario.md` to
-   `specs/tests/smoke.hurl` and edit for your domain.
 
 ### Authoring invariants
 
-- `operationId` is identical across OpenAPI / SSaC / STML / states / Hurl.
-- DDL table = snake_case (plural recommended, singular also accepted); SSaC Model = PascalCase singular. Model↔table matching normalises both sides to a canonical singular lower-snake form, so `AppConfig` matches `app_config` or `app_configs`.
-- stateDiagram transition label = SSaC funcName = OpenAPI operationId.
-- DDL `DEFAULT` on the state column = stateDiagram `[*] --> X` (XDM-28).
-- OPA `@ownership` references existing tables/columns; role literals appear in
-  `backend.auth.roles`.
-- Every SSaC `@publish "topic"` has a matching `@subscribe` (and vice versa).
-- Pagination / sort / filter params declared in OpenAPI match sqlc params and
-  SSaC Input keys exactly.
+- `operationId` identical across all SSOTs.
+- DDL table = snake_case plural; SSaC Model = PascalCase singular. Both normalised.
+- stateDiagram transition = SSaC funcName = operationId.
+- DDL `DEFAULT` on state column = `[*] --> X` (XDM-28).
+- OPA `@ownership` references existing tables/columns; roles in `backend.auth.roles`.
+- Every `@publish "topic"` has a matching `@subscribe` (and vice versa).
+- Pagination params match across OpenAPI, sqlc, SSaC.
 
 ### Error triage
 
 | Stage | Action |
 |---|---|
-| `validate` fails | Fix SSOTs, re-run. |
-| `generate` refused (WARNINGs) | Resolve every WARNING, re-run. |
-| `generate` codegen error | Report as a yongol bug. Do not patch `artifacts/`. |
-| `go build` authz | Ensure `OPA_POLICY_PATH` is set at runtime. |
-| `go build` config | `config.*` is banned in SSaC; funcs read env vars. |
-| `go build` other | SSOT or codegen bug — never edit `artifacts/`. |
-| `hurl --test` fails | Classify SSOT vs codegen, report. |
-| `XOH-NN` ERROR at validate | Hurl drifted from another SSOT. Fix the hurl, or fix OpenAPI / state machine / manifest so they agree. |
-| `XSD-55` ERROR: DDL table not referenced | If the table is consumed only through `@call <pkg>.<Func>` (an RPC / custom package) and so never appears in a SSaC `@model`/`@result` directly, add `-- @func-managed` above its `CREATE TABLE`. If the table is genuinely unused/retired, use `-- @archived` instead. |
+| `validate` fails | Fix SSOTs, re-run |
+| `generate` refused (WARNINGs) | Resolve every WARNING |
+| `generate` codegen error | Report as yongol bug. Do not patch `artifacts/` |
+| `go build` fails | SSOT or codegen bug — never edit `artifacts/` |
+| `hurl --test` fails | Classify SSOT vs codegen, report |
+| `XSD-55` ERROR | Add `-- @func-managed` (RPC table) or `-- @archived` (unused) |
