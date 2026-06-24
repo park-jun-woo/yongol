@@ -26,7 +26,7 @@ func TestTM58BearerLogoutOpHint(t *testing.T) {
 
 	bearerAuth := &manifest.Auth{Type: "jwt", Mode: "bearer"}
 	cookieAuth := &manifest.Auth{Type: "jwt", Mode: "cookie"}
-	doc := logoutDoc("Logout")
+	doc := logoutDoc("Logout", false)
 
 	t.Run("bearer valueless data-logout with logout op fires warning", func(t *testing.T) {
 		diags := tm58BearerLogoutOpHint(fsWith(bearerAuth, &stml.LogoutSpec{}, doc))
@@ -38,6 +38,16 @@ func TestTM58BearerLogoutOpHint(t *testing.T) {
 		}
 		if !strings.Contains(diags[0].Message, "operationId") {
 			t.Errorf("Message = %q, want operationId mention", diags[0].Message)
+		}
+	})
+
+	t.Run("bearer valueless data-logout with public logout op fires warning", func(t *testing.T) {
+		// nisabit pattern: logout op has security: [] (auth opt-out) because
+		// the access token may be expired; refresh token is sent in the body.
+		pubDoc := logoutDoc("Logout", true)
+		diags := tm58BearerLogoutOpHint(fsWith(bearerAuth, &stml.LogoutSpec{}, pubDoc))
+		if got := countDiag(diags, "[TM-58]"); got != 1 {
+			t.Fatalf("expected 1 TM-58 for security:[] logout op, got %d: %+v", got, diags)
 		}
 	})
 
