@@ -1,5 +1,5 @@
 //ff:func feature=validate type=helper control=iteration dimension=1 topic=stml-openapi
-//ff:what findLogoutOp — OpenAPI doc에서 auth 필수인 logout-like operationId 검색
+//ff:what FindLogoutOp — OpenAPI doc에서 auth 필수인 logout-like operationId 검색
 
 package stml_openapi
 
@@ -9,9 +9,9 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 )
 
-// findLogoutOp returns the operationId of the first logout-like operation
+// FindLogoutOp returns the operationId of the first logout-like operation
 // (case-insensitive "logout" in operationId) that requires auth, or "" if none.
-func findLogoutOp(doc *openapi3.T) string {
+func FindLogoutOp(doc *openapi3.T) string {
 	if doc.Paths == nil {
 		return ""
 	}

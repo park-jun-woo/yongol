@@ -68,6 +68,7 @@ func writeAPIClient(srcDir string, doc *openapi3.T, plan apiClientPlan) error {
 	b.WriteString("const client = createClient<paths>(" + clientInit + ")\n")
 
 	withRetry := plan.bearer && plan.refresh != nil
+	secIndex := opSecurityIndex(doc)
 	if plan.bearer {
 		writeAuthzMiddleware(&b, withRetry)
 		if withRetry {
@@ -93,7 +94,8 @@ func writeAPIClient(srcDir string, doc *openapi3.T, plan apiClientPlan) error {
 
 	b.WriteString("export const api = {\n")
 	for _, ep := range entries {
-		writeApiClientEntry(&b, ep, withRetry)
+		opRetry := withRetry && secIndex[ep.opID]
+		writeApiClientEntry(&b, ep, opRetry)
 	}
 	b.WriteString("}\n")
 

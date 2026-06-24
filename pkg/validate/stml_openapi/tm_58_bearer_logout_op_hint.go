@@ -31,7 +31,7 @@ func tm58BearerLogoutOpHint(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	}
 
 	// Find the first logout-like operation that requires auth.
-	logoutOp := findLogoutOp(fs.OpenAPIDoc)
+	logoutOp := FindLogoutOp(fs.OpenAPIDoc)
 	if logoutOp == "" {
 		return nil
 	}

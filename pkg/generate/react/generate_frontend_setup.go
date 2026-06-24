@@ -77,6 +77,7 @@ func generateFrontendSetup(fs *yongol.Fullstack, frontendDir, specPath string) e
 	if err := writeMainTSX(srcDir); err != nil {
 		return err
 	}
+	resolveLayoutLogoutOps(stmlLayouts, fsOpenAPIDoc(fs), bearerAuth)
 	if err := writeLayoutsTSX(srcDir, stmlLayouts, navRoutePatterns(stmlPages), resolveLayoutAuthMode(hasAuth, bearerAuth), fsSitemap(fs), defaultLayout, resolveRoleField(fs), crumbFieldLayouts(stmlPages, fsSitemap(fs), defaultLayout)); err != nil {
 		return err
 	}

@@ -100,5 +100,7 @@ func runSingle(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		diags = append(diags, tm58BearerLogoutOpHint(fs)...)
 	}
 
+	diags = append(diags, tm59RefreshFieldCapture(fs)...)
+
 	return diags
 }
