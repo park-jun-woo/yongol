@@ -7,4 +7,5 @@ type FrontendType string
 
 const (
 	React FrontendType = "react"
+	None  FrontendType = "none"
 )

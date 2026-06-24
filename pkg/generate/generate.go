@@ -4,6 +4,7 @@ package generate
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/park-jun-woo/yongol/pkg/generate/hurl_mirror"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
@@ -22,8 +23,15 @@ func Generate(fs *yongol.Fullstack, artifactsDir string, backend BackendType, fr
 	if err := runBackend(fs, artifactsDir, backend); err != nil {
 		return fmt.Errorf("backend: %w", err)
 	}
-	if err := runFrontend(fs, artifactsDir, frontend); err != nil {
-		return fmt.Errorf("frontend: %w", err)
+	skipFrontend := frontend == None ||
+		(!cfg.regenerateFrontend && frontendDirExists(fs, artifactsDir))
+	if skipFrontend && frontend != None {
+		fmt.Fprintf(os.Stderr, "frontend already exists, skipping (use -r to regenerate)\n")
+	}
+	if !skipFrontend {
+		if err := runFrontend(fs, artifactsDir, frontend); err != nil {
+			return fmt.Errorf("frontend: %w", err)
+		}
 	}
 	if fs != nil {
 		if _, err := hurl_mirror.MirrorSpecsTests(fs.SpecsDir, artifactsDir); err != nil {

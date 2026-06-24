@@ -41,6 +41,12 @@ identifier.
 `specs/`. yongol parses everything internally; all compilation and code
 generation land in `arts/` via `yongol generate`.
 
+**Frontend scaffold mode (Phase048).** Frontend generation is
+**scaffold-only**: when the output directory (`arts/frontend/`) already exists,
+`yongol generate` skips frontend emission entirely. Use
+`--regenerate-frontend` (`-r`) to force a fresh re-emit, or `--frontend none`
+to skip frontend generation altogether.
+
 **Frontend compile smoke (Phase041).** After emitting the React tree,
 `yongol generate` runs a `tsc --noEmit` smoke over `arts/frontend/` — the
 front-end counterpart of the backend `go build` step — so a generated tree that
@@ -1337,9 +1343,9 @@ invalid → 401. Permission checks are handled by `@auth`.
 
 ## Validation
 
-`yongol validate` runs 338 active rules from a catalog of 364 rule IDs across
+`yongol validate` runs 371 active rules from a catalog of 398 rule IDs across
 60 prefix categories (C-*, D-*, O-*, S-*, TM-*, XOS-*, XPS-*, XDM-*, XDP-*,
-XNS-*, PRV-*, MIG-*, CORS-*, SEC-*, OBS-*, H-*, …; the remaining 26 IDs are
+XNS-*, PRV-*, MIG-*, CORS-*, SEC-*, OBS-*, H-*, …; the remaining 27 IDs are
 retired — see the rulebook's Deprecated section). AI authors do not memorise IDs — the validator prints rule ID, level,
 file, line, message. Catalog: [`rulebook.md`](rulebook.md). `yongol generate`
 refuses to run while any ERROR or WARNING remains.
@@ -1412,7 +1418,7 @@ hatch: `// nolint:prv-NN` (or `// nolint:panic` for PRV-10). Full spec:
 | `yongol hash <specs-dir>` | Read `features.yaml` from `<specs-dir>`, compute SHA-256, and write `<specs-dir>/.yongol` hash lock. Use for existing projects where `yongol init` was not used. |
 | `yongol next <specs-dir>` | Show one error (or one operationId group) + fix instruction. Repeat until 0 errors. |
 | `yongol validate [-f md\|json\|sarif] <specs-dir>` | Per-SSOT + cross validation. Shows all errors at once. |
-| `yongol generate [--backend go-gin] [--frontend react] <specs-dir> <artifacts-dir>` | Runs validate then emits code. Refuses on any ERROR or WARNING. |
+| `yongol generate [--backend go-gin] [--frontend react\|none] [-r] <specs-dir> <artifacts-dir>` | Runs validate then emits code. Refuses on any ERROR or WARNING. Frontend is **scaffold-only**: skipped when output dir already exists unless `-r` (`--regenerate-frontend`) is given. `--frontend none` skips frontend entirely. |
 | `yongol status <specs-dir> [<arts-dir>]` | Read-only dashboard. With `<arts-dir>`, lists preserved files and PRV-01~17 drift. Never fails. |
 | `yongol chain <operationId> <specs-dir>` | Trace every SSOT node connected to one API operation. |
 | `yongol import <openapi-source> <output-dir>` | Generate a Go client package from an external OpenAPI; callable from SSaC via `@call <pkg>.<Func>(...)`. |

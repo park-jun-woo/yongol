@@ -3,5 +3,6 @@
 package generate
 
 type generateConfig struct {
-	migration MigrationHook
+	migration          MigrationHook
+	regenerateFrontend bool
 }

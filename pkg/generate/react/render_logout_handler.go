@@ -21,11 +21,15 @@ import (
 // The /login destination reuses the existing convention
 // (clearSessionAndLogin / writeCookie401Redirect); promoting it to an
 // SSOT decision is a recorded follow-up outside the page-flow series.
-func renderLogoutHandler(operationID, authMode string) string {
+func renderLogoutHandler(operationID, authMode, refreshBodyKey string) string {
 	var sb strings.Builder
 	if operationID != "" {
 		sb.WriteString("  const handleLogout = async () => {\n")
-		fmt.Fprintf(&sb, "    await api.%s().catch(() => {}) // server logout is best-effort\n", operationID)
+		if refreshBodyKey != "" {
+			fmt.Fprintf(&sb, "    await api.%s({ %s: useAuthStore.getState().refresh ?? '' }).catch(() => {}) // server logout is best-effort\n", operationID, refreshBodyKey)
+		} else {
+			fmt.Fprintf(&sb, "    await api.%s().catch(() => {}) // server logout is best-effort\n", operationID)
+		}
 	} else {
 		sb.WriteString("  const handleLogout = () => {\n")
 	}

@@ -108,7 +108,7 @@ func renderLayoutTSX(componentName string, layout stml.LayoutSpec, routePatterns
 	renderSitemapGroupQueries(&sb, dynamicOps, bearerGate)
 	if emitLogout {
 		sb.WriteString("  const navigate = useNavigate()\n")
-		sb.WriteString(renderLogoutHandler(layout.Logout.OperationID, authMode))
+		sb.WriteString(renderLogoutHandler(layout.Logout.OperationID, authMode, layout.Logout.RefreshBodyKey))
 		sb.WriteString("\n")
 	} else if usesLocation || usesRoles || dynamicCrumb || hasDynamicGroups {
 		sb.WriteString("\n")

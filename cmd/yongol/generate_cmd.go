@@ -22,8 +22,9 @@ import (
 //  5. Call generate.Generate for the chosen backend / frontend targets
 func generateCmd() *cobra.Command {
 	var (
-		backendFlag  string
-		frontendFlag string
+		backendFlag            string
+		frontendFlag           string
+		regenerateFrontendFlag bool
 	)
 	cmd := &cobra.Command{
 		Use:           "generate <specs-dir> <artifacts-dir>",
@@ -67,11 +68,21 @@ func generateCmd() *cobra.Command {
 				}
 			}
 			frontend := generate.FrontendType(frontendFlag)
-			migHook := generate.WithMigration(generate.MigrationHook{
+			switch frontend {
+			case generate.React, generate.None:
+				// valid
+			default:
+				return fmt.Errorf("unknown --frontend value %q; valid: react, none", frontendFlag)
+			}
+			var opts []generate.GenerateOption
+			opts = append(opts, generate.WithMigration(generate.MigrationHook{
 				Version: Version,
 				Logger:  cmd.OutOrStdout(),
-			})
-			if err := generate.Generate(fs, artifactsDir, backend, frontend, migHook); err != nil {
+			}))
+			if regenerateFrontendFlag {
+				opts = append(opts, generate.WithRegenerateFrontend())
+			}
+			if err := generate.Generate(fs, artifactsDir, backend, frontend, opts...); err != nil {
 				return fmt.Errorf("generate: %w", err)
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "\nartifacts written to %s (backend=%s, frontend=%s)\n",
@@ -80,6 +91,7 @@ func generateCmd() *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVar(&backendFlag, "backend", string(generate.GoGin), "backend framework: go-gin (default), nestjs, fastapi")
-	cmd.Flags().StringVar(&frontendFlag, "frontend", string(generate.React), "frontend code generator (react)")
+	cmd.Flags().StringVar(&frontendFlag, "frontend", string(generate.React), "frontend code generator (react, none)")
+	cmd.Flags().BoolVarP(&regenerateFrontendFlag, "regenerate-frontend", "r", false, "regenerate frontend even if it already exists")
 	return cmd
 }

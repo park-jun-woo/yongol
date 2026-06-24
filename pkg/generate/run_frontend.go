@@ -23,6 +23,8 @@ import (
 // is unchanged: one pipeline against <artifacts>/frontend.
 func runFrontend(fs *yongol.Fullstack, artifactsDir string, frontend FrontendType) error {
 	switch frontend {
+	case None:
+		return nil
 	case React:
 		if err := react.Generate(fs, artifactsDir); err != nil {
 			return err

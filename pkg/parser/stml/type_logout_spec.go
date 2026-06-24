@@ -10,6 +10,7 @@ package stml
 // client-only logout (bearer mode clears the store; cookie mode cannot
 // end the session client-side — TM-38 warns).
 type LogoutSpec struct {
-	OperationID string // optional OpenAPI operationId of the server logout op ("" when valueless)
-	Label       string // element text content (button label)
+	OperationID    string // optional OpenAPI operationId of the server logout op ("" when valueless)
+	Label          string // element text content (button label)
+	RefreshBodyKey string // requestBody property mapped to store.refresh ("" when body-less)
 }
