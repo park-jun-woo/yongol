@@ -20,7 +20,7 @@ func TestWriteAPIClient_Bearer_401AutoLogout(t *testing.T) {
 	}
 	content := string(data)
 
-	assertContains(t, content, "async onResponse({ response })")
+	assertContains(t, content, "async onResponse({ request, response })")
 	assertContains(t, content, "response.status === 401")
 	assertContains(t, content, "useAuthStore.getState().clear()")
 	assertContains(t, content, "window.location.href = '/login'")

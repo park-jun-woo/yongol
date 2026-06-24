@@ -26,8 +26,8 @@ func writeAuthzMiddleware(b *strings.Builder, withRefresh bool) {
 	b.WriteString("    return request\n")
 	b.WriteString("  },\n")
 	if !withRefresh {
-		b.WriteString("  async onResponse({ response }) {\n")
-		b.WriteString("    if (response.status === 401) {\n")
+		b.WriteString("  async onResponse({ request, response }) {\n")
+		b.WriteString("    if (response.status === 401 && request.headers.has('Authorization')) {\n")
 		b.WriteString("      useAuthStore.getState().clear()\n")
 		b.WriteString("      window.location.href = '/login'\n")
 		b.WriteString("    }\n")

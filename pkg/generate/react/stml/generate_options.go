@@ -2,7 +2,10 @@
 //ff:what 코드 생성 옵션을 설정하는 구조체
 package stml
 
-import oapiparser "github.com/park-jun-woo/yongol/pkg/parser/openapi"
+import (
+	oapiparser "github.com/park-jun-woo/yongol/pkg/parser/openapi"
+	"github.com/park-jun-woo/yongol/pkg/parser/design"
+)
 
 // GenerateOptions configures code generation behavior.
 type GenerateOptions struct {
@@ -70,4 +73,9 @@ type GenerateOptions struct {
 	// BUG-125/Phase036). renderOnErrorHandler normalizes "" to "error", so a
 	// partially constructed GenerateOptions stays safe.
 	ErrorDisplayField string
+	// DesignSpec holds the parsed DESIGN.md tokens. When non-nil,
+	// renderComponentJSX can consult component definitions to merge base
+	// classes and validate variant/size references. Nil means no DESIGN.md
+	// was declared — components emit only the STML-declared props.
+	DesignSpec *design.DesignSpec
 }

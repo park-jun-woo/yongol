@@ -8,4 +8,6 @@ type ComponentRef struct {
 	Bind      string // data-bind value if present
 	Field     string // data-field value if present
 	ClassName string // class attribute value
+	Variant   string // data-variant value
+	Size      string // data-size value
 }

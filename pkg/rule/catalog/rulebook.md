@@ -63,9 +63,9 @@ The `Source` column of each rule row is a Go file path relative to the repo root
 ## Rule count
 
 **This catalog is the single source of truth for the rule set.** The official
-total is the count of distinct rule IDs in the tables below — **391 rules across
+total is the count of distinct rule IDs in the tables below — **398 rules across
 60 prefixes**. This includes 27 retired rules (Deprecated section); the
-**active** subset (rows in the non-deprecated tables) is **364**.
+**active** subset (rows in the non-deprecated tables) is **371**.
 
 Counting note: a rule's ID is emitted either as a `[ID]` literal in the
 diagnostic message **or** via a `RuleID:` field / builder. A naive
@@ -178,6 +178,12 @@ SSaC self-consistency — required fields, variable flow, model references, @sub
 | C-9 | ERROR | Unsupported `backend.lang` + `backend.framework` combination | `pkg/validate/manifest/c_09_backend_lang_framework.go` |
 | C-10 | ERROR | Every `backend.rate_limit` entry must have `rate` >= 1 and a `period` parseable by `time.ParseDuration` (blocks zero-value entries codegen would silently drop) | `pkg/validate/manifest/c_10_rate_limit_value_valid.go` |
 | C-11 | WARNING | `backend.rate_limit` entry keyed by `ip` (or key unset → default `ip`) with `backend.http.trusted_proxies` unset — behind a reverse proxy `c.ClientIP()` always returns the proxy address, collapsing the IP-keyed limiter onto one key (BUG-117); directly exposed deployments may ignore | `pkg/validate/manifest/c_11_ipkey_requires_proxy.go` |
+| C-12 | ERROR | Multi-domain: each entry under the top-level `domains` key must declare an `openapi` path — a domain without an API contract silently vanishes from the generated backend | `pkg/validate/manifest/c_12_domain_openapi_required.go` |
+| C-13 | ERROR | Multi-domain: each `domains.<name>` must declare a `frontend` directory — each domain is an independent app whose STML source location is its own frontend dir | `pkg/validate/manifest/c_13_domain_frontend_required.go` |
+| C-14 | ERROR | Multi-domain: two domains must not declare the same `route_prefix` — distinct domains must occupy distinct URL namespaces or their Gin route groups collide (empty prefixes ignored) | `pkg/validate/manifest/c_14_domain_route_prefix_unique.go` |
+| C-15 | ERROR | Multi-domain: a domain's `auth_mode` override must be one of `cookie` / `bearer` / `hybrid` (reuses SEC-403's `validAuthModes`; empty = inherit `backend.auth.mode`) | `pkg/validate/manifest/c_15_domain_auth_mode_enum.go` |
+| C-16 | WARNING | Multi-domain: a domain's `frontend` path resolving to the single-site STML root (`frontend`) collides with the legacy location — move the domain's pages into a dedicated subdir (e.g. `frontend/<name>`) | `pkg/validate/manifest/c_16_domain_frontend_conflict.go` |
+| C-17 | ERROR | Multi-domain: a `domains:` block declaring exactly 1 domain is rejected — multi-site machinery only earns its complexity at ≥2 domains; a single domain should be a plain single-site project (top-level `openapi` + `frontend`) | `pkg/validate/manifest/c_17_domain_minimum_two.go` |
 | CORS-01 | ERROR | `allow_origins=["*"]` combined with `allow_credentials=true` is forbidden | `pkg/validate/manifest/cors_01_wildcard_credentials.go` |
 | OBS-001 | ERROR | `backend.observability.metrics.path` must be an absolute path starting with `/` | `pkg/validate/manifest/obs_01_metrics_path.go` |
 | OBS-002 | ERROR | `backend.observability.metrics.path` must not collide with an OpenAPI path | `pkg/validate/manifest/obs_02_metrics_path_not_openapi.go` |
@@ -552,7 +558,11 @@ Cross-validation between STML template classes/attributes and DESIGN.md design t
 
 ## Z4. Domain Security (`XDO-90`, `XDS-80/81/82`, `XMO-20/21/22`)
 
-Multi-domain OpenAPI security rules. Applies only when `manifest.yaml` declares multiple domain configurations (e.g. `public`, `admin`, `internal`). Validates operationId uniqueness across domains, domain-specific access control, and STML consumption coverage per domain.
+Multi-domain OpenAPI security rules. Applies only when `manifest.yaml` declares multiple domain configurations (e.g. `public`, `admin`, `internal` — these key names are reserved semantic markers, see C-12~C-17 in section B). Validates operationId uniqueness across domains, domain-specific access control, and STML consumption coverage per domain.
+
+> **Domain-mode coverage (post BUG-141).** A multi-domain project has no top-level `api/openapi.yaml`; before BUG-141 the validate step gate silently skipped every OpenAPI-dependent step — including `domain_security` — yielding a false `0 errors`. After the fix, in domain mode the OpenAPI-dependent steps run over the per-domain specs and `domain_security` executes (it is internally guarded by `len(fs.Manifest.Domains) > 0`).
+>
+> **XMO-10 vs XMO-11/12 / XMO-20/21/22 in domain mode.** The single-site coverage rule **XMO-10** (`stml_openapi`) is single-site-only — it does not fire in domain mode, where per-domain consumption is instead enforced by **XMO-20/21** (this section). **XMO-11/12** (`stml_openapi`) still run, iterating over *all* domains' STML pages / OpenAPI docs (`AllSTMLPages()` / `AllOpenAPIDocs()`). XMO-20/21/22 here are the domain-scoped operationId-consumption and cross-domain-call boundary checks.
 
 | Rule ID | Level | Description | Source |
 |---|---|---|---|
@@ -670,6 +680,7 @@ Cross-validation between STML template attributes (`data-fetch`, `data-action`, 
 | TM-55 | WARNING | the canonical edit page forgets prefill (plans/gen/frontend Phase035, BUG-124): the page has a GET-by-id `data-fetch` (a GET that consumes a `route.` path param) and a PUT/PATCH `data-action` carrying `data-field` inputs, yet declares no `data-prefill` — so the form is generated empty and a single-field edit forces re-entering every field. It makes that blank-form generation visible and points to `data-prefill`. Forms already declaring `data-prefill`, field-less actions and non-PUT/PATCH actions stay silent; an unknown operationId is TM-02's finding | `pkg/validate/stml_openapi/tm_55_edit_form_no_prefill.go` |
 | TM-56 | WARNING | a PATCH `data-action` form consumes an operation whose requestBody fields are all required (plans/gen/frontend Phase035, BUG-124) — PATCH means partial update, but all-required forces resending every field. The codegen never relaxes zod on its own (required is the OpenAPI decision), so it points back to OpenAPI: mark the optional fields not required and the existing `zod_chain` `.optional()` path applies. Scoped to operations actually consumed by an STML form (de-duplicated by operationId) to avoid noise on non-frontend PATCH APIs | `pkg/validate/stml_openapi/tm_56_patch_all_required.go` |
 | TM-57 | ERROR | a state-changing mutation `data-action` (OpenAPI POST/PUT/PATCH/DELETE) does not declare `data-redirect` — where to navigate on success (plans/gen/frontend Phase040, BUG-132). "Where to go after create/update/delete" is an author decision, not a heuristic, so the codegen requires it: with a declared `data-redirect` the generated onSuccess always navigates (and combines invalidate/removeQueries), otherwise the CRUD screen stays on the same form and delete refetches the deleted resource. A bearer login capture action (`data-capture`) is exempt (it drives its own navigation); a GET `data-action` and an unknown operationId (TM-02 reports it) stay silent | `pkg/validate/stml_openapi/tm_57_mutation_redirect_required.go` |
+| TM-58 | WARNING | bearer 모드에서 layout `data-logout`에 operationId가 미지정(valueless)이고 OpenAPI에 logout-like operation(operationId에 "logout" 포함, case-insensitive, auth 필요)이 존재하면 서버 logout이 호출되지 않아 refresh token이 revoke되지 않을 수 있음 — TM-38의 bearer-mode 대칭 (plans/gen/frontend Phase045, BUG-145) | `pkg/validate/stml_openapi/tm_58_bearer_logout_op_hint.go` |
 | XMO-10 | ERROR | Frontend ON & OpenAPI operationId is never consumed by any STML `data-fetch`, `data-action`, or component `api.<Op>(` call, and is not tagged `no-front` (auth endpoints are no longer auto-excluded) | `pkg/validate/stml_openapi/xmo_10_unconsumed.go` |
 | XMO-11 | ERROR | Frontend ON but no STML pages were found (set `frontend.enabled: false` for a backend-only project) | `pkg/validate/stml_openapi/xmo_11_no_stml.go` |
 | XMO-12 | WARNING | OpenAPI operationId is tagged `no-front` but is actually consumed by an STML page or component (stale or wrong tag) | `pkg/validate/stml_openapi/xmo_12_no_front_consumed.go` |

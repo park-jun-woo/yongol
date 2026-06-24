@@ -32,7 +32,7 @@ func dispatchStaticFetchChild(c *html.Node, fb *FetchBlock) *ChildNode {
 		return &ChildNode{Kind: "state", State: &sb}
 	case getAttr(c, "data-component") != "":
 		comp := getAttr(c, "data-component")
-		cr := ComponentRef{Name: comp, Bind: getAttr(c, "data-bind"), Field: getAttr(c, "data-field"), ClassName: getAttr(c, "class")}
+		cr := ComponentRef{Name: comp, Bind: getAttr(c, "data-bind"), Field: getAttr(c, "data-field"), ClassName: getAttr(c, "class"), Variant: getAttr(c, "data-variant"), Size: getAttr(c, "data-size")}
 		fb.Components = append(fb.Components, cr)
 		return &ChildNode{Kind: "component", Component: &cr}
 	case hasContent(c) || hasDescendantDataInFetch(c):

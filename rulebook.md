@@ -63,9 +63,9 @@ The `Source` column of each rule row is a Go file path relative to the repo root
 ## Rule count
 
 **This catalog is the single source of truth for the rule set.** The official
-total is the count of distinct rule IDs in the tables below — **397 rules across
+total is the count of distinct rule IDs in the tables below — **398 rules across
 60 prefixes**. This includes 27 retired rules (Deprecated section); the
-**active** subset (rows in the non-deprecated tables) is **370**.
+**active** subset (rows in the non-deprecated tables) is **371**.
 
 Counting note: a rule's ID is emitted either as a `[ID]` literal in the
 diagnostic message **or** via a `RuleID:` field / builder. A naive
@@ -680,6 +680,7 @@ Cross-validation between STML template attributes (`data-fetch`, `data-action`, 
 | TM-55 | WARNING | the canonical edit page forgets prefill (plans/gen/frontend Phase035, BUG-124): the page has a GET-by-id `data-fetch` (a GET that consumes a `route.` path param) and a PUT/PATCH `data-action` carrying `data-field` inputs, yet declares no `data-prefill` — so the form is generated empty and a single-field edit forces re-entering every field. It makes that blank-form generation visible and points to `data-prefill`. Forms already declaring `data-prefill`, field-less actions and non-PUT/PATCH actions stay silent; an unknown operationId is TM-02's finding | `pkg/validate/stml_openapi/tm_55_edit_form_no_prefill.go` |
 | TM-56 | WARNING | a PATCH `data-action` form consumes an operation whose requestBody fields are all required (plans/gen/frontend Phase035, BUG-124) — PATCH means partial update, but all-required forces resending every field. The codegen never relaxes zod on its own (required is the OpenAPI decision), so it points back to OpenAPI: mark the optional fields not required and the existing `zod_chain` `.optional()` path applies. Scoped to operations actually consumed by an STML form (de-duplicated by operationId) to avoid noise on non-frontend PATCH APIs | `pkg/validate/stml_openapi/tm_56_patch_all_required.go` |
 | TM-57 | ERROR | a state-changing mutation `data-action` (OpenAPI POST/PUT/PATCH/DELETE) does not declare `data-redirect` — where to navigate on success (plans/gen/frontend Phase040, BUG-132). "Where to go after create/update/delete" is an author decision, not a heuristic, so the codegen requires it: with a declared `data-redirect` the generated onSuccess always navigates (and combines invalidate/removeQueries), otherwise the CRUD screen stays on the same form and delete refetches the deleted resource. A bearer login capture action (`data-capture`) is exempt (it drives its own navigation); a GET `data-action` and an unknown operationId (TM-02 reports it) stay silent | `pkg/validate/stml_openapi/tm_57_mutation_redirect_required.go` |
+| TM-58 | WARNING | bearer 모드에서 layout `data-logout`에 operationId가 미지정(valueless)이고 OpenAPI에 logout-like operation(operationId에 "logout" 포함, case-insensitive, auth 필요)이 존재하면 서버 logout이 호출되지 않아 refresh token이 revoke되지 않을 수 있음 — TM-38의 bearer-mode 대칭 (plans/gen/frontend Phase045, BUG-145) | `pkg/validate/stml_openapi/tm_58_bearer_logout_op_hint.go` |
 | XMO-10 | ERROR | Frontend ON & OpenAPI operationId is never consumed by any STML `data-fetch`, `data-action`, or component `api.<Op>(` call, and is not tagged `no-front` (auth endpoints are no longer auto-excluded) | `pkg/validate/stml_openapi/xmo_10_unconsumed.go` |
 | XMO-11 | ERROR | Frontend ON but no STML pages were found (set `frontend.enabled: false` for a backend-only project) | `pkg/validate/stml_openapi/xmo_11_no_stml.go` |
 | XMO-12 | WARNING | OpenAPI operationId is tagged `no-front` but is actually consumed by an STML page or component (stale or wrong tag) | `pkg/validate/stml_openapi/xmo_12_no_front_consumed.go` |

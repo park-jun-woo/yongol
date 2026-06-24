@@ -1,5 +1,5 @@
 //ff:func feature=validate type=rule control=iteration dimension=2 topic=stml-openapi
-//ff:what runSingle — 단일 사이트 STML<->OpenAPI 전체 규칙 실행 (TM-01 ~ TM-57, XMO-10/11/12)
+//ff:what runSingle — 단일 사이트 STML<->OpenAPI 전체 규칙 실행 (TM-01 ~ TM-58, XMO-10/11/12)
 
 package stml_openapi
 
@@ -97,6 +97,7 @@ func runSingle(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 		diags = append(diags, tm36NavTarget(fs.Layouts, fs.STMLPages)...)
 		diags = append(diags, tm37LogoutOp(fs.Layouts, opMap)...)
 		diags = append(diags, tm38LogoutMode(fs)...)
+		diags = append(diags, tm58BearerLogoutOpHint(fs)...)
 	}
 
 	return diags

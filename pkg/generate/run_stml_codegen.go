@@ -48,6 +48,7 @@ func runSTMLCodegen(fs *yongol.Fullstack, srcFrontendDir, frontendDir string) er
 		CrumbFields:             stml.SitemapCrumbFields(fs.Sitemap),
 		CrumbTitleSuffix:        crumbTitleSuffix(fs),
 		ErrorDisplayField:       oapiparser.ExtractErrorDisplayField(fs.OpenAPIDoc),
+		DesignSpec:              fs.DesignSpec,
 	}
 	_, err := stmlgen.Generate(fs.STMLPages, srcFrontendDir, pagesDir, opt)
 	return err

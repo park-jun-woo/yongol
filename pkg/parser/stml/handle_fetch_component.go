@@ -11,6 +11,8 @@ func handleFetchComponent(n *html.Node, fb *FetchBlock) bool {
 		Bind:      getAttr(n, "data-bind"),
 		Field:     getAttr(n, "data-field"),
 		ClassName: getAttr(n, "class"),
+		Variant:   getAttr(n, "data-variant"),
+		Size:      getAttr(n, "data-size"),
 	}
 	fb.Components = append(fb.Components, cr)
 	fb.Children = append(fb.Children, ChildNode{Kind: "component", Component: &cr})

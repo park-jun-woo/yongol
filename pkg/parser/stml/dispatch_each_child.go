@@ -39,13 +39,7 @@ func dispatchEachChild(n *html.Node, eb *EachBlock) bool {
 		eb.Children = append(eb.Children, ChildNode{Kind: "state", State: &sb})
 		return true
 	case getAttr(n, "data-component") != "":
-		comp := getAttr(n, "data-component")
-		cr := ComponentRef{
-			Name:      comp,
-			Bind:      getAttr(n, "data-bind"),
-			Field:     getAttr(n, "data-field"),
-			ClassName: getAttr(n, "class"),
-		}
+		cr := buildComponentRefFromEach(n)
 		eb.Components = append(eb.Components, cr)
 		eb.Children = append(eb.Children, ChildNode{Kind: "component", Component: &cr})
 		return true
