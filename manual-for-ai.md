@@ -628,6 +628,37 @@ ON. An operation counts as consumed when referenced by STML `data-fetch`/
 `data-action`, a sitemap dynamic menu group fetch, or a `data-component`'s
 `api.<Op>(` call.
 
+## DESIGN.md (Design Token SSOT)
+
+`frontend/DESIGN.md` (convention) 또는 `manifest.yaml`의 `frontend.design` 경로. 파일 부재 시 무시 — codegen 출력 동일. YAML front matter (`---` 구분) + Markdown body. body `##` 헤딩은 문서 구조용.
+
+**front matter 키**: `version`(string), `name`(string), `colors`(map[string]string), `typography`(map[string]TypographyToken — fontFamily/fontSize/fontWeight/lineHeight/letterSpacing), `rounded`(map[string]string), `spacing`(map[string]string), `components`(map[string]ComponentToken).
+
+**ComponentToken**: `base`(기본 클래스), `variants`(variant명 -> 클래스), `sizes`(size명 -> 클래스), `defaultVariant`, `defaultSize`, `props`(prop명 -> 타입 힌트).
+
+**STML 연동**: `data-component="Button"` + `data-variant`, `data-size` 속성. codegen이 base + variant + size 클래스를 병합.
+
+**교차 검증** (9 규칙): **XVM-01~06** STML 토큰 -> DESIGN.md 정의 확인 (color/rounded/spacing/font/inline/component), **XMV-10~12** DESIGN.md dead 토큰 검출. Catalog: [`rulebook.md`](rulebook.md) §XVM, §XMV.
+
+```yaml
+---
+version: "1.0"
+name: MyApp
+colors: { primary: "#3B82F6", danger: "#EF4444" }
+typography:
+  heading: { fontFamily: "Inter", fontSize: "2rem", fontWeight: "700", lineHeight: "1.2" }
+spacing: { sm: "8px", md: "16px" }
+rounded: { sm: "4px" }
+components:
+  Button:
+    base: "inline-flex items-center justify-center"
+    variants: { primary: "bg-primary text-white", secondary: "bg-secondary text-black" }
+    sizes: { sm: "h-8 px-3", md: "h-10 px-4" }
+    defaultVariant: primary
+    defaultSize: md
+---
+```
+
 ## Hurl tests
 
 Standard Hurl — [`docs/scenario.md`](docs/scenario.md). yongol adds no DSL.

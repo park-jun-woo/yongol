@@ -4,7 +4,7 @@ description: Full-stack SSOT orchestrator that validates the consistency of 10 d
 license: MIT
 metadata:
   author: park-jun-woo
-  version: "0.7.41"
+  version: "0.7.52"
 ---
 
 # yongol — Full-Stack SSOT Orchestrator
@@ -36,7 +36,7 @@ Raw code mixes **user decisions**, **business logic**, and **implementation deta
 yongol separates these concerns:
 1. **SSOTs hold only decisions.** DDL = data model, OpenAPI = API contract, SSaC = service flow, Rego = authorization.
 2. **Code is generated from SSOTs.** Every `yongol generate` re-renders code deterministically. Code is disposable.
-3. **`validate` catches contradictions** (~344 cross-SSOT rules). Validation fails until all contradictions are resolved.
+3. **`validate` catches contradictions** (~371 cross-SSOT rules). Validation fails until all contradictions are resolved.
 
 ## Install
 
@@ -66,7 +66,7 @@ go install github.com/park-jun-woo/yongol/cmd/yongol@latest
 | Command | Purpose |
 |---|---|
 | `yongol next <specs>` | Show one error + fix instruction. Repeat until 0 errors. |
-| `yongol generate <specs> <arts>` | Generate backend + frontend + migrations |
+| `yongol generate [--frontend react\|none] [-r] <specs> <arts>` | Generate backend + frontend + migrations. `-r` forces frontend re-emit; `--frontend none` skips frontend |
 | `yongol init <id> <features.yaml> ["desc"]` | Scaffold SSOT stubs from features.yaml + hash lock |
 | `yongol features add <features.yaml>` | Add new features: SSaC stub gen + hash update |
 | `yongol features remove <opId> [...] [--yes]` | Remove features: SSaC + features.yaml cleanup + hash update |
@@ -149,7 +149,7 @@ go install github.com/park-jun-woo/yongol/cmd/yongol@latest
 | Document | Purpose |
 |---|---|
 | `manual-for-ai.md` | Complete AI manual: all SSOT syntax, conventions, examples |
-| `rulebook.md` | ~344 validation rules with IDs, levels, descriptions |
+| `rulebook.md` | ~371 active validation rules (398 total) with IDs, levels, descriptions |
 | `codebook.yaml` | Feature/type/topic keyword index |
 | `examples/zenflow/` | Working SSOT example project: specs, add-on specs, benchmark reports. Refer to this when writing SSOTs |
 | `README.md` | Quick start and benchmarks |
