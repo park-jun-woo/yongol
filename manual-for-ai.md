@@ -49,6 +49,53 @@ generate with the `tsc` output. When the toolchain is unavailable (no
 `node_modules`/`tsc`/`npx`), the gate **skips with a warning** instead of
 failing; install front-end deps to enforce it (CI/dev).
 
+## Multi-domain project layout
+
+A project may serve **several independent apps from one backend binary** by
+declaring a `domains:` block in `manifest.yaml` (full syntax in
+[`docs/manifest.md`](docs/manifest.md#multi-domain-block-domains)). Each domain
+owns its **OpenAPI contract, STML frontend directory, backend route-group
+prefix**, and may override **auth mode and CORS**; the **DDL/sqlc, SSaC, and
+Rego are shared** across all domains.
+
+```
+<project-root>/
+├── manifest.yaml                 # declares domains: public + admin (+ internal)
+├── api/
+│   ├── public.yaml               # one OpenAPI spec PER DOMAIN (no top-level api/openapi.yaml)
+│   └── admin.yaml
+├── db/ … service/ … states/ … policy/   # SHARED across all domains
+└── frontend/
+    ├── public/                   # one STML app PER DOMAIN (sitemap.html + pages + layouts/)
+    │   └── sitemap.html
+    └── admin/
+        └── sitemap.html
+```
+
+**Reserved domain key-names (semantic).** The domain map keys `public`,
+`admin`, `internal` are **reserved markers** consumed by the domain-security
+rules (Z4: XDS-80/81/82, XMO-20/21/22) — they classify a domain by its key
+name, not by a flag. `admin` endpoints may not expose `security: []` (XDS-80);
+`internal` endpoints are service-to-service (XDS-81); `public`/`admin`
+operationIds must each be consumed by their own frontend (XMO-20/21).
+
+**One operationId namespace.** operationIds are globally unique across domains
+(XDO-90), so a single shared `*service.Server` implements every domain's
+`StrictServerInterface`. There is **no `PublicServer`/`AdminServer` split**.
+
+**Single binary, per-domain route groups.** `generate` emits one backend with a
+route group per domain at its `route_prefix` (e.g. `/api`, `/api/admin`), a
+per-domain `internal/api_<domain>` oapi-codegen package, and a per-domain React
+app under `arts/frontend/<domain>/`. Auth and CORS are applied per route group
+from each domain's `auth_mode` / `cors` (CORS stays global with a per-path
+origin decision). A `domains:` block must declare **at least two** domains
+(C-17) — a single domain is a plain single-site project.
+
+The manifest-structural domain rules **C-12~C-17** validate the block (openapi
+& frontend required, unique route_prefix, auth_mode enum, single-site frontend
+collision, ≥2 domains). See [`docs/manifest.md`](docs/manifest.md#multi-domain-block-domains)
+and `rulebook.md` §B / §Z4.
+
 ## manifest.yaml
 
 Full schema: [`docs/manifest.md`](docs/manifest.md).

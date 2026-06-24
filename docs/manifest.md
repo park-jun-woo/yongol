@@ -153,6 +153,66 @@ declared types (`BIGINT`/`INT8` → `int64`, `INTEGER`/`INT`/`INT4` →
 `int32`, `VARCHAR`/`TEXT` → `string`, `BOOLEAN`/`BOOL` → `bool`,
 `UUID` → `uuid`).
 
+## Multi-domain block (`domains:`)
+
+Declare a `domains:` block to serve **several independent apps from one backend
+binary** (e.g. a public site at `/api` and an admin console at `/api/admin`).
+When present, each domain supplies its **own OpenAPI spec, STML frontend
+directory, and route-group prefix**, and may **override the auth mode and CORS**
+it otherwise inherits from `backend.*`. The DDL/sqlc, SSaC, and Rego SSOTs stay
+shared across all domains.
+
+```yaml
+backend:
+  # ... auth, rate_limit, etc. — the inherited defaults ...
+  auth:
+    mode: cookie                    # global default (inherited by domains that omit auth_mode)
+  cors:
+    allow_origins:                  # correct tag is allow_origins (NOT allowed_origins)
+      - "http://localhost:5173"
+    allow_credentials: true
+
+domains:
+  public:
+    openapi: api/public.yaml        # required (C-12)
+    frontend: frontend/public       # required (C-13)
+    route_prefix: /api              # must be unique across domains (C-14)
+    auth_mode: cookie               # cookie | bearer | hybrid; omit to inherit backend.auth.mode (C-15)
+    cors:                           # optional per-domain override; omit to inherit backend.cors
+      allow_origins:
+        - "https://www.example.com"
+  admin:
+    openapi: api/admin.yaml
+    frontend: frontend/admin
+    route_prefix: /api/admin
+    auth_mode: bearer
+    cors:
+      allow_origins:
+        - "https://admin.example.com"
+```
+
+**Per-domain fields**
+
+| Field | Required | Meaning |
+|---|---|---|
+| `openapi` | yes (C-12) | Path to the domain's OpenAPI spec |
+| `frontend` | yes (C-13) | Domain's STML source directory (must not be the single-site root `frontend`, C-16) |
+| `route_prefix` | — | Backend route-group prefix; must be unique across domains (C-14) |
+| `auth_mode` | — | `cookie` / `bearer` / `hybrid`; omitted = inherit `backend.auth.mode` (C-15) |
+| `cors` | — | Per-domain CORS override (same `allow_origins` / `allow_methods` / `allow_headers` / `expose_headers` tags as `backend.cors`); omitted = inherit `backend.cors` |
+
+**Rules.** A `domains:` block must declare **at least two** domains (C-17) — a
+single domain should be a plain single-site project (top-level `openapi` +
+`frontend`). Validation: C-12~C-17 (structural, this section) plus the
+domain-security cross-checks XDO-90 / XDS-80/81/82 / XMO-20/21/22 (rulebook §Z4).
+The key names `public` / `admin` / `internal` are **reserved semantic markers**
+the domain-security rules classify on.
+
+> **CORS tag.** The correct YAML tag is **`allow_origins`** (not
+> `allowed_origins`) — likewise `allow_methods` / `allow_headers` /
+> `expose_headers`. A misspelled tag is silently ignored by the parser, leaving
+> CORS unconfigured.
+
 ## Cross-SSOT Links
 
 | Link | Rule |
