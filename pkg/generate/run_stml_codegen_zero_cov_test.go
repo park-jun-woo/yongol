@@ -10,11 +10,11 @@ import (
 
 func TestRunSTMLCodegen_ZeroCov(t *testing.T) {
 	// nil fs → nil.
-	if err := runSTMLCodegen(nil, t.TempDir()); err != nil {
+	if err := runSTMLCodegen(nil, "", t.TempDir()); err != nil {
 		t.Errorf("nil fs should be nil, got %v", err)
 	}
 	// no STML pages → nil.
-	if err := runSTMLCodegen(&yongol.Fullstack{}, t.TempDir()); err != nil {
+	if err := runSTMLCodegen(&yongol.Fullstack{}, "", t.TempDir()); err != nil {
 		t.Errorf("no STML pages should be nil, got %v", err)
 	}
 }

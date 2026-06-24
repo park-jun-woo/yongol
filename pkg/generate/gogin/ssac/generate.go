@@ -21,10 +21,18 @@ import (
 // Every emitted file holds exactly one top-level func (Phase004: 1-file-1-func
 // applied uniformly, replacing the Phase003 POC gating that limited the split
 // to ActivateWorkflow's dependency tree).
-func Generate(fs *yongol.Fullstack, artifactsDir string) error {
+//
+// apiSuffix / funcPrefix carry the per-domain emission context (Phase007). In
+// single-site mode both are "" — the api import stays "<module>/internal/api"
+// and converters keep their plain convert<Name> name. In domain mode the caller
+// passes sanitizeDomainName(name) / domainTitle(name) and invokes Generate once
+// per domain over fs.DomainView(name); the operationId membership filter below
+// then emits each method exactly once, by its owning domain.
+func Generate(fs *yongol.Fullstack, artifactsDir, apiSuffix, funcPrefix string) error {
 	if len(fs.ServiceFuncs) == 0 {
 		return nil
 	}
+	dg := domainGen{ApiSuffix: apiSuffix, FuncPrefix: funcPrefix}
 	modulePath := ""
 	if fs.Manifest != nil {
 		modulePath = fs.Manifest.Backend.Module
@@ -59,7 +67,7 @@ func Generate(fs *yongol.Fullstack, artifactsDir string) error {
 			filtered[name] = true
 		}
 	}
-	if err := emitAllConverterFiles(fs.OpenAPIDoc, serviceDir, modulePath, filtered, fs.DDLTables, usedNames); err != nil {
+	if err := emitAllConverterFiles(fs.OpenAPIDoc, serviceDir, modulePath, filtered, fs.DDLTables, usedNames, dg); err != nil {
 		return fmt.Errorf("converters: %w", err)
 	}
 
@@ -74,7 +82,7 @@ func Generate(fs *yongol.Fullstack, artifactsDir string) error {
 			funcFiltered[name] = info
 		}
 	}
-	if err := emitFuncResponseConverterFiles(fs.OpenAPIDoc, serviceDir, modulePath, funcFiltered, fs.ProjectFuncSpecs, usedNames); err != nil {
+	if err := emitFuncResponseConverterFiles(fs.OpenAPIDoc, serviceDir, modulePath, funcFiltered, fs.ProjectFuncSpecs, usedNames, dg); err != nil {
 		return fmt.Errorf("func response converters: %w", err)
 	}
 
@@ -96,16 +104,36 @@ func Generate(fs *yongol.Fullstack, artifactsDir string) error {
 	// `components/responses` references (BUG-106 / Phase012). A nil map (api
 	// dir absent / unreadable) triggers the alias fallback in
 	// errorResponseLiteral, preserving prior behaviour.
-	apiDir := filepath.Join(artifactsDir, "backend", "internal", "api")
+	// In domain mode the oapi-codegen types live in internal/api_<domain>,
+	// so classification reads that per-domain directory (Phase007).
+	apiDirName := "api"
+	if dg.ApiSuffix != "" {
+		apiDirName = "api_" + dg.ApiSuffix
+	}
+	apiDir := filepath.Join(artifactsDir, "backend", "internal", apiDirName)
 	respShapes := classifyResponseShapes(apiDir)
 
+	// operationId membership filter (Phase007 linchpin). In domain mode the
+	// shared internal/service package is emitted once per domain; without this
+	// gate every ServiceFunc's method would be re-emitted for every domain,
+	// duplicating declarations in the shared directory. Skipping any sf whose
+	// Name is absent from this domain's OpenAPI doc makes each operationId emit
+	// exactly once, by its owning domain, with that domain's alias. Single-site
+	// (dg.ApiSuffix == "") never filters — behaviour is unchanged.
+	var ownedOps map[string]bool
+	if dg.ApiSuffix != "" {
+		ownedOps = opIDsInDoc(fs.OpenAPIDoc)
+	}
 	for _, sf := range fs.ServiceFuncs {
+		if ownedOps != nil && !ownedOps[sf.Name] {
+			continue
+		}
 		if sf.Subscribe != nil {
 			if err := generateSubscribeMethod(sf, fs, serviceDir, modulePath, respShapes); err != nil {
 				return fmt.Errorf("subscribe %s: %w", sf.Name, err)
 			}
 		} else {
-			if err := generateHTTPMethod(sf, fs, serviceDir, modulePath, respShapes); err != nil {
+			if err := generateHTTPMethod(sf, fs, serviceDir, modulePath, respShapes, dg); err != nil {
 				return fmt.Errorf("method %s: %w", sf.Name, err)
 			}
 		}

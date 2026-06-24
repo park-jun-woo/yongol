@@ -20,7 +20,7 @@ import (
 func TestBlockCsrf_BearerMode_RuntimeGated(t *testing.T) {
 	raw := &pmanifest.Auth{Mode: "bearer"}
 	a := prepared.Auth{Present: true, Mode: "bearer", Raw: raw}
-	block := blockCsrf(a, "example.com/zenflow")
+	block := blockCsrf(nil, a, "example.com/zenflow")
 	if len(block.Lines) == 0 {
 		t.Fatalf("bearer build with auth present must register CSRF (runtime-gated), got inert block")
 	}

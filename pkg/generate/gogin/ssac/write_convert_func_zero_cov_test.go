@@ -9,7 +9,7 @@ import (
 
 func TestWriteConvertFunc_ZeroCov(t *testing.T) {
 	var sb strings.Builder
-	writeConvertFunc(&sb, "Widget", convertSchemaZeroCov(), nil)
+	writeConvertFunc(&sb, "Widget", convertSchemaZeroCov(), nil, "")
 	out := sb.String()
 	for _, want := range []string{
 		"func convertWidget(row db.Widget) (*api.Widget, error) {",

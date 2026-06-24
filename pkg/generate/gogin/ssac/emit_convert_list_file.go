@@ -18,7 +18,9 @@ import (
 func emitConvertListFile(
 	serviceDir, modulePath, name string,
 	used map[string]bool,
+	dg domainGen,
 ) error {
+	base := dg.FuncPrefix + name
 	var sb strings.Builder
 	sb.WriteString(ffannot.EmitAnnotationBlock(ffannot.Block{
 		Func: ffannot.FuncAnnot{
@@ -28,20 +30,20 @@ func emitConvertListFile(
 			Dimension: 1,
 			Topic:     "response-serialize",
 		},
-		What: "convert" + name + "List — []db." + name + " → []api." + name + " 변환",
+		What: "convert" + base + "List — []db." + name + " → []api." + name + " 변환",
 	}))
 	sb.WriteString("package service\n\nimport (\n")
-	sb.WriteString("\t\"" + modulePath + "/internal/api\"\n")
+	sb.WriteString("\t" + apiImportLine(modulePath, dg.ApiSuffix) + "\n")
 	sb.WriteString("\t\"" + modulePath + "/internal/db\"\n")
 	sb.WriteString(")\n\n")
 	// convert<Model> now returns (*api.X, error) because JSONB unmarshal
 	// can fail (BUG-005). The list variant must propagate that error
 	// instead of swallowing it — unmarshal errors are 500-class bugs
 	// and tx rollback only works when the handler sees them.
-	sb.WriteString("func convert" + name + "List(rows []db." + name + ") ([]api." + name + ", error) {\n")
+	sb.WriteString("func convert" + base + "List(rows []db." + name + ") ([]api." + name + ", error) {\n")
 	sb.WriteString("\tresult := make([]api." + name + ", len(rows))\n")
 	sb.WriteString("\tfor i, row := range rows {\n")
-	sb.WriteString("\t\titem, err := convert" + name + "(row)\n")
+	sb.WriteString("\t\titem, err := convert" + base + "(row)\n")
 	sb.WriteString("\t\tif err != nil {\n")
 	sb.WriteString("\t\t\treturn nil, err\n")
 	sb.WriteString("\t\t}\n")
@@ -50,6 +52,6 @@ func emitConvertListFile(
 	sb.WriteString("\treturn result, nil\n")
 	sb.WriteString("}\n")
 
-	fileName := fffile.EnsureUnique(fffile.FileNameForFunc("convert"+name+"List"), used)
+	fileName := fffile.EnsureUnique(fffile.FileNameForFunc("convert"+base+"List"), used)
 	return fffile.WriteIfNotPreserved(filepath.Join(serviceDir, fileName), []byte(sb.String()))
 }

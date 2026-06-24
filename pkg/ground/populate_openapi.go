@@ -1,5 +1,5 @@
-//ff:func feature=rule type=loader control=iteration dimension=1
-//ff:what populateOpenAPI — OpenAPI에서 operationId, path, method, response 스키마 추출
+//ff:func feature=rule type=loader control=sequence
+//ff:what populateOpenAPI — 단일/도메인 모드 분기: 도메인 모드는 모든 도메인 doc 을 MERGE 누적, 단일 사이트는 fs.OpenAPIDoc 하나만 적재
 package ground
 
 import (
@@ -7,27 +7,17 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
+// populateOpenAPI registers operationId/path/method/security from OpenAPI. In
+// domain mode it iterates every per-domain document, merging into the shared
+// operationId/path/security sets (populateOpenAPISingle unions rather than
+// assigns) so no domain overwrites another; in single-site mode it loads the
+// singular fs.OpenAPIDoc. Branching here keeps Build's call order intact.
 func populateOpenAPI(g *rule.Ground, fs *yongol.Fullstack) {
-	if fs.OpenAPIDoc == nil {
+	if fs.IsDomained() {
+		for _, doc := range fs.DomainOpenAPIDocs {
+			populateOpenAPISingle(g, doc)
+		}
 		return
 	}
-	opIDs := make(rule.StringSet)
-	paths := make(rule.StringSet)
-	security := make(rule.StringSet)
-
-	for path, item := range fs.OpenAPIDoc.Paths.Map() {
-		paths[path] = true
-		methods := make(rule.StringSet)
-		populatePathOps(g, opIDs, methods, item.Operations())
-		g.Lookup["OpenAPI.method."+path] = methods
-	}
-	g.Lookup["OpenAPI.operationId"] = opIDs
-	g.Lookup["OpenAPI.path"] = paths
-
-	if fs.OpenAPIDoc.Components != nil {
-		for name := range fs.OpenAPIDoc.Components.SecuritySchemes {
-			security[name] = true
-		}
-	}
-	g.Lookup["OpenAPI.security"] = security
+	populateOpenAPISingle(g, fs.OpenAPIDoc)
 }

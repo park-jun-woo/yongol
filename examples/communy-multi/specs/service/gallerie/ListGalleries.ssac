@@ -1,0 +1,7 @@
+package service
+
+// @no-pagination
+// @get []Gallery galleries = Gallery.List({})
+// @get int64 total = Gallery.Count({})
+// @response { items: galleries, total: total }
+func ListGalleries() {}

@@ -9,7 +9,7 @@ import (
 )
 
 func TestGoginSSaCGenerate_EmptyEarlyReturn_Integ(t *testing.T) {
-	if err := Generate(&yongol.Fullstack{}, t.TempDir()); err != nil {
+	if err := Generate(&yongol.Fullstack{}, t.TempDir(), "", ""); err != nil {
 		t.Fatalf("empty Generate should be a no-op nil, got %v", err)
 	}
 }

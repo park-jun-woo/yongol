@@ -9,7 +9,10 @@ func kindPresent(fs *yongol.Fullstack, k yongol.SSOTKind) bool {
 	case yongol.KindConfig:
 		return fs.Manifest != nil
 	case yongol.KindOpenAPI:
-		return fs.OpenAPIDoc != nil
+		// Domain mode keeps each domain's doc under DomainOpenAPIDocs and leaves
+		// the singular OpenAPIDoc nil (BUG-141). Treat OpenAPI as present when
+		// either is populated so the OpenAPI-gated steps run in both modes.
+		return fs.OpenAPIDoc != nil || len(fs.DomainOpenAPIDocs) > 0
 	case yongol.KindDDL:
 		return fs.DDLTables != nil
 	case yongol.KindSSaC:
@@ -24,7 +27,9 @@ func kindPresent(fs *yongol.Fullstack, k yongol.SSOTKind) bool {
 	case yongol.KindFunc:
 		return fs.ProjectFuncSpecs != nil || len(fs.YongolPkgSpecs) > 0
 	case yongol.KindSTML:
-		return fs.STMLPages != nil
+		// Same domain-mode split as KindOpenAPI: pages live under
+		// DomainSTMLPages with the singular STMLPages left nil (BUG-141).
+		return fs.STMLPages != nil || len(fs.DomainSTMLPages) > 0
 	case yongol.KindDesign:
 		return fs.DesignSpec != nil
 	case yongol.KindFeatures:

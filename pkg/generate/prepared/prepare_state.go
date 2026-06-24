@@ -17,6 +17,7 @@ func New(fs *yongol.Fullstack) State {
 	return State{
 		ActiveBackends: activeBackendsFor(fs),
 		Auth:           AuthFor(fs),
+		DomainAuth:     DomainAuthFor(fs),
 		Middlewares:    middlewaresFor(fs),
 		Routes:         routesFor(fs),
 	}

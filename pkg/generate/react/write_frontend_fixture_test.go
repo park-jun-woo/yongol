@@ -10,8 +10,9 @@ import (
 )
 
 // writeFrontendFixture lays out <dir>/frontend with a tsconfig and a single
-// source file, returning the artifacts dir (parent of frontend). When deps is
-// true an empty node_modules marker is created so RunTscCheck attempts the gate.
+// source file, returning the frontend dir itself (the arg RunTscCheck now
+// takes directly). When deps is true an empty node_modules marker is created so
+// RunTscCheck attempts the gate.
 func writeFrontendFixture(t *testing.T, src string, deps bool) string {
 	t.Helper()
 	artifacts := t.TempDir()
@@ -31,5 +32,5 @@ func writeFrontendFixture(t *testing.T, src string, deps bool) string {
 			t.Fatal(err)
 		}
 	}
-	return artifacts
+	return fe
 }

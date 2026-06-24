@@ -19,7 +19,7 @@ func TestByNameGenerateHTTPMethod_ZeroCov(t *testing.T) {
 		},
 	}
 	fs := &yongol.Fullstack{OpenAPIDoc: doc}
-	if err := generateHTTPMethod(sf, fs, t.TempDir(), "example.com/app", nil); err != nil {
+	if err := generateHTTPMethod(sf, fs, t.TempDir(), "example.com/app", nil, domainGen{}); err != nil {
 		t.Fatalf("generateHTTPMethod: %v", err)
 	}
 }

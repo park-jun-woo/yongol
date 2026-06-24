@@ -8,5 +8,5 @@ import "fmt"
 // dbToAPIConvert generates a conversion expression from db field to api field.
 // e.g. db.Workflow{ID: 1, Title: "x"} → api.Workflow{Id: &row.ID, Title: &row.Title}
 func (g *methodGen) dbToAPIConvert(varName, refType string) string {
-	return fmt.Sprintf("convert%s(%s)", refType, varName)
+	return fmt.Sprintf("convert%s%s(%s)", g.DomainTitle, refType, varName)
 }

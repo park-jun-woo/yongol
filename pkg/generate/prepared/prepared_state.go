@@ -27,4 +27,11 @@ type State struct {
 	Auth           Auth
 	Middlewares    []Middleware
 	Routes         []Route
+
+	// DomainAuth holds the per-domain resolved Auth for multi-domain
+	// projects (Phase008). Each entry is the backend Auth with the domain's
+	// auth_mode override applied (cookie/bearer/hybrid), so the route-group
+	// wiring can pick the matching strict middleware per domain. nil for
+	// single-site projects.
+	DomainAuth map[string]Auth
 }

@@ -6,8 +6,6 @@ package yongol
 import (
 	"os"
 	"path/filepath"
-
-	"github.com/park-jun-woo/yongol/pkg/parser/stml"
 )
 
 // parseSitemapIfPresent parses the fixed-name sitemap.html directly under
@@ -27,9 +25,9 @@ func parseSitemapIfPresent(fs *Fullstack, has map[SSOTKind]DetectedSSOT) {
 		return
 	}
 
-	spec, diags := stml.ParseSitemap(path)
+	spec, diags := parseSitemap(path)
 	fs.ParseDiagnostics = append(fs.ParseDiagnostics, diags...)
 	if len(diags) == 0 {
-		fs.Sitemap = &spec
+		fs.Sitemap = spec
 	}
 }

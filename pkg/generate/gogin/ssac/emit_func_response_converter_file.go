@@ -22,6 +22,7 @@ func emitFuncResponseConverterFiles(
 	funcFiltered map[string]funcRespInfo,
 	projectFuncSpecs []funcspec.FuncSpec,
 	used map[string]bool,
+	dg domainGen,
 ) error {
 	if doc == nil || doc.Components == nil || doc.Components.Schemas == nil {
 		return nil
@@ -57,7 +58,7 @@ func emitFuncResponseConverterFiles(
 			continue
 		}
 		spec := specLookup[name]
-		if err := emitFuncResponseConverterFile(serviceDir, modulePath, name, ref.Value, info, spec, used); err != nil {
+		if err := emitFuncResponseConverterFile(serviceDir, modulePath, name, ref.Value, info, spec, used, dg); err != nil {
 			return err
 		}
 	}

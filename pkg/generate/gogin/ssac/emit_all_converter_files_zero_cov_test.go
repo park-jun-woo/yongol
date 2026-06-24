@@ -18,7 +18,7 @@ func TestEmitAllConverterFiles_ZeroCov(t *testing.T) {
 	}}}
 	needed := map[string]bool{"Widget": true}
 
-	if err := emitAllConverterFiles(doc, dir, "example.com/app", needed, nil, used); err != nil {
+	if err := emitAllConverterFiles(doc, dir, "example.com/app", needed, nil, used, domainGen{}); err != nil {
 		t.Fatalf("emitAllConverterFiles: %v", err)
 	}
 	got, _ := os.ReadDir(dir)
@@ -27,10 +27,10 @@ func TestEmitAllConverterFiles_ZeroCov(t *testing.T) {
 	}
 
 	// early-return: nil components, empty needed.
-	if err := emitAllConverterFiles(&openapi3.T{}, dir, "m", needed, nil, used); err != nil {
+	if err := emitAllConverterFiles(&openapi3.T{}, dir, "m", needed, nil, used, domainGen{}); err != nil {
 		t.Fatalf("nil components should no-op: %v", err)
 	}
-	if err := emitAllConverterFiles(doc, dir, "m", map[string]bool{}, nil, used); err != nil {
+	if err := emitAllConverterFiles(doc, dir, "m", map[string]bool{}, nil, used, domainGen{}); err != nil {
 		t.Fatalf("empty needed should no-op: %v", err)
 	}
 }

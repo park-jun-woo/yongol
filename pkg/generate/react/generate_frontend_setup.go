@@ -16,8 +16,14 @@ import (
 // significant only for openapi-typescript: api.ts imports from types/api,
 // so types/api.d.ts must exist (even as a stub) before Vite's type-check
 // runs. All other files are independent.
-func generateFrontendSetup(fs *yongol.Fullstack, artifactsDir string) error {
-	frontendDir := filepath.Join(artifactsDir, "frontend")
+//
+// frontendDir is the fully-resolved output directory (the caller composes
+// <artifactsDir>/frontend for single-site or <artifactsDir>/frontend/<domain>
+// for domain mode). specPath is the OpenAPI yaml feeding openapi-typescript;
+// the caller resolves it (findOpenAPISpec(fs) single-site, or the per-domain
+// filepath.Join(fs.SpecsDir, cfg.OpenAPI) — Decision N — for domain mode)
+// because SpecsDir-based path synthesis is not domain-aware.
+func generateFrontendSetup(fs *yongol.Fullstack, frontendDir, specPath string) error {
 	srcDir := filepath.Join(frontendDir, "src")
 	typesDir := filepath.Join(srcDir, "types")
 	if err := os.MkdirAll(typesDir, 0o755); err != nil {
@@ -99,7 +105,6 @@ func generateFrontendSetup(fs *yongol.Fullstack, artifactsDir string) error {
 	// stub-then-error contract means api.ts is always emitted, and the
 	// tool error is only returned after the tree is complete.
 	typesDest := filepath.Join(typesDir, "api.d.ts")
-	specPath := findOpenAPISpec(fs)
 	var deferredErr error
 	if specPath != "" {
 		if err := runOpenAPITypescript(specPath, typesDest); err != nil {

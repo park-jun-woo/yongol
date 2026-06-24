@@ -19,6 +19,12 @@ import (
 // error and exit with code 1 instead of panicking. This keeps restart loops
 // observable via slog and produces a clear stderr line for operators.
 func blockRequestValidator(fs *yongol.Fullstack, modulePath string) MainBlock {
+	// Domain mode (BUG-142): there is no single global validator. Each domain's
+	// validator is mounted on its own route group in blockRegisterHandlersDomained
+	// (appendDomainHandler → group.Use), so emit nothing here.
+	if fs.IsDomained() {
+		return MainBlock{Name: "request-validator"}
+	}
 	return MainBlock{
 		Name: "request-validator",
 		Imports: []string{

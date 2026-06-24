@@ -60,6 +60,23 @@ type Fullstack struct {
 	DesignSpec       *design.DesignSpec
 	ParseDiagnostics []diagnostic.Diagnostic   // All errors collected during the parser phase. Gated at the CLI level.
 	Presences        map[SSOTKind]SSOTPresence // Presence state (Absent/Declared/Populated) per SSOT kind.
+	// DomainPresences holds per-domain SSOT presence for multi-domain projects:
+	// domain name → SSOT kind → presence. Only OpenAPI and STML are split per
+	// domain (everything else is shared). nil for single-site projects; populated
+	// by ParseAll's domain loop (Phase004) when fs.Manifest.Domains is non-empty.
+	DomainPresences map[string]map[SSOTKind]SSOTPresence
+	// Per-domain SSOT data for multi-domain projects (domains: declared). Keyed by
+	// domain name. nil for single-site projects (the singular fields above are used
+	// instead). Populated by ParseAll's domain loop (Phase004); consumed via the
+	// helper accessors (IsDomained/DomainNames/AllOpenAPIDocs/AllSTMLPages/DomainView).
+	DomainOpenAPIDocs map[string]*openapi3.T
+	// DomainOpenAPILines is declared here (Phase003 data model) but populated later
+	// in Phase004's ParseAll domain loop — same per-node line index as the singular
+	// OpenAPILines, one per domain.
+	DomainOpenAPILines map[string]*oapiparser.LineIndex
+	DomainSTMLPages    map[string][]stml.PageSpec
+	DomainSitemaps     map[string]*stml.SitemapSpec
+	DomainLayouts      map[string][]stml.LayoutSpec
 	// SsacInterfaces holds parsed ssac/pkg/*/interface.yaml documents keyed
 	// by package name. Populated by parseSsacInterfaces during ParseAll and
 	// consumed by Phase002 codegen (pkg/generate/gogin/infra/) plus Phase004/005

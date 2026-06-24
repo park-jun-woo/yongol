@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/park-jun-woo/yongol/pkg/parser/manifest"
 	"github.com/park-jun-woo/yongol/pkg/parser/stml"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
@@ -39,6 +40,15 @@ paths:
 		t.Fatal(err)
 	}
 
+	adminDoc, err := openapi3.NewLoader().LoadFromFile(filepath.Join(dir, "admin.yaml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	coreDoc, err := openapi3.NewLoader().LoadFromFile(filepath.Join(dir, "core.yaml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	fs := &yongol.Fullstack{
 		SpecsDir: dir,
 		Manifest: &manifest.ProjectConfig{
@@ -50,6 +60,10 @@ paths:
 		STMLPages: []stml.PageSpec{
 			{FileName: "frontend/admin/dashboard.html"},
 			{FileName: "frontend/core/items.html", Fetches: []stml.FetchBlock{{OperationID: "AdminList"}}},
+		},
+		DomainOpenAPIDocs: map[string]*openapi3.T{
+			"admin": adminDoc,
+			"core":  coreDoc,
 		},
 	}
 

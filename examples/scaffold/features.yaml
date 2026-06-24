@@ -1,0 +1,33 @@
+features:
+  # --- 기본 인증 (Authentication) ---
+  - op: Signup
+    path: POST /api/v1/auth/signup
+    desc: Register a new user account
+    table: users
+    public: true
+
+  - op: Login
+    path: POST /api/v1/auth/login
+    desc: Authenticate user and issue JWT access token
+    table: users
+    public: true
+
+  - op: RefreshToken
+    path: POST /api/v1/auth/refresh
+    desc: Rotate the refresh token and issue a new access/refresh pair
+    table: users
+    public: true
+
+  - op: Logout
+    path: POST /api/v1/auth/logout
+    desc: Revoke the supplied refresh token
+    table: users
+    public: true
+
+  - op: GetMe
+    path: GET /api/v1/auth/me
+    desc: Get the currently authenticated user's profile
+    table: users
+
+tables:
+  users: {}

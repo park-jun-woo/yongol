@@ -122,6 +122,11 @@ type methodGen struct {
 	// fields to Go literals (Phase002-ManifestRef). Nil when manifest is
 	// absent — callers must nil-guard before use.
 	Manifest *manifest.ProjectConfig
+	// DomainTitle is the PascalCase domain prefix (domainTitle(name)) applied
+	// to converter call sites so the body references convert<DomainTitle><Name>
+	// — the same name the per-domain converter file declares. Empty in
+	// single-site mode, keeping convert<Name> unchanged (Phase007).
+	DomainTitle string
 	// ResponseShapes maps each `<Op><Status>JSONResponse` wrapper type name
 	// to its oapi-codegen-generated shape (alias vs embedded struct). Built
 	// once per Generate run by classifyResponseShapes reading the already-

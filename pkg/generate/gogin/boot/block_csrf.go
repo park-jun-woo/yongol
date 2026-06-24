@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/park-jun-woo/yongol/pkg/generate/prepared"
+	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
 // blockCsrf emits the middleware.Csrf registration whenever auth is
@@ -23,11 +24,16 @@ import (
 // the CSRF check fires early in the chain, ahead of body reads. In
 // hybrid mode the Csrf middleware short-circuits on Bearer headers so
 // API clients are unaffected.
-func blockCsrf(a prepared.Auth, modulePath string) MainBlock {
+func blockCsrf(fs *yongol.Fullstack, a prepared.Auth, modulePath string) MainBlock {
 	if !hasCsrf(a) {
 		return MainBlock{Name: "csrf", Active: csrfAlwaysInactive}
 	}
 	cookieName, headerName, exempt, maxAge, secure := csrfCookieSettings(a.Raw.Csrf)
+	// Phase008 §4 — in domain mode, exempt bearer-only domain prefixes so the
+	// global Csrf check applies to cookie/hybrid domain paths only. isExemptPath
+	// is prefix-matched, so /api/admin (bearer) skips while /api (cookie) stays
+	// verified.
+	exempt = append(exempt, bearerDomainPrefixes(fs)...)
 	hybridSkip := a.Mode == "hybrid"
 
 	lines := []string{

@@ -1,0 +1,10 @@
+package service
+
+import "github.com/park-jun-woo/ssac/pkg/auth"
+
+// @get User existing = User.FindByEmail({Email: request.email})
+// @exists existing "Email already registered" 409
+// @call HashPasswordResponse h = auth.HashPassword({Password: request.password})
+// @post User user = User.Create({Email: request.email, PasswordHash: h.HashedPassword})
+// @response { id: user.ID, email: user.Email, role: user.Role }
+func Signup() {}

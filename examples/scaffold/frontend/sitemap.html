@@ -1,0 +1,16 @@
+<!-- frontend/sitemap.html — [name] auth scaffold site structure -->
+
+<!-- 보호 영역: 로그인 후 사용하는 화면 (admin 전용 GetMe) -->
+<nav data-sitemap data-layout="app">
+  <ul>
+    <li data-page="me" data-index>내 정보</li>
+  </ul>
+</nav>
+
+<!-- 공개 진입 영역: 인증 전 페이지 -->
+<nav data-sitemap data-entry>
+  <ul>
+    <li data-page="login">로그인</li>
+    <li data-page="signup">회원가입</li>
+  </ul>
+</nav>

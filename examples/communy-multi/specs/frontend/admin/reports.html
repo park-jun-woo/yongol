@@ -1,0 +1,18 @@
+<main>
+  <section data-fetch="ListReports">
+    <ul data-each="items">
+      <li>
+        <span data-bind="reason"></span>
+        <span data-bind="status"></span>
+        <button data-action="ResolveReport"
+                data-param-id="item.id"
+                data-redirect="reports"
+                data-invalidates="ListReports">처리</button>
+        <button data-action="DismissReport"
+                data-param-id="item.id"
+                data-redirect="reports"
+                data-invalidates="ListReports">반려</button>
+      </li>
+    </ul>
+  </section>
+</main>

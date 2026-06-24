@@ -1,28 +1,31 @@
-//ff:func feature=gen-gogin type=util control=iteration dimension=2 topic=dos-guard
-//ff:what buildOperationRouteIndex — OpenAPI 의 operationId → "METHOD /path" 매핑
+//ff:func feature=gen-gogin type=util control=sequence topic=dos-guard
+//ff:what buildOperationRouteIndex — operationId → "METHOD <prefix><path>" 매핑 (도메인 인지)
 
 package boot
 
 import "github.com/park-jun-woo/yongol/pkg/yongol"
 
-// buildOperationRouteIndex walks the OpenAPI doc and maps each
-// operationId to its gin route key ("METHOD /path"). Returns empty map
-// when the doc is nil so callers can still iterate safely.
+// buildOperationRouteIndex maps each operationId to its gin route key
+// ("METHOD <route>"). The route key must match the runtime FullPath the
+// rate-limit / body-limit middlewares compare against.
 //
-// Nested loop structure (path → methods) is intrinsic to the OpenAPI
-// document shape, so this func declares dimension=2 rather than flattening.
+// Domain mode: each domain's OpenAPI paths are RELATIVE and mounted under its
+// route_prefix (r.Group(cfg.RoutePrefix) + RegisterHandlers), so keys are
+// prefixed per domain and merged into one map (operationIds globally unique,
+// XDO-90). Single-site: the singular OpenAPIDoc is indexed with no prefix —
+// byte-identical to the pre-domain behaviour. Returns an empty map when no
+// document is available so callers can iterate safely.
 func buildOperationRouteIndex(fs *yongol.Fullstack) map[string]string {
 	idx := map[string]string{}
-	if fs == nil || fs.OpenAPIDoc == nil || fs.OpenAPIDoc.Paths == nil {
+	if fs == nil {
 		return idx
 	}
-	for path, pi := range fs.OpenAPIDoc.Paths.Map() {
-		for method, op := range pi.Operations() {
-			if op == nil || op.OperationID == "" {
-				continue
-			}
-			idx[op.OperationID] = method + " " + openAPIPathToGin(path)
+	if fs.IsDomained() {
+		for _, name := range fs.DomainNames() {
+			indexOpenAPIDoc(idx, fs.DomainOpenAPIDocs[name], fs.Manifest.Domains[name].RoutePrefix)
 		}
+		return idx
 	}
+	indexOpenAPIDoc(idx, fs.OpenAPIDoc, "")
 	return idx
 }

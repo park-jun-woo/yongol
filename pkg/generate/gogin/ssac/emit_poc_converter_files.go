@@ -22,6 +22,7 @@ func emitAllConverterFiles(
 	needed map[string]bool,
 	ddlTables []ddl.Table,
 	used map[string]bool,
+	dg domainGen,
 ) error {
 	if doc == nil || doc.Components == nil || doc.Components.Schemas == nil {
 		return nil
@@ -41,10 +42,10 @@ func emitAllConverterFiles(
 		if ref == nil || ref.Value == nil {
 			continue
 		}
-		if err := emitConvertFuncFile(serviceDir, modulePath, name, ref.Value, ddlTables, used); err != nil {
+		if err := emitConvertFuncFile(serviceDir, modulePath, name, ref.Value, ddlTables, used, dg); err != nil {
 			return err
 		}
-		if err := emitConvertListFile(serviceDir, modulePath, name, used); err != nil {
+		if err := emitConvertListFile(serviceDir, modulePath, name, used, dg); err != nil {
 			return err
 		}
 	}

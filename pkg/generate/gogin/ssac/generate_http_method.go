@@ -11,16 +11,20 @@ import (
 )
 
 // generateHTTPMethod writes one StrictServerInterface method file.
-func generateHTTPMethod(sf ssacparser.ServiceFunc, fs *yongol.Fullstack, serviceDir, modulePath string, respShapes map[string]respShape) error {
+func generateHTTPMethod(sf ssacparser.ServiceFunc, fs *yongol.Fullstack, serviceDir, modulePath string, respShapes map[string]respShape, dg domainGen) error {
 	useTx := needsTransaction(sf)
 	g := newMethodGen(fs.OpenAPIDoc, sf, modulePath, useTx, fs.ProjectFuncSpecs, fs.YongolPkgSpecs, tracingWrapCalls(fs), fs.StateDiagrams, collectOwnerships(fs), fs.DDLTables, fs.SQLcQueries, fs.Manifest)
 	g.ResponseShapes = respShapes
+	// Domain mode: converter call sites in the body (buildResponseConvert /
+	// buildFieldResponse / dbToAPIConvert) must reference the owning domain's
+	// convert<DomainTitle><Name>. Single-site leaves DomainTitle "" (unchanged).
+	g.DomainTitle = dg.FuncPrefix
 
 	var imports []string
 	var body []string
 
 	imports = append(imports, `"context"`)
-	imports = append(imports, fmt.Sprintf(`"%s/internal/api"`, modulePath))
+	imports = append(imports, apiImportLine(modulePath, dg.ApiSuffix))
 	imports = append(imports, `"log/slog"`)
 
 	// Handler entry DEBUG log (Phase012 AutoLogInsert 1단계)

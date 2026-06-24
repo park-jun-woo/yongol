@@ -7,8 +7,8 @@ import "testing"
 
 func TestRunTscCheck_SkipsWithoutNodeModules(t *testing.T) {
 	// No node_modules → graceful skip (warn, not fail), regardless of tsc.
-	artifacts := writeFrontendFixture(t, "const n: number = 'x'\n", false)
-	if err := RunTscCheck(artifacts); err != nil {
+	frontend := writeFrontendFixture(t, "const n: number = 'x'\n", false)
+	if err := RunTscCheck(frontend); err != nil {
 		t.Fatalf("expected skip (nil) without node_modules, got: %v", err)
 	}
 }

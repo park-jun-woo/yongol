@@ -42,7 +42,7 @@ func baseCandidateBlocks(fs *yongol.Fullstack, p prepared.State, modulePath stri
 		blockCORS(fs),
 		blockPrometheus(fs, modulePath),
 		blockSecurityHeaders(fs, modulePath),
-		blockCsrf(p.Auth, modulePath),
+		blockCsrf(fs, p.Auth, modulePath),
 		blockBodyLimit(fs, modulePath),
 		blockRateLimit(fs, modulePath),
 		blockRequestValidator(fs, modulePath),

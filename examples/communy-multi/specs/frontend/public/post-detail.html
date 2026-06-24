@@ -1,0 +1,39 @@
+<main>
+  <article data-fetch="GetPost" data-param-id="route.PostID">
+    <h2 data-bind="title"></h2>
+    <p data-bind="body"></p>
+    <span data-bind="upvotes"></span>
+  </article>
+  <section data-fetch="ListComments" data-param-id="route.PostID">
+    <ul data-each="items">
+      <li><span data-bind="body"></span></li>
+    </ul>
+  </section>
+  <section data-action="VotePost"
+           data-param-id="route.PostID"
+           data-redirect="post-detail"
+           data-redirect-params="route.PostID -> PostID"
+           data-invalidates="GetPost">
+    <input data-field="vote_type" />
+    <button type="submit">추천</button>
+    <p data-on-error></p>
+  </section>
+  <section data-action="CreateComment"
+           data-param-id="route.PostID"
+           data-redirect="post-detail"
+           data-redirect-params="route.PostID -> PostID"
+           data-invalidates="ListComments">
+    <input data-field="body" />
+    <input data-field="is_anonymous" type="checkbox" />
+    <button type="submit">댓글</button>
+    <p data-on-error></p>
+  </section>
+  <section data-action="CreateReport"
+           data-param-id="route.PostID"
+           data-redirect="post-detail"
+           data-redirect-params="route.PostID -> PostID">
+    <input data-field="reason" />
+    <button type="submit">신고</button>
+    <p data-on-error></p>
+  </section>
+</main>

@@ -13,14 +13,14 @@ import (
 func (g *methodGen) buildResponseConvert(model, target string) []string {
 	if elem, ok := strings.CutPrefix(model, "[]"); ok {
 		return []string{
-			fmt.Sprintf("converted, err := convert%sList(%s)", elem, target),
+			fmt.Sprintf("converted, err := convert%s%sList(%s)", g.DomainTitle, elem, target),
 			"if err != nil { return nil, err }",
 			fmt.Sprintf("return api.%s%dJSONResponse(converted), nil",
 				g.FuncName, g.SuccessStatus),
 		}
 	}
 	return []string{
-		fmt.Sprintf("converted, err := convert%s(%s)", model, target),
+		fmt.Sprintf("converted, err := convert%s%s(%s)", g.DomainTitle, model, target),
 		"if err != nil { return nil, err }",
 		fmt.Sprintf("return api.%s%dJSONResponse(*converted), nil",
 			g.FuncName, g.SuccessStatus),

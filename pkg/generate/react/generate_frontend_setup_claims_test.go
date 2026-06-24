@@ -34,7 +34,7 @@ func TestGenerateFrontendSetup_CookieClaims(t *testing.T) {
 
 	t.Run("cookie mode with a claims capture emits the claims-only store", func(t *testing.T) {
 		out := t.TempDir()
-		if err := generateFrontendSetup(makeCookieFS([]stml.PageSpec{claimsPage}), out); err != nil {
+		if err := generateFrontendSetup(makeCookieFS([]stml.PageSpec{claimsPage}), filepath.Join(out, "frontend"), ""); err != nil {
 			t.Fatalf("generateFrontendSetup: %v", err)
 		}
 		data, err := os.ReadFile(filepath.Join(out, "frontend", "src", "stores", "auth.ts"))
@@ -53,7 +53,7 @@ func TestGenerateFrontendSetup_CookieClaims(t *testing.T) {
 	t.Run("cookie mode without claims captures emits no store (pre-Phase005 shape)", func(t *testing.T) {
 		out := t.TempDir()
 		plain := stml.PageSpec{Name: "login", FileName: "login.html", Actions: []stml.ActionBlock{{OperationID: "Login"}}}
-		if err := generateFrontendSetup(makeCookieFS([]stml.PageSpec{plain}), out); err != nil {
+		if err := generateFrontendSetup(makeCookieFS([]stml.PageSpec{plain}), filepath.Join(out, "frontend"), ""); err != nil {
 			t.Fatalf("generateFrontendSetup: %v", err)
 		}
 		if _, err := os.Stat(filepath.Join(out, "frontend", "src", "stores", "auth.ts")); !os.IsNotExist(err) {

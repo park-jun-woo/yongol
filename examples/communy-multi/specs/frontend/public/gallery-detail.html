@@ -1,0 +1,26 @@
+<main>
+  <article data-fetch="GetGallery" data-param-gallery-id="route.GalleryID">
+    <h2 data-bind="name"></h2>
+    <p data-bind="description"></p>
+  </article>
+  <section data-fetch="ListPosts" data-param-gallery-id="route.GalleryID">
+    <ul data-each="items">
+      <li>
+        <a data-link="post-detail" data-link-params="item.id -> PostID">
+          <span data-bind="title"></span>
+        </a>
+      </li>
+    </ul>
+  </section>
+  <section data-action="CreatePost"
+           data-param-gallery-id="route.GalleryID"
+           data-redirect="gallery-detail"
+           data-redirect-params="route.GalleryID -> GalleryID"
+           data-invalidates="ListPosts">
+    <input data-field="title" />
+    <input data-field="body" />
+    <input data-field="is_anonymous" type="checkbox" />
+    <button type="submit">작성</button>
+    <p data-on-error></p>
+  </section>
+</main>

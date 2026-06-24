@@ -13,10 +13,10 @@ func TestEmitConvertFiles_ZeroCov(t *testing.T) {
 	dir := t.TempDir()
 	used := map[string]bool{}
 
-	if err := emitConvertFuncFile(dir, "example.com/app", "Widget", convertSchemaZeroCov(), nil, used); err != nil {
+	if err := emitConvertFuncFile(dir, "example.com/app", "Widget", convertSchemaZeroCov(), nil, used, domainGen{}); err != nil {
 		t.Fatalf("emitConvertFuncFile: %v", err)
 	}
-	if err := emitConvertListFile(dir, "example.com/app", "Widget", used); err != nil {
+	if err := emitConvertListFile(dir, "example.com/app", "Widget", used, domainGen{}); err != nil {
 		t.Fatalf("emitConvertListFile: %v", err)
 	}
 

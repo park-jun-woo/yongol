@@ -24,7 +24,9 @@ func emitFuncResponseConverterFile(
 	info funcRespInfo,
 	spec *funcspec.FuncSpec,
 	used map[string]bool,
+	dg domainGen,
 ) error {
+	funcName := "convert" + dg.FuncPrefix + name
 	var sb strings.Builder
 	sb.WriteString(ffannot.EmitAnnotationBlock(ffannot.Block{
 		Func: ffannot.FuncAnnot{
@@ -33,16 +35,16 @@ func emitFuncResponseConverterFile(
 			Control: "sequence",
 			Topic:   "response-serialize",
 		},
-		What: "convert" + name + " — " + info.PkgAlias + "." + name + " → *api." + name + " 변환",
+		What: funcName + " — " + info.PkgAlias + "." + name + " → *api." + name + " 변환",
 	}))
 	sb.WriteString("package service\n\nimport (\n")
-	sb.WriteString("\t\"" + modulePath + "/internal/api\"\n")
+	sb.WriteString("\t" + apiImportLine(modulePath, dg.ApiSuffix) + "\n")
 	if info.ImportPath != "" {
 		sb.WriteString("\t\"" + info.ImportPath + "\"\n")
 	}
 	sb.WriteString(")\n\n")
-	writeFuncResponseConvertFunc(&sb, name, schema, info, spec)
+	writeFuncResponseConvertFunc(&sb, name, schema, info, spec, dg.FuncPrefix)
 
-	fileName := fffile.EnsureUnique(fffile.FileNameForFunc("convert"+name), used)
+	fileName := fffile.EnsureUnique(fffile.FileNameForFunc(funcName), used)
 	return fffile.WriteIfNotPreserved(filepath.Join(serviceDir, fileName), []byte(sb.String()))
 }

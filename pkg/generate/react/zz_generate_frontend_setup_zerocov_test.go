@@ -13,7 +13,7 @@ import (
 func TestGenerateFrontendSetup_ZeroCov(t *testing.T) {
 	out := t.TempDir()
 	// Empty Fullstack drives the nil-guard branches (no Manifest/DesignSpec).
-	if err := generateFrontendSetup(&yongol.Fullstack{}, out); err != nil {
+	if err := generateFrontendSetup(&yongol.Fullstack{}, filepath.Join(out, "frontend"), ""); err != nil {
 		t.Fatalf("generateFrontendSetup: %v", err)
 	}
 	for _, name := range []string{

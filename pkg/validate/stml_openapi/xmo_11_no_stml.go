@@ -16,11 +16,5 @@ func xmo11NoStml(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	if !frontendEnabled(fs) || len(fs.STMLPages) != 0 {
 		return nil
 	}
-	return []diagnostic.Diagnostic{{
-		File:    "manifest.yaml",
-		Phase:   diagnostic.PhaseValidate,
-		Level:   diagnostic.LevelError,
-		Message: "[XMO-11] frontend is enabled but no STML pages were found",
-		Advice:  "Author STML pages under specs/frontend/, or set frontend.enabled: false in manifest.yaml if this project has no frontend",
-	}}
+	return xmo11Diag()
 }

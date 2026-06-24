@@ -1,0 +1,7 @@
+package service
+
+import "github.com/park-jun-woo/ssac/pkg/auth"
+
+// @call RefreshRotateResponse rotated = auth.RefreshRotate({RefreshToken: request.refresh_token}) 401
+// @response { access_token: rotated.AccessToken, refresh_token: rotated.RefreshToken }
+func RefreshToken() {}

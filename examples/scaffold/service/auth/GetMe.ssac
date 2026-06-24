@@ -1,0 +1,6 @@
+package service
+
+// @auth "GetMe" "user" {} "Forbidden" 403
+// @get User user = User.FindByID({ID: currentUser.ID})
+// @response { id: user.ID, email: user.Email, role: user.Role }
+func GetMe() {}

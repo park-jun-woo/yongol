@@ -1,0 +1,20 @@
+version: "2"
+sql:
+  - engine: postgresql
+    schema: .
+    queries: queries
+    gen:
+      go:
+        package: db
+        out: ../../../artifacts/[name]/backend/internal/db
+        sql_package: pgx/v5
+        emit_json_tags: true
+        emit_prepared_queries: false
+        emit_interface: true
+        overrides:
+          - db_type: "timestamptz"
+            nullable: false
+            go_type: { import: "github.com/jackc/pgx/v5/pgtype", package: "pgtype", type: "Timestamptz" }
+          - db_type: "timestamptz"
+            nullable: true
+            go_type: { import: "github.com/jackc/pgx/v5/pgtype", package: "pgtype", type: "Timestamptz" }

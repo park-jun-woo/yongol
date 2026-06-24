@@ -30,7 +30,14 @@ func Generate(fs *yongol.Fullstack, p prepared.State, artifactsDir string) error
 	if err := generateUserClaim(artifactsDir, fields); err != nil {
 		return fmt.Errorf("user_claim: %w", err)
 	}
-	if err := generateBearerAuth(artifactsDir, modulePath, fields, p.Auth.Mode); err != nil {
+	if fs.IsDomained() {
+		// Phase008 — emit one strict middleware per domain (BearerAuthStrict
+		// <Title>/CookieAuthStrict<Title>) by resolved auth_mode; the shared
+		// auth_mode.go/extract_token.go are not written in domain mode (§3c/§3d).
+		if err := generateDomainAuth(fs, p, artifactsDir, modulePath); err != nil {
+			return fmt.Errorf("domain_auth: %w", err)
+		}
+	} else if err := generateBearerAuth(artifactsDir, modulePath, fields, p.Auth.Mode); err != nil {
 		return fmt.Errorf("bearer_auth: %w", err)
 	}
 	// Phase001 UserClaimUnification — the whole internal/auth/ directory is

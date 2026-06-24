@@ -32,16 +32,27 @@ func Generate(fs *yongol.Fullstack, p prepared.State, artifactsDir string) error
 		return fmt.Errorf("remove stale combined: %w", err)
 	}
 
-	// Copy specs/api/openapi.yaml → middleware/openapi.yaml for go:embed.
-	src := filepath.Join(fs.SpecsDir, "api", "openapi.yaml")
-	dst := filepath.Join(mwDir, "openapi.yaml")
-	if err := copyFile(src, dst); err != nil {
-		return fmt.Errorf("copy openapi.yaml: %w", err)
-	}
-
-	// Write request_validator.go
-	if err := writeValidator(mwDir); err != nil {
-		return fmt.Errorf("write validator: %w", err)
+	// Request-validator emission. Single-site (BUG-142 unchanged path) copies the
+	// lone specs/api/openapi.yaml → middleware/openapi.yaml and writes the global
+	// request_validator.go (RequestValidator, applied via r.Use). Domain mode has
+	// no top-level openapi.yaml — only per-domain api/<domain>.yaml — so it emits
+	// one openapi_<ident>.yaml + request_validator_<ident>.go per domain, mounted
+	// per route group (boot.appendDomainHandler) instead of globally.
+	if fs.IsDomained() {
+		if err := generateDomainValidators(fs, mwDir); err != nil {
+			return fmt.Errorf("domain validators: %w", err)
+		}
+	} else {
+		// Copy specs/api/openapi.yaml → middleware/openapi.yaml for go:embed.
+		src := filepath.Join(fs.SpecsDir, "api", "openapi.yaml")
+		dst := filepath.Join(mwDir, "openapi.yaml")
+		if err := copyFile(src, dst); err != nil {
+			return fmt.Errorf("copy openapi.yaml: %w", err)
+		}
+		// Write request_validator.go
+		if err := writeValidator(mwDir); err != nil {
+			return fmt.Errorf("write validator: %w", err)
+		}
 	}
 	// Write body_limit.go (Phase003 DoS guard).
 	if err := GenerateBodyLimit(artifactsDir); err != nil {

@@ -1,26 +1,23 @@
 //ff:func feature=validate type=util control=iteration dimension=1 topic=domain-security
-//ff:what loadDomainOpenAPIDocs — manifest domains 키로부터 도메인별 OpenAPI 문서를 로드
+//ff:what loadDomainOpenAPIDocs — Phase004 사전 파싱 결과(fs.DomainOpenAPIDocs)와 manifest 도메인 설정을 재조립해 []domainDoc 반환 (디스크 재파싱 제거)
 package domain_security
 
 import (
-	"path/filepath"
-
-	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
-// loadDomainOpenAPIDocs loads each domain's OpenAPI file relative to specsDir.
-// Domains whose OpenAPI file cannot be loaded are silently skipped (parse errors
-// are surfaced elsewhere).
+// loadDomainOpenAPIDocs assembles each domain's pre-parsed OpenAPI document
+// (populated by ParseAll's domain loop in Phase004 into fs.DomainOpenAPIDocs)
+// with its manifest DomainConfig. The rules consume Cfg.OpenAPI (diagnostic
+// paths) and Cfg.Frontend (filterPagesByDomain), so Cfg must travel alongside
+// the doc — the raw fs.DomainOpenAPIDocs map alone would drop it. Domains
+// whose doc was not pre-parsed are skipped. No disk re-parse occurs here; the
+// seven rule call-sites stay unchanged.
 func loadDomainOpenAPIDocs(fs *yongol.Fullstack) []domainDoc {
 	var result []domainDoc
 	for name, cfg := range fs.Manifest.Domains {
-		if cfg.OpenAPI == "" {
-			continue
-		}
-		path := filepath.Join(fs.SpecsDir, cfg.OpenAPI)
-		doc, err := openapi3.NewLoader().LoadFromFile(path)
-		if err != nil {
+		doc := fs.DomainOpenAPIDocs[name]
+		if doc == nil {
 			continue
 		}
 		result = append(result, domainDoc{Name: name, Doc: doc, Cfg: cfg})

@@ -88,13 +88,13 @@ func (g *methodGen) buildFieldResponse(fields map[string]string) ([]string, []st
 		if rf.IsArray {
 			listLocal[jsonName] = local
 			lines = append(lines,
-				fmt.Sprintf("%s, err := convert%sList(%s)", local, rf.RefType, varExpr),
+				fmt.Sprintf("%s, err := convert%s%sList(%s)", local, g.DomainTitle, rf.RefType, varExpr),
 				"if err != nil { return nil, err }",
 			)
 		} else {
 			scalarLocal[jsonName] = local
 			lines = append(lines,
-				fmt.Sprintf("%s, err := convert%s(%s)", local, rf.RefType, varExpr),
+				fmt.Sprintf("%s, err := convert%s%s(%s)", local, g.DomainTitle, rf.RefType, varExpr),
 				"if err != nil { return nil, err }",
 			)
 		}

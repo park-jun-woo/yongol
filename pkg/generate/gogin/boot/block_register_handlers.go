@@ -21,6 +21,12 @@ import (
 // backend.rate_limit is mandatory when backend.auth exists, and codegen
 // wires RouteRateLimit middleware via blockRateLimit.
 func blockRegisterHandlers(fs *yongol.Fullstack, modulePath string) MainBlock {
+	// Domain mode (Phase007): mount each domain's handlers on its own route
+	// group, all sharing the single srv (Decision B). Single-site keeps the
+	// historical single RegisterHandlers below.
+	if fs.IsDomained() {
+		return blockRegisterHandlersDomained(fs, modulePath)
+	}
 	imports := []string{fmt.Sprintf(`"%s/internal/api"`, modulePath)}
 	var lines []string
 

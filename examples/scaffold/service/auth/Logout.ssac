@@ -1,0 +1,7 @@
+package service
+
+import "github.com/park-jun-woo/ssac/pkg/auth"
+
+// @call LogoutResponse out = auth.Logout({RefreshToken: request.refresh_token})
+// @response { success: out.Success }
+func Logout() {}

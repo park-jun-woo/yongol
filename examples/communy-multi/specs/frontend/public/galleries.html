@@ -1,0 +1,12 @@
+<main>
+  <section data-fetch="ListGalleries">
+    <ul data-each="items">
+      <li>
+        <a data-link="gallery-detail" data-link-params="item.id -> GalleryID">
+          <span data-bind="name"></span>
+        </a>
+        <span data-bind="post_count"></span>
+      </li>
+    </ul>
+  </section>
+</main>

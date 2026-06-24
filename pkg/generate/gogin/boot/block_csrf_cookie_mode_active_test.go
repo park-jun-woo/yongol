@@ -22,7 +22,7 @@ func TestBlockCsrf_CookieMode_Active(t *testing.T) {
 		},
 	}
 	a := prepared.Auth{Present: true, Mode: "cookie", CsrfRequired: true, Raw: raw}
-	block := blockCsrf(a, "example.com/zenflow")
+	block := blockCsrf(nil, a, "example.com/zenflow")
 	if block.Active != nil {
 		t.Fatalf("cookie mode with csrf enabled should leave Active nil (always active)")
 	}

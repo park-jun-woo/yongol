@@ -1,0 +1,9 @@
+package service
+
+import "github.com/park-jun-woo/ssac/pkg/auth"
+
+// @verify-password User.email=request.email User.password_hash vs request.password -> user 401 "Invalid credentials"
+// @call IssueTokenResponse token = auth.IssueToken({ID: user.ID, Email: user.Email, Role: user.Role})
+// @call RefreshTokenResponse refresh = auth.RefreshToken({ID: user.ID, Email: user.Email, Role: user.Role})
+// @response { access_token: token.AccessToken, refresh_token: refresh.RefreshToken }
+func Login() {}

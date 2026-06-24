@@ -27,7 +27,9 @@ func emitConvertFuncFile(
 	schema *openapi3.Schema,
 	ddlTables []ddl.Table,
 	used map[string]bool,
+	dg domainGen,
 ) error {
+	funcName := "convert" + dg.FuncPrefix + name
 	var sb strings.Builder
 	sb.WriteString(ffannot.EmitAnnotationBlock(ffannot.Block{
 		Func: ffannot.FuncAnnot{
@@ -36,7 +38,7 @@ func emitConvertFuncFile(
 			Control: "sequence",
 			Topic:   "response-serialize",
 		},
-		What: "convert" + name + " — db." + name + " row → *api." + name + " 변환",
+		What: funcName + " — db." + name + " row → *api." + name + " 변환",
 	}))
 	// encoding/json is imported unconditionally — even for schemas that
 	// have no JSONB fields the convert function signature now returns an
@@ -53,7 +55,7 @@ func emitConvertFuncFile(
 	if needsJSON {
 		sb.WriteString("\t\"encoding/json\"\n\n")
 	}
-	sb.WriteString("\t\"" + modulePath + "/internal/api\"\n")
+	sb.WriteString("\t" + apiImportLine(modulePath, dg.ApiSuffix) + "\n")
 	sb.WriteString("\t\"" + modulePath + "/internal/db\"\n")
 	if needsTypes {
 		// openapi_types is the import alias oapi-codegen uses in its own
@@ -67,8 +69,8 @@ func emitConvertFuncFile(
 		sb.WriteString("\t\"github.com/park-jun-woo/ssac/pkg/pgtypex\"\n")
 	}
 	sb.WriteString(")\n\n")
-	writeConvertFunc(&sb, name, schema, ddlTables)
+	writeConvertFunc(&sb, name, schema, ddlTables, dg.FuncPrefix)
 
-	fileName := fffile.EnsureUnique(fffile.FileNameForFunc("convert"+name), used)
+	fileName := fffile.EnsureUnique(fffile.FileNameForFunc(funcName), used)
 	return fffile.WriteIfNotPreserved(filepath.Join(serviceDir, fileName), []byte(sb.String()))
 }

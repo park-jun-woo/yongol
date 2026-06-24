@@ -19,7 +19,7 @@ func TestGoginSSaCGenerate_Integ(t *testing.T) {
 	}
 
 	out := t.TempDir()
-	if err := Generate(fs, out); err != nil {
+	if err := Generate(fs, out, "", ""); err != nil {
 		t.Fatalf("Generate: %v", err)
 	}
 

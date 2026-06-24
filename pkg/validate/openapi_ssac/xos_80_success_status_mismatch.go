@@ -24,10 +24,10 @@ import (
 // stricter policy (e.g. refuse fallback selection) activates without a
 // new rule ID.
 func xos80SuccessStatusMismatch(fs *yongol.Fullstack) []diagnostic.Diagnostic {
-	if fs.OpenAPIDoc == nil {
+	opMap := buildOperationMethodMapAll(fs)
+	if len(opMap) == 0 {
 		return nil
 	}
-	opMap := buildOperationMethodMap(fs.OpenAPIDoc)
 	var diags []diagnostic.Diagnostic
 	for _, fn := range fs.ServiceFuncs {
 		diags = append(diags, xos80CheckFunc(fn, opMap)...)

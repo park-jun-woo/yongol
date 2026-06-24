@@ -13,13 +13,20 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
-// runSTMLCodegen generates page TSX files from STML specs when STMLPages
-// are present. Skips silently if no STML pages were parsed.
-func runSTMLCodegen(fs *yongol.Fullstack, artifactsDir string) error {
+// runSTMLCodegen generates page TSX files from fs.STMLPages into
+// <frontendDir>/src/pages. Skips silently if no STML pages were parsed.
+//
+// srcFrontendDir is the directory stmlgen resolves per-page
+// <dir>/<page>.custom.ts against (collect_imports.go). Single-site passes
+// fs.SpecsDir (unchanged), domain mode passes filepath.Join(fs.SpecsDir,
+// cfg.Frontend) so the custom.ts sidecars resolve per domain — DomainView
+// keeps SpecsDir shared, so the source dir must be threaded explicitly rather
+// than synthesized from SpecsDir+convention (Decision N).
+func runSTMLCodegen(fs *yongol.Fullstack, srcFrontendDir, frontendDir string) error {
 	if fs == nil || len(fs.STMLPages) == 0 {
 		return nil
 	}
-	pagesDir := filepath.Join(artifactsDir, "frontend", "src", "pages")
+	pagesDir := filepath.Join(frontendDir, "src", "pages")
 	// Prepared mode, not raw ResolvedMode(): keeps the capture-commit gate
 	// aligned with the backend emitters and the react auth gates (Phase004
 	// — including the BUG-014 jwt-without-mode → bearer rule).
@@ -42,6 +49,6 @@ func runSTMLCodegen(fs *yongol.Fullstack, artifactsDir string) error {
 		CrumbTitleSuffix:        crumbTitleSuffix(fs),
 		ErrorDisplayField:       oapiparser.ExtractErrorDisplayField(fs.OpenAPIDoc),
 	}
-	_, err := stmlgen.Generate(fs.STMLPages, fs.SpecsDir, pagesDir, opt)
+	_, err := stmlgen.Generate(fs.STMLPages, srcFrontendDir, pagesDir, opt)
 	return err
 }

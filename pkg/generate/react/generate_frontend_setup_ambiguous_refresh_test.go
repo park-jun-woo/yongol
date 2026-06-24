@@ -29,7 +29,7 @@ func TestGenerateFrontendSetup_AmbiguousRefreshOp_Error(t *testing.T) {
 		)},
 	}
 
-	err := generateFrontendSetup(fs, t.TempDir())
+	err := generateFrontendSetup(fs, t.TempDir(), "")
 	if err == nil {
 		t.Fatal("ambiguous refresh-op inference: want generate error, got nil")
 	}

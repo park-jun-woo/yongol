@@ -4,6 +4,8 @@
 package react
 
 import (
+	"path/filepath"
+
 	"github.com/park-jun-woo/yongol/pkg/yongol"
 )
 
@@ -23,5 +25,10 @@ import (
 // Page files (src/pages/*.tsx) are **not** emitted — TSX is the SSOT, so
 // yongol reads them, not writes them.
 func Generate(fs *yongol.Fullstack, artifactsDir string) error {
-	return generateFrontendSetup(fs, artifactsDir)
+	if fs.IsDomained() {
+		return generateDomainFrontends(fs, artifactsDir)
+	}
+	// Single site: byte-identical to the pre-domain behavior — output under
+	// <artifactsDir>/frontend/ with the hardcoded findOpenAPISpec(fs) path.
+	return generateFrontendSetup(fs, filepath.Join(artifactsDir, "frontend"), findOpenAPISpec(fs))
 }

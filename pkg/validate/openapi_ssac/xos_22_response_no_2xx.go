@@ -11,10 +11,10 @@ import (
 // xos22ResponseNo2xx validates XOS-22: a SSaC func with @response must have at
 // least one explicit 2xx response code defined in OpenAPI.
 func xos22ResponseNo2xx(fs *yongol.Fullstack) []diagnostic.Diagnostic {
-	if fs.OpenAPIDoc == nil {
+	opMap := buildOperationMapAll(fs)
+	if len(opMap) == 0 {
 		return nil
 	}
-	opMap := buildOperationMap(fs.OpenAPIDoc)
 	var diags []diagnostic.Diagnostic
 	for _, fn := range fs.ServiceFuncs {
 		if !hasResponseSequence(fn) {

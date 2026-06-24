@@ -13,20 +13,23 @@ import (
 func TestGenerateOpenAPIGoGin(t *testing.T) {
 	t.Run("MkdirError", func(t *testing.T) {
 		arts := t.TempDir()
-		// backend is a regular file -> backend/internal/api MkdirAll fails.
-		if err := os.WriteFile(filepath.Join(arts, "backend"), []byte("x"), 0o644); err != nil {
+		// parent is a regular file -> outDir MkdirAll fails.
+		parent := filepath.Join(arts, "backend")
+		if err := os.WriteFile(parent, []byte("x"), 0o644); err != nil {
 			t.Fatalf("setup: %v", err)
 		}
-		err := generateOpenAPIGoGin(t.TempDir(), arts)
+		outDir := filepath.Join(parent, "internal", "api")
+		err := generateOpenAPIGoGin(filepath.Join(t.TempDir(), "openapi.yaml"), outDir, "api")
 		if err == nil || !strings.Contains(err.Error(), "mkdir") {
 			t.Errorf("expected mkdir error, got: %v", err)
 		}
 	})
 
 	t.Run("ExecFailsOnMissingSpec", func(t *testing.T) {
-		// specs/api/openapi.yaml does not exist -> oapi-codegen exits non-zero
+		// the spec path does not exist -> oapi-codegen exits non-zero
 		// (or the binary is absent); either way exec returns an error.
-		err := generateOpenAPIGoGin(t.TempDir(), t.TempDir())
+		oapiPath := filepath.Join(t.TempDir(), "api", "openapi.yaml")
+		err := generateOpenAPIGoGin(oapiPath, t.TempDir(), "api")
 		if err == nil {
 			t.Errorf("expected exec error for missing openapi.yaml, got nil")
 		}

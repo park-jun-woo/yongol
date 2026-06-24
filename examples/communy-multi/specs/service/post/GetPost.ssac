@@ -1,0 +1,9 @@
+package service
+
+// @state-neutral
+// @get Post post = Post.FindByID({ID: request.id})
+// @empty post "Post not found"
+// @put Post.IncrementViewCount({ID: post.ID})
+// @get Post updated = Post.FindByID({ID: post.ID})
+// @response { id: updated.ID, gallery_id: updated.GalleryID, user_id: updated.UserID, title: updated.Title, body: updated.Body, status: updated.Status, is_anonymous: updated.IsAnonymous, is_concept: updated.IsConcept, upvotes: updated.Upvotes, downvotes: updated.Downvotes, comment_count: updated.CommentCount, view_count: updated.ViewCount }
+func GetPost() {}

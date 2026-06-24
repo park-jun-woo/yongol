@@ -16,10 +16,10 @@ import (
 // WARNING keeps the operation visible without blocking codegen. The
 // warning also nudges authors to trim genuinely dead declarations.
 func xos82UnreachableSuccessStatus(fs *yongol.Fullstack) []diagnostic.Diagnostic {
-	if fs.OpenAPIDoc == nil {
+	opMap := buildOperationMethodMapAll(fs)
+	if len(opMap) == 0 {
 		return nil
 	}
-	opMap := buildOperationMethodMap(fs.OpenAPIDoc)
 	var diags []diagnostic.Diagnostic
 	for _, fn := range fs.ServiceFuncs {
 		diags = append(diags, xos82CheckFunc(fn, opMap)...)

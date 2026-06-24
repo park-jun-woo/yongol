@@ -22,6 +22,13 @@ func Run(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	diags = append(diags, c10RateLimitValueValid(fs)...)
 	diags = append(diags, c11IpKeyRequiresProxy(fs)...)
 	diags = append(diags, c09BackendLangFramework(fs)...)
+	// Phase001 (multi-site) — domains block structural checks.
+	diags = append(diags, c12DomainOpenAPIRequired(fs)...)
+	diags = append(diags, c13DomainFrontendRequired(fs)...)
+	diags = append(diags, c14DomainRoutePrefixUnique(fs)...)
+	diags = append(diags, c15DomainAuthModeEnum(fs)...)
+	diags = append(diags, c16DomainFrontendConflict(fs)...)
+	diags = append(diags, c17DomainMinimumTwo(fs)...)
 	diags = append(diags, cors01WildcardCredentials(fs)...)
 	diags = append(diags, obs01MetricsPath(fs)...)
 	diags = append(diags, obs02MetricsPathNotOpenAPI(fs)...)

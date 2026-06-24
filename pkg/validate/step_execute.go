@@ -12,6 +12,6 @@ func (s step) execute(fs *yongol.Fullstack, cfg *config) StepResult {
 	if s.Run == nil {
 		return StepResult{Name: s.Name, Status: StatusSkip, Summary: "validator not wired"}
 	}
-	diags := s.Run(fs)
+	diags := s.run(fs)
 	return finalize(s.Name, diags)
 }

@@ -12,7 +12,7 @@ import (
 
 func TestBlockCsrf_NoAuthBlock_Dormant(t *testing.T) {
 	a := prepared.Auth{}
-	block := blockCsrf(a, "example.com/zenflow")
+	block := blockCsrf(nil, a, "example.com/zenflow")
 	if len(block.Lines) != 0 {
 		t.Fatalf("missing auth should yield inert block, got lines: %+v", block.Lines)
 	}

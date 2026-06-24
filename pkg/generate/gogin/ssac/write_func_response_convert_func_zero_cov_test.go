@@ -18,7 +18,7 @@ func TestWriteFuncResponseConvertFunc_ZeroCov(t *testing.T) {
 			{Name: "Total", JSONName: "total"},
 		},
 	}
-	writeFuncResponseConvertFunc(&sb, "SummarizeResponse", convertSchemaZeroCov(), info, spec)
+	writeFuncResponseConvertFunc(&sb, "SummarizeResponse", convertSchemaZeroCov(), info, spec, "")
 	out := sb.String()
 	for _, want := range []string{
 		"func convertSummarizeResponse(src dashboard.SummarizeResponse) (*api.SummarizeResponse, error) {",

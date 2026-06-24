@@ -32,6 +32,7 @@ func writeFuncResponseConvertFunc(
 	schema *openapi3.Schema,
 	info funcRespInfo,
 	spec *funcspec.FuncSpec,
+	funcPrefix string,
 ) {
 	required := requiredSet(schema)
 
@@ -44,7 +45,7 @@ func writeFuncResponseConvertFunc(
 	// Build a lookup from jsonName → FuncSpec Field.Name for the Func side.
 	funcFieldName := buildFuncFieldLookup(spec)
 
-	sb.WriteString("func convert" + name + "(src " + info.PkgAlias + "." + name + ") (*api." + name + ", error) {\n")
+	sb.WriteString("func convert" + funcPrefix + name + "(src " + info.PkgAlias + "." + name + ") (*api." + name + ", error) {\n")
 	sb.WriteString("\treturn &api." + name + "{\n")
 	for _, jsonName := range propNames {
 		apiField := pascalCase(jsonName)

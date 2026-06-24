@@ -10,7 +10,7 @@ import (
 
 func TestBlockCsrf_Inactive(t *testing.T) {
 	// Default bearer (no csrf) → inert block with always-inactive predicate.
-	block := blockCsrf(prepared.Auth{Present: false}, "example.com/zenflow")
+	block := blockCsrf(nil, prepared.Auth{Present: false}, "example.com/zenflow")
 	if block.Active == nil || block.Active(nil) {
 		t.Errorf("non-csrf block must carry csrfAlwaysInactive predicate")
 	}

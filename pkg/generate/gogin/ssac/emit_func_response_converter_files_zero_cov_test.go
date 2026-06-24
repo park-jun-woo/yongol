@@ -22,7 +22,7 @@ func TestEmitFuncResponseConverterFiles_ZeroCov(t *testing.T) {
 	}
 	specs := []funcspec.FuncSpec{{Name: "Summarize"}}
 
-	if err := emitFuncResponseConverterFiles(doc, dir, "example.com/app", funcFiltered, specs, used); err != nil {
+	if err := emitFuncResponseConverterFiles(doc, dir, "example.com/app", funcFiltered, specs, used, domainGen{}); err != nil {
 		t.Fatalf("emitFuncResponseConverterFiles: %v", err)
 	}
 	got, _ := os.ReadDir(dir)
@@ -31,11 +31,11 @@ func TestEmitFuncResponseConverterFiles_ZeroCov(t *testing.T) {
 	}
 
 	// early-return: nil components.
-	if err := emitFuncResponseConverterFiles(&openapi3.T{}, dir, "m", funcFiltered, specs, used); err != nil {
+	if err := emitFuncResponseConverterFiles(&openapi3.T{}, dir, "m", funcFiltered, specs, used, domainGen{}); err != nil {
 		t.Fatalf("nil components should no-op, got %v", err)
 	}
 	// early-return: empty filter.
-	if err := emitFuncResponseConverterFiles(doc, dir, "m", map[string]funcRespInfo{}, specs, used); err != nil {
+	if err := emitFuncResponseConverterFiles(doc, dir, "m", map[string]funcRespInfo{}, specs, used, domainGen{}); err != nil {
 		t.Fatalf("empty filter should no-op, got %v", err)
 	}
 }

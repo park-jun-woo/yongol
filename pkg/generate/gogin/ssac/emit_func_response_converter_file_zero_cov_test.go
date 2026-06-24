@@ -13,7 +13,7 @@ func TestEmitFuncResponseConverterFile_ZeroCov(t *testing.T) {
 	dir := t.TempDir()
 	used := map[string]bool{}
 	info := funcRespInfo{PkgAlias: "dashboard", ImportPath: "example.com/app/internal/dashboard"}
-	if err := emitFuncResponseConverterFile(dir, "example.com/app", "SummarizeResponse", convertSchemaZeroCov(), info, nil, used); err != nil {
+	if err := emitFuncResponseConverterFile(dir, "example.com/app", "SummarizeResponse", convertSchemaZeroCov(), info, nil, used, domainGen{}); err != nil {
 		t.Fatalf("emitFuncResponseConverterFile: %v", err)
 	}
 	got, _ := os.ReadDir(dir)

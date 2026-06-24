@@ -27,6 +27,12 @@ func blockCORS(fs *yongol.Fullstack) MainBlock {
 		`r.Use(cors.New(buildCORSConfig()))`,
 	}
 
+	// Multi-domain (Phase008 §2, Decision L): origin validation becomes
+	// path-aware. Delegated to blockDomainCORS so blockCORS stays small.
+	if fs.IsDomained() {
+		return blockDomainCORS(fs, c, lines)
+	}
+
 	helperFunc := fmt.Sprintf(`func buildCORSConfig() cors.Config {
 	cfg := cors.Config{
 		AllowMethods:     envStringList("CORS_ALLOW_METHODS", %s),

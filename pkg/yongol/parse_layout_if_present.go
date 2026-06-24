@@ -5,8 +5,6 @@ package yongol
 import (
 	"os"
 	"path/filepath"
-
-	"github.com/park-jun-woo/yongol/pkg/parser/stml"
 )
 
 // parseLayoutIfPresent parses the layouts/ subdirectory under the STML
@@ -24,7 +22,7 @@ func parseLayoutIfPresent(fs *Fullstack, has map[SSOTKind]DetectedSSOT) {
 		return
 	}
 
-	layouts, diags := stml.ParseLayoutDir(layoutDir)
+	layouts, diags := parseLayouts(layoutDir)
 	fs.ParseDiagnostics = append(fs.ParseDiagnostics, diags...)
 	if len(diags) == 0 {
 		fs.Layouts = layouts

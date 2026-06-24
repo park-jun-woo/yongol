@@ -12,6 +12,7 @@ func ParseAll(root string, detected []DetectedSSOT) *Fullstack {
 	has := indexDetected(detected, fs)
 
 	parseManifestIfPresent(fs, root, has)
+	parseDomainsIfPresent(fs, root)
 	parseOpenAPIIfPresent(fs, has)
 	parseSSaCIfPresent(fs, has)
 	parseStatesIfPresent(fs, has)

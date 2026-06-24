@@ -10,17 +10,18 @@ import (
 	"strings"
 )
 
-// RunTscCheck spawns `tsc --noEmit` over the generated frontend tree
-// (<artifactsDir>/frontend) so the "generate success = buildable" invariant is
-// enforced for the frontend, symmetric to the backend `go build` step. A
-// compile error fails generate (the gate); exit 0 passes.
+// RunTscCheck spawns `tsc --noEmit` over the generated frontend tree rooted at
+// frontendDir so the "generate success = buildable" invariant is enforced for
+// the frontend, symmetric to the backend `go build` step. A compile error fails
+// generate (the gate); exit 0 passes.
+//
+// frontendDir is the concrete frontend root: <artifacts>/frontend for a single
+// site, or <artifacts>/frontend/<domain> per domain (the caller loops domains).
 //
 // Graceful skip (warn, not fail) when the toolchain is unresolved: no project
 // node_modules (imported packages like react/@tanstack would not resolve — a
 // false gate) or no tsc/npx. Auto `npm install` is out of scope.
-func RunTscCheck(artifactsDir string) error {
-	frontendDir := filepath.Join(artifactsDir, "frontend")
-
+func RunTscCheck(frontendDir string) error {
 	// Prefer the project's own tsc (matches its tsconfig/version); otherwise
 	// fall back to env/npx resolution, but only when node_modules exists so
 	// package imports resolve.

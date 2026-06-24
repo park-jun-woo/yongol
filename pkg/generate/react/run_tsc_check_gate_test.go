@@ -11,14 +11,14 @@ func TestRunTscCheck_PassesAndFails(t *testing.T) {
 	}
 
 	// Clean source type-checks → gate passes.
-	okArtifacts := writeFrontendFixture(t, "const n: number = 1\nvoid n\n", true)
-	if err := RunTscCheck(okArtifacts); err != nil {
+	okFrontend := writeFrontendFixture(t, "const n: number = 1\nvoid n\n", true)
+	if err := RunTscCheck(okFrontend); err != nil {
 		t.Fatalf("clean frontend should pass tsc gate, got: %v", err)
 	}
 
 	// Broken source (TS2322) → gate fails.
-	badArtifacts := writeFrontendFixture(t, "const n: number = 'x'\nvoid n\n", true)
-	if err := RunTscCheck(badArtifacts); err == nil {
+	badFrontend := writeFrontendFixture(t, "const n: number = 'x'\nvoid n\n", true)
+	if err := RunTscCheck(badFrontend); err == nil {
 		t.Fatal("type-broken frontend should fail tsc gate, got nil")
 	}
 }

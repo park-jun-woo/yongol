@@ -1,0 +1,8 @@
+package service
+
+// @no-pagination
+// @auth "ListReports" "report" {} "Forbidden"
+// @get []Report reports = Report.ListAll({})
+// @get int64 total = Report.CountAll({})
+// @response { items: reports, total: total }
+func ListReports() {}

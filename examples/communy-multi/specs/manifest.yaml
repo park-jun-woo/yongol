@@ -1,0 +1,57 @@
+apiVersion: yongol/v1
+kind: Project
+metadata:
+  name: communy
+  description: "DC Inside-style anonymous community — multi-domain"
+backend:
+  lang: go
+  framework: gin
+  module: github.com/park-jun-woo/communy
+  middleware:
+    - bearerAuth
+  http:
+    trusted_proxies:
+      - "127.0.0.1/32"
+      - "::1/128"
+  rate_limit:
+    Login:
+      rate: 5
+      period: "1m"
+      key: ip
+  auth:
+    type: jwt
+    mode: cookie
+    secret_env: JWT_SECRET
+    user_table: users
+    claims:
+      ID: id:int64
+      Email: email:string
+      Role: role:string
+    roles: [admin]
+  cors:
+    allow_origins:
+      - "http://localhost:5173"
+      - "http://localhost:5174"
+    allow_credentials: true
+domains:
+  public:
+    openapi: api/public.yaml
+    frontend: frontend/public
+    route_prefix: /api
+    auth_mode: cookie
+    cors:
+      allow_origins:
+        - "https://www.communy.com"
+  admin:
+    openapi: api/admin.yaml
+    frontend: frontend/admin
+    route_prefix: /api/admin
+    auth_mode: bearer
+    cors:
+      allow_origins:
+        - "https://admin.communy.com"
+frontend:
+  lang: typescript
+  framework: react
+  bundler: vite
+  name: communy-web

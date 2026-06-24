@@ -12,10 +12,10 @@ import (
 // guard-style sequence (@empty/@exists/@state/@auth) is defined as a response
 // on the matching OpenAPI operation.
 func xos21ErrStatusNotInOpenAPI(fs *yongol.Fullstack) []diagnostic.Diagnostic {
-	if fs.OpenAPIDoc == nil {
+	opMap := buildOperationMapAll(fs)
+	if len(opMap) == 0 {
 		return nil
 	}
-	opMap := buildOperationMap(fs.OpenAPIDoc)
 	allFuncSpecs := append(fs.ProjectFuncSpecs, fs.YongolPkgSpecs...)
 	var diags []diagnostic.Diagnostic
 	for _, fn := range fs.ServiceFuncs {

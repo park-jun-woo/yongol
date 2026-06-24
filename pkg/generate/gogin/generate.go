@@ -25,12 +25,8 @@ import (
 // SQL queries (including pagination) are user-authored — yongol validate checks correctness.
 func Generate(fs *yongol.Fullstack, artifactsDir string) error {
 	p := prepared.New(fs)
-	if err := generateOpenAPIGoGin(fs.SpecsDir, artifactsDir); err != nil {
-		return fmt.Errorf("oapi-codegen strict-server: %w", err)
-	}
-	apiDir := filepath.Join(artifactsDir, "backend", "internal", "api")
-	if err := splitter.SplitDirectory(apiDir, splitter.ToolOAPICodegen); err != nil {
-		return fmt.Errorf("split oapi-codegen output: %w", err)
+	if err := generateAPICode(fs, artifactsDir); err != nil {
+		return err
 	}
 	if err := checkSqlcOutPath(fs.SpecsDir, artifactsDir); err != nil {
 		return fmt.Errorf("sqlc.yaml validation: %w", err)
@@ -65,7 +61,17 @@ func Generate(fs *yongol.Fullstack, artifactsDir string) error {
 	if err := boot.Generate(fs, p, artifactsDir); err != nil {
 		return fmt.Errorf("main.go: %w", err)
 	}
-	if err := ssacgen.Generate(fs, artifactsDir); err != nil {
+	// Service-layer method generation. Single-site emits once with empty
+	// domain context. Domain mode (Phase007) emits once per domain over
+	// fs.DomainView(name); the per-domain api package is aliased to `api`
+	// (apiSuffix) and converters are domain-prefixed (funcPrefix) so the
+	// shared internal/service package compiles against per-domain types
+	// without name collisions.
+	if fs.IsDomained() {
+		if err := generateDomainServices(fs, artifactsDir); err != nil {
+			return err
+		}
+	} else if err := ssacgen.Generate(fs, artifactsDir, "", ""); err != nil {
 		return fmt.Errorf("ssac service: %w", err)
 	}
 	if err := copyFuncSpecs(fs.SpecsDir, artifactsDir); err != nil {

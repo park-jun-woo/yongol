@@ -39,7 +39,7 @@ import (
 // pkg/generate/gogin/types via the column lookup helper. The kind enum
 // is gone; pickConvertRHS receives the ddl.Column directly and uses
 // types.Expand on the binding template.
-func writeConvertFunc(sb *strings.Builder, name string, schema *openapi3.Schema, ddlTables []ddl.Table) {
+func writeConvertFunc(sb *strings.Builder, name string, schema *openapi3.Schema, ddlTables []ddl.Table, funcPrefix string) {
 	required := requiredSet(schema)
 
 	propNames := make([]string, 0, len(schema.Properties))
@@ -50,7 +50,7 @@ func writeConvertFunc(sb *strings.Builder, name string, schema *openapi3.Schema,
 
 	jsonbs := collectJSONBFieldAliases(schema, propNames)
 
-	sb.WriteString("func convert" + name + "(row db." + name + ") (*api." + name + ", error) {\n")
+	sb.WriteString("func convert" + funcPrefix + name + "(row db." + name + ") (*api." + name + ", error) {\n")
 	writeJSONBUnmarshalScaffolding(sb, jsonbs)
 	sb.WriteString("\treturn &api." + name + "{\n")
 	for _, jsonName := range propNames {

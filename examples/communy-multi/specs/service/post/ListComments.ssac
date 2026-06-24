@@ -1,0 +1,9 @@
+package service
+
+// @no-pagination
+// @get Post post = Post.FindByID({ID: request.id})
+// @empty post "Post not found"
+// @get []Comment comments = Comment.ListByPost({PostID: post.ID})
+// @get int64 total = Comment.CountByPost({PostID: post.ID})
+// @response { items: comments, total: total }
+func ListComments() {}

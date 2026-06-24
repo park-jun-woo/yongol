@@ -13,7 +13,7 @@ import (
 func TestBlockCsrf_HybridSetsBearerSkip(t *testing.T) {
 	raw := &pmanifest.Auth{Mode: "hybrid", Csrf: &pmanifest.CsrfConfig{Enabled: true}}
 	a := prepared.Auth{Present: true, Mode: "hybrid", CsrfRequired: true, Raw: raw}
-	block := blockCsrf(a, "example.com/zenflow")
+	block := blockCsrf(nil, a, "example.com/zenflow")
 	body := strings.Join(block.Lines, "\n")
 	if !strings.Contains(body, "HybridBearerSkip: true") {
 		t.Errorf("hybrid mode must set HybridBearerSkip: true, got:\n%s", body)
