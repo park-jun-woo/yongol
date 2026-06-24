@@ -29,8 +29,8 @@ func TestGenerateLoginPage(t *testing.T) {
 	assertContains(t, code, `type="email"`)
 	assertContains(t, code, `type="password"`)
 	// label + id attributes
-	assertContains(t, code, `<label htmlFor="login-Email">Email</label>`)
-	assertContains(t, code, `<label htmlFor="login-Password">Password</label>`)
+	assertContains(t, code, `<label htmlFor="login-Email" className="text-sm font-medium">Email</label>`)
+	assertContains(t, code, `<label htmlFor="login-Password" className="text-sm font-medium">Password</label>`)
 	assertContains(t, code, `id="login-Email"`)
 	assertContains(t, code, `id="login-Password"`)
 	// isPending on submit button

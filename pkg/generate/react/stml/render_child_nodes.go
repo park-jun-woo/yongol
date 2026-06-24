@@ -10,11 +10,11 @@ func renderChildNodes(nodes []stmlparser.ChildNode, dataVar, itemVar string, ind
 	for _, ch := range nodes {
 		switch ch.Kind {
 		case "bind":
-			lines = append(lines, renderBindJSX(*ch.Bind, dataVar, indent, ctx))
+			lines = append(lines, renderBindJSX(*ch.Bind, orDefault(itemVar, dataVar), indent, ctx))
 		case "each":
 			lines = append(lines, renderEachJSX(*ch.Each, dataVar, indent, noBodyOps, ctx))
 		case "state":
-			lines = append(lines, renderStateJSX(*ch.State, dataVar, indent, noBodyOps, ctx))
+			lines = append(lines, renderStateJSX(*ch.State, dataVar, itemVar, indent, noBodyOps, ctx))
 		case "component":
 			lines = append(lines, renderComponentJSX(*ch.Component, dataVar, indent))
 		case "static":

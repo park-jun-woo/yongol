@@ -17,6 +17,6 @@ func TestFieldLabelPascalCase(t *testing.T) {
   </div>
 </main>`))
 	code := GeneratePage(page, "")
-	assertContains(t, code, `<label htmlFor="updateRoom-RoomID">Room ID</label>`)
+	assertContains(t, code, `<label htmlFor="updateRoom-RoomID" className="text-sm font-medium">Room ID</label>`)
 	assertContains(t, code, `id="updateRoom-RoomID"`)
 }

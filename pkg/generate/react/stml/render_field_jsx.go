@@ -54,8 +54,8 @@ func renderFieldJSX(f stmlparser.FieldBind, formName, idPrefix string, indent in
 	label := toLabel(f.Name)
 
 	var lines []string
-	lines = append(lines, fmt.Sprintf("%s<div>", ind))
-	lines = append(lines, fmt.Sprintf(`%s  <label htmlFor="%s">%s</label>`, ind, domID, label))
+	lines = append(lines, fmt.Sprintf(`%s<div className="space-y-1">`, ind))
+	lines = append(lines, fmt.Sprintf(`%s  <label htmlFor="%s" className="text-sm font-medium">%s</label>`, ind, domID, label))
 	lines = append(lines, fmt.Sprintf("%s  <Input%s %s />", ind, attrStr, reg))
 	lines = append(lines, fmt.Sprintf(`%s  {%s.formState.errors.%s && (`, ind, formName, f.Name))
 	lines = append(lines, fmt.Sprintf(`%s    <p className="text-sm text-destructive">{%s.formState.errors.%s?.message}</p>`, ind, formName, f.Name))

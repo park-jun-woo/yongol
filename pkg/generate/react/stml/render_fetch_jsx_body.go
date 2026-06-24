@@ -9,7 +9,7 @@ func renderFetchJSXBody(f stmlparser.FetchBlock, alias string, indent int, noBod
 	var lines []string
 
 	if len(f.Children) > 0 {
-		lines = append(lines, renderChildNodes(f.Children, alias, "item", indent, noBodyOps, ctx)...)
+		lines = append(lines, renderChildNodes(f.Children, alias, "", indent, noBodyOps, ctx)...)
 	} else {
 		lines = append(lines, renderFetchJSXFlatChildren(f, alias, indent, noBodyOps, ctx)...)
 	}

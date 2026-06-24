@@ -14,7 +14,7 @@ func renderActionForm(a stmlparser.ActionBlock, indent int) string {
 	mutName := toLowerFirst(a.OperationID) + "Mutation"
 	formName := toLowerFirst(a.OperationID) + "Form"
 	idPrefix := toLowerFirst(a.OperationID)
-	cls := clsAttr(a.ClassName)
+	cls := clsAttr(orDefault(a.ClassName, "space-y-4"))
 	submitText := orDefault(a.SubmitText, "제출")
 
 	var lines []string

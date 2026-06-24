@@ -13,7 +13,7 @@ func renderPageJSXWithChildren(children []stmlparser.ChildNode, sb *strings.Buil
 	if len(children) == 1 && children[0].Kind == "static" {
 		inner = children[0].Static.Children
 	}
-	for _, line := range renderChildNodes(inner, "", "item", 6, noBodyOps, ctx) {
+	for _, line := range renderChildNodes(inner, "", "", 6, noBodyOps, ctx) {
 		sb.WriteString(line)
 		sb.WriteString("\n")
 	}

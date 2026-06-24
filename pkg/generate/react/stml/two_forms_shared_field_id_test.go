@@ -36,10 +36,10 @@ func TestTwoFormsSharedFieldScopedID(t *testing.T) {
 		t.Errorf(`bare id="memo" must not be emitted: %q`, code)
 	}
 	// each label's htmlFor matches its own form's input id.
-	if !strings.Contains(code, `<label htmlFor="updateBuilding-memo">`) {
+	if !strings.Contains(code, `<label htmlFor="updateBuilding-memo" className="text-sm font-medium">`) {
 		t.Errorf("missing update form label htmlFor")
 	}
-	if !strings.Contains(code, `<label htmlFor="createBuilding-memo">`) {
+	if !strings.Contains(code, `<label htmlFor="createBuilding-memo" className="text-sm font-medium">`) {
 		t.Errorf("missing create form label htmlFor")
 	}
 	// register/zod keys stay the bare contract field name (unchanged).

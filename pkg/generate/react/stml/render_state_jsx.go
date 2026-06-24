@@ -10,7 +10,7 @@ import (
 )
 
 // renderStateJSX generates JSX for a StateBind.
-func renderStateJSX(s stmlparser.StateBind, dataVar string, indent int, noBodyOps map[string]bool, ctx bindCtx) string {
+func renderStateJSX(s stmlparser.StateBind, dataVar, itemVar string, indent int, noBodyOps map[string]bool, ctx bindCtx) string {
 	ind := indentStr(indent)
 	tag := orDefault(s.Tag, "div")
 	cls := clsAttr(s.ClassName)
@@ -22,7 +22,7 @@ func renderStateJSX(s stmlparser.StateBind, dataVar string, indent int, noBodyOp
 		var lines []string
 		lines = append(lines, fmt.Sprintf("%s{%s && (", ind, cond))
 		lines = append(lines, fmt.Sprintf("%s  <%s%s>", ind, tag, cls))
-		lines = append(lines, renderChildNodes(s.Children, dataVar, "item", indent+4, noBodyOps, ctx)...)
+		lines = append(lines, renderChildNodes(s.Children, dataVar, itemVar, indent+4, noBodyOps, ctx)...)
 		lines = append(lines, fmt.Sprintf("%s  </%s>", ind, tag))
 		lines = append(lines, fmt.Sprintf("%s)}", ind))
 		return strings.Join(lines, "\n")

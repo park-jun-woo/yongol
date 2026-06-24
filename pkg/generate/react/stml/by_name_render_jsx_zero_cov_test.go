@@ -42,7 +42,7 @@ func TestByNameRenderJSX_ZeroCov(t *testing.T) {
 		}
 	}
 	if len(f.States) > 0 {
-		if s := renderStateJSX(f.States[0], "data", 1, noBody, bindCtx{}); s == "" {
+		if s := renderStateJSX(f.States[0], "data", "", 1, noBody, bindCtx{}); s == "" {
 			t.Errorf("renderStateJSX empty")
 		}
 	}
