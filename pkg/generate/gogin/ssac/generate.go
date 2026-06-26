@@ -82,7 +82,15 @@ func Generate(fs *yongol.Fullstack, artifactsDir, apiSuffix, funcPrefix string) 
 			funcFiltered[name] = info
 		}
 	}
-	if err := emitFuncResponseConverterFiles(fs.OpenAPIDoc, serviceDir, modulePath, funcFiltered, fs.ProjectFuncSpecs, usedNames, dg); err != nil {
+	// Inner types: complex struct fields within @call result types (e.g.
+	// ChatMessage inside LoadMessagesResponse). These are in needed (from
+	// OpenAPI property $refs) but not in funcRespNames or sqlcModelNames,
+	// so they fell through both converter paths before BUG-149 / Phase006.
+	funcInnerNames := collectFuncInnerTypeNames(funcRespNames, fs.ProjectFuncSpecs, needed, sqlcModelNames)
+	for name, info := range funcInnerNames {
+		funcFiltered[name] = info
+	}
+	if err := emitFuncResponseConverterFiles(fs.OpenAPIDoc, serviceDir, modulePath, funcFiltered, fs.ProjectFuncSpecs, fs.FuncPackageTypes, usedNames, dg); err != nil {
 		return fmt.Errorf("func response converters: %w", err)
 	}
 

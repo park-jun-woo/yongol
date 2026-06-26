@@ -11,16 +11,23 @@ import (
 	"github.com/park-jun-woo/yongol/pkg/parser/funcspec"
 )
 
-// emitFuncResponseConverterFiles writes one convert<Name>.go per Func
-// Response type in funcFiltered. Each file contains a single
+// emitFuncResponseConverterFiles writes one convert<Name>.go and one
+// convert<Name>List.go per Func Response type in funcFiltered. Each
+// convert<Name>.go contains a single
 // convert<Name>(src <pkg>.<Type>) (*api.<Name>, error) function that maps
 // Func Response fields to api DTO fields with pointer wrapping for optional
 // properties.
+//
+// funcPackageTypes supplies struct field info for inner (non-response)
+// types that lack a direct FuncSpec. When specLookup misses, a synthetic
+// FuncSpec is built from funcPackageTypes so that field name resolution
+// (especially initialisms like TurnID) works correctly (BUG-149).
 func emitFuncResponseConverterFiles(
 	doc *openapi3.T,
 	serviceDir, modulePath string,
 	funcFiltered map[string]funcRespInfo,
 	projectFuncSpecs []funcspec.FuncSpec,
+	funcPackageTypes map[string]map[string][]funcspec.Field,
 	used map[string]bool,
 	dg domainGen,
 ) error {
@@ -58,7 +65,16 @@ func emitFuncResponseConverterFiles(
 			continue
 		}
 		spec := specLookup[name]
+		// For inner types (no matching FuncSpec), build a synthetic spec
+		// from funcPackageTypes so buildFuncFieldLookup resolves field
+		// names correctly (especially initialisms like TurnID).
+		if spec == nil {
+			spec = buildSyntheticFuncSpec(name, info.PkgAlias, funcPackageTypes)
+		}
 		if err := emitFuncResponseConverterFile(serviceDir, modulePath, name, ref.Value, info, spec, used, dg); err != nil {
+			return err
+		}
+		if err := emitFuncResponseConvertListFile(serviceDir, modulePath, name, info, used, dg); err != nil {
 			return err
 		}
 	}

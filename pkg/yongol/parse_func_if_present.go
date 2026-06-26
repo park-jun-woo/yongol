@@ -17,4 +17,10 @@ func parseFuncIfPresent(fs *Fullstack, has map[SSOTKind]DetectedSSOT) {
 	if len(diags) == 0 {
 		fs.ProjectFuncSpecs = specs
 	}
+	// Collect all struct types from the func directory tree so the codegen
+	// emitter can resolve inner types referenced from @call result structs
+	// (BUG-149 / Phase006).
+	pkgTypes, ptDiags := funcspec.CollectAllPackageTypes(d.Path)
+	fs.ParseDiagnostics = append(fs.ParseDiagnostics, ptDiags...)
+	fs.FuncPackageTypes = pkgTypes
 }

@@ -83,5 +83,11 @@ type Fullstack struct {
 	// validate rules. Absent key ⇒ package declares no DB ports (or is not a
 	// DB-using ssac package).
 	SsacInterfaces map[string]*ssacmeta.PackageInterface
-	ground         *rule.Ground
+	// FuncPackageTypes holds all struct types collected from the func spec
+	// directory tree, keyed by package name → type name → fields. Populated
+	// by parseFuncIfPresent via funcspec.CollectAllPackageTypes and consumed
+	// by the ssac codegen emitter to resolve inner (non-response) types
+	// referenced from @call result structs (BUG-149 / Phase006).
+	FuncPackageTypes map[string]map[string][]funcspec.Field
+	ground           *rule.Ground
 }
