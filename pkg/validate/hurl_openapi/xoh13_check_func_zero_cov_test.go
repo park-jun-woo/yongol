@@ -18,7 +18,7 @@ func TestXoh13CheckFunc_ZeroCov(t *testing.T) {
 			{Type: "response", Line: 5},
 		},
 	}
-	diags := xoh13CheckFunc(fn, map[string]bool{})
+	diags := xoh13CheckFunc(fn, map[string]bool{}, nil)
 	if len(diags) != 2 {
 		t.Fatalf("expected 2 diags (guard + happy path), got %d: %+v", len(diags), diags)
 	}

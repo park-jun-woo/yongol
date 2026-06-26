@@ -5,13 +5,14 @@ package hurl_openapi
 
 import (
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
+	"github.com/park-jun-woo/yongol/pkg/parser/rego"
 	"github.com/park-jun-woo/yongol/pkg/parser/ssac"
 )
 
-func xoh13CheckFunc(fn ssac.ServiceFunc, coveredSet map[string]bool) []diagnostic.Diagnostic {
+func xoh13CheckFunc(fn ssac.ServiceFunc, coveredSet map[string]bool, policies []rego.Policy) []diagnostic.Diagnostic {
 	var diags []diagnostic.Diagnostic
 	for _, seq := range fn.Sequences {
-		diags = append(diags, xoh13CheckGuard(fn, seq, coveredSet)...)
+		diags = append(diags, xoh13CheckGuard(fn, seq, coveredSet, policies)...)
 	}
 	diags = append(diags, xoh13CheckHappyPath(fn, coveredSet)...)
 	return diags

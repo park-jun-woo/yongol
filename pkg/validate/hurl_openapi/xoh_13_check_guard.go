@@ -8,10 +8,11 @@ import (
 	"strconv"
 
 	"github.com/park-jun-woo/yongol/pkg/diagnostic"
+	"github.com/park-jun-woo/yongol/pkg/parser/rego"
 	"github.com/park-jun-woo/yongol/pkg/parser/ssac"
 )
 
-func xoh13CheckGuard(fn ssac.ServiceFunc, seq ssac.Sequence, coveredSet map[string]bool) []diagnostic.Diagnostic {
+func xoh13CheckGuard(fn ssac.ServiceFunc, seq ssac.Sequence, coveredSet map[string]bool, policies []rego.Policy) []diagnostic.Diagnostic {
 	if !xoh13IsGuardType(seq.Type) {
 		return nil
 	}
@@ -20,6 +21,9 @@ func xoh13CheckGuard(fn ssac.ServiceFunc, seq ssac.Sequence, coveredSet map[stri
 		status = xoh13GuardDefaultStatus(seq.Type)
 	}
 	if status == 0 {
+		return nil
+	}
+	if seq.Type == "auth" && isAllowAll(seq.Action, seq.Resource, policies) {
 		return nil
 	}
 	statusStr := strconv.Itoa(status)

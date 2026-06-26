@@ -19,7 +19,7 @@ func xoh13GuardCoverage(fs *yongol.Fullstack) []diagnostic.Diagnostic {
 	var diags []diagnostic.Diagnostic
 	for _, fn := range fs.ServiceFuncs {
 		coveredSet := covered[fn.Name]
-		diags = append(diags, xoh13CheckFunc(fn, coveredSet)...)
+		diags = append(diags, xoh13CheckFunc(fn, coveredSet, fs.ParsedPolicies)...)
 	}
 	return diags
 }
