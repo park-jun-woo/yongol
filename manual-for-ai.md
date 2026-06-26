@@ -8,7 +8,9 @@ as the ground truth; examples below omit error output.
 ## What yongol does
 
 Orchestrates 10 SSOTs into one contract, cross-validates them, and generates a
-Go+Gin backend plus a React frontend. The keystone is **`operationId`**: every
+Go+Gin backend plus a React frontend. 프론트엔드는 Alpha 단계로 미완성이므로
+백엔드 중심으로 활용하고, 프론트엔드 산출물은 스캐폴드 참고용으로 사용을
+권장합니다. The keystone is **`operationId`**: every
 OpenAPI operation, SSaC `func`, STML `data-fetch`/`data-action` attribute,
 Mermaid transition label, and Hurl scenario references the same PascalCase
 identifier.

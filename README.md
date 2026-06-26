@@ -4,7 +4,7 @@
   <img src="yongol.webp" alt="yongol — the keel of your AI-coded SaaS" width="480">
 </p>
 
-[![Version](https://img.shields.io/badge/version-v0.7.52-blue.svg)](https://github.com/park-jun-woo/yongol/releases)
+[![Version](https://img.shields.io/badge/version-v0.7.53-blue.svg)](https://github.com/park-jun-woo/yongol/releases)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![skills.sh](https://skills.sh/b/park-jun-woo/yongol)](https://skills.sh/park-jun-woo/yongol)
 
@@ -48,6 +48,7 @@ Adding features never slowed down. Existing tests never broke.
 A full-stack SSOT orchestrator. Validates the consistency of 10 declarative sources and generates code from them.
 
 > **Status:** Go+Gin backend generation is **Beta** — functional end-to-end. React frontend generation is **Alpha** (work in progress).
+> 프론트엔드는 미완성이므로 백엔드만 실사용하고, 프론트엔드는 스캐폴드 수준의 참고용으로 활용하시기를 권장합니다.
 
 ## Quick Start
 

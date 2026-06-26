@@ -13,6 +13,9 @@ func extractRequestFields(body *openapi3.RequestBody) rule.StringSet {
 		return nil
 	}
 	ct := body.Content.Get("application/json")
+	if ct == nil {
+		ct = body.Content.Get("multipart/form-data")
+	}
 	if ct == nil || ct.Schema == nil || ct.Schema.Value == nil {
 		return nil
 	}

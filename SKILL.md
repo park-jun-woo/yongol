@@ -4,12 +4,12 @@ description: Full-stack SSOT orchestrator that validates the consistency of 10 d
 license: MIT
 metadata:
   author: park-jun-woo
-  version: "0.7.52"
+  version: "0.7.53"
 ---
 
 # yongol — Full-Stack SSOT Orchestrator
 
-yongol cross-validates 10 declarative SSOT (Single Source of Truth) files and generates a Go+Gin backend plus a React frontend from them. The AI edits only the SSOT specs; code is a disposable projection re-rendered on every `yongol generate`.
+yongol cross-validates 10 declarative SSOT (Single Source of Truth) files and generates a Go+Gin backend plus a React frontend from them. The AI edits only the SSOT specs; code is a disposable projection re-rendered on every `yongol generate`. 프론트엔드 생성은 아직 Alpha 단계이므로 백엔드 위주로 활용하고, 프론트엔드는 스캐폴드 참고용으로만 사용하시기 바랍니다.
 
 ## Critical Rule
 
