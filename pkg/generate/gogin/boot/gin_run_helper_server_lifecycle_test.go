@@ -10,7 +10,9 @@ import (
 func TestGinRunHelperServerLifecycle(t *testing.T) {
 	src := ginRunHelperServerLifecycle()
 	for _, must := range []string{
-		"func runServerWithGracefulShutdown(r *gin.Engine, cancelBootstrap context.CancelFunc, headerLimit int) {",
+		"func runServerWithGracefulShutdown(r *gin.Engine, cancelBootstrap context.CancelFunc, port, headerLimit int) {",
+		`addr := fmt.Sprintf(":%d", port)`,
+		"Addr: addr",
 		"MaxHeaderBytes: headerLimit",
 		"httpSrv.ListenAndServe()",
 		"signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)",

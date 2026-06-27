@@ -20,6 +20,7 @@ import (
 // manifest-derived default via envInt64 (matching the BODY_LIMIT pattern).
 func blockGinRun(fs *yongol.Fullstack) MainBlock {
 	headerLimit := resolveHeaderLimit(fs)
+	port := resolvePort(fs)
 	return MainBlock{
 		Name: "gin-run",
 		Imports: []string{
@@ -30,8 +31,9 @@ func blockGinRun(fs *yongol.Fullstack) MainBlock {
 			`"time"`,
 		},
 		Lines: []string{
+			fmt.Sprintf(`port := envInt("BACKEND_HTTP_PORT", %d)`, port),
 			fmt.Sprintf(`headerLimit := envInt64("BACKEND_HTTP_HEADER_LIMIT", %d)`, headerLimit),
-			`runServerWithGracefulShutdown(r, cancelBootstrap, int(headerLimit))`,
+			`runServerWithGracefulShutdown(r, cancelBootstrap, port, int(headerLimit))`,
 		},
 		Funcs: []string{
 			ginRunHelperServerLifecycle(),

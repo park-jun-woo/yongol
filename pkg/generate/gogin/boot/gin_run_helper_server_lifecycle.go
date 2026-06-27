@@ -12,10 +12,11 @@ package boot
 // oversized request-line / header payloads return 431 at the stdlib layer
 // before reaching any gin handler.
 func ginRunHelperServerLifecycle() string {
-	return `func runServerWithGracefulShutdown(r *gin.Engine, cancelBootstrap context.CancelFunc, headerLimit int) {
-	httpSrv := &http.Server{Addr: ":8080", Handler: r, MaxHeaderBytes: headerLimit}
+	return `func runServerWithGracefulShutdown(r *gin.Engine, cancelBootstrap context.CancelFunc, port, headerLimit int) {
+	addr := fmt.Sprintf(":%d", port)
+	httpSrv := &http.Server{Addr: addr, Handler: r, MaxHeaderBytes: headerLimit}
 	go func() {
-		slog.Info("server starting", "addr", ":8080")
+		slog.Info("server starting", "addr", addr)
 		if err := httpSrv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			slog.Error("server", "err", err)
 			os.Exit(1)

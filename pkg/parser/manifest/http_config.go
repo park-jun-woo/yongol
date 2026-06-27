@@ -18,6 +18,7 @@ package manifest
 // Unset/empty means "trust no proxy": the generated router calls
 // gin's SetTrustedProxies(nil), so c.ClientIP() uses RemoteAddr only.
 type HTTPConfig struct {
+	Port           int                     `yaml:"port"`
 	BodyLimit      string                  `yaml:"body_limit"`
 	MultipartLimit string                  `yaml:"multipart_limit"`
 	HeaderLimit    string                  `yaml:"header_limit"`
